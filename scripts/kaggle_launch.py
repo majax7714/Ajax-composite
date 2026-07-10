@@ -52,7 +52,8 @@ WORK = "/tmp/rgr"  # NOT /kaggle/working: the bundle holds keys, output must not
 shutil.copytree(SRC, WORK)
 os.chdir(WORK)
 
-subprocess.run([sys.executable, "-m", "pip", "install", "-q", "daytona"], check=True)
+subprocess.run([sys.executable, "-m", "pip", "install", "-q", "daytona",
+                "-U", "bitsandbytes>=0.46.1"], check=True)
 
 env = dict(os.environ, PYTHONPATH=os.path.join(WORK, "src"))
 code = subprocess.run([sys.executable] + {script_args!r}, env=env).returncode
