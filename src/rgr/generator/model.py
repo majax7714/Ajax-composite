@@ -108,9 +108,12 @@ class Generator:
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_prompt},
         ]
-        input_ids = self._tokenizer.apply_chat_template(
+        encoded = self._tokenizer.apply_chat_template(
             messages, add_generation_prompt=True, return_tensors="pt"
-        ).to(self.device)
+        )
+        # transformers version drift: newer releases return a BatchEncoding,
+        # older ones a bare tensor.
+        input_ids = getattr(encoded, "input_ids", encoded).to(self.device)
 
         embeds = self._model.get_input_embeddings()(input_ids)
         prompt_tokens = input_ids.shape[1]
