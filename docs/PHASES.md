@@ -8,11 +8,14 @@ proceed past a failed gate by tuning until it passes.**
 
 ## Phase 0 — Harness (no learning)
 
-- [ ] Model pinned: Qwen2.5-Coder-1.5B-Instruct, 4-bit inference confirmed on
-      target GPU (Kaggle T4/P100). *(code wired, GPU run pending)*
-- [ ] Format-discipline layer: clean, executable code extracted on 20 MBPP
-      problems inspected *by hand* (brief §11.1). Record the extraction rate.
-      *(`phase0_lock_baselines.py --handcheck` ready; needs the GPU box)*
+- [x] Model pinned: Qwen2.5-Coder-1.5B-Instruct, 4-bit inference confirmed on
+      Kaggle **T4** (P100 is dead: Kaggle's torch build dropped sm_60 —
+      kernels pin machine_shape=NvidiaTeslaT4). *(2026-07-10)*
+- [x] Format-discipline layer: 20 MBPP completions inspected by hand
+      (runs/kaggle/handcheck/stdout.txt). **Extraction 20/20**, all single
+      fenced blocks, no narration; 12/20 passed execution (single-shot,
+      failures are genuine model errors); partial-credit frac_tests values
+      hand-verified. *(2026-07-10)*
 - [x] Daytona execution wrapper live: `(problem, candidate) → {passed,
       frac_tests, error_type}`, with timeout and clean sandbox teardown.
       *(2026-07-10: driver + SDK backend; canonical solutions 8/8 pass;
