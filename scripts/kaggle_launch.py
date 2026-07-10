@@ -140,7 +140,7 @@ def launch(kaggle_api, mode: str) -> None:
         RUNNER_TEMPLATE.format(mode=mode, user=user, dataset_slug=DATASET_SLUG,
                                script_args=script_args)
     )
-    (stage / "kernel-metadata.json").write_text(json.dumps({
+    metadata = {
         "id": f"{user}/{slug}",
         "title": slug,
         "code_file": "runner.py",
@@ -152,7 +152,12 @@ def launch(kaggle_api, mode: str) -> None:
         "dataset_sources": [f"{user}/{DATASET_SLUG}"],
         "competition_sources": [],
         "kernel_sources": [],
-    }))
+    }
+    if gpu:
+        # Kaggle's current torch build dropped sm_60: a P100 assignment fails
+        # at model load. Pin the T4 (sm_75, supported).
+        metadata["machine_shape"] = "NvidiaTeslaT4"
+    (stage / "kernel-metadata.json").write_text(json.dumps(metadata))
     print(f"pushing kernel {user}/{slug} (gpu={gpu}) ...")
     kaggle_api.kernels_push_cli(str(stage), None, None)
     print(f"launched. Poll with: python scripts/kaggle_launch.py status {mode}")
