@@ -1,0 +1,14 @@
+# Phase 1 — verifier training and the H1 head-to-head (V AUROC vs likelihood AUROC).
+
+[labels]
+candidates_per_problem = 16
+temperatures = [0.2, 0.8, 1.0]
+
+[verifier_train]
+lr = 1e-4
+batch_size = 64
+epochs = 10
+val_metric = "auroc"
+
+[run]
+tag = "phase1"

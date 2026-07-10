@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rgr"
+version = "0.1.0"
+description = "Register-Gated Refinement: does a learned latent register carried across refinement steps improve correctness and calibration at matched compute?"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+# Core is deliberately dependency-free: loop control flow, compute accounting,
+# and metrics must run and test on bare Python (docs/DECISIONS.md D8).
+dependencies = []
+
+[project.optional-dependencies]
+# GPU / training environment (Kaggle or rented GPU)
+model = [
+    "torch>=2.2",
+    "transformers>=4.44",
+    "accelerate>=0.30",
+    "bitsandbytes>=0.43",
+    "datasets>=2.19",
+]
+# Local development and analysis
+dev = [
+    "pytest>=8",
+    "ruff>=0.5",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

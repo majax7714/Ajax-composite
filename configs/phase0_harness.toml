@@ -1,0 +1,8 @@
+# Phase 0 — harness: lock B0/B1 baselines, no learned modules.
+# B1 reranking uses generator likelihood here (no V yet); re-locked in Phase 1.
+
+[loop]
+freeze_register = true
+
+[run]
+tag = "phase0"

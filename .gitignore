@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# Tooling
+.pytest_cache/
+.ruff_cache/
+.coverage
+
+# Experiment outputs — results are artifacts, not source.
+# Frozen baseline numbers belong in docs/PHASES.md gate log, not in git blobs.
+runs/
+data/cache/
+*.ckpt
+*.safetensors
+*.jsonl
+
+# Local
+.env
+.DS_Store

@@ -1,0 +1,11 @@
+# Phase 2 — register loop: imitation-train U + injector + r_0 encoder (D2),
+# then FULL vs B1 vs B1' vs B2 at matched compute. The H2 run.
+
+[register_train]
+regime = "imitation"       # D2; "rl" reserved post-H3
+lr = 1e-4
+batch_size = 32
+epochs = 5
+
+[run]
+tag = "phase2"

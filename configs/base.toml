@@ -1,0 +1,47 @@
+# Base configuration. Phase configs overlay this (rgr.config.load_config merges
+# phase file over base). Decisions D1-D8 are encoded here; changing a value that
+# implements a decision requires a docs/DECISIONS.md entry first.
+
+[generator]
+model_name = "Qwen/Qwen2.5-Coder-1.5B-Instruct"   # D6
+load_4bit = true
+frozen = true
+max_new_tokens = 512
+temperature = 0.8
+top_p = 0.95
+
+[register]
+d_r = 128            # D1
+k_soft_tokens = 8    # D1
+init = "problem_encoded"   # D4 ("learned_constant" reserved as debug fallback)
+rms_normalize = true
+max_update_norm = 1.0
+
+[verifier]
+sees_register = false      # D3 — v1 is register-blind; v2 flips this + retrains
+hidden_dim = 512
+aux_frac_tests = true
+aux_error_type = true
+
+[loop]
+t_max = 8                  # pre-registered N (COMPUTE_ACCOUNTING.md)
+early_stop = false         # Phase 3 flips this
+tau = 0.9                  # D5 fixed threshold; swept on MBPP-val before freeze
+freeze_register = false    # true => condition B1 (the ablation)
+
+[baselines]
+n = 8                      # must equal loop.t_max for matched compute
+
+[execution]
+backend = "daytona"        # only sanctioned backend; "local_unsafe" needs RGR_ALLOW_LOCAL_EXEC=1
+timeout_seconds = 10
+
+[data]
+train = "mbpp"
+heldout = "humaneval"
+val_fraction = 0.1
+seed = 17
+
+[run]
+seed = 17
+output_dir = "runs"

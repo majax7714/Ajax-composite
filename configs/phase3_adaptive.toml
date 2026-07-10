@@ -1,0 +1,8 @@
+# Phase 3 — adaptive compute: fixed-tau early stopping (D5), depth-vs-difficulty,
+# adaptive vs fixed-K at matched mean generations.
+
+[loop]
+early_stop = true
+
+[run]
+tag = "phase3"
