@@ -78,15 +78,32 @@ never silently depend on an untested GPU path.
 
 ## Status
 
-Phase 0 (harness) — scaffolding complete, model edges unwired.
-See [docs/PHASES.md](docs/PHASES.md) for the gate checklist.
+Phase 0 (harness) — wired. Daytona sandbox live (canonical solutions verified
+end-to-end), datasets loaded and checksum-pinned, generator + baseline-lock
+script implemented. Remaining: the GPU runs themselves (`--handcheck`, then
+`--lock` twice). See [docs/PHASES.md](docs/PHASES.md) for the gate checklist.
 
 ## Quickstart
 
 ```bash
 pip install -e ".[dev]"      # local: pure-logic work + tests
 pip install -e ".[model]"    # GPU env (Kaggle): torch/transformers extras
+pip install daytona          # execution sandbox SDK (any box that runs labels)
 make test                    # runs the stdlib test suite
+```
+
+Credentials: the Daytona key is read from `DAYTONA_API_KEY` or the gitignored
+`rgb-daytona.txt` at the repo root. Never commit it.
+
+### Phase 0 on the GPU box (Kaggle T4/P100)
+
+```bash
+git clone <this repo> && cd rgr
+pip install -e ".[model]" daytona
+export DAYTONA_API_KEY=...                     # or place rgb-daytona.txt at repo root
+python scripts/phase0_lock_baselines.py --handcheck          # §11.1: inspect BY HAND
+python scripts/phase0_lock_baselines.py --lock --seed-tag lock_a
+python scripts/phase0_lock_baselines.py --lock --seed-tag lock_b   # reproducibility gate
 ```
 
 Training runs on Kaggle/rented GPU; the 8600G box is for orchestration, analysis,

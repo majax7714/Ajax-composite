@@ -9,15 +9,22 @@ proceed past a failed gate by tuning until it passes.**
 ## Phase 0 — Harness (no learning)
 
 - [ ] Model pinned: Qwen2.5-Coder-1.5B-Instruct, 4-bit inference confirmed on
-      target GPU (Kaggle T4/P100).
+      target GPU (Kaggle T4/P100). *(code wired, GPU run pending)*
 - [ ] Format-discipline layer: clean, executable code extracted on 20 MBPP
       problems inspected *by hand* (brief §11.1). Record the extraction rate.
-- [ ] Daytona execution wrapper live: `(problem, candidate) → {passed,
+      *(`phase0_lock_baselines.py --handcheck` ready; needs the GPU box)*
+- [x] Daytona execution wrapper live: `(problem, candidate) → {passed,
       frac_tests, error_type}`, with timeout and clean sandbox teardown.
-- [ ] Dataset splits wired: MBPP train/val, HumanEval strictly held out,
-      split-discipline guard tested.
-- [ ] B0 (single-shot) locked on HumanEval.
+      *(2026-07-10: driver + SDK backend; canonical solutions 8/8 pass;
+      wrong/partial/hanging candidates map to wrong_answer / frac_tests /
+      timeout correctly; sandbox survives hung candidates)*
+- [x] Dataset splits wired: MBPP train/val, HumanEval strictly held out,
+      split-discipline guard tested. *(2026-07-10: sanitized MBPP 427 +
+      HumanEval 164, checksum-pinned; guard raises on contamination)*
+- [ ] B0 (single-shot) locked on HumanEval. *(script ready — `--lock`)*
 - [ ] B1 (best-of-n, likelihood-reranked for now — no V yet) locked at N = 8.
+      *(same `--lock` run; full loop→sandbox→results→summary plumbing
+      integration-tested against live Daytona with a scripted generator)*
 - [ ] Numbers frozen on the dashboard; per-problem B0 pass rates saved (they are
       the H3 difficulty proxy).
 

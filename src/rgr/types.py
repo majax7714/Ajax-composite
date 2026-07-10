@@ -29,6 +29,13 @@ class Problem:
     tests: str
     entry_point: str | None = None
     source: str = ""  # "mbpp", "mbpp+", "humaneval", "humaneval+"
+    # Individual test statements when the dataset provides them (MBPP's assert
+    # list). Enables per-test frac_tests, V's auxiliary target. When empty,
+    # ``tests`` runs as one block and frac_tests collapses to 0/1 (HumanEval's
+    # check() driver).
+    test_list: tuple[str, ...] = ()
+    # Run once after the candidate, before any test (MBPP's test_imports).
+    test_setup: str = ""
 
 
 @dataclass(frozen=True)

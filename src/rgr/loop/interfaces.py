@@ -49,6 +49,25 @@ class RegisterInitLike(Protocol):
         ...
 
 
+class NoRegister:
+    """Init+update adapter for register-free conditions (Phase 0: no register
+    modules exist yet). init() -> None means the generator injects nothing;
+    update is the identity on None. Satisfies RegisterInitLike and
+    RegisterUpdateLike."""
+
+    def init(self, problem: Problem) -> None:
+        return None
+
+    def update(self, register, candidate: Candidate, verifier_score: float) -> None:
+        return None
+
+    def norm(self, register) -> float:
+        return 0.0
+
+    def delta_norm(self, before, after) -> float:
+        return 0.0
+
+
 class RegisterUpdateLike(Protocol):
     def update(self, register: Register, candidate: Candidate, verifier_score: float) -> Register:
         """r_{t+1} = U(r_t, phi(candidate), v). The ONLY cross-step channel."""

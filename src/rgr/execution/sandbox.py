@@ -26,23 +26,84 @@ def no_code_result() -> ExecutionResult:
     return ExecutionResult(passed=False, frac_tests=0.0, error_type="no_code")
 
 
-class DaytonaBackend:
-    """Wrapper around the existing Daytona rollout harness (brief §4).
+def load_daytona_key(key_file: str | Path = "rgb-daytona.txt") -> str:
+    """DAYTONA_API_KEY env var, else the gitignored key file at the repo root."""
+    key = os.environ.get("DAYTONA_API_KEY", "").strip()
+    if key:
+        return key
+    path = Path(key_file)
+    if not path.is_absolute():
+        path = Path(__file__).parents[3] / path
+    if path.exists():
+        key = path.read_text().strip()
+        if key:
+            return key
+    raise RuntimeError(
+        "no Daytona API key: set DAYTONA_API_KEY or provide the key file "
+        f"(looked at {path})"
+    )
 
-    To wire in Phase 0: point this at the standing harness — create/reuse a
-    sandbox, write candidate code + problem tests, run with the configured
-    timeout, map the outcome to ExecutionResult {passed, frac_tests,
-    error_type}. Must count individual test outcomes (frac_tests is an
-    auxiliary training target for V), not just overall pass/fail.
+
+class DaytonaBackend:
+    """Daytona cloud sandbox via the `daytona` SDK (lazy import — GPU boxes
+    and label runs need it, the local test suite does not).
+
+    One sandbox is created lazily and reused across executions — creation
+    costs seconds, a code_run costs a fraction of that, and label generation
+    is thousands of executions (brief §7). The driver's internal
+    signal.alarm handles hung candidates, so the sandbox survives timeouts;
+    if the sandbox itself dies (SDK error), it is torn down and the next
+    execute() recreates it. Call close() when done.
     """
 
-    def __init__(self, timeout_seconds: int = 10) -> None:
+    def __init__(self, timeout_seconds: int = 10, api_key: str | None = None) -> None:
         self.timeout_seconds = timeout_seconds
+        self._api_key = api_key or load_daytona_key()
+        self._client = None
+        self._sandbox = None
+
+    def _get_sandbox(self):
+        from daytona import Daytona, DaytonaConfig
+
+        if self._client is None:
+            self._client = Daytona(DaytonaConfig(api_key=self._api_key))
+        if self._sandbox is None:
+            self._sandbox = self._client.create()
+        return self._sandbox
 
     def execute(self, problem: Problem, candidate: Candidate) -> ExecutionResult:
+        from rgr.execution.driver import build_driver, parse_driver_output
+
         if candidate.code is None:
             return no_code_result()
-        raise NotImplementedError("Phase 0: wire the Daytona rollout harness")
+        driver = build_driver(problem, candidate, self.timeout_seconds)
+        # Hard backstop above the driver's own alarms: candidate exec + each
+        # test can each burn up to timeout_seconds inside the driver.
+        sdk_timeout = self.timeout_seconds * (2 + len(problem.test_list)) + 30
+        try:
+            sandbox = self._get_sandbox()
+            response = sandbox.process.code_run(driver, timeout=sdk_timeout)
+        except Exception:
+            self._teardown()  # sandbox state unknown — recreate on next call
+            return ExecutionResult(passed=False, frac_tests=0.0, error_type="sandbox")
+        return parse_driver_output(response.result or "")
+
+    def _teardown(self) -> None:
+        sandbox, self._sandbox = self._sandbox, None
+        if sandbox is not None:
+            try:
+                sandbox.delete()
+            except Exception:
+                pass  # already gone; Daytona auto-stops idle sandboxes
+
+    def close(self) -> None:
+        self._teardown()
+
+    def __enter__(self) -> "DaytonaBackend":
+        return self
+
+    def __exit__(self, *exc_info) -> None:
+        self.close()
 
 
 class LocalUnsafeBackend:
@@ -93,9 +154,9 @@ class LocalUnsafeBackend:
         return ExecutionResult(passed=False, frac_tests=0.0, error_type=error)
 
 
-def make_backend(name: str, timeout_seconds: int) -> ExecutionBackend:
+def make_backend(name: str, timeout_seconds: int, api_key: str | None = None) -> ExecutionBackend:
     if name == "daytona":
-        return DaytonaBackend(timeout_seconds)
+        return DaytonaBackend(timeout_seconds, api_key=api_key)
     if name == "local_unsafe":
         return LocalUnsafeBackend(timeout_seconds)
     raise ValueError(f"unknown execution backend: {name!r}")

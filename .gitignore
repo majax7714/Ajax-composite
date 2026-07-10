@@ -24,3 +24,7 @@ data/cache/
 # Local
 .env
 .DS_Store
+
+# Credentials — never commit
+rgb-daytona.txt
+*.key
