@@ -28,3 +28,4 @@ data/cache/
 # Credentials — never commit
 rgb-daytona.txt
 *.key
+rgr-kaggle
