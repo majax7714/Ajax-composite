@@ -78,10 +78,12 @@ never silently depend on an untested GPU path.
 
 ## Status
 
-Phase 0 (harness) — wired. Daytona sandbox live (canonical solutions verified
-end-to-end), datasets loaded and checksum-pinned, generator + baseline-lock
-script implemented. Remaining: the GPU runs themselves (`--handcheck`, then
-`--lock` twice). See [docs/PHASES.md](docs/PHASES.md) for the gate checklist.
+**Phase 0 — CLOSED (gate PASS, 2026-07-11).** Baselines frozen on HumanEval
+(T4, seed 17, N=8): B0 pass@1 **0.5922**, B1 likelihood-reranked **0.6280**,
+pass@8 **0.8415**, format discipline 99.1%. Reproduced bit-for-bit across two
+runs. The ~21-point gap between likelihood reranking and the pass@8 ceiling is
+the selection headroom H1's verifier must claim. Next: Phase 1 (verifier).
+See [docs/PHASES.md](docs/PHASES.md) for the gate log.
 
 ## Quickstart
 

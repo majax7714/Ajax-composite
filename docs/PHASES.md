@@ -24,15 +24,22 @@ proceed past a failed gate by tuning until it passes.**
 - [x] Dataset splits wired: MBPP train/val, HumanEval strictly held out,
       split-discipline guard tested. *(2026-07-10: sanitized MBPP 427 +
       HumanEval 164, checksum-pinned; guard raises on contamination)*
-- [ ] B0 (single-shot) locked on HumanEval. *(script ready — `--lock`)*
-- [ ] B1 (best-of-n, likelihood-reranked for now — no V yet) locked at N = 8.
-      *(same `--lock` run; full loop→sandbox→results→summary plumbing
-      integration-tested against live Daytona with a scripted generator)*
-- [ ] Numbers frozen on the dashboard; per-problem B0 pass rates saved (they are
-      the H3 difficulty proxy).
+- [x] B0 (single-shot) locked on HumanEval: **pass@1 = 0.5922** (unbiased over
+      8 samples/problem, temp 0.8). *(2026-07-11, runs lock_a/lock_b)*
+- [x] B1 (best-of-8, likelihood-reranked — no V yet) locked:
+      **pass@1 = 0.6280**; pass@2/4/8 = 0.6997 / 0.7804 / 0.8415.
+      Format discipline 1300/1312 (99.1%). Ledger: 1312 generations exactly,
+      3 sandbox faults (0.2%). Note the headline gap for H1: oracle-rerank
+      ceiling (pass@8) is 0.8415 vs likelihood's 0.6280 — ~21 points of
+      selection headroom for the verifier to claim.
+- [x] Numbers frozen; per-problem B0 pass rates (H3 difficulty proxy) committed
+      at artifacts/phase0_difficulty_proxy.csv; full records in Kaggle kernel
+      output (rgr-lock-a / rgr-lock-b) and runs/kaggle/.
 
 **Gate:** reproducible baseline pass@1 (two runs, same seed policy, matching
-numbers). — *verdict: pending*
+numbers). — **verdict: PASS (2026-07-11).** lock_a vs lock_b: byte-identical
+candidates on 164/164 problems, identical (n, c) everywhere, identical token
+totals (204,553). Effectively a bit-for-bit replay.
 
 ## Phase 1 — Verifier (H1)
 
@@ -84,4 +91,4 @@ sweeps.
 
 | Date | Phase | Verdict | Numbers | Notes |
 |---|---|---|---|---|
-| — | — | — | — | — |
+| 2026-07-11 | 0 — Harness | **PASS** | B0 pass@1 0.5922 · B1(lik) 0.6280 · pass@8 0.8415 · format 99.1% | lock_a ≡ lock_b byte-identical (164/164); T4, seed 17, N=8, temp 0.8; difficulty proxy in artifacts/ |
