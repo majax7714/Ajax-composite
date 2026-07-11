@@ -1,11 +1,14 @@
-# Phase 2 — register loop: imitation-train U + injector + r_0 encoder (D2),
-# then FULL vs B1 vs B1' vs B2 at matched compute. The H2 run.
+# Phase 2 — register loop: likelihood-steering imitation (D10), then
+# FULL vs B1 vs B1' vs B2 at matched compute. The H2 run.
+# Plan: docs/PHASE2-PLAN.md
 
 [register_train]
-regime = "imitation"       # D2; "rl" reserved post-H3
+regime = "imitation"       # D2/D10; "rl" reserved post-H3
 lr = 1e-4
-batch_size = 32
-epochs = 5
+batch_size = 4
+epochs = 3
+examples_per_problem = 12
+k_max = 7
 
 [run]
 tag = "phase2"

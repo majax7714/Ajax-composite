@@ -39,6 +39,10 @@ MODES = {
     "phase1_data": (True, ["scripts/phase1_verifier.py", "--labels", "--reencode"]),
     "phase1_v2": (True, ["scripts/phase1_v2_encoder.py", "--train"]),
     "phase1_v2b": (True, ["scripts/phase1_v2b_qlora.py", "--train"]),
+    "phase2_score": (True, ["scripts/phase2_register_loop.py", "--score"]),
+    "phase2_train": (True, ["scripts/phase2_register_loop.py", "--train"]),
+    "phase2_full": (True, ["scripts/phase2_register_loop.py", "--full"]),
+    "phase2_b2": (True, ["scripts/phase2_register_loop.py", "--b2"]),
 }
 
 # Frozen result files each mode needs beyond the committed tree; bundle()
@@ -46,6 +50,15 @@ MODES = {
 BUNDLE_EXTRAS = {
     "runs/kaggle/lock_a/runs/phase0/lock_a.jsonl": "artifacts/lock_a.jsonl",
     "runs/kaggle/phase1_data/runs/phase1/labels.jsonl": "artifacts/phase1_labels.jsonl",
+    # dirs are copied recursively
+    "runs/kaggle/phase1_data/runs/phase1/phi": "artifacts/phase1_phi",
+    "runs/kaggle/phase1_data/runs/phase1/phi_problems": "artifacts/phase1_phi_problems",
+    "runs/kaggle/phase1_v2b/runs/phase1_v2b/lora": "artifacts/v2b_lora",
+    "runs/kaggle/phase1_v2b/runs/phase1_v2b/heldout_scores.json": "artifacts/heldout_scores.json",
+    # produced by phase2_score, then re-bundled for phase2_train:
+    "runs/kaggle/phase2_score/runs/phase2/v_scores.json": "artifacts/v_scores.json",
+    # produced by phase2_train, then re-bundled for phase2_full:
+    "runs/kaggle/phase2_train/runs/phase2/register_modules.pt": "artifacts/register_modules.pt",
 }
 
 RUNNER_TEMPLATE = '''\
@@ -115,7 +128,9 @@ def bundle(kaggle_api) -> None:
 
     for src, dst in BUNDLE_EXTRAS.items():
         src_path = REPO / src
-        if src_path.exists():
+        if src_path.is_dir():
+            shutil.copytree(src_path, stage / dst)
+        elif src_path.exists():
             (stage / dst).parent.mkdir(parents=True, exist_ok=True)
             shutil.copy(src_path, stage / dst)
         else:

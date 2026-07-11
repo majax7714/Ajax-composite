@@ -114,3 +114,23 @@ val-selected. Consequences:
   frozen pooled representation is an input signal, not the verdict.
 - The aux heads (frac_tests, error_type) were not needed to pass H1; adding
   them to v2b is open Phase-2 work if the loop wants a denser reward.
+
+## D10 — Imitation regime, concretely: likelihood steering on synthesized prefixes
+
+D2 said "imitation first" but left the objective abstract; with V
+register-blind (D3) there is no differentiable V→register path, and imitating
+"register trajectories that led to passes" is vacuous when the initial modules
+are random. The implemented objective (rgr/training/imitation.py,
+scripts/phase2_register_loop.py --train):
+
+sample k failed candidates from the Phase-1 label set as a prefix, unroll
+r_k = U(...U(r_0, phi(c_1), v_1)..., phi(c_k), v_k), and minimize
+teacher-forced -log P_G(passing candidate | prompt, soft(r_k)) with G frozen.
+Prefix v scores come from V-v2b (phase2_score kernel) so training sees the
+inference-time score distribution. Round 1 reuses Phase-1 data — no new
+rollouts. k=0 examples train pure r_0 steering; k>0 trains failure
+integration, which is exactly the cross-step-learning claim.
+
+*Revisit if:* trained modules don't reduce val teacher-forced loss vs the
+untrained baseline (logged in register_modules.pt), or H2 shows the steering
+signal doesn't survive sampling.

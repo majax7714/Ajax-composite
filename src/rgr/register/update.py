@@ -34,11 +34,16 @@ class RegisterUpdate(nn.Module):
         # input = pooled candidate embedding + scalar verifier score
         self.cell = nn.GRUCell(input_size=phi_dim + 1, hidden_size=d_r)
 
-    def forward(self, register: torch.Tensor, phi: torch.Tensor, score: float) -> torch.Tensor:
+    def forward(
+        self, register: torch.Tensor, phi: torch.Tensor, score: "float | torch.Tensor"
+    ) -> torch.Tensor:
         squeeze = register.dim() == 1
         r = register.unsqueeze(0) if squeeze else register
         p = phi.unsqueeze(0) if phi.dim() == 1 else phi
-        v = torch.full((r.shape[0], 1), float(score), dtype=p.dtype, device=p.device)
+        if isinstance(score, torch.Tensor):
+            v = score.to(dtype=p.dtype, device=p.device).reshape(r.shape[0], 1)
+        else:
+            v = torch.full((r.shape[0], 1), float(score), dtype=p.dtype, device=p.device)
 
         proposed = self.cell(torch.cat([p, v], dim=-1), r)
 
