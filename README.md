@@ -78,11 +78,14 @@ never silently depend on an untested GPU path.
 
 ## Status
 
-**Phase 0 — CLOSED (gate PASS, 2026-07-11).** Baselines frozen on HumanEval
-(T4, seed 17, N=8): B0 pass@1 **0.5922**, B1 likelihood-reranked **0.6280**,
-pass@8 **0.8415**, format discipline 99.1%. Reproduced bit-for-bit across two
-runs. The ~21-point gap between likelihood reranking and the pass@8 ceiling is
-the selection headroom H1's verifier must claim. Next: Phase 1 (verifier).
+**Phase 1 — CLOSED (H1 gate PASS, 2026-07-11).** The execution-trained
+verifier (V-v2b, QLoRA cross-encoder on Qwen2.5-Coder-1.5B) beats the
+generator's own likelihood as a confidence signal on held-out HumanEval:
+AUROC **0.795 vs 0.696** (Δ 0.099, CI [0.044, 0.153]), within-problem
+**0.719 vs 0.568**, B1 reranked by V reaches **0.671** pass@1. Phase 0
+baselines frozen earlier (B0 0.5922 · pass@8 0.8415). Two failed verifier
+attempts (pooled-phi MLP, codebert) are logged in docs/PHASES.md.
+Next: Phase 2 — the register loop, the experiment's core claim.
 See [docs/PHASES.md](docs/PHASES.md) for the gate log.
 
 ## Quickstart

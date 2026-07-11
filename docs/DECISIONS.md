@@ -97,3 +97,20 @@ ballgame" and does not need a new decision entry.
 - **Split discipline:** HumanEval/HumanEval+ never touch training, tuning, or
   threshold selection. All tuning happens on MBPP validation. Enforced by
   `rgr.data.splits` refusing to hand HumanEval to any training-tagged consumer.
+
+## D9 — Verifier of record: V-v2b (QLoRA cross-encoder), superseding D7's V-v1
+
+V-v1's pooled-phi features hit a measured ceiling (in-domain probe loses to
+raw likelihood) and codebert-base was too weak on val. The verifier of record
+is a 4-bit QLoRA classifier on Qwen2.5-Coder-1.5B-Instruct (LoRA r16 on
+attention + trainable head) over raw `(problem, candidate code)` text,
+val-selected. Consequences:
+
+- **V inference costs a G-scale forward pass** (~1.5B), not an MLP — the
+  compute-accounting audit columns must count V calls at this weight in
+  Phase ≥ 2 (the primary budgeted unit is unchanged: candidate generations;
+  one V forward ≈ 1/150th of a 156-token generation, still secondary).
+- phi features stay for U's candidate input (register update), where the
+  frozen pooled representation is an input signal, not the verdict.
+- The aux heads (frac_tests, error_type) were not needed to pass H1; adding
+  them to v2b is open Phase-2 work if the loop wants a denser reward.

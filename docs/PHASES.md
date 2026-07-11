@@ -49,21 +49,30 @@ totals (204,553). Effectively a bit-for-bit replay.
       rgr-phase1-data, batched sampling + 4-way pooled execution)*
 - [x] V-v1 trained (pooled-feature MLP + aux heads, register-blind per D3).
       MBPP-val AUROC 0.7498.
-- [ ] Head-to-head on held-out problems: AUROC(V) vs AUROC(likelihood), plus
+- [x] Head-to-head on held-out problems: AUROC(V) vs AUROC(likelihood), plus
       ECE/Brier.
       - **Attempt 1 (V-v1, pooled-phi MLP): FAILED the margin.** Pooled AUROC
         V 0.708 vs likelihood 0.696; Δ = 0.012, CI [−0.046, +0.070].
         Diagnostics: macro *within-problem* AUROC only 0.579 vs 0.568 — and an
         in-domain linear probe on the same features (0.642) loses to
         likelihood (0.678), i.e. **feature ceiling**: mean-pooled frozen-G
-        states don't carry the signal. Escalating to V-v2 (fine-tuned
-        cross-encoder) per D7's pre-authorized single escalation.
-        H1 held-out peeks so far: 1 (v1). v2 gets exactly one more.
-- [ ] B1 re-locked with V reranking (replacing likelihood reranking).
+        states don't carry the signal. Escalated per D7.
+      - **Attempt 2a (codebert-base cross-encoder): disqualified on val**
+        (0.665 < v1's 0.750); its held-out scores were never opened.
+      - **Attempt 2b (V-v2b, QLoRA cross-encoder on Qwen2.5-Coder-1.5B):
+        PASSED.** Val 0.7814 (epoch 2 of 3). Held-out: **V 0.7951 vs
+        likelihood 0.6961, Δ = 0.0991, CI [0.0441, 0.1531]**. Secondaries all
+        favor V — ECE 0.162 vs 0.221, Brier 0.212 vs 0.267, and macro
+        within-problem AUROC **0.719 vs 0.568** (the reranking-relevant
+        signal). Held-out peeks spent: 2 total (v1, v2b) — logged honestly.
+- [x] B1 re-locked with V-v2b reranking: **pass@1 = 0.6707** (vs 0.6280
+      likelihood-reranked, B0 0.5922, oracle pass@8 0.8415 — 17 points of
+      selection headroom remain for iteration to claim in H2).
+      Verifier of record: runs/kaggle/phase1_v2b/.../lora (adapter, epoch 2).
 
-**Gate:** ΔAUROC ≥ 0.05, bootstrap CI excluding 0 (METRICS.md). If marginal:
-escalate to V-v2 (fine-tuned encoder, D7) **once**; if still flat, H1 is dead —
-stop, per the kill criterion. — *verdict: pending*
+**Gate:** ΔAUROC ≥ 0.05, bootstrap CI excluding 0 (METRICS.md). —
+**verdict: PASS (2026-07-11, V-v2b).** Confidence can be made trustworthy;
+the register loop is earned (brief §11).
 
 ## Phase 2 — Register loop (H2, the core)
 
@@ -101,4 +110,5 @@ sweeps.
 
 | Date | Phase | Verdict | Numbers | Notes |
 |---|---|---|---|---|
+| 2026-07-11 | 1 — Verifier (H1) | **PASS** | V-v2b heldout AUROC 0.7951 vs lik 0.6961, Δ 0.0991 CI [0.044, 0.153] · within-problem 0.719 vs 0.568 · B1(V) 0.6707 | QLoRA cross-encoder on Qwen2.5-Coder-1.5B, val-selected epoch 2; v1 failed (Δ 0.012), codebert DQ'd on val; 2 held-out peeks total |
 | 2026-07-11 | 0 — Harness | **PASS** | B0 pass@1 0.5922 · B1(lik) 0.6280 · pass@8 0.8415 · format 99.1% | lock_a ≡ lock_b byte-identical (164/164); T4, seed 17, N=8, temp 0.8; difficulty proxy in artifacts/ |
