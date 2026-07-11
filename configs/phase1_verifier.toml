@@ -3,6 +3,7 @@
 [labels]
 candidates_per_problem = 16
 temperatures = [0.2, 0.8, 1.0]
+pool_size = 4
 
 [verifier_train]
 lr = 1e-4

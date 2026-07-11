@@ -36,6 +36,13 @@ MODES = {
     "handcheck": (True, ["scripts/phase0_lock_baselines.py", "--handcheck"]),
     "lock_a": (True, ["scripts/phase0_lock_baselines.py", "--lock", "--seed-tag", "lock_a"]),
     "lock_b": (True, ["scripts/phase0_lock_baselines.py", "--lock", "--seed-tag", "lock_b"]),
+    "phase1_data": (True, ["scripts/phase1_verifier.py", "--labels", "--reencode"]),
+}
+
+# Frozen result files each mode needs beyond the committed tree; bundle()
+# copies them into the dataset under artifacts/.
+BUNDLE_EXTRAS = {
+    "runs/kaggle/lock_a/runs/phase0/lock_a.jsonl": "artifacts/lock_a.jsonl",
 }
 
 RUNNER_TEMPLATE = '''\
@@ -102,6 +109,14 @@ def bundle(kaggle_api) -> None:
     cache = REPO / "data" / "cache"
     if cache.exists():
         shutil.copytree(cache, stage / "data" / "cache")
+
+    for src, dst in BUNDLE_EXTRAS.items():
+        src_path = REPO / src
+        if src_path.exists():
+            (stage / dst).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(src_path, stage / dst)
+        else:
+            print(f"warning: bundle extra missing, skipped: {src}")
 
     (stage / "dataset-metadata.json").write_text(json.dumps({
         "title": DATASET_SLUG,

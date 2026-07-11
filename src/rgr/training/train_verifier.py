@@ -1,28 +1,19 @@
-"""Phase 1: train V on execution labels; run the H1 head-to-head.
+"""The H1 verdict: AUROC(V) vs AUROC(likelihood) with problem-level bootstrap.
 
-Loss = BCE(p_correct, passed)
-     + lambda_frac * MSE(frac_tests_head, frac_tests)        (aux, D7)
-     + lambda_err  * CE(error_type_logits, error_type)       (aux, D7)
+Pure stdlib — callable on saved score lists without torch or a GPU, so the
+gate decision itself is locally testable. The training loop that produces V
+lives in scripts/phase1_verifier.py (--train); loss there is
+BCE(p_correct, passed) + 0.5*MSE(frac_tests) + 0.25*CE(error_type) per D7,
+selected on MBPP-validation AUROC (never HumanEval).
 
-Selection on MBPP-validation AUROC (never HumanEval). The gate that this
-module must answer (brief §11.4): AUROC(V) vs AUROC(mean_logprob) on held-out
-problems, with the pre-registered margin from docs/METRICS.md (ΔAUROC >= 0.05,
-bootstrap CI excluding 0).
-
-The evaluation half is pure stdlib and lives in rgr.evals — this module only
-produces the two score lists and hands them over.
+Pre-registered margin (docs/METRICS.md): delta-AUROC >= 0.05 with the 95%
+problem-level bootstrap CI excluding 0.
 """
 
 from __future__ import annotations
 
 from rgr.evals.bootstrap import bootstrap_ci
 from rgr.evals.calibration import auroc
-
-
-def train_verifier(labels_path: str, config) -> None:
-    """Phase 1: dataset from JSONL labels (phi features computed once and
-    cached — they are frozen-G outputs), AdamW, early stop on val AUROC."""
-    raise NotImplementedError("Phase 1")
 
 
 def h1_head_to_head(

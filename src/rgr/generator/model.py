@@ -77,13 +77,22 @@ class Generator:
     # --- GeneratorLike ---
 
     def generate(self, problem: Problem, register) -> Candidate:
-        return self._sample(build_prompt(problem.prompt), register)
+        return self.sample_batch(build_prompt(problem.prompt), 1, register=register)[0]
+
+    def sample(self, problem: Problem, n: int, *, temperature: float | None = None,
+               register=None) -> list[Candidate]:
+        """n candidates for one problem in a single batched generate call.
+        All share one prompt, so num_return_sequences batching has no padding
+        asymmetry. ~5-8x faster than n sequential calls; used by label
+        generation (Phase 1)."""
+        return self.sample_batch(build_prompt(problem.prompt), n,
+                                 temperature=temperature, register=register)
 
     # --- FeedbackGeneratorLike (B2 only) ---
 
     def generate_with_feedback(self, problem: Problem, prev: Candidate, verifier_score: float) -> Candidate:
         prompt = build_feedback_prompt(problem.prompt, prev.code or prev.text, verifier_score)
-        return self._sample(prompt, register=None)
+        return self.sample_batch(prompt, 1, register=None)[0]
 
     # --- phi source (r_0 encoder, V features) ---
 
@@ -98,12 +107,37 @@ class Generator:
             out = self._model(input_ids=ids, output_hidden_states=True)
         return out.hidden_states[-1][0].float().mean(dim=0)
 
-    # --- internals ---
+    def embed_candidate(self, problem: Problem, completion_text: str):
+        """phi for a stored completion, matching generation-time phi.
 
-    def _sample(self, user_prompt: str, register) -> Candidate:
+        Causal LM hidden states depend only on the prefix, so teacher-forcing
+        the same (chat prompt + completion) tokens reproduces the states that
+        emitted each completion token: output positions [L-1, L+T-2] for a
+        prompt of length L and completion of length T. Used to re-encode the
+        frozen Phase-0 HumanEval candidates as the H1 evaluation features.
+        (Decode/re-tokenize can shift token boundaries slightly; mean pooling
+        absorbs it.)
+        """
         import torch
 
         self._require_loaded()
+        prompt_ids = self._chat_ids(build_prompt(problem.prompt))
+        comp = self._tokenizer(completion_text, return_tensors="pt",
+                               add_special_tokens=False, truncation=True,
+                               max_length=self.config.max_new_tokens)
+        comp_ids = comp.input_ids.to(self.device)
+        if comp_ids.shape[1] == 0:
+            return self.embed_problem(problem)  # degenerate empty completion
+        full = torch.cat([prompt_ids, comp_ids], dim=1)
+        with torch.no_grad():
+            out = self._model(input_ids=full, output_hidden_states=True)
+        h = out.hidden_states[-1][0]  # (L+T, d)
+        L, T = prompt_ids.shape[1], comp_ids.shape[1]
+        return h[L - 1 : L - 1 + T].float().mean(dim=0)
+
+    # --- internals ---
+
+    def _chat_ids(self, user_prompt: str):
         messages = [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_prompt},
@@ -113,7 +147,15 @@ class Generator:
         )
         # transformers version drift: newer releases return a BatchEncoding,
         # older ones a bare tensor.
-        input_ids = getattr(encoded, "input_ids", encoded).to(self.device)
+        return getattr(encoded, "input_ids", encoded).to(self.device)
+
+    def sample_batch(self, user_prompt: str, n: int, *, temperature: float | None = None,
+                     register=None) -> list[Candidate]:
+        import torch
+
+        self._require_loaded()
+        temperature = self.config.temperature if temperature is None else temperature
+        input_ids = self._chat_ids(user_prompt)
 
         embeds = self._model.get_input_embeddings()(input_ids)
         prompt_tokens = input_ids.shape[1]
@@ -129,9 +171,10 @@ class Generator:
             out = self._model.generate(
                 inputs_embeds=embeds,
                 attention_mask=attention_mask,
+                num_return_sequences=n,
                 max_new_tokens=self.config.max_new_tokens,
-                do_sample=self.config.temperature > 0,
-                temperature=self.config.temperature or None,
+                do_sample=temperature > 0,
+                temperature=temperature or None,
                 top_p=self.config.top_p,
                 pad_token_id=self._tokenizer.eos_token_id,
                 return_dict_in_generate=True,
@@ -139,33 +182,42 @@ class Generator:
                 output_hidden_states=True,
             )
 
-        # With inputs_embeds (no input_ids), sequences holds generated tokens only.
-        gen_ids = out.sequences[0]
-        text = self._tokenizer.decode(gen_ids, skip_special_tokens=True)
+        # With inputs_embeds (no input_ids), sequences holds generated tokens
+        # only: (n, T_max_emitted). pad_token == eos, so a sequence's real
+        # length runs through its FIRST eos; everything after is padding.
+        sequences = out.sequences
+        eos = self._tokenizer.eos_token_id
+        lengths = []
+        for row in sequences:
+            hits = (row == eos).nonzero()
+            lengths.append(int(hits[0]) + 1 if len(hits) else row.shape[0])
 
-        # Mean token log-probability under the sampling distribution's logits —
-        # the H1 likelihood baseline.
-        logprobs = [
-            torch.log_softmax(step_scores[0].float(), dim=-1)[token].item()
-            for step_scores, token in zip(out.scores, gen_ids)
-        ]
-        mean_logprob = sum(logprobs) / len(logprobs) if logprobs else None
-
-        # phi: last-layer hidden state of each generated position, mean-pooled.
-        # out.hidden_states[t][-1] is (batch, seq_t, d); seq_t is the prompt at
-        # t=0 and 1 thereafter — taking [:, -1, :] uniformly gives exactly the
-        # positions that emitted the generated tokens.
-        steps = [h[-1][:, -1, :].float() for h in out.hidden_states[: len(gen_ids)]]
-        phi = torch.cat(steps, dim=0).mean(dim=0) if steps else None
-
-        return Candidate(
-            text=text,
-            code=extract_code(text),
-            mean_logprob=mean_logprob,
-            prompt_tokens=prompt_tokens,
-            generated_tokens=len(gen_ids),
-            phi=phi,
+        # Per-step last-layer states at the emitting position: (T, n, d).
+        # hidden_states[t][-1] is (n, seq_t, d) — seq_t = prompt at t=0, else 1.
+        states = torch.stack(
+            [h[-1][:, -1, :].float() for h in out.hidden_states[: sequences.shape[1]]]
         )
+        # Per-step token log-probs under the sampling logits: (T, n).
+        logprobs = torch.stack([
+            torch.log_softmax(step_scores.float(), dim=-1)
+            .gather(-1, sequences[:, t : t + 1])
+            .squeeze(-1)
+            for t, step_scores in enumerate(out.scores)
+        ])
+
+        candidates = []
+        for i in range(sequences.shape[0]):
+            length = lengths[i]
+            text = self._tokenizer.decode(sequences[i][:length], skip_special_tokens=True)
+            candidates.append(Candidate(
+                text=text,
+                code=extract_code(text),
+                mean_logprob=float(logprobs[:length, i].mean()) if length else None,
+                prompt_tokens=prompt_tokens,
+                generated_tokens=length,
+                phi=states[:length, i].mean(dim=0) if length else None,
+            ))
+        return candidates
 
     @staticmethod
     def make_candidate(text: str, **kwargs) -> Candidate:
