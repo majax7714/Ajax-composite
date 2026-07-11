@@ -38,6 +38,7 @@ MODES = {
     "lock_b": (True, ["scripts/phase0_lock_baselines.py", "--lock", "--seed-tag", "lock_b"]),
     "phase1_data": (True, ["scripts/phase1_verifier.py", "--labels", "--reencode"]),
     "phase1_v2": (True, ["scripts/phase1_v2_encoder.py", "--train"]),
+    "phase1_v2b": (True, ["scripts/phase1_v2b_qlora.py", "--train"]),
 }
 
 # Frozen result files each mode needs beyond the committed tree; bundle()
@@ -61,7 +62,7 @@ WORK = "/tmp/rgr"  # NOT /kaggle/working: the bundle holds keys, output must not
 shutil.copytree(SRC, WORK)
 os.chdir(WORK)
 
-subprocess.run([sys.executable, "-m", "pip", "install", "-q", "daytona",
+subprocess.run([sys.executable, "-m", "pip", "install", "-q", "daytona", "peft",
                 "-U", "bitsandbytes>=0.46.1"], check=True)
 
 env = dict(os.environ, PYTHONPATH=os.path.join(WORK, "src"))
