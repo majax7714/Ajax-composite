@@ -37,12 +37,14 @@ MODES = {
     "lock_a": (True, ["scripts/phase0_lock_baselines.py", "--lock", "--seed-tag", "lock_a"]),
     "lock_b": (True, ["scripts/phase0_lock_baselines.py", "--lock", "--seed-tag", "lock_b"]),
     "phase1_data": (True, ["scripts/phase1_verifier.py", "--labels", "--reencode"]),
+    "phase1_v2": (True, ["scripts/phase1_v2_encoder.py", "--train"]),
 }
 
 # Frozen result files each mode needs beyond the committed tree; bundle()
 # copies them into the dataset under artifacts/.
 BUNDLE_EXTRAS = {
     "runs/kaggle/lock_a/runs/phase0/lock_a.jsonl": "artifacts/lock_a.jsonl",
+    "runs/kaggle/phase1_data/runs/phase1/labels.jsonl": "artifacts/phase1_labels.jsonl",
 }
 
 RUNNER_TEMPLATE = '''\

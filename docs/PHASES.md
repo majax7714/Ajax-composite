@@ -43,12 +43,22 @@ totals (204,553). Effectively a bit-for-bit replay.
 
 ## Phase 1 — Verifier (H1)
 
-- [ ] V training set: candidates per MBPP-train problem across temperatures,
-      executed and labeled. Budget the sandbox time — labels are the expensive
-      line item (brief §7).
-- [ ] V-v1 trained (pooled-feature MLP + aux heads, register-blind per D3).
+- [x] V training set: 6,832 labeled candidates (427 MBPP problems × 16, temps
+      0.2/0.8/1.0), pass rate 0.584, **0 sandbox faults**; phi features for
+      train and for the frozen HumanEval eval set. *(2026-07-11, kernel
+      rgr-phase1-data, batched sampling + 4-way pooled execution)*
+- [x] V-v1 trained (pooled-feature MLP + aux heads, register-blind per D3).
+      MBPP-val AUROC 0.7498.
 - [ ] Head-to-head on held-out problems: AUROC(V) vs AUROC(likelihood), plus
       ECE/Brier.
+      - **Attempt 1 (V-v1, pooled-phi MLP): FAILED the margin.** Pooled AUROC
+        V 0.708 vs likelihood 0.696; Δ = 0.012, CI [−0.046, +0.070].
+        Diagnostics: macro *within-problem* AUROC only 0.579 vs 0.568 — and an
+        in-domain linear probe on the same features (0.642) loses to
+        likelihood (0.678), i.e. **feature ceiling**: mean-pooled frozen-G
+        states don't carry the signal. Escalating to V-v2 (fine-tuned
+        cross-encoder) per D7's pre-authorized single escalation.
+        H1 held-out peeks so far: 1 (v1). v2 gets exactly one more.
 - [ ] B1 re-locked with V reranking (replacing likelihood reranking).
 
 **Gate:** ΔAUROC ≥ 0.05, bootstrap CI excluding 0 (METRICS.md). If marginal:
