@@ -256,7 +256,7 @@ with **B1 ≈ 0.84, FULL ≈ 0.82–0.84, B2 ≈ 0.72–0.78.**
 **Procedure.** From committed `runs/phase2/full_b1.jsonl` (FULL, B1) and
 `runs/phase2/b2.jsonl` (B2): per condition, pool coverage = fraction of the 164
 problems with ≥1 passing candidate among its 8. Report the three numbers and the
-ordering. Output `artifacts/diag7_pool_coverage.json`
+ordering. Output `artifacts/diag7_oracle_coverage.json`
 (`scripts/diag7_pool_coverage.py`).
 
 **Interpretation (committed).** If the ordering holds, the null is not merely

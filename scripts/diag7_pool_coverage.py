@@ -25,7 +25,7 @@ from rgr.results import read_jsonl, selected_passed  # noqa: E402
 
 FULL_B1 = REPO / "runs/phase2/full_b1.jsonl"
 B2 = REPO / "runs/phase2/b2.jsonl"
-OUT = REPO / "artifacts/diag7_pool_coverage.json"
+OUT = REPO / "artifacts/diag7_oracle_coverage.json"
 
 
 def pool_covered(rec: dict) -> bool:
