@@ -305,22 +305,31 @@ the chain worked except the last one" — was challenged by the post-mortem in
 register's near-chance φ input, and the proxy training objective) were likely
 broken upstream. Two diagnostics have now reported ([DIAGNOSTICS.md]):
 
-- **DIAG-4 refutes the training-objective link.** The imitation targets are
-  short (median 28 tokens, not the 156-token HumanEval average the post-mortem
-  used); the trained target sequence probability is ~1.4e-2, samplable, so the
-  −10.7% loss gain moved a *reachable* quantity. The "training was not a no-op"
-  line **stands**; the post-mortem's "exponentially disconnected objective"
-  does not.
+- **DIAG-4 refutes the post-mortem's arithmetic and opens a genuine
+  contradiction.** The imitation targets are short (median 28 tokens, not the
+  156-token HumanEval average the post-mortem imported); trained target seq-prob
+  is ~1.4e-2, samplable. But 1.4e-2 vs untrained 8.3e-3 is a **1.7× gain** in the
+  probability of sampling the target — which, had it transferred, forbids a
+  0.0000 pass@1 move. The resolution is that both calculations measured the wrong
+  object: the imitation loss raises P(*this specific* passing string), while the
+  goal is P(*any* passing program), a set of enormous cardinality. The null is a
+  **generalization failure from strings to the correctness manifold** — which
+  indicts starting with imitation (D2(a)) rather than execution-reward RL, a
+  set-membership objective. "Training was not a no-op" stands; *what it bought*
+  is the open question.
 - **DIAG-1 sharpens the null.** FULL's 9 wins are 8 reselection + 1 within the
   resampling-noise floor set by B1's 2 symmetric wins; B1 (frozen register)
   reaches *more* oracle-empty solutions than FULL (5 vs 3). The register's
-  *generative* contribution is non-positive — a strictly stronger statement than
-  the aggregate tie.
+  *generative* contribution is non-positive — strictly stronger than the
+  aggregate tie. And since 3–5 of the 26 "oracle-empty" problems dissolve under
+  resampling, they were low-probability, not unreachable: the genuine generative
+  headroom on this benchmark is even smaller than 16%.
 
-What remains open is whether the register *encodes* useful state it cannot
-transmit, or encodes nothing (input starvation): DIAG-2 and DIAG-3 (GPU,
-post-B2) decide that. The "every link worked except the last" phrasing is
-therefore retired in favor of the more precise account above.
+What remains open is where the 1.7× teacher-forced gain dies. **DIAG-5** (does it
+transfer to HumanEval at all?) forks it: a domain/length transfer failure vs a
+teacher-forced/sampled gap the register cannot bridge (DIAG-3 control authority,
+carrying a pre-registered entropy-killer hypothesis). The "every link worked
+except the last" phrasing is retired in favor of this account.
 
 ### 5.4 The conceptual mapping, honestly closed
 

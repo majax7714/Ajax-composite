@@ -120,15 +120,29 @@ retune.
       FULL 3 vs **B1 5**. Register generative effect **non-positive** (B1 ≥ FULL
       everywhere). *Prediction partly held:* "0–1 pool-empty" ✓, "FULL solves 0
       oracle-empty" ✗ (3) — but conclusion strengthened. → `artifacts/diag1_*.json`
-- [ ] **DIAG-2** (MBPP val, GPU) register-probe: encoding vs transmission
-      failure. *Prediction:* weak `passed` probe, decodable clock → encoding.
-- [ ] **DIAG-3** (MBPP val, GPU) control authority: does r move G's sampling?
-      *Prediction:* KL < 0.05 nats, pass-rate CI straddles 0 → ~zero authority.
 - [x] **DIAG-4** (CPU, 2026-07-12, items 1–2) objective units. 0.1713/0.1530 =
       mean per-token NLL confirmed. **Prediction REFUTED:** real targets median
       28 tok (not 156), median trained seq-prob 1.4e-2, 97.8% > 1e-9 — samplable.
-      Refutes post-mortem §1.3; "training was not a no-op" stands. Item 3
+      Refutes §1.3 arithmetic but **opens the 1.7×-teacher-forced → 0.000-sampled
+      contradiction**: reframed as a wrong-object failure (imitation raises
+      P(specific string), goal is P(passing class)) → indicts D2(a) vs RL. Item 3
       (entropy split) pending GPU. → `artifacts/diag4_*.json`
+
+  *After B2, run order (pre-registered 2026-07-12): DIAG-5 → DIAG-3 → DIAG-2 →
+  DIAG-4 item 3 → DIAG-6.*
+- [ ] **DIAG-5** (HumanEval re-analysis, GPU, **first after B2**) does the 1.7×
+      teacher-forced gain transfer to HumanEval? *Prediction:* shrinks/vanishes →
+      domain/length transfer failure (28-tok MBPP → 156-tok HumanEval). Survives →
+      teacher-forced/sampled gap, DIAG-3 decisive.
+- [ ] **DIAG-3** (MBPP val, GPU) control authority: does r move G's sampling?
+      *Prediction:* KL < 0.05 nats, pass-rate CI straddles 0 → ~zero authority.
+      **Directional hypothesis (pre-committed):** within-r_7 diversity <
+      within-r_0 ⇒ register is an *entropy killer* (narrows reach).
+- [ ] **DIAG-2** (MBPP val, GPU) register-probe: encoding vs transmission
+      failure. *Prediction:* weak `passed` probe, decodable clock → encoding.
+- [ ] **DIAG-6** (HumanEval gen, GPU, lowest) pass@50 on the 26 oracle-empty to
+      bound headroom. *Prediction:* pass@50 ≥ 0.8 → genuine target ~5%, task
+      redesign mandatory with a number.
 
 Predictions are on the record so they can be wrong; outcomes get appended to
 [PRE-B2-HANDOFF.md] §3–4, [DIAGNOSTICS.md], and the gate log below (one line per

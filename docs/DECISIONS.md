@@ -23,6 +23,19 @@ working loop. G stays frozen throughout Phases 0–3.
 imitate) — then consider verifier-score-shaped RL, but only after documenting the
 sparsity numbers here.
 
+*Post-hoc note (2026-07-12, after the H2 null + DIAG-4):* the imitation-first call
+was probably the wrong starting choice, for a reason we could not see going in.
+The implemented objective `−log P(specific passing candidate)` is a
+**string-reproduction** objective; the goal is P(any passing program), a
+**set-membership** objective. DIAG-4 caught them coming apart: a 1.7× teacher-forced
+gain on specific strings produced exactly 0.0000 sampled pass@1 movement — the
+signature of a string→class generalization gap. RL with execution reward (regime
+(b)) optimizes set membership directly. So D2(a) bought stability at the cost of
+optimizing the wrong object; the next register experiment should *start* from
+regime (b), not extend imitation. This does not retro-change what was run — it
+records why the starting call was likely wrong. See [PRE-B2-HANDOFF.md] §1.3 and
+[DIAGNOSTICS.md] DIAG-4 / DIAG-5.
+
 ## D3 — Verifier is register-blind in v1
 
 V scores `P(correct | problem, candidate)` — it does **not** see `r_t` in the

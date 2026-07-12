@@ -56,6 +56,15 @@ domain was chosen because execution gives clean verification: correct for H1,
 wrong for H2. It optimized the control (verification) and starved the treatment
 (generative steering), on a benchmark already ~84% saturated at the pool level.
 
+> **[APPENDED 2026-07-12 — DIAG-1 tightens this; the ~16% is an overcount.]**
+> "Generation failure" was defined as pass@8 = 0 in the *single* Phase-0 8-sample
+> draw — but that is *low-probability, not unreachable*. Fresh resampling recovers
+> some: of the 26, B1 solved 5 and FULL 3. So the genuinely-unreachable set is
+> **smaller than 26**, the benchmark is even more saturated than ~84% implies, and
+> the maximum headroom for *any* refinement mechanism here is smaller than claimed
+> above. **DIAG-6** (new) puts a hard number on it (pass@50 on the 26). See
+> [DIAGNOSTICS.md] DIAG-1 / DIAG-6.
+
 ### 1.2 The register was fed a representation already measured near-chance
 
 The sharpest point, and the evidence is inside our own writeup. V-v1 (MLP over
@@ -90,20 +99,49 @@ candidates sampled *without* register conditioning), and V is register-blind so
 there is no V→r gradient path at all (D3, D10). The register never received a
 single gradient from an execution outcome under its own sampling distribution.
 
-> **[APPENDED 2026-07-12 — DIAG-4 items 1–2 REFUTE the core of §1.3. Left
-> standing above per the pre-registration discipline; corrected here.]** The
-> "exponentially disconnected / unsamplable → unsamplable" claim used the
-> 156-token HumanEval average. The actual imitation targets are *MBPP val*
-> passing candidates with **median 28 tokens** (min 18, max 511). At the trained
-> per-token NLL of 0.1530, sequence probability crosses 1e-9 only at L = 135
-> tokens, so the median target has seq-prob **1.4e-2** (untrained 8.3e-3) and
-> 97.8% of targets sit above 1e-9 — **samplable**, not unsamplable. The −10.7%
-> moved seq-prob within a samplable regime. So the objective was *not*
-> exponentially disconnected; the writeup's "training was not a no-op" line
-> stands. The off-policy / no-V→r-gradient points survive; the sequence-length
-> arithmetic does not. What broke the loop is therefore §1.1/§1.2 territory
-> (headroom, input starvation) or a transmission failure (DIAG-2/DIAG-3), not a
-> quantitatively unreachable target. See [DIAGNOSTICS.md] DIAG-4.
+> **[APPENDED 2026-07-12 — DIAG-4 items 1–2 REFUTE the length arithmetic of
+> §1.3 and replace it with a sharper puzzle. The original claim + prediction are
+> left standing above per the pre-registration discipline; this note is analysis,
+> re-sharpened after the first draft closed one step too early.]**
+>
+> **The provenance error.** The "unsamplable → unsamplable" claim used 156 tokens
+> — the mean generated length of *HumanEval* Phase-0 candidates — in a calculation
+> about *MBPP val* imitation targets, which are median **28 tokens** (min 18, max
+> 511). A length constant imported from the wrong dataset; the exponential did the
+> rest. At the trained per-token NLL 0.1530, sequence probability crosses 1e-9
+> only at L = 135, so the median target is seq-prob **1.4e-2** (untrained 8.3e-3),
+> 97.8% above 1e-9 — samplable. Refuted, correctly, and it deserved to be.
+>
+> **But the refutation opens a contradiction; it does not close one.** Trained
+> 1.4e-2 vs untrained 8.3e-3 is a **1.7× increase** in the probability of sampling
+> the target. Had that transferred, pass@1 could not have moved by exactly 0.0000.
+> We now hold a **1.7× in-domain teacher-forced gain against a precisely-zero
+> out-of-domain sampled effect** — something destroys that factor in between, and
+> that is now the most interesting unanswered question in the run.
+>
+> **Both calculations measured the wrong object.** P(exact target string) is not
+> the objective; **P(any passing program) is.** The model samples a correct
+> HumanEval solution ~60% of the time while the seq-prob of any *specific* string
+> is tiny — the passing set has enormous cardinality, so the two quantities are
+> barely related. The imitation loss `−log P(this specific passing candidate |
+> prompt, soft(r_k))` is a **string-reproduction** objective; the hope was that
+> reproducing passing strings would generalize into steering toward the *class* of
+> passing programs. The H2 null says it did not. A 1.7× string-level gain with
+> zero class-level gain is exactly what a **generalization failure from specific
+> strings to the correctness manifold** looks like — a far better-supported
+> diagnosis than the original one.
+>
+> **This indicts D2(a).** "Imitation first, because it is stabler than RL" (D2)
+> chose a string-matching objective; RL with execution reward is a
+> *set-membership* objective (reward = "is this in the passing class"). Those two
+> come apart precisely the way we are now watching them come apart. DIAG-4 is what
+> made that visible. See [DECISIONS.md] D2 (post-hoc note).
+>
+> **Survives / next.** The off-policy and no-V→r-gradient points (above) survive;
+> the sequence-length arithmetic does not. "Training was not a no-op" stands — but
+> *what the training bought* is the open question, not a closed one. **DIAG-5**
+> (new, run before DIAG-2) is the decisive fork: does the teacher-forced gain
+> transfer to HumanEval at all? See [DIAGNOSTICS.md] DIAG-4 / DIAG-5.
 
 ### 1.4 Root cause
 
@@ -185,12 +223,18 @@ prediction held? — one line, no edits above.)
   artifact. They **may not** reopen the H2 verdict, and **may not** become a
   claim that the register "would have worked if."
 - **Held-out hygiene.** DIAG-1 and DIAG-4 are pure re-analysis of existing
-  Phase-0/Phase-2 artifacts — no new HumanEval access, no new peek. DIAG-2 and
-  DIAG-3 run on **MBPP val, not HumanEval**, precisely so they cost nothing
-  against held-out. Do not touch HumanEval for them.
-- **Priority under GPU quota.** DIAG-1 and DIAG-4 are CPU-first and free — run
-  them first. **B2 has first claim on GPU quota.** DIAG-2 (probe training, cheap)
-  and DIAG-3 (needs generation) run after B2.
+  Phase-0/Phase-2 artifacts — no new HumanEval access. DIAG-2 and DIAG-3 run on
+  **MBPP val, not HumanEval**, so they cost nothing against held-out. **DIAG-5**
+  re-analyzes already-revealed Phase-0 HumanEval passing candidates (teacher-forced
+  NLL only — no new generation, no new selection, no new peek). **DIAG-6** is the
+  sole exception: new HumanEval generation, but benchmark *characterization* only
+  (no register claim; deflates rather than inflates), lowest priority, labeled.
+- **Priority under GPU quota.** DIAG-1 and DIAG-4 items 1–2 are CPU-first and free
+  — done. **B2 has first claim on GPU quota.** After B2, the order is: **DIAG-5
+  first** (it forks the DIAG-4 1.7×→0 puzzle with one forward pass and gates
+  whether DIAG-3 or "length transfer" is the story), then **DIAG-3** (decisive if
+  the gain survives; carries the entropy-killer hypothesis), then **DIAG-2**, then
+  **DIAG-4 item 3**, with **DIAG-6** last (new held-out generation).
 
 Predictions below are pre-registered. Report predictions-vs-outcomes honestly,
 including the ones recorded here — they are on the record specifically so they
@@ -282,6 +326,13 @@ problem). Compute:
 **Prediction:** across-set edit distance statistically indistinguishable from
 within-set; mean KL small (< 0.05 nats); pass-rate difference CI straddles 0.
 
+**Directional hypothesis (committed 2026-07-12, before the run):** if
+**within-r_7 diversity < within-r_0 diversity**, the register is an **entropy
+killer** — narrowing the sampling distribution the way a more specific prompt does,
+which is fatal and ironic for a mechanism whose only route to value was *widening*
+reach. DIAG-1's B1 > FULL on the oracle-empty stratum is weakly consistent. Report
+within-r_0 vs within-r_7 diversity explicitly.
+
 **Output:** `artifacts/diag3_control_authority.json`.
 **Readiness:** needs a **new Kaggle kernel** (r_0-vs-r_7 paired sampling on MBPP
 val + KL/edit-distance instrumentation). Not built yet.
@@ -322,9 +373,55 @@ during training. Items 1–2 (which carry the pre-registered "< 1e-9" claim) do 
 depend on the GPU sub-part.
 **OUTCOME (2026-07-12, items 1–2):** units confirmed (mean per-token NLL). The
 "< 1e-9" prediction is **REFUTED** — real targets median 28 tokens (not 156),
-median trained seq-prob 1.4e-2, 97.8% above 1e-9. This refutes §1.3's
-disconnected-objective claim (see the appended note there). Item 3 still pending
-GPU. Full write-up: [DIAGNOSTICS.md] DIAG-4.
+median trained seq-prob 1.4e-2, 97.8% above 1e-9. This refutes §1.3's length
+arithmetic *and opens the 1.7×-teacher-forced → 0.000-sampled contradiction* (see
+the appended note in §1.3, and the reframe to a wrong-object / string→class
+failure). Item 3 still pending GPU. Full write-up: [DIAGNOSTICS.md] DIAG-4.
+
+### DIAG-5 — Does the teacher-forced gain transfer to HumanEval? (re-analysis, GPU, run BEFORE DIAG-2)
+
+Added 2026-07-12 to fork the DIAG-4 contradiction. The 1.7× MBPP-val
+teacher-forced gain must go *somewhere* between training and the flat pass@1;
+DIAG-5 is the one measurement that says whether it even reaches the eval domain.
+
+**Procedure.** No new generation, no new peek. Take the already-labeled Phase-0
+HumanEval passing candidates (`lock_a`); compute teacher-forced NLL under the
+**trained** soft prompt vs **untrained**, exactly as in Phase-2 training. Report
+the HumanEval trained/untrained NLL and implied multiplier beside the MBPP-val
+1.7×.
+
+**Interpretation (committed).**
+- Gain **vanishes** on HumanEval → **domain/length transfer failure** (trained on
+  28-token one-liners, deployed on 156-token functions). Fix: train in-domain /
+  length-matched. DIAG-3 becomes secondary.
+- Gain **survives** (~1.7×) but sampling flat → **teacher-forced/sampled gap**
+  (string→class). **DIAG-3 is decisive**; the story is transmission/authority.
+
+**Prediction:** the gain shrinks substantially or vanishes on HumanEval
+(domain/length transfer failure).
+
+**Output:** `artifacts/diag5_transfer.json`.
+**Readiness:** small GPU forward pass; shares plumbing with DIAG-4 item 3.
+
+### DIAG-6 — Bound the maximum possible refinement headroom (HumanEval, GPU, lowest priority)
+
+Added 2026-07-12 after DIAG-1 showed "oracle-empty" ≠ unreachable.
+
+**Procedure.** Sample large-k (k ≈ 50–100) on the 26 Phase-0 oracle-empty
+problems; compute unbiased pass@k — a hard ceiling on what *any* refinement
+mechanism could win here.
+
+**Interpretation (committed).** pass@50 ≈ 0.95 ⇒ the genuine refinement target is
+~5% of problems and §5's task redesign is mandatory, stated with a number. Low
+pass@50 ⇒ a real hard core exists.
+
+**Prediction:** pass@50 ≥ 0.8 on the 26 (most "generation failures" are sampling
+variance).
+
+**Output:** `artifacts/diag6_headroom_ceiling.json`.
+**Readiness:** GPU generation kernel (26 × ~75 samples + execution). **Note:** the
+only diagnostic doing new HumanEval generation — benchmark characterization,
+no register claim, lowest priority.
 
 ---
 
@@ -334,10 +431,14 @@ Recorded here so they do not leak into the runs above. Which of these is even
 worth doing depends entirely on whether B2 lands in **Branch A** or **Branch B**
 (§3). Do not start any until B2 and DIAG-1..4 are in.
 
+- **On-policy training of the register with execution reward (regime (b) of D2)
+  — now the *indicated* next call, not just an option.** DIAG-4 reframed the null
+  as a wrong-object failure: imitation optimized P(specific string), the goal is
+  P(passing class). RL with execution reward is a set-membership objective by
+  construction. Any register revival should start here, not extend imitation
+  ([DECISIONS.md] D2 post-hoc note).
 - Feeding `error_type` / failing-test IDs / tracebacks into U (fixes §1.2 input
   starvation).
-- On-policy training of the register (GRPO with execution reward; regime (b) of
-  D2).
 - A register-conditioned verifier (D3's deferred coupling; `verifier.sees_register`),
   restoring a V→r gradient path.
 - Higher-authority injection (FiLM, cross-attention, KV-prefix, r-modulated LoRA)
@@ -368,17 +469,21 @@ worth doing depends entirely on whether B2 lands in **Branch A** or **Branch B**
 |---|---|---|
 | B2 run | **launch-ready** | `phase2_b2` mode wired; config frozen; all bundle artifacts present. Launch: `kaggle_launch.py bundle` → `launch phase2_b2` → fetch → `--h2`. |
 | B2 result file | **plumbing gap** | `--h2` writes `artifacts/h2_result.json` (overwrites the FULL-vs-B1 verdict, now with `delta_b2` filled). Deliverable names `artifacts/h2_b2_result.json`. Resolve by an analysis-only step (copy the regenerated file, or one extra `json.dump`) — **does not touch B2's frozen run.** |
-| DIAG-1 | **CPU-runnable now** | inputs committed. |
-| DIAG-4 (items 1–2) | **CPU-runnable now** | units confirmed by code inspection. |
-| DIAG-4 (item 3) | **needs GPU** | per-token NLLs unlogged; small forward pass over ~240 val targets. |
+| DIAG-1 | **DONE (2026-07-12)** | register generative effect non-positive. |
+| DIAG-4 (items 1–2) | **DONE (2026-07-12)** | refuted §1.3 arithmetic; opened the 1.7×→0 puzzle. |
+| DIAG-5 | **needs GPU** | forward pass over Phase-0 HumanEval passing candidates (re-analysis); run first after B2. |
+| DIAG-3 | **needs new kernel** | r_0-vs-r_7 paired MBPP-val sampling + KL/edit + r_0/r_7 diversity. |
 | DIAG-2 | **needs new kernel** | MBPP-val FULL rollout + trajectory dump; then CPU probes. |
-| DIAG-3 | **needs new kernel** | r_0-vs-r_7 paired MBPP-val sampling + KL/edit instrumentation. |
+| DIAG-4 (item 3) | **needs GPU** | per-token NLLs unlogged; entropy split; shares DIAG-5 plumbing. |
+| DIAG-6 | **needs new kernel** | 26 × ~75 HumanEval samples + execution; benchmark ceiling; lowest priority. |
 
-**Sequencing:** (1) commit this pre-registration + [DIAGNOSTICS.md] scaffold
-[done 2026-07-12]. (2) DIAG-1 and DIAG-4 items 1–2 on CPU, first. (3) B2 on GPU
-(first claim on quota). (4) DIAG-2, DIAG-3, DIAG-4 item 3 after B2. (5) Append
-outcomes to §3 here, to [DIAGNOSTICS.md], and the [PHASES.md] log; then the
-writeup edits per §6 deliverable 1.
+**Sequencing:** (1) pre-registration + scaffold [done]. (2) DIAG-1 + DIAG-4
+items 1–2 on CPU [done — reframed the null]. (3) **B2 on GPU [running]**. (4)
+After B2, in priority order: **DIAG-5** (forks the 1.7×→0 puzzle) → **DIAG-3**
+(decisive if the gain survives; entropy-killer hypothesis) → **DIAG-2** →
+**DIAG-4 item 3** → **DIAG-6** (last; new held-out gen). (5) Append every outcome
+to §3/§4 here, to [DIAGNOSTICS.md], and the [PHASES.md] log; then the writeup
+edits per §6 deliverable 1.
 
 ---
 
