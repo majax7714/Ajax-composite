@@ -429,6 +429,48 @@ def stage_h2(config: Config) -> None:
                "b1_prime": b1p_rate, "gate_pass": gate},
               open("artifacts/h2_result.json", "w"), indent=2, default=str)
 
+    # B2 completion of the record + pre-registered branch verdict (PRE-B2-HANDOFF
+    # §3). Additive: this reads the frozen b2.jsonl, it does not alter B2's run.
+    if b2:
+        full_rate = sum(selected_passed(full[p]) for p in pids) / len(pids)
+        b2_rate = sum(selected_passed(b2[p]) for p in pids) / len(pids)
+        b1_rate = sum(selected_passed(b1[p]) for p in pids) / len(pids)
+        paired = [(selected_passed(b2[p]), selected_passed(b1[p])) for p in pids]
+        d_b2_b1 = bootstrap_ci(paired, lambda s: sum(a - b for a, b in s) / len(s))
+        # Branch A = B2 ties B1 (CI includes 0); Branch B = B2 beats B1.
+        branch = "B" if (d_b2_b1.point > 0 and d_b2_b1.excludes_zero) else "A"
+
+        def gens(rec):
+            return rec["ledger"]["generations"]
+
+        def ptok(cond):
+            return sum(cond[p]["ledger"]["prompt_tokens"] for p in pids)
+
+        matched = all(gens(c[p]) == n for c in (full, b1, b2) for p in pids)
+        b2_result = {
+            "_label": "B2 (in-context refinement) completes the H2 kill record; "
+                      "does NOT change the FAIL gate (claim required beating both).",
+            "n_problems": len(pids),
+            "N_matched": n,
+            "ledger_generations_matched": matched,
+            "full_pass_at_1": full_rate,
+            "b1_pass_at_1": b1_rate,
+            "b2_pass_at_1": b2_rate,
+            "delta_full_minus_b2": vars(d_b2),   # kill-criterion piece ("ties both")
+            "delta_b2_minus_b1": vars(d_b2_b1),  # pre-registered branch discriminator
+            "branch": branch,
+            "branch_note": ("A = B2 ties B1 (no iteration headroom at this scale); "
+                            "B = B2 beats B1 (register parasitic to in-context text)."),
+            "prompt_tokens_full": ptok(full),
+            "prompt_tokens_b2": ptok(b2),  # audit: B2's growing context (favors B2)
+        }
+        json.dump(b2_result, open("artifacts/h2_b2_result.json", "w"),
+                  indent=2, default=str)
+        print(f"\nB2 branch {branch}: B2 {b2_rate:.4f} vs B1 {b1_rate:.4f} | "
+              f"Δ(B2−B1) {d_b2_b1.point:+.4f} CI [{d_b2_b1.lo:+.4f}, {d_b2_b1.hi:+.4f}]"
+              f" | ledger matched={matched}")
+        print("wrote artifacts/h2_b2_result.json")
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
