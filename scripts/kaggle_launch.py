@@ -33,6 +33,7 @@ DATASET_SLUG = "rgr-code"
 MODES = {
     #  mode       gpu    script args
     "smoke": (False, ["scripts/kaggle_smoke.py"]),
+    "envcap": (False, ["scripts/capture_env.py"]),  # Phase K env capture (CPU, free)
     "handcheck": (True, ["scripts/phase0_lock_baselines.py", "--handcheck"]),
     "lock_a": (True, ["scripts/phase0_lock_baselines.py", "--lock", "--seed-tag", "lock_a"]),
     "lock_b": (True, ["scripts/phase0_lock_baselines.py", "--lock", "--seed-tag", "lock_b"]),
