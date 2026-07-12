@@ -87,7 +87,19 @@ the register loop is earned (brief §11).
       spend most debugging time here — brief §8.)
 
 **Gate:** FULL beats **both** B1 and B2, CIs excluding 0. Tie either → register
-is dead; write the negative result up honestly. — *verdict: pending*
+is dead; write the negative result up honestly. —
+**verdict: FAILED (2026-07-12) — FULL ties B1 exactly.**
+FULL 0.6829 vs B1 0.6829 at N=8 matched compute (164 HumanEval problems);
+Δ = 0.0000, CI [−0.049, +0.055]. Not an artifact: register dynamics healthy
+(mean step Δ 1.76, no collapse/blow-up), verifier not stale (0.792 vs 0.795),
+per-step pass rates flat (no within-loop improvement), paired disagreements
+symmetric (9 vs 9), best-step position uniform. The D10 imitation signal
+(−11% val teacher-forced loss) did not survive sampling. B1′ control: 0.6707
+(different sampling run — the +1.2pt static-r₀ effect is within run noise,
+not claimable). B2 run pending quota completes the kill-criterion record
+("ties both") but cannot change the gate verdict: the claim requires beating
+both. Per brief §1: the register is dead as stated; this is the clean,
+publishable negative the design was built to produce.
 
 ## Phase 3 — Adaptive compute (H3)
 
@@ -110,5 +122,6 @@ sweeps.
 
 | Date | Phase | Verdict | Numbers | Notes |
 |---|---|---|---|---|
+| 2026-07-12 | 2 — Register loop (H2) | **FAIL** | FULL 0.6829 ≡ B1 0.6829, Δ 0.0000 CI [−0.049, +0.055]; register healthy, V not stale, per-step rates flat | The core claim's pre-registered kill fired on FULL-vs-B1; B2 pending for the complete record; do not tune past the gate |
 | 2026-07-11 | 1 — Verifier (H1) | **PASS** | V-v2b heldout AUROC 0.7951 vs lik 0.6961, Δ 0.0991 CI [0.044, 0.153] · within-problem 0.719 vs 0.568 · B1(V) 0.6707 | QLoRA cross-encoder on Qwen2.5-Coder-1.5B, val-selected epoch 2; v1 failed (Δ 0.012), codebert DQ'd on val; 2 held-out peeks total |
 | 2026-07-11 | 0 — Harness | **PASS** | B0 pass@1 0.5922 · B1(lik) 0.6280 · pass@8 0.8415 · format 99.1% | lock_a ≡ lock_b byte-identical (164/164); T4, seed 17, N=8, temp 0.8; difficulty proxy in artifacts/ |

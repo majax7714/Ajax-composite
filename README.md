@@ -78,15 +78,23 @@ never silently depend on an untested GPU path.
 
 ## Status
 
-**Phase 1 — CLOSED (H1 gate PASS, 2026-07-11).** The execution-trained
-verifier (V-v2b, QLoRA cross-encoder on Qwen2.5-Coder-1.5B) beats the
-generator's own likelihood as a confidence signal on held-out HumanEval:
-AUROC **0.795 vs 0.696** (Δ 0.099, CI [0.044, 0.153]), within-problem
-**0.719 vs 0.568**, B1 reranked by V reaches **0.671** pass@1. Phase 0
-baselines frozen earlier (B0 0.5922 · pass@8 0.8415). Two failed verifier
-attempts (pooled-phi MLP, codebert) are logged in docs/PHASES.md.
-Next: Phase 2 — the register loop, the experiment's core claim.
-See [docs/PHASES.md](docs/PHASES.md) for the gate log.
+**Phase 2 — H2 gate FAILED (2026-07-12): the register is dead as claimed.**
+FULL (register-gated refinement) ties B1 (verifier-reranked best-of-n,
+register frozen at r_0) *exactly* at matched compute on HumanEval: 0.6829 vs
+0.6829, CI [−0.049, +0.055]. Diagnostics rule out the mundane outs — register
+dynamics healthy, verifier not stale, imitation training verifiably steered
+teacher-forced likelihood (−11% val) — the steering simply did not survive
+sampling at 1.5B. This is the clean negative the pre-registered design was
+built to surface (brief §1 H2 kill criterion).
+
+Standing positive results: H1 PASSED — the execution-trained verifier beats
+self-fluency decisively (AUROC 0.795 vs 0.696, within-problem 0.719 vs 0.568)
+and lifts best-of-8 from 0.628 to 0.671 pass@1. Phase 0 baselines frozen and
+bit-for-bit reproducible.
+
+Remaining: B2 run (completes the kill record), then the write-up. Post-hoc
+directions (RL regime, richer injection, larger G) are future experiments,
+not rescues. See [docs/PHASES.md](docs/PHASES.md) for the gate log.
 
 ## Quickstart
 
