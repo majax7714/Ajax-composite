@@ -147,3 +147,21 @@ integration, which is exactly the cross-step-learning claim.
 *Revisit if:* trained modules don't reduce val teacher-forced loss vs the
 untrained baseline (logged in register_modules.pt), or H2 shows the steering
 signal doesn't survive sampling.
+
+## D11 — Generator precision on the migrated stack: **OPEN** (settle at Phase M / M0)
+
+Reserved, **not yet decided** — full context in [PHASE_M.md] §3, §7. The choice:
+**fp16** (recommended — 4-bit NF4 was never justified at 1.5B on a 16 GB T4, it
+dequantizes every forward pass and costs 2–4× throughput, and it degrades the
+generator the whole experiment depends on) vs **staying 4-bit** to preserve
+V-v2b's training distribution. Choosing fp16 accepts the **M4** verifier
+revalidation/retrain: switching G to fp16 shifts the candidate distribution
+underneath V — a substrate change, not ordinary actor drift. On T4 (Turing/sm75)
+fp16 only; on L4/A10 (Ada/Ampere) prefer bf16.
+
+This must be made **explicitly at M0** and written here with its reasoning before
+any migration code runs; it may not happen by accident.
+
+*Do not finalize until:* §0 of [PHASE_M.md] is green — B2 and all diagnostics
+closed on the old stack. Recording it as OPEN now only reserves the number and
+puts the pending call on the record.

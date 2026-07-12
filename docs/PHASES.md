@@ -163,6 +163,21 @@ Scale to 4B QLoRA · FiLM / cross-attention injection · RL register training ·
 register-conditioned V (flip `verifier.sees_register`, retrain V) · d_r and k
 sweeps.
 
+## Phase M — stack migration (GATED; infra refactor, no science change)
+
+Kaggle/HF/4-bit → Modal/vLLM/fp16. Full plan and M0–M5 gates: [PHASE_M.md].
+**HARD PRECONDITION (do not start):** the current record must be closed on the
+old stack first — B2 + `h2_b2_result.json` + Branch verdict, and DIAG-2/3/5 +
+DIAG-4 item 3 (and DIAG-6 if run on the old stack). Rationale: migrating changes
+sampling numerics and permanently destroys the bit-for-bit Phase-0 lock; migrate
+at a clean boundary, never mid-comparison. Precision call reserved as **D11
+(open)**, settled at M0. Gates below (unchecked until M runs):
+
+- [ ] M0 precondition + repo tag + D11 · [ ] M1 vLLM≡HF soft-prompt (greedy
+      token-match) · [ ] M2 throughput ≥ 20× · [ ] M3 stat-equivalent re-baseline
+      (fp16 shift stated/sized) · [ ] M4 V-v2b revalidation on fp16 candidates ·
+      [ ] M5 new lock_a/lock_b + COMPUTE_ACCOUNTING amendment.
+
 ---
 
 ## Gate log
