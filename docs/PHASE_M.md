@@ -1,9 +1,18 @@
-# Phase M — stack migration (Kaggle/HF/4-bit → Modal/vLLM/fp16)
+# Phase M — throughput STACK rebuild (HF/4-bit → vLLM/fp16, on L4)
 
 *Written 2026-07-12. **This work does not start yet.** Read §0 before anything
 else. Nothing in this document may be executed until the current experimental
-record is closed on the existing Kaggle stack. This is a pre-registered plan and
-a hard gate, not a task in progress.*
+record is closed. This is a pre-registered plan and a hard gate, not a task in
+progress.*
+
+> **Platform ≠ stack (correction, 2026-07-12).** This document originally bundled
+> the *platform* move (Kaggle → Modal) with the *stack* rebuild (fp16 + vLLM).
+> Those are independent. Getting off the Kaggle quota wall for the remaining
+> diagnostics does **not** require any stack change — it runs the *same* HF+NF4+T4
+> stack on rented Modal T4. That is **[PHASE_K.md]** (lift-and-shift, zero science
+> change), and it is what closes the diagnostic record. **Phase M is strictly the
+> fp16 + vLLM + L4 throughput rebuild** — a separate, later step (after Phase 3
+> design), with its own re-lock. Do not conflate them again.*
 
 ---
 
