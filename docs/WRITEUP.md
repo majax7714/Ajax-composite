@@ -205,10 +205,14 @@ artifacts/h2_result.json]:
 bootstrap resamples). The pre-committed kill criterion — FULL failing to
 beat B1 — fired. The kill record is now complete: **FULL does not beat B2
 either** (Δ(FULL − B2) = +0.0610, CI [−0.0122, +0.1341], includes 0), and B2
-itself does **not** beat B1 (Δ(B2 − B1) = −0.0610, CI [−0.1341, +0.0122]) —
-in-context text feedback, at ~2× the prompt-token cost (566,712 vs 281,064),
-lands *below* parallel sampling. The Branch-A reading (§5.3) follows:
-cross-step information of any kind buys nothing at this scale.
+itself does **not** beat B1 (Δ(B2 − B1) = −0.0610, CI [−0.1341, +0.0122]).
+B2's cross-step channel was the **previous candidate plus a scalar
+verifier-confidence estimate, with no execution feedback** (intrinsic
+self-refinement — distinct from execution-grounded self-correction, which B2 does
+not test). Conditioning on the previous attempt — higher-bandwidth than FULL's
+register, at ~2× the prompt-token cost (566,712 vs 281,064) — buys nothing; the
+pass@1 point estimate sits below B1 though its CI crosses 0. The Branch-A reading
+(§5.3) follows: cross-step conditioning of any kind buys nothing at this scale.
 
 **Why this null is attributable, not ambiguous.** Every mundane explanation
 was measured and excluded:
@@ -318,15 +322,19 @@ self-correct without external feedback, which B2 as specified does not receive.
 
 **Outcome (2026-07-12): Branch A — prediction held.** B2 pass@1 = 0.6220 (102/164)
 vs B1 0.6829; Δ(B2 − B1) = −0.0610, CI [−0.1341, +0.0122]. B2 does not beat B1;
-the point estimate and most of the CI mass put it *below* B1. So cross-step
-information of any kind — including raw text feedback at ~2× the attention-FLOPs
-(566,712 vs 281,064 prompt tokens) — buys nothing here, and in-context revision
-on a scalar score if anything mildly hurt (the self-correction-without-external-
-feedback pattern). The H2 null is therefore uninformative about registers *per se*
-and informative about the task: no iteration headroom at this scale, corroborated
-by DIAG-1 (the genuine unreachable set is < 26 of 164). **The next step is task
-redesign (§5.2 / [PRE-B2-HANDOFF.md] §5), not an architecture change.** Prediction
-left standing as written.
+the point estimate and most of the CI mass put it below, though the CI crosses 0
+so we make no significance claim on pass@1. **What B2's channel was:** the
+previous candidate plus a scalar verifier-confidence estimate, with **no execution
+feedback** — intrinsic self-refinement, which is distinct from execution-grounded
+self-correction (feeding the actual error); B2 is evidence about the former only.
+Conditioning on the previous attempt — higher-bandwidth than FULL's register, at
+~2× the prompt-token cost (566,712 vs 281,064) — buys nothing. Direction is
+corroborated not by the pass@1 CI but by the *direct* pool-coverage measurement
+(DIAG-7: B2 0.707 vs B1 0.848). The H2 null is therefore uninformative about
+registers *per se* and informative about the task. **Why redesign:** the ceiling
+(pass@8 = 0.842, minus the 3–5 problems DIAG-1 shows dissolve under resampling) is
+*channel-independent* — the argument is the ceiling, not "iteration is dead."
+Prediction left standing as written.
 
 *Caveat under active test.* The abstract's and §4.3's framing — "every link in
 the chain worked except the last one" — was challenged by the post-mortem in

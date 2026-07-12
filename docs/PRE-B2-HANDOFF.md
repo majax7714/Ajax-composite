@@ -223,18 +223,24 @@ external feedback — which B2, as specified, does not receive.
 **B2 OUTCOME (2026-07-12): Branch A. Prediction HELD (predicted Branch A, ~65/35).**
 B2 pass@1 = 0.6220 (102/164) vs B1 0.6829 (112/164); **Δ(B2−B1) = −0.0610, CI
 [−0.1341, +0.0122]** — the CI includes 0, so B2 does not beat B1, and both the
-point estimate and most of the CI mass put B2 *below* B1. Cross-step information
-of any kind — including raw text feedback, the highest-bandwidth channel a
-transformer has — bought nothing here, and if anything slightly hurt (consistent
-with models not self-correcting without external feedback: B2 received only the
-scalar verifier score, not execution/test feedback). The audit asymmetry sharpens
-it: B2 consumed **566,712 prompt tokens vs FULL's 281,064** (~2×, context grows
-with the embedded previous candidate), so B2 had *both* a richer channel and more
-attention-FLOPs and still did not beat parallel sampling. The H2 null therefore
-says **this task at this scale has no iteration headroom** — exactly as
-pass@8 = 0.8415 and DIAG-1's "unreachable set < 26" predict. **Next step is task
-redesign (§5), not an architecture change.** Ledger matched at N=8 across
-FULL/B1/B2 (`artifacts/h2_b2_result.json`). Prediction left standing as written.
+point estimate and most of the CI mass put B2 *below* B1. **What B2's channel
+actually was (correcting an earlier over-statement):** per the frozen spec, the
+prompt held the **previous candidate plus a scalar verifier-confidence estimate**
+("estimated its probability of being correct at 0.42") — and **no execution
+feedback** (no traceback, failing-test IDs, or error_type; those were forbidden by
+design). So B2 tested **intrinsic self-refinement**, which the literature separates
+sharply from **execution-grounded self-correction** (feeding the model the actual
+error). B2 is clean evidence about the first and says *nothing* about the second.
+Cross-step conditioning on the previous attempt — a higher-bandwidth channel than
+FULL's 128-dim register — bought nothing, even at ~2× the prompt-token cost
+(566,712 vs 281,064). *Honesty on direction:* the pass@1 CI crosses 0, so we do
+**not** claim B2 "hurt"; but the point estimate, the bulk of the CI, the
+diversity-tax mechanism, and the **direct** DIAG-7 pool-coverage measurement
+(B2 0.707 vs B1 0.848, a real 23-problem gap) all point the same way. **Why redesign
+the task:** the *ceiling* — pass@8 = 0.8415 minus the 3–5 problems DIAG-1 shows
+dissolve under pure resampling — which is **channel-independent**; not "iteration
+is dead," which over-claims. Ledger matched at N=8 across FULL/B1/B2
+(`artifacts/h2_b2_result.json`). Prediction left standing as written.
 
 ---
 

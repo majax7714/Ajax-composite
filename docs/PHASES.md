@@ -113,10 +113,16 @@ retune.
 - [x] **B2** (in-context refinement, N=8, frozen spec) run on HumanEval
       (2026-07-12, ~6.8h GPU). **Branch A — prediction HELD** (predicted A,
       ~65/35). B2 pass@1 **0.6220** (102/164) vs B1 0.6829; Δ(B2−B1) −0.0610, CI
-      [−0.1341, +0.0122] → B2 does *not* beat B1 (point estimate below it). Cross-
-      step text feedback at ~2× prompt-token cost buys nothing ⇒ **no iteration
-      headroom at this scale; task redesign next.** Ledger matched N=8; gate stays
-      FAIL. → `artifacts/h2_b2_result.json`
+      [−0.1341, +0.0122] → B2 does *not* beat B1 (point estimate below; CI crosses
+      0, so no significance claim). B2's channel was the **previous candidate +
+      a scalar verifier-confidence estimate, with NO execution feedback** — it
+      tested *intrinsic self-refinement*, not execution-grounded self-correction,
+      and says nothing about the latter. Conditioning on the previous attempt
+      (higher-bandwidth than FULL's register, at ~2× prompt-token cost) buys
+      nothing. **Task-redesign rationale = the ceiling** (pass@8 0.84 minus the
+      3–5 DIAG-1 shows dissolve under resampling), which is *channel-independent* —
+      not "iteration is dead." Ledger matched N=8; gate stays FAIL. →
+      `artifacts/h2_b2_result.json`
 - [x] **DIAG-1** (CPU, 2026-07-12) oracle stratification. FULL's 9 wins = 8
       reselection + 1 B1-pool-empty; symmetry control B1 = 2; oracle-empty solves
       FULL 3 vs **B1 5**. Register generative effect **non-positive** (B1 ≥ FULL
@@ -142,9 +148,9 @@ retune.
       within-r_0 ⇒ register is an *entropy killer* (narrows reach).
 - [ ] **DIAG-2** (MBPP val, GPU) register-probe: encoding vs transmission
       failure. *Prediction:* weak `passed` probe, decodable clock → encoding.
-- [ ] **DIAG-6** (HumanEval gen, GPU, lowest) pass@50 on the 26 oracle-empty to
-      bound headroom. *Prediction:* pass@50 ≥ 0.8 → genuine target ~5%, task
-      redesign mandatory with a number.
+- [~] **DIAG-6** **DESCOPED → Phase 3** (2026-07-12, [DECISIONS.md] D12): ceiling
+      already carried by pass@8 0.84 + DIAG-1 + DIAG-7; the large-k pass@k folds
+      into Phase 3 benchmark selection.
 - [x] **DIAG-7** (CPU, 2026-07-12) oracle pool coverage by cross-step channel.
       **Prediction HELD:** pass@8 **B1 0.848 > FULL 0.823 > B2 0.707**, strict,
       monotonic in channel bandwidth. Register updates (FULL vs B1) cost 2.4 pts
@@ -191,7 +197,7 @@ at a clean boundary, never mid-comparison. Precision call reserved as **D11
 
 | Date | Phase | Verdict | Numbers | Notes |
 |---|---|---|---|---|
-| 2026-07-12 | 2 — B2 branch (record close) | **Branch A** (pred. held) | B2 0.6220 vs B1 0.6829, Δ(B2−B1) −0.061 CI [−0.134, +0.012]; Δ(FULL−B2) +0.061 CI [−0.012, +0.134]; ledger matched N=8; B2 prompt-tok 2× FULL | Kill record complete: FULL beats neither, B2 beats neither. Cross-step info (even raw text) buys nothing ⇒ no iteration headroom, task redesign next. Gate stays FAIL |
+| 2026-07-12 | 2 — B2 branch (record close) | **Branch A** (pred. held) | B2 0.6220 vs B1 0.6829, Δ(B2−B1) −0.061 CI [−0.134, +0.012]; Δ(FULL−B2) +0.061 CI [−0.012, +0.134]; ledger matched N=8; B2 prompt-tok 2× FULL | Kill record complete: FULL beats neither, B2 beats neither. B2 channel = prev candidate + scalar verifier score, NO execution feedback (intrinsic self-refinement). Higher-bandwidth cross-step conditioning buys nothing; redesign rationale is the channel-independent ceiling (pass@8 0.84), not "iteration dead". Gate stays FAIL |
 | 2026-07-12 | 2 — Register loop (H2) | **FAIL** | FULL 0.6829 ≡ B1 0.6829, Δ 0.0000 CI [−0.049, +0.055]; register healthy, V not stale, per-step rates flat | The core claim's pre-registered kill fired on FULL-vs-B1; B2 pending for the complete record; do not tune past the gate |
 | 2026-07-11 | 1 — Verifier (H1) | **PASS** | V-v2b heldout AUROC 0.7951 vs lik 0.6961, Δ 0.0991 CI [0.044, 0.153] · within-problem 0.719 vs 0.568 · B1(V) 0.6707 | QLoRA cross-encoder on Qwen2.5-Coder-1.5B, val-selected epoch 2; v1 failed (Δ 0.012), codebert DQ'd on val; 2 held-out peeks total |
 | 2026-07-11 | 0 — Harness | **PASS** | B0 pass@1 0.5922 · B1(lik) 0.6280 · pass@8 0.8415 · format 99.1% | lock_a ≡ lock_b byte-identical (164/164); T4, seed 17, N=8, temp 0.8; difficulty proxy in artifacts/ |

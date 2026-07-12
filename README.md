@@ -93,12 +93,14 @@ and lifts best-of-8 from 0.628 to 0.671 pass@1. Phase 0 baselines frozen and
 bit-for-bit reproducible.
 
 **B2 complete (2026-07-12): Branch A — the standing prediction held.** In-context
-refinement (prev. candidate + verifier score in prompt) reaches pass@1 0.6220 and
-does *not* beat B1 (Δ(B2−B1) −0.061, CI [−0.134, +0.012]) — cross-step information
-of any kind, even raw text at ~2× the prompt-token cost, buys nothing here. The H2
-null is thus about the *task* (no iteration headroom at this scale), not registers
-per se; the next step is task redesign, not architecture. All pre-registered
-before running ([docs/PRE-B2-HANDOFF.md](docs/PRE-B2-HANDOFF.md)).
+refinement (prev. candidate + a scalar verifier-confidence estimate in prompt —
+**no execution feedback**; intrinsic self-refinement) reaches pass@1 0.6220 and
+does *not* beat B1 (Δ(B2−B1) −0.061, CI [−0.134, +0.012]) — higher-bandwidth
+cross-step conditioning, at ~2× the prompt-token cost, buys nothing here. The H2
+null is thus about the *task*, not registers per se; the reason to redesign is the
+**channel-independent ceiling** (pass@8 0.84 minus the few DIAG-1 shows dissolve
+under resampling), not "iteration is dead." All pre-registered before running
+([docs/PRE-B2-HANDOFF.md](docs/PRE-B2-HANDOFF.md)).
 
 Diagnostics ([docs/DIAGNOSTICS.md](docs/DIAGNOSTICS.md)) decide *what the null
 means* — DIAG-1 (register effect non-positive; "unreachable" set < 26) and DIAG-4

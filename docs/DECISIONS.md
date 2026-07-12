@@ -165,3 +165,19 @@ any migration code runs; it may not happen by accident.
 *Do not finalize until:* §0 of [PHASE_M.md] is green — B2 and all diagnostics
 closed on the old stack. Recording it as OPEN now only reserves the number and
 puts the pending call on the record.
+
+## D12 — DIAG-6 descoped from the diagnostic record (2026-07-12)
+
+DIAG-6 (large-k pass@k, k ≈ 50–100, on the 26 oracle-empty HumanEval problems —
+the headroom ceiling) is **descoped**, not run on the current stack. Reasoning:
+it is the most expensive remaining item (~$3.30, vs < $1 for all other GPU
+diagnostics combined) and now largely **redundant** — its finding (the refinement
+headroom ceiling is low) is already carried by pass@8 = 0.8415 plus DIAG-1's
+resampling recovery (3–5 of 26 dissolve) plus DIAG-7's pool-coverage account, and
+the task is being redesigned regardless. The same measurement is worth far more
+pointed at a *useful* question: it folds into **Phase 3's benchmark-selection
+screen** (choose a benchmark with genuine generative headroom), where large-k
+pass@k is the natural instrument. Not dropped — relocated.
+
+*Revisit if:* Phase 3 benchmark selection needs the ceiling on the *current*
+HumanEval set specifically (unlikely — Phase 3 changes the benchmark).

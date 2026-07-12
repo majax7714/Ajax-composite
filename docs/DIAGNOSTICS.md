@@ -196,7 +196,14 @@ HumanEval passing candidates); shares plumbing with DIAG-4 item 3.
 
 ---
 
-## DIAG-6 — Bound the maximum possible refinement headroom  *(HumanEval · GPU · status: PENDING — lowest priority)*
+## DIAG-6 — Bound the maximum possible refinement headroom  *(HumanEval · GPU · status: DESCOPED 2026-07-12 → Phase 3, [DECISIONS.md] D12)*
+
+**DESCOPED** (not run on the current stack). Its finding — the headroom ceiling is
+low — is already carried by pass@8 = 0.8415 + DIAG-1's resampling recovery +
+DIAG-7's pool account, and it is the most expensive item (~$3.30). The same
+large-k pass@k measurement relocates to **Phase 3's benchmark-selection screen**,
+pointed at a useful question. Rationale recorded as D12. Spec retained below for
+if it is ever run there.
 
 Added 2026-07-12 after DIAG-1 showed "oracle-empty" problems dissolve under
 resampling.
@@ -299,5 +306,5 @@ the outcome-level story is complete and evidence-backed.
 | DIAG-3 | _pending (GPU)_ | _pending_ | control authority of r; entropy-killer? (r_7 diversity < r_0?) |
 | DIAG-4 | 1.7× teacher-forced gain → 0.000 sampled | **no** (refutes §1.3 arithmetic, opens 1.7×→0 puzzle) | wrong-object failure: string-reproduction ≠ class steering; indicts D2(a) |
 | DIAG-5 | _pending (GPU, run first)_ | _pending_ | domain/length transfer vs teacher-forced/sampled gap |
-| DIAG-6 | _pending (GPU)_ | _pending_ | hard ceiling on refinement headroom |
+| DIAG-6 | **descoped → Phase 3** (D12) | — | ceiling already carried by pass@8 + DIAG-1 + DIAG-7 |
 | DIAG-7 | pool coverage 0.848 > 0.823 > 0.707 (B1>FULL>B2) | **yes** (strict ordering) | every cross-step channel net-harmful, monotonic in bandwidth; register updates cost 2.4 pts of pool |
