@@ -1,0 +1,25 @@
+{
+  "_label": "B2 (in-context refinement) completes the H2 kill record; does NOT change the FAIL gate (claim required beating both).",
+  "n_problems": 164,
+  "N_matched": 8,
+  "ledger_generations_matched": true,
+  "full_pass_at_1": 0.6829268292682927,
+  "b1_pass_at_1": 0.6829268292682927,
+  "b2_pass_at_1": 0.6219512195121951,
+  "delta_full_minus_b2": {
+    "point": 0.06097560975609756,
+    "lo": -0.012195121951219513,
+    "hi": 0.13414634146341464,
+    "n_resamples": 10000
+  },
+  "delta_b2_minus_b1": {
+    "point": -0.06097560975609756,
+    "lo": -0.13414634146341464,
+    "hi": 0.012195121951219513,
+    "n_resamples": 10000
+  },
+  "branch": "A",
+  "branch_note": "A = B2 ties B1 (no iteration headroom at this scale); B = B2 beats B1 (register parasitic to in-context text).",
+  "prompt_tokens_full": 281064,
+  "prompt_tokens_b2": 566712
+}

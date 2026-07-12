@@ -209,8 +209,21 @@ external feedback — which B2, as specified, does not receive.
 > Whichever branch fires, this section is not revised afterward. The outcome is
 > **appended** below; the prediction is **left standing, right or wrong.**
 
-**B2 OUTCOME: _pending_.** (To append: B2 pass@1, Δ(B2−B1) with CI, branch fired,
-prediction held? — one line, no edits above.)
+**B2 OUTCOME (2026-07-12): Branch A. Prediction HELD (predicted Branch A, ~65/35).**
+B2 pass@1 = 0.6220 (102/164) vs B1 0.6829 (112/164); **Δ(B2−B1) = −0.0610, CI
+[−0.1341, +0.0122]** — the CI includes 0, so B2 does not beat B1, and both the
+point estimate and most of the CI mass put B2 *below* B1. Cross-step information
+of any kind — including raw text feedback, the highest-bandwidth channel a
+transformer has — bought nothing here, and if anything slightly hurt (consistent
+with models not self-correcting without external feedback: B2 received only the
+scalar verifier score, not execution/test feedback). The audit asymmetry sharpens
+it: B2 consumed **566,712 prompt tokens vs FULL's 281,064** (~2×, context grows
+with the embedded previous candidate), so B2 had *both* a richer channel and more
+attention-FLOPs and still did not beat parallel sampling. The H2 null therefore
+says **this task at this scale has no iteration headroom** — exactly as
+pass@8 = 0.8415 and DIAG-1's "unreachable set < 26" predict. **Next step is task
+redesign (§5), not an architecture change.** Ledger matched at N=8 across
+FULL/B1/B2 (`artifacts/h2_b2_result.json`). Prediction left standing as written.
 
 ---
 

@@ -96,10 +96,11 @@ per-step pass rates flat (no within-loop improvement), paired disagreements
 symmetric (9 vs 9), best-step position uniform. The D10 imitation signal
 (−11% val teacher-forced loss) did not survive sampling. B1′ control: 0.6707
 (different sampling run — the +1.2pt static-r₀ effect is within run noise,
-not claimable). B2 run pending quota completes the kill-criterion record
-("ties both") but cannot change the gate verdict: the claim requires beating
-both. Per brief §1: the register is dead as stated; this is the clean,
-publishable negative the design was built to produce.
+not claimable). B2 (2026-07-12) completes the kill-criterion record — FULL does
+not beat B2 either (Δ +0.061, CI [−0.012, +0.134]) and B2 does not beat B1
+(Δ −0.061, CI [−0.134, +0.012], **Branch A**) — but cannot change the gate
+verdict: the claim required beating both. Per brief §1: the register is dead as
+stated; this is the clean, publishable negative the design was built to produce.
 
 ### Post-gate work — pre-registered 2026-07-12 (does NOT reopen the gate)
 
@@ -109,12 +110,13 @@ The post-mortem there argues the null was likely over-determined upstream of the
 register (§1); DIAG-1/DIAG-4 adjudicate that. Nothing below is a rescue or a
 retune.
 
-- [ ] **B2** (in-context refinement, N=8, frozen spec) run on HumanEval; Δ(B2−B1)
-      with CI; branch verdict recorded. **Pre-registered branch (committed before
-      the number):** *Branch A* — B2 also ties B1 ⇒ no iteration headroom at this
-      scale, task redesign next; *Branch B* — B2 beats B1 ⇒ register is
-      architecturally parasitic to in-context text, architecture rethink next.
-      **Standing prediction: Branch A, ~65/35.**
+- [x] **B2** (in-context refinement, N=8, frozen spec) run on HumanEval
+      (2026-07-12, ~6.8h GPU). **Branch A — prediction HELD** (predicted A,
+      ~65/35). B2 pass@1 **0.6220** (102/164) vs B1 0.6829; Δ(B2−B1) −0.0610, CI
+      [−0.1341, +0.0122] → B2 does *not* beat B1 (point estimate below it). Cross-
+      step text feedback at ~2× prompt-token cost buys nothing ⇒ **no iteration
+      headroom at this scale; task redesign next.** Ledger matched N=8; gate stays
+      FAIL. → `artifacts/h2_b2_result.json`
 - [x] **DIAG-1** (CPU, 2026-07-12) oracle stratification. FULL's 9 wins = 8
       reselection + 1 B1-pool-empty; symmetry control B1 = 2; oracle-empty solves
       FULL 3 vs **B1 5**. Register generative effect **non-positive** (B1 ≥ FULL
@@ -184,6 +186,7 @@ at a clean boundary, never mid-comparison. Precision call reserved as **D11
 
 | Date | Phase | Verdict | Numbers | Notes |
 |---|---|---|---|---|
+| 2026-07-12 | 2 — B2 branch (record close) | **Branch A** (pred. held) | B2 0.6220 vs B1 0.6829, Δ(B2−B1) −0.061 CI [−0.134, +0.012]; Δ(FULL−B2) +0.061 CI [−0.012, +0.134]; ledger matched N=8; B2 prompt-tok 2× FULL | Kill record complete: FULL beats neither, B2 beats neither. Cross-step info (even raw text) buys nothing ⇒ no iteration headroom, task redesign next. Gate stays FAIL |
 | 2026-07-12 | 2 — Register loop (H2) | **FAIL** | FULL 0.6829 ≡ B1 0.6829, Δ 0.0000 CI [−0.049, +0.055]; register healthy, V not stale, per-step rates flat | The core claim's pre-registered kill fired on FULL-vs-B1; B2 pending for the complete record; do not tune past the gate |
 | 2026-07-11 | 1 — Verifier (H1) | **PASS** | V-v2b heldout AUROC 0.7951 vs lik 0.6961, Δ 0.0991 CI [0.044, 0.153] · within-problem 0.719 vs 0.568 · B1(V) 0.6707 | QLoRA cross-encoder on Qwen2.5-Coder-1.5B, val-selected epoch 2; v1 failed (Δ 0.012), codebert DQ'd on val; 2 held-out peeks total |
 | 2026-07-11 | 0 — Harness | **PASS** | B0 pass@1 0.5922 · B1(lik) 0.6280 · pass@8 0.8415 · format 99.1% | lock_a ≡ lock_b byte-identical (164/164); T4, seed 17, N=8, temp 0.8; difficulty proxy in artifacts/ |

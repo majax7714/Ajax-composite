@@ -1,9 +1,9 @@
 # Register-Gated Refinement: an execution-grounded verifier carries load; a learned cross-step register does not
 
 *Draft v1 — 2026-07-12. All numbers trace to committed artifacts and run
-records; sources cited inline as `[file]`. B2 (in-context refinement
-baseline) is pending GPU quota; its absence cannot change the H2 verdict
-(§5.3) but its numbers are marked PENDING where they would appear.*
+records; sources cited inline as `[file]`. B2 (in-context refinement baseline)
+is now complete: pass@1 0.6220, it does not beat B1 (Branch A; §5.3,
+[artifacts/h2_b2_result.json]) and does not change the H2 FAIL verdict.*
 
 ---
 
@@ -199,11 +199,16 @@ artifacts/h2_result.json]:
 | FULL (register updating) | learned register only | **0.6829** |
 | B1 (register frozen at r₀) — *the ablation* | none | **0.6829** |
 | B1′ (no injection; frozen Phase-1 artifact) | none | 0.6707 |
-| B2 (in-context refinement) | prev. candidate in prompt | PENDING |
+| B2 (in-context refinement) | prev. candidate in prompt | **0.6220** |
 
 **Δ(FULL − B1) = 0.0000, 95% CI [−0.0488, +0.0549]** (10,000 problem-level
 bootstrap resamples). The pre-committed kill criterion — FULL failing to
-beat B1 — fired.
+beat B1 — fired. The kill record is now complete: **FULL does not beat B2
+either** (Δ(FULL − B2) = +0.0610, CI [−0.0122, +0.1341], includes 0), and B2
+itself does **not** beat B1 (Δ(B2 − B1) = −0.0610, CI [−0.1341, +0.0122]) —
+in-context text feedback, at ~2× the prompt-token cost (566,712 vs 281,064),
+lands *below* parallel sampling. The Branch-A reading (§5.3) follows:
+cross-step information of any kind buys nothing at this scale.
 
 **Why this null is attributable, not ambiguous.** Every mundane explanation
 was measured and excluded:
@@ -296,8 +301,18 @@ committed here **before B2's number is known** (full statement in
 **Standing prediction (recorded 2026-07-12, before the run): Branch A, ~65/35**
 — pass@8 = 0.84 leaves little for iteration to do, and models do not reliably
 self-correct without external feedback, which B2 as specified does not receive.
-Outcome PENDING quota; will be appended as a §4.3 table row with the prediction
-left standing, right or wrong.
+
+**Outcome (2026-07-12): Branch A — prediction held.** B2 pass@1 = 0.6220 (102/164)
+vs B1 0.6829; Δ(B2 − B1) = −0.0610, CI [−0.1341, +0.0122]. B2 does not beat B1;
+the point estimate and most of the CI mass put it *below* B1. So cross-step
+information of any kind — including raw text feedback at ~2× the attention-FLOPs
+(566,712 vs 281,064 prompt tokens) — buys nothing here, and in-context revision
+on a scalar score if anything mildly hurt (the self-correction-without-external-
+feedback pattern). The H2 null is therefore uninformative about registers *per se*
+and informative about the task: no iteration headroom at this scale, corroborated
+by DIAG-1 (the genuine unreachable set is < 26 of 164). **The next step is task
+redesign (§5.2 / [PRE-B2-HANDOFF.md] §5), not an architecture change.** Prediction
+left standing as written.
 
 *Caveat under active test.* The abstract's and §4.3's framing — "every link in
 the chain worked except the last one" — was challenged by the post-mortem in

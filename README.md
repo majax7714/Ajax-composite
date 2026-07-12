@@ -92,16 +92,20 @@ self-fluency decisively (AUROC 0.795 vs 0.696, within-problem 0.719 vs 0.568)
 and lifts best-of-8 from 0.628 to 0.671 pass@1. Phase 0 baselines frozen and
 bit-for-bit reproducible.
 
-Remaining, all pre-registered before running (2026-07-12):
-[docs/PRE-B2-HANDOFF.md](docs/PRE-B2-HANDOFF.md) — the frozen B2 run (with its
-Branch A/B verdict committed *before* the number) plus four exploratory
-diagnostics ([docs/DIAGNOSTICS.md](docs/DIAGNOSTICS.md)) that decide *what the
-null means*: whether the register's effect was generative or pure reselection
-(DIAG-1), an encoding vs a transmission failure (DIAG-2), whether the register
-moved G's sampling at all (DIAG-3), and whether the training objective could
-mechanically move sampling behaviour (DIAG-4). None of these reopens the H2
-verdict. Post-hoc *directions* (RL regime, richer injection into U, larger G,
-verifier-first work) are future experiments, not rescues. See
+**B2 complete (2026-07-12): Branch A — the standing prediction held.** In-context
+refinement (prev. candidate + verifier score in prompt) reaches pass@1 0.6220 and
+does *not* beat B1 (Δ(B2−B1) −0.061, CI [−0.134, +0.012]) — cross-step information
+of any kind, even raw text at ~2× the prompt-token cost, buys nothing here. The H2
+null is thus about the *task* (no iteration headroom at this scale), not registers
+per se; the next step is task redesign, not architecture. All pre-registered
+before running ([docs/PRE-B2-HANDOFF.md](docs/PRE-B2-HANDOFF.md)).
+
+Diagnostics ([docs/DIAGNOSTICS.md](docs/DIAGNOSTICS.md)) decide *what the null
+means* — DIAG-1 (register effect non-positive; "unreachable" set < 26) and DIAG-4
+(objective units; opened the 1.7×-teacher-forced → 0.000-sampled puzzle, a
+string-vs-class failure) are in; DIAG-5/3/2/6 run next. None reopens the H2
+verdict. A gated infra migration to Modal/vLLM/fp16 is pre-registered but must not
+start until the record closes ([docs/PHASE_M.md](docs/PHASE_M.md)). See
 [docs/PHASES.md](docs/PHASES.md) for the gate log.
 
 ## Quickstart
