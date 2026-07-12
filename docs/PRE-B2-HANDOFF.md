@@ -65,6 +65,17 @@ wrong for H2. It optimized the control (verification) and starved the treatment
 > above. **DIAG-6** (new) puts a hard number on it (pass@50 on the 26). See
 > [DIAGNOSTICS.md] DIAG-1 / DIAG-6.
 
+> **[APPENDED 2026-07-12 — DIAG-7 confirms the "structurally guaranteed" clause
+> and closes the outcome-level account.]** At ~0.85 i.i.d. pool coverage there is
+> almost nothing for cross-step conditioning to *add* and much for anchoring on
+> prior failures to *subtract*. Measured exactly: oracle pool coverage (pass@8) is
+> ordered **B1 0.848 > FULL 0.823 > B2 0.707**, monotonically in cross-step channel
+> bandwidth (none / 128-dim latent / previous-candidate text). Isolating the
+> register updates (FULL vs B1) costs 2.4 pts of pool; the text channel costs 14.
+> *Every* cross-step channel we built was **net-harmful** — the register's updates
+> actively shrink the reachable pool, they don't merely fail to grow it. See
+> [DIAGNOSTICS.md] DIAG-7.
+
 ### 1.2 The register was fed a representation already measured near-chance
 
 The sharpest point, and the evidence is inside our own writeup. V-v1 (MLP over

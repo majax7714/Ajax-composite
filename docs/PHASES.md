@@ -145,6 +145,11 @@ retune.
 - [ ] **DIAG-6** (HumanEval gen, GPU, lowest) pass@50 on the 26 oracle-empty to
       bound headroom. *Prediction:* pass@50 ≥ 0.8 → genuine target ~5%, task
       redesign mandatory with a number.
+- [x] **DIAG-7** (CPU, 2026-07-12) oracle pool coverage by cross-step channel.
+      **Prediction HELD:** pass@8 **B1 0.848 > FULL 0.823 > B2 0.707**, strict,
+      monotonic in channel bandwidth. Register updates (FULL vs B1) cost 2.4 pts
+      of pool; text channel 14. **Every cross-step channel net-harmful** — the
+      capstone mechanistic result. → `artifacts/diag7_*.json`
 
 Predictions are on the record so they can be wrong; outcomes get appended to
 [PRE-B2-HANDOFF.md] §3–4, [DIAGNOSTICS.md], and the gate log below (one line per

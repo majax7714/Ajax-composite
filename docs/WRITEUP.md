@@ -265,6 +265,20 @@ mean compute — and is future work, explicitly outside the original gates.
 3. **Selection headroom remains large** (0.671 achieved vs 0.842 oracle at
    n=8): better verifiers still have ~17 points to claim, independent of
    any iteration mechanism.
+4. **Every cross-step channel was net-harmful, monotonically in bandwidth.**
+   Oracle pool coverage (pass@8) is ordered **B1 0.848 > FULL 0.823 > B2
+   0.707** by the amount each condition conditions on prior failed attempts
+   (none / 128-dim latent / full previous-candidate text; DIAG-7,
+   [DIAGNOSTICS.md]). Isolating the register updates (FULL vs B1, same r₀
+   injection) costs 2.4 points of pool coverage — so the register does not
+   merely fail to help, its updates *shrink the reachable pool* by anchoring
+   the generator onto shown-wrong candidates; the verifier reselected FULL
+   back to a 0.6829 tie, masking the damage, while B2's 14-point pool crash
+   broke through to pass@1. This was structurally guaranteed: at ~0.85 i.i.d.
+   pool coverage there is almost nothing for cross-step conditioning to add
+   and much for anchoring to subtract. The null is therefore not "the register
+   did nothing" but "conditioning on a saturated task's own failures is
+   net-harmful, and the harm scales with channel bandwidth."
 
 ### 5.2 Honest bounds on the negative
 

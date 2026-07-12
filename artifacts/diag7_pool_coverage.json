@@ -1,0 +1,45 @@
+{
+  "_label": "EXPLORATORY / POST-HOC \u2014 does not reopen the H2 gate",
+  "n_problems": 164,
+  "channel_bandwidth_order": [
+    "B1 (none/i.i.d.)",
+    "FULL (128-dim latent)",
+    "B2 (prev-candidate text)"
+  ],
+  "conditions": {
+    "B1": {
+      "pool_coverage_pass_at_8": 0.8475609756097561,
+      "pool_covered_count": 139,
+      "selected_pass_at_1": 0.6829268292682927,
+      "selected_pass_count": 112,
+      "mean_passing_per_problem": 4.670731707317073
+    },
+    "FULL": {
+      "pool_coverage_pass_at_8": 0.823170731707317,
+      "pool_covered_count": 135,
+      "selected_pass_at_1": 0.6829268292682927,
+      "selected_pass_count": 112,
+      "mean_passing_per_problem": 4.810975609756097
+    },
+    "B2": {
+      "pool_coverage_pass_at_8": 0.7073170731707317,
+      "pool_covered_count": 116,
+      "selected_pass_at_1": 0.6219512195121951,
+      "selected_pass_count": 102,
+      "mean_passing_per_problem": 3.6402439024390243
+    }
+  },
+  "pool_coverage": {
+    "B1": 0.8475609756097561,
+    "FULL": 0.823170731707317,
+    "B2": 0.7073170731707317
+  },
+  "predicted": {
+    "B1": "~0.84",
+    "FULL": "~0.82-0.84",
+    "B2": "~0.72-0.78",
+    "ordering": "B1 > FULL > B2"
+  },
+  "ordering_B1_ge_FULL_ge_B2": true,
+  "ordering_strict_B1_gt_FULL_gt_B2": true
+}

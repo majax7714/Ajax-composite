@@ -259,8 +259,34 @@ was *structurally guaranteed* by a task whose pool coverage is already ~0.84 at
 i.i.d. sampling, leaving anchoring nowhere to add and everywhere to subtract. That
 is a materially stronger paper than a bare null, for an afternoon of CPU.
 
-**RESULT:** _pending_.
-**Prediction held?** _pending._
+**RESULT.** Pool coverage (pass@8): **B1 0.8476 (139/164) > FULL 0.8232 (135/164)
+> B2 0.7073 (116/164)** — strict monotonic ordering in channel bandwidth.
+Selected pass@1: B1 0.6829, FULL 0.6829, B2 0.6220.
+
+**Prediction held? YES.** Strict ordering B1 > FULL > B2 as predicted; B1 0.848
+(pred ~0.84 ✓), FULL 0.823 (pred 0.82–0.84 ✓), B2 0.707 (pred 0.72–0.78 — landed
+a hair below, i.e. the text channel was *even more* harmful than predicted). Two
+sharpenings, both from committed data:
+
+- **FULL vs B1 isolates the register updates** (both inject r₀; FULL updates r_t,
+  B1 freezes it) → the register updates **cost 2.4 pts of pool coverage** (0.8232
+  vs 0.8476, 135 vs 139 problems). So the register is not merely non-positive
+  (DIAG-1) — its updates *actively shrink the reachable pool*. The verifier
+  reselected FULL back to 0.6829, masking the pool damage at pass@1; for B2 the
+  14-pt pool crash broke through to pass@1 (0.6220).
+- **FULL's mean passing-candidates/problem (4.811) exceeds B1's (4.671) despite
+  lower coverage** — the register piles *redundant* passes onto already-solvable
+  problems while losing marginal ones. That is the **entropy-killer signature**
+  (DIAG-3's pre-registered directional hypothesis) surfacing in the pool
+  statistics on CPU, and it is consistent with DIAG-1 (B1 reaching more
+  oracle-empty problems). B2's mean (3.640) is lowest — the text channel reduces
+  both coverage *and* richness.
+
+The account is now closed on the CPU side: at ~0.85 i.i.d. pool coverage there is
+almost nothing for cross-step conditioning to *add* and a great deal for anchoring
+on prior failures to *subtract*, so bandwidth buys harm. GPU diagnostics (DIAG-5
+transfer, DIAG-3 authority) remain to pin the register's internal mechanism, but
+the outcome-level story is complete and evidence-backed.
 
 ---
 
@@ -274,4 +300,4 @@ is a materially stronger paper than a bare null, for an afternoon of CPU.
 | DIAG-4 | 1.7× teacher-forced gain → 0.000 sampled | **no** (refutes §1.3 arithmetic, opens 1.7×→0 puzzle) | wrong-object failure: string-reproduction ≠ class steering; indicts D2(a) |
 | DIAG-5 | _pending (GPU, run first)_ | _pending_ | domain/length transfer vs teacher-forced/sampled gap |
 | DIAG-6 | _pending (GPU)_ | _pending_ | hard ceiling on refinement headroom |
-| DIAG-7 | _pending (CPU)_ | _pending_ | pool coverage B1>FULL>B2? every cross-step channel net-harmful |
+| DIAG-7 | pool coverage 0.848 > 0.823 > 0.707 (B1>FULL>B2) | **yes** (strict ordering) | every cross-step channel net-harmful, monotonic in bandwidth; register updates cost 2.4 pts of pool |
