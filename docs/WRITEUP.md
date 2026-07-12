@@ -273,15 +273,40 @@ higher-bandwidth injection (FiLM / cross-attention), or a generator scale
 where soft-prompt control is stronger. These are future experiments, not
 rescues of the present claim.
 
-### 5.3 Pending completion
+### 5.3 B2 and the pre-registered branch verdict
 
-The B2 run (in-context iterative refinement, N=8) completes the
-pre-registered record: the kill statement was "FULL ties B1 *and* B2." B2
-cannot change the gate verdict — passing required beating both — but it
-answers whether *any* form of cross-step information (even raw text
-feedback) beats parallel sampling in this setting, which locates the
-failure more precisely: register-specific, or iteration-general at this
-scale. PENDING quota; will be appended as §4.3 table row + analysis.
+The B2 run (in-context iterative refinement, N=8) completes the pre-registered
+record: the kill statement was "FULL ties B1 *and* B2." B2 cannot change the
+gate verdict — passing required beating both — but it answers whether *any* form
+of cross-step information (even raw text feedback) beats parallel sampling in
+this setting, which decides how the null should be read. The interpretation is
+committed here **before B2's number is known** (full statement in
+[PRE-B2-HANDOFF.md] §3):
+
+- **Branch A — B2 also ties B1.** Cross-step information of any kind, including
+  raw text, buys nothing here. The null then says nothing about registers; it
+  says this task at this scale has no iteration headroom, as pass@8 = 0.842
+  predicts. The experiment was uninformative about the hypothesis, and the next
+  step is task redesign, not architecture.
+- **Branch B — B2 beats B1.** Iteration pays, and a 128-dim latent through 8 soft
+  tokens lost to putting the previous attempt in the context window: the register
+  is architecturally parasitic to the in-context channel the transformer already
+  optimizes for. The next step is an architecture rethink, not a task change.
+
+**Standing prediction (recorded 2026-07-12, before the run): Branch A, ~65/35**
+— pass@8 = 0.84 leaves little for iteration to do, and models do not reliably
+self-correct without external feedback, which B2 as specified does not receive.
+Outcome PENDING quota; will be appended as a §4.3 table row with the prediction
+left standing, right or wrong.
+
+*Caveat under active test.* The abstract's and §4.3's framing — "every link in
+the chain worked except the last one" — is challenged by the post-mortem in
+[PRE-B2-HANDOFF.md] §1, which argues three links (refinement headroom, the
+register's near-chance φ input, and the proxy training objective) were likely
+broken upstream. That is a pre-registered hypothesis, not yet a finding: DIAG-1
+and DIAG-4 ([DIAGNOSTICS.md]) adjudicate it. In particular the "training was not
+a no-op" line (§4.3) is provisional pending DIAG-4's objective-units result. The
+framing above stands as written until those diagnostics land.
 
 ### 5.4 The conceptual mapping, honestly closed
 

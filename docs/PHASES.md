@@ -101,6 +101,33 @@ not claimable). B2 run pending quota completes the kill-criterion record
 both. Per brief §1: the register is dead as stated; this is the clean,
 publishable negative the design was built to produce.
 
+### Post-gate work — pre-registered 2026-07-12 (does NOT reopen the gate)
+
+Full plan and committed predictions: [PRE-B2-HANDOFF.md]. This is B2 + four
+exploratory diagnostics that decide *what the null means*, not whether it holds.
+The post-mortem there argues the null was likely over-determined upstream of the
+register (§1); DIAG-1/DIAG-4 adjudicate that. Nothing below is a rescue or a
+retune.
+
+- [ ] **B2** (in-context refinement, N=8, frozen spec) run on HumanEval; Δ(B2−B1)
+      with CI; branch verdict recorded. **Pre-registered branch (committed before
+      the number):** *Branch A* — B2 also ties B1 ⇒ no iteration headroom at this
+      scale, task redesign next; *Branch B* — B2 beats B1 ⇒ register is
+      architecturally parasitic to in-context text, architecture rethink next.
+      **Standing prediction: Branch A, ~65/35.**
+- [ ] **DIAG-1** (CPU) oracle stratification of the 9/9 wins → is FULL's effect
+      generative or pure reselection? *Prediction:* generative effect exactly 0.
+- [ ] **DIAG-2** (MBPP val, GPU) register-probe: encoding vs transmission
+      failure. *Prediction:* weak `passed` probe, decodable clock → encoding.
+- [ ] **DIAG-3** (MBPP val, GPU) control authority: does r move G's sampling?
+      *Prediction:* KL < 0.05 nats, pass-rate CI straddles 0 → ~zero authority.
+- [ ] **DIAG-4** (CPU-first) training-objective units. *Prediction:* > 80% of the
+      loss gain on low-entropy tokens; target seq-prob stays < 1e-9.
+
+Predictions are on the record so they can be wrong; outcomes get appended to
+[PRE-B2-HANDOFF.md] §3–4, [DIAGNOSTICS.md], and the gate log below (one line per
+run). The H2 verdict above stands regardless.
+
 ## Phase 3 — Adaptive compute (H3)
 
 - [ ] τ swept on MBPP validation, fixed value frozen (D5).
