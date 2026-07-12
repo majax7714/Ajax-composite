@@ -300,13 +300,27 @@ Outcome PENDING quota; will be appended as a §4.3 table row with the prediction
 left standing, right or wrong.
 
 *Caveat under active test.* The abstract's and §4.3's framing — "every link in
-the chain worked except the last one" — is challenged by the post-mortem in
-[PRE-B2-HANDOFF.md] §1, which argues three links (refinement headroom, the
+the chain worked except the last one" — was challenged by the post-mortem in
+[PRE-B2-HANDOFF.md] §1, which argued three links (refinement headroom, the
 register's near-chance φ input, and the proxy training objective) were likely
-broken upstream. That is a pre-registered hypothesis, not yet a finding: DIAG-1
-and DIAG-4 ([DIAGNOSTICS.md]) adjudicate it. In particular the "training was not
-a no-op" line (§4.3) is provisional pending DIAG-4's objective-units result. The
-framing above stands as written until those diagnostics land.
+broken upstream. Two diagnostics have now reported ([DIAGNOSTICS.md]):
+
+- **DIAG-4 refutes the training-objective link.** The imitation targets are
+  short (median 28 tokens, not the 156-token HumanEval average the post-mortem
+  used); the trained target sequence probability is ~1.4e-2, samplable, so the
+  −10.7% loss gain moved a *reachable* quantity. The "training was not a no-op"
+  line **stands**; the post-mortem's "exponentially disconnected objective"
+  does not.
+- **DIAG-1 sharpens the null.** FULL's 9 wins are 8 reselection + 1 within the
+  resampling-noise floor set by B1's 2 symmetric wins; B1 (frozen register)
+  reaches *more* oracle-empty solutions than FULL (5 vs 3). The register's
+  *generative* contribution is non-positive — a strictly stronger statement than
+  the aggregate tie.
+
+What remains open is whether the register *encodes* useful state it cannot
+transmit, or encodes nothing (input starvation): DIAG-2 and DIAG-3 (GPU,
+post-B2) decide that. The "every link worked except the last" phrasing is
+therefore retired in favor of the more precise account above.
 
 ### 5.4 The conceptual mapping, honestly closed
 

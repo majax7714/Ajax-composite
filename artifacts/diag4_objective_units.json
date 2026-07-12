@@ -1,0 +1,43 @@
+{
+  "_label": "EXPLORATORY / POST-HOC \u2014 does not reopen the H2 gate",
+  "item1_units": {
+    "conclusion": "mean per-token NLL (HF out.loss over masked labels, averaged over val examples)",
+    "source": "register_modules.pt",
+    "val_nll_untrained": 0.171346124385794,
+    "val_nll_trained": 0.15296807177364827,
+    "relative_improvement": 0.10725689114955798
+  },
+  "item2_sequence_probability": {
+    "population": "val-split passing candidates (possible imitation targets)",
+    "n_targets": 400,
+    "length_source": "generated_tokens (true sampled length)",
+    "length_min_median_max": [
+      18,
+      28.0,
+      511
+    ],
+    "threshold": 1e-09,
+    "trained_crosses_1e-9_at_len": 135.47445291466633,
+    "untrained": {
+      "nll_per_token": 0.171346124385794,
+      "median_len": 28.0,
+      "median_seq_logprob": -4.797691482802232,
+      "median_seq_prob": 0.008248767507696885,
+      "seq_prob_at_min_len": 0.04576524865112395,
+      "seq_prob_at_max_len": 9.421073724894099e-39,
+      "n_targets_above_1e-9": 385,
+      "frac_below_1e-9": 0.0375
+    },
+    "trained": {
+      "nll_per_token": 0.15296807177364827,
+      "median_len": 28.0,
+      "median_seq_logprob": -4.283106009662151,
+      "median_seq_prob": 0.013799733347340463,
+      "seq_prob_at_min_len": 0.06370926421287626,
+      "seq_prob_at_max_len": 1.1288602387852876e-34,
+      "n_targets_above_1e-9": 391,
+      "frac_below_1e-9": 0.0225
+    },
+    "prob_ratio_trained_over_untrained_at_median": 1.672944877457631
+  }
+}

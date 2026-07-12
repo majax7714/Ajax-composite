@@ -90,6 +90,21 @@ candidates sampled *without* register conditioning), and V is register-blind so
 there is no V→r gradient path at all (D3, D10). The register never received a
 single gradient from an execution outcome under its own sampling distribution.
 
+> **[APPENDED 2026-07-12 — DIAG-4 items 1–2 REFUTE the core of §1.3. Left
+> standing above per the pre-registration discipline; corrected here.]** The
+> "exponentially disconnected / unsamplable → unsamplable" claim used the
+> 156-token HumanEval average. The actual imitation targets are *MBPP val*
+> passing candidates with **median 28 tokens** (min 18, max 511). At the trained
+> per-token NLL of 0.1530, sequence probability crosses 1e-9 only at L = 135
+> tokens, so the median target has seq-prob **1.4e-2** (untrained 8.3e-3) and
+> 97.8% of targets sit above 1e-9 — **samplable**, not unsamplable. The −10.7%
+> moved seq-prob within a samplable regime. So the objective was *not*
+> exponentially disconnected; the writeup's "training was not a no-op" line
+> stands. The off-policy / no-V→r-gradient points survive; the sequence-length
+> arithmetic does not. What broke the loop is therefore §1.1/§1.2 territory
+> (headroom, input starvation) or a transmission failure (DIAG-2/DIAG-3), not a
+> quantitatively unreachable target. See [DIAGNOSTICS.md] DIAG-4.
+
 ### 1.4 Root cause
 
 The constraint *"refinement = regenerate under the updated register, nothing else
@@ -210,6 +225,11 @@ belongs in the paper.
 
 **Output:** `artifacts/diag1_oracle_stratification.json` + a 4-row table.
 **Readiness:** all inputs committed; CPU-runnable now.
+**OUTCOME (2026-07-12):** FULL-only wins with B1-pool-empty = 1 (prediction 0–1
+✓); FULL solved 3 of 26 oracle-empty (prediction 0 ✗). But the conclusion holds
+and strengthens — B1 (frozen register) reaches *more* (5 oracle-empty solves,
+2 opponent-pool-empty wins) than FULL. Register generative effect is
+non-positive. Full write-up: [DIAGNOSTICS.md] DIAG-1.
 
 ### DIAG-2 — Encoding failure or transmission failure? (MBPP val, cheap GPU, after B2)
 
@@ -294,12 +314,17 @@ post-training sequence probability of the target stays below 1e-9.
 **Output:** `artifacts/diag4_objective_units.json`.
 **Readiness:** units-confirmation (code inspection: HF `out.loss` on masked
 labels = mean per-token NLL — confirmed) and the implied-sequence-prob
-computation (aggregate loss × real token counts from `phase1_labels.jsonl`,
-CPU tokenizer) are CPU-free and runnable now. **The entropy-split sub-part (item
-3) needs a small GPU forward pass** over the ~240 val targets with/without the
-trained soft prompt — per-token NLLs were never logged during training. Items
-1–2 (which carry the pre-registered "< 1e-9" claim) do not depend on the GPU
-sub-part.
+computation (aggregate loss × real token counts from `phase1_labels.jsonl`
+`generated_tokens`, no tokenizer needed) are CPU-free and runnable now. **The
+entropy-split sub-part (item 3) needs a small GPU forward pass** over the val
+targets with/without the trained soft prompt — per-token NLLs were never logged
+during training. Items 1–2 (which carry the pre-registered "< 1e-9" claim) do not
+depend on the GPU sub-part.
+**OUTCOME (2026-07-12, items 1–2):** units confirmed (mean per-token NLL). The
+"< 1e-9" prediction is **REFUTED** — real targets median 28 tokens (not 156),
+median trained seq-prob 1.4e-2, 97.8% above 1e-9. This refutes §1.3's
+disconnected-objective claim (see the appended note there). Item 3 still pending
+GPU. Full write-up: [DIAGNOSTICS.md] DIAG-4.
 
 ---
 

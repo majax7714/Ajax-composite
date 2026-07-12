@@ -1,0 +1,37 @@
+{
+  "_label": "EXPLORATORY / POST-HOC \u2014 does not reopen the H2 gate",
+  "n_problems": 164,
+  "phase0_oracle_covered": 138,
+  "phase0_oracle_empty": 26,
+  "full_only_wins": 9,
+  "b1_only_wins": 9,
+  "full_only_where_b1_pool_covered": 8,
+  "full_only_where_b1_pool_empty": 1,
+  "b1_only_where_full_pool_covered": 7,
+  "b1_only_where_full_pool_empty": 2,
+  "full_selected_solved_of_oracle_empty": 3,
+  "b1_selected_solved_of_oracle_empty": 5,
+  "full_pool_reached_oracle_empty": 7,
+  "b1_pool_reached_oracle_empty": 8,
+  "detail": {
+    "full_only_b1_pool_empty_pids": [
+      "humaneval/HumanEval/125"
+    ],
+    "b1_only_full_pool_empty_pids": [
+      "humaneval/HumanEval/101",
+      "humaneval/HumanEval/127"
+    ],
+    "full_solved_oracle_empty_pids": [
+      "humaneval/HumanEval/81",
+      "humaneval/HumanEval/87",
+      "humaneval/HumanEval/99"
+    ],
+    "b1_solved_oracle_empty_pids": [
+      "humaneval/HumanEval/101",
+      "humaneval/HumanEval/81",
+      "humaneval/HumanEval/87",
+      "humaneval/HumanEval/90",
+      "humaneval/HumanEval/99"
+    ]
+  }
+}

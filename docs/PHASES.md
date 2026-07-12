@@ -115,14 +115,20 @@ retune.
       scale, task redesign next; *Branch B* — B2 beats B1 ⇒ register is
       architecturally parasitic to in-context text, architecture rethink next.
       **Standing prediction: Branch A, ~65/35.**
-- [ ] **DIAG-1** (CPU) oracle stratification of the 9/9 wins → is FULL's effect
-      generative or pure reselection? *Prediction:* generative effect exactly 0.
+- [x] **DIAG-1** (CPU, 2026-07-12) oracle stratification. FULL's 9 wins = 8
+      reselection + 1 B1-pool-empty; symmetry control B1 = 2; oracle-empty solves
+      FULL 3 vs **B1 5**. Register generative effect **non-positive** (B1 ≥ FULL
+      everywhere). *Prediction partly held:* "0–1 pool-empty" ✓, "FULL solves 0
+      oracle-empty" ✗ (3) — but conclusion strengthened. → `artifacts/diag1_*.json`
 - [ ] **DIAG-2** (MBPP val, GPU) register-probe: encoding vs transmission
       failure. *Prediction:* weak `passed` probe, decodable clock → encoding.
 - [ ] **DIAG-3** (MBPP val, GPU) control authority: does r move G's sampling?
       *Prediction:* KL < 0.05 nats, pass-rate CI straddles 0 → ~zero authority.
-- [ ] **DIAG-4** (CPU-first) training-objective units. *Prediction:* > 80% of the
-      loss gain on low-entropy tokens; target seq-prob stays < 1e-9.
+- [x] **DIAG-4** (CPU, 2026-07-12, items 1–2) objective units. 0.1713/0.1530 =
+      mean per-token NLL confirmed. **Prediction REFUTED:** real targets median
+      28 tok (not 156), median trained seq-prob 1.4e-2, 97.8% > 1e-9 — samplable.
+      Refutes post-mortem §1.3; "training was not a no-op" stands. Item 3
+      (entropy split) pending GPU. → `artifacts/diag4_*.json`
 
 Predictions are on the record so they can be wrong; outcomes get appended to
 [PRE-B2-HANDOFF.md] §3–4, [DIAGNOSTICS.md], and the gate log below (one line per
