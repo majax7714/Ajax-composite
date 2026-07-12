@@ -17,10 +17,13 @@ worked if" claim. Held-out hygiene by diagnostic:
 - **DIAG-6** — the one exception: *new* HumanEval generation, but for benchmark
   *characterization* only (it makes no register claim and, if anything, deflates
   future headroom claims). Lowest priority; clearly labeled as touching held-out.
+- **DIAG-7** — CPU re-analysis of committed `b2.jsonl` + `full_b1.jsonl`
+  (post-B2); no new access.
 
 Predictions are committed before each diagnostic runs (DIAG-1..4 on 2026-07-12;
 DIAG-5, DIAG-6, and the DIAG-3 directional hypothesis added 2026-07-12 after
-DIAG-1/DIAG-4 reframed the null). They are left standing whether they hold or not.
+DIAG-1/DIAG-4 reframed the null; DIAG-7 added 2026-07-12 after B2 landed). They
+are left standing whether they hold or not.
 
 ---
 
@@ -226,6 +229,41 @@ future headroom claims. Lowest priority under quota.
 
 ---
 
+## DIAG-7 — Oracle pool coverage by cross-step channel: was every channel net-harmful?  *(CPU · committed data · status: PENDING)*
+
+Added 2026-07-12 after B2 landed at 0.6220 < B1 0.6829 (Branch A). The sharp,
+zero-GPU test of the whole account. Known going in: only the *selected* pass@1
+per condition (FULL/B1 0.6829, B2 0.6220) from the `--h2` verdict. Unrevealed and
+pre-registered here: **per-condition pool coverage (pass@8 = "did any of the 8
+candidates pass").**
+
+**The hypothesis and its sharp prediction.** If the cross-step channels are
+net-harmful — each conditioning on prior *failed* attempts and anchoring the model
+onto them — then pool coverage should degrade *monotonically in channel
+bandwidth*: B1 (no cross-step, fresh i.i.d. samples) richest, FULL (128-dim latent
+register) mildly degraded, B2 (full previous-candidate text) most degraded.
+
+**Pre-registered prediction (2026-07-12): pool coverage ordered B1 > FULL > B2,**
+with **B1 ≈ 0.84, FULL ≈ 0.82–0.84, B2 ≈ 0.72–0.78.**
+
+**Procedure.** From committed `runs/phase2/full_b1.jsonl` (FULL, B1) and
+`runs/phase2/b2.jsonl` (B2): per condition, pool coverage = fraction of the 164
+problems with ≥1 passing candidate among its 8. Report the three numbers and the
+ordering. Output `artifacts/diag7_pool_coverage.json`
+(`scripts/diag7_pool_coverage.py`).
+
+**Interpretation (committed).** If the ordering holds, the null is not merely
+"the register did nothing" — it is a **complete mechanistic account**: every
+cross-step channel we built was net-harmful, monotonically in bandwidth, and that
+was *structurally guaranteed* by a task whose pool coverage is already ~0.84 at
+i.i.d. sampling, leaving anchoring nowhere to add and everywhere to subtract. That
+is a materially stronger paper than a bare null, for an afternoon of CPU.
+
+**RESULT:** _pending_.
+**Prediction held?** _pending._
+
+---
+
 ## Roll-up (fill as diagnostics land)
 
 | Diagnostic | Headline number | Prediction held? | What it implies about the null |
@@ -236,3 +274,4 @@ future headroom claims. Lowest priority under quota.
 | DIAG-4 | 1.7× teacher-forced gain → 0.000 sampled | **no** (refutes §1.3 arithmetic, opens 1.7×→0 puzzle) | wrong-object failure: string-reproduction ≠ class steering; indicts D2(a) |
 | DIAG-5 | _pending (GPU, run first)_ | _pending_ | domain/length transfer vs teacher-forced/sampled gap |
 | DIAG-6 | _pending (GPU)_ | _pending_ | hard ceiling on refinement headroom |
+| DIAG-7 | _pending (CPU)_ | _pending_ | pool coverage B1>FULL>B2? every cross-step channel net-harmful |
