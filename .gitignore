@@ -24,7 +24,8 @@ data/cache/
 # Local
 .env
 .DS_Store
-.modal_stage/    # Modal upload staging (contains artifacts + the Daytona key)
+# Modal upload staging (contains artifacts + the Daytona key)
+.modal_stage/
 
 # Credentials — never commit
 rgb-daytona.txt
