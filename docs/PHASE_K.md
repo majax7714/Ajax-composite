@@ -192,11 +192,14 @@ without any GPU (no Modal spend, no new held-out access):
 - **DIAG-7b (McNemar)** — retracts DIAG-7's "register updates cost 2.4 pts / shrink
   the pool": the FULL−B1 gap is a 4-problem, **non-significant** difference (exact
   p = 0.39); only B2's 23-problem crash is established. Register is null on coverage.
-- **DIAG-8 + DIAG-9** — resolve DIAG-7's anchoring-vs-formatting confound: B2's
-  consecutive candidates are **0.35×** as diverse as i.i.d. (DIAG-8) and repeat the
-  **same error type 85%** while pass rate declines 0.61→0.40 (DIAG-9) → **content
-  anchoring** confirmed, so "condition on an abstraction, not the candidate" is now
-  empirically motivated for Phase 3.
+- **DIAG-8 + DIAG-9 (+9b)** — resolve DIAG-7's anchoring-vs-formatting confound:
+  B2's consecutive candidates are **0.35×** as diverse as i.i.d. (DIAG-8,
+  format-matched) and pass rate declines 0.61→0.40 with a **local error-echo**
+  (DIAG-9b: adjacent 0.851 > non-adjacent 0.660, +0.19 over the correct
+  within-problem baseline — DIAG-9's Σp_t² baseline was wrong; part of the decline
+  is also no_code output-collapse) → **content anchoring** confirmed as a local
+  effect, so "condition on an abstraction, not the candidate" is empirically
+  motivated (and DIAG-10 tests it directly).
 - **Synthesis reworked** — from a flat "four causes" to a **two-component** account:
   W₀ = transfer failure (fix = in-domain training), U = in-domain mechanism failure
   from input starvation (fix = richer input into U — the only lever that touches the

@@ -508,17 +508,22 @@ types among 715 failing steps: wrong_answer 360, runtime 289, no_code 51, syntax
 sandbox 1.
 
 - **Error-type persistence:** among adjacent step pairs where **both** fail, the
-  observed same-error-type rate is **0.851** vs an independence baseline Σp_t² =
-  **0.422** (and modal-share 0.503) — **excess +0.43, far above chance.** When B2
-  fails twice in a row it repeats the *same* failure mode 85% of the time.
+  observed same-error-type rate is **0.851** vs ~~an independence baseline Σp_t² =
+  **0.422**~~ *[SUPERSEDED 2026-07-13 by DIAG-9b — the pooled Σp_t² baseline ignores
+  within-problem error clustering; the correct chance is B1's within-problem 0.743,
+  against which the honest local excess is +0.19 (adjacent 0.851 vs non-adjacent
+  0.660), not +0.43].* When B2 fails twice in a row it repeats the *same* failure
+  mode 85% of the time — but so do i.i.d. samples of the same problem (~74%); the
+  real signal is the adjacent-vs-non-adjacent gap.
 - **Refinement trajectory:** pass rate by step = **[0.61, 0.49, 0.46, 0.45, 0.43,
   0.40, 0.39, 0.40]** — a **monotone decline** from the un-anchored step 0 (0.61) to
   ~0.40 (slope −0.21). Step 0 is itself the i.i.d. control (un-anchored, 191-tok
   prompt); every anchored step is *worse* than it.
 
-**Verdict: SEMANTIC ANCHORING confirmed; the text channel anti-refines. Prediction
-held in direction, undershot in magnitude** — I called "modestly above chance,
-flat"; it is *massively* above chance (0.85 vs 0.42) and *declining*, not flat. B2
+**Verdict: SEMANTIC ANCHORING confirmed** *(magnitude corrected by DIAG-9b: the
+"0.85 vs 0.42" excess used the wrong baseline; the honest effect is a **local
++0.19** adjacent-vs-non-adjacent gap, and part of the decline is no_code collapse —
+the direction survives, the size shrinks).* **the text channel anti-refines.** B2
 does not refine its prior attempt — it locks onto its own failure mode and each
 step degrades. Together with DIAG-8 (surface anchoring) this is the semantic
 confirmation that the bandwidth→harm ordering (DIAG-7) is real content-anchoring:
@@ -555,6 +560,38 @@ conclusion **collapses** and Phase 3 would be resting on an artifact — the num
 decides it either way.
 
 **Output:** `artifacts/diag9b_persistence_baseline.json` (`scripts/diag9b_persistence_baseline.py`).
+
+**RESULT (2026-07-13, `scripts/diag9b_persistence_baseline.py`, committed data).**
+Within-problem same-error-type agreement among failing candidates:
+
+| condition | within-problem agreement | n (≥2 fail) |
+|---|---|---|
+| **B1 (i.i.d. — the correct chance)** | **0.743** | 98 |
+| FULL (register, no text anchor) | 0.778 | 95 |
+| B2 (all failing pairs) | 0.736 | 112 |
+
+B2 adjacent failing pairs **0.851** vs B2 non-adjacent **0.660**. no_code rate by
+step: B1 flat **0.0**; B2 rises **0.012 → 0.055**.
+
+**Verdict: DIAG-9's magnitude is RETRACTED; a smaller, *local* anchoring survives;
+the decline is multi-causal. Prediction partially held.** The review was right: the
+pooled Σp_t²=0.422 baseline was wrong, and against the correct within-problem chance
+(B1 **0.743**) B2's *gross* homogeneity (0.736) shows **no excess at all**
+(−0.007) — the 0.851 was almost entirely per-problem structure, exactly the failure
+mode flagged. **But** the format-matched within-B2 contrast — adjacent **0.851** >
+non-adjacent **0.660**, **+0.19** — is real: the step immediately after a shown
+failure echoes *that* candidate's error type more than a random same-problem step.
+This is the semantic analog of DIAG-8's sound `d_consec < d_b2_all` contrast (both
+hold problem *and* format fixed), so **the anchoring conclusion survives — as a
+transient, local echo, not the global lock-on DIAG-9 claimed, and ~+0.11–0.19, not
++0.43.** Separately, **no_code rises 0.012→0.055 across B2 steps** (B1 flat): ~4–5pp
+of the 21pp pass decline is **output-discipline collapse** under the longer prompt
+(a distinct failure, prefilling-fixable), not anchoring — the rest is genuine
+anti-refinement. *Prediction:* B1 0.743 (a touch above the predicted 0.60–0.70),
+FULL ≈ B1 ✓; the excess "shrank but stayed positive" only in the local contrast, not
+the gross one. **Net: the load-bearing test of the anchoring story is now DIAG-10
+(does removing the candidate actually help), not this inference.** →
+`artifacts/diag9b_persistence_baseline.json`
 
 ---
 
@@ -629,7 +666,8 @@ a fresh test set regardless.
 | DIAG-7 | pool coverage 0.848 > 0.823 > 0.707 (B1>FULL>B2) | **yes** (strict) | text channel net-harmful & monotonic in bandwidth; register (FULL−B1) null, *not* a proven shrinker (see 7b) |
 | DIAG-7b | FULL−B1 p=**0.39 n.s.**; B2 pairs p<1e-3 | expectation **yes** | only B2's 23-problem crash is a *significant* coverage effect; register null six ways |
 | DIAG-8 | B2 adjacent edit-dist **0.35×** B1 i.i.d.; tighter in 154/163 | direction **yes**, magnitude undershot | B2 pool crash is **content anchoring**, not a formatting artifact |
-| DIAG-9 | same-error persistence **0.85** (chance 0.42); pass 0.61→0.40 | direction **yes**, magnitude undershot | B2 loops on its own failure mode & **anti-refines** — semantic confirmation of DIAG-8 |
+| DIAG-9 | adjacent same-error **0.85**; pass 0.61→0.40 | *magnitude corrected by 9b* | text channel anti-refines; local error-echo (see 9b) |
+| DIAG-9b | within-problem chance **0.743** (not 0.42); B2 adjacent 0.851 > non-adj 0.660; no_code 0.01→0.055 | **partly** (B1 0.74 vs pred 0.60–0.70) | DIAG-9's excess retracted; anchoring survives as **local +0.19**; decline partly no_code collapse |
 
 ## Synthesis — what the null means (diagnostic record closed 2026-07-13; reworked after review)
 
@@ -669,9 +707,12 @@ The task is saturated (pass@8 ≈ 0.85 i.i.d.; genuinely-unreachable set < 26/16
 cross-step conditioning has almost nothing to *add*. And conditioning on a *failed*
 candidate actively subtracts: DIAG-8 shows B2's consecutive candidates are only
 **0.35×** as far apart as i.i.d. draws (content anchoring, not a formatting
-artifact — the prompt-degradation confound is *ruled out*), and DIAG-9 shows B2
-repeats its **same error type 85%** of the time and **anti-refines** (pass
-0.61→0.40 across steps). Only the text channel's crash is statistically established
+artifact — the prompt-degradation confound is *ruled out* by the format-matched
+`d_consec < d_b2_all` contrast), and B2 **anti-refines** (pass 0.61→0.40 across
+steps) with a **local error-echo** (DIAG-9b: adjacent-failure error-type match
+0.851 vs non-adjacent 0.660, +0.19 — *after* correcting DIAG-9's inflated baseline;
+part of the decline is also no_code output-collapse). Only the text channel's crash
+is statistically established
 (DIAG-7b: FULL−B1 p = 0.39 n.s.; B2 pairs p < 1e-3) — so the honest coverage
 statement is *the register is null six ways; the text channel demonstrably hurts.*
 

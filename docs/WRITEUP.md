@@ -280,9 +280,11 @@ mean compute — and is future work, explicitly outside the original gates.
    the harm side but within paired noise. The text channel's harm, however, is
    **content anchoring**, not a formatting artifact: conditioning on the failed
    candidate makes B2's consecutive candidates only **0.35× as diverse** as
-   i.i.d. draws (DIAG-8) and repeat the **same error type 85%** of the time
-   while pass rate *declines* 0.61→0.40 across steps (DIAG-9) — G loops on its
-   own mistake. This was structurally primed: at ~0.85 i.i.d. pool coverage
+   i.i.d. draws (DIAG-8, a format-matched contrast) while pass rate *declines*
+   0.61→0.40 across steps, with a local error-echo (DIAG-9b: adjacent-failure
+   error-type match 0.85 vs 0.66 non-adjacent, +0.19 over the correct
+   within-problem baseline; part of the decline is also no_code output-collapse)
+   — G locally loops on its own mistake. This was structurally primed: at ~0.85 i.i.d. pool coverage
    there is almost nothing for cross-step conditioning to add and much for
    anchoring on a *shown-wrong* candidate to subtract. The null is therefore not
    "the register did nothing" but "on a saturated task, conditioning on prior
@@ -381,8 +383,9 @@ correctness (DIAG-2, passed AUROC 0.558, no clock) → uninformative updates →
 0.000. One word: **input starvation.** The outcome frame explains why neither could
 have won: the task is saturated (DIAG-1/7), and conditioning on a failed candidate
 anchors G to its own mistake (DIAG-8: consecutive candidates 0.35× as diverse as
-i.i.d.; DIAG-9: same error type 85%, pass 0.61→0.40), while the register's own
-coverage effect is null not harmful (DIAG-7b: FULL−B1 p = 0.39). The "every link
+i.i.d.; DIAG-9b: local error-echo +0.19 adjacent-vs-non-adjacent, pass 0.61→0.40
+partly no_code collapse), while the register's own coverage effect is null not
+harmful (DIAG-7b: FULL−B1 p = 0.39). The "every link
 worked except the last" phrasing is retired. **The prioritization this hands
 Phase 3:** in-domain/length-matched training fixes only W₀ (U already fails
 in-domain); the single lever that touches U is **enriching what it conditions on —

@@ -1,0 +1,60 @@
+{
+  "_label": "EXPLORATORY / POST-HOC \u2014 corrects DIAG-9 chance baseline; no H2 reopen",
+  "within_problem_error_type_agreement": {
+    "B1": {
+      "agreement": 0.742759961127308,
+      "n_problems_ge2_fail": 98
+    },
+    "FULL": {
+      "agreement": 0.778295739348371,
+      "n_problems_ge2_fail": 95
+    },
+    "B2": {
+      "agreement": 0.7358418367346938,
+      "n_problems_ge2_fail": 112
+    }
+  },
+  "diag9_pooled_baseline_sum_pt2": 0.422,
+  "diag9_observed_b2_adjacent": 0.851,
+  "b2_adjacent_vs_nonadjacent": {
+    "adjacent": 0.8513986013986014,
+    "n_adjacent": 572,
+    "non_adjacent": 0.6599866399465598,
+    "n_non_adjacent": 1497
+  },
+  "correct_chance_baseline_B1_within_problem": 0.742759961127308,
+  "b2_excess_over_correct_baseline": -0.006918124392614189,
+  "no_code_rate_by_step": {
+    "B1": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "FULL": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "B2": [
+      0.012195121951219513,
+      0.024390243902439025,
+      0.03048780487804878,
+      0.036585365853658534,
+      0.04878048780487805,
+      0.054878048780487805,
+      0.04878048780487805,
+      0.054878048780487805
+    ]
+  },
+  "predicted": "B1 ~0.60-0.70, FULL ~= B1; B2 excess shrinks but stays positive"
+}

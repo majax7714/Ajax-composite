@@ -165,8 +165,12 @@ retune.
       154/163 problems → **content anchoring**, not a formatting artifact. →
       `artifacts/diag8_*.json`
 - [x] **DIAG-9** (CPU, 2026-07-13) semantic anchoring + refinement trajectory.
-      Same-error persistence **0.85** (chance 0.42); pass rate **0.61→0.40** across
-      steps → B2 loops on its failure mode & **anti-refines**. → `artifacts/diag9_*.json`
+      pass rate **0.61→0.40** across steps → B2 **anti-refines**. *[Persistence
+      magnitude corrected by 9b.]* → `artifacts/diag9_*.json`
+- [x] **DIAG-9b** (CPU, 2026-07-13) corrected persistence baseline. Right chance =
+      B1 within-problem **0.743** (not 0.42); B2 gross homogeneity ≈ B1 (no excess),
+      but adjacent 0.851 > non-adjacent 0.660 (**local +0.19** anchoring); no_code
+      rises 0.01→0.055 (part of the decline is output-collapse). → `artifacts/diag9b_*.json`
 
 Predictions are on the record so they can be wrong; outcomes get appended to
 [PRE-B2-HANDOFF.md] §3–4, [DIAGNOSTICS.md], and the gate log below (one line per
