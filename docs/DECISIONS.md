@@ -148,23 +148,29 @@ integration, which is exactly the cross-step-learning claim.
 untrained baseline (logged in register_modules.pt), or H2 shows the steering
 signal doesn't survive sampling.
 
-## D11 — Generator precision on the migrated stack: **OPEN** (settle at Phase M / M0)
+## D11 — Generator precision on the migrated stack: **SETTLED at M0 → half precision (bf16 on L4)** (2026-07-13)
 
-Reserved, **not yet decided** — full context in [PHASE_M.md] §3, §7. The choice:
-**fp16** (recommended — 4-bit NF4 was never justified at 1.5B on a 16 GB T4, it
-dequantizes every forward pass and costs 2–4× throughput, and it degrades the
-generator the whole experiment depends on) vs **staying 4-bit** to preserve
-V-v2b's training distribution. Choosing fp16 accepts the **M4** verifier
-revalidation/retrain: switching G to fp16 shifts the candidate distribution
-underneath V — a substrate change, not ordinary actor drift. On T4 (Turing/sm75)
-fp16 only; on L4/A10 (Ada/Ampere) prefer bf16.
+**Decision (M0, 2026-07-13):** drop 4-bit NF4; run G in **half precision** —
+**bf16 on the L4 target** (Ada/sm89 supports it; use fp16 only if a run ever lands
+on a Turing/sm75 T4). Full prior context in [PHASE_M.md] §3, §7.
 
-This must be made **explicitly at M0** and written here with its reasoning before
-any migration code runs; it may not happen by accident.
+**Reasoning.** 4-bit NF4 (D6) was inherited from the 4B QLoRA work where it was
+correct; at 1.5B it never was — fp16 weights are ~3.1 GB against L4's 24 GB, so we
+were never memory-constrained, and NF4 dequantizes every forward pass, costing 2–4×
+throughput and degrading the generator the entire experiment depends on. Phase 3
+([PHASE_3.md]) makes throughput load-bearing (large-k pass@k screen at k=50, more
+conditions, on-policy GRPO rollouts), so the throughput win is no longer optional.
 
-*Do not finalize until:* §0 of [PHASE_M.md] is green — B2 and all diagnostics
-closed on the old stack. Recording it as OPEN now only reserves the number and
-puts the pending call on the record.
+**Accepted consequences.** (i) **M4 verifier revalidation** — V-v2b was trained on
+4-bit-generated candidates; half precision shifts the candidate distribution
+underneath V (a *substrate* change, not actor drift), so V is revalidated and
+retrained if AUROC degrades vs the recorded 0.7951/0.7189. (ii) All baselines
+**re-lock** on the new stack (M3/M5); no post-migration number is ever compared to a
+pre-migration one. (iii) Cheaper than it looks: Phase 3 re-locks baselines on a new
+benchmark regardless (3a), so the migration is nearly free.
+
+*Gate status:* §0 of [PHASE_M.md] is **green** — B2 + all diagnostics (DIAG-1..11)
+closed on the old stack, record committed. Settled here at M0, not before.
 
 ## D12 — DIAG-6 descoped from the diagnostic record (2026-07-12)
 

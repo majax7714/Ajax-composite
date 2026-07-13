@@ -1,9 +1,9 @@
-# Phase M — throughput STACK rebuild (HF/4-bit → vLLM/fp16, on L4)
+# Phase M — throughput STACK rebuild (HF/4-bit → vLLM/bf16, on L4)
 
-*Written 2026-07-12. **This work does not start yet.** Read §0 before anything
-else. Nothing in this document may be executed until the current experimental
-record is closed. This is a pre-registered plan and a hard gate, not a task in
-progress.*
+*Written 2026-07-12. **BEGUN 2026-07-13** — the diagnostic record is closed
+(DIAG-1..11 committed), so §0 is green and Phase M is in progress. Gate log at §5.
+This is the throughput rebuild that [PHASE_3.md] §3 makes a hard prerequisite for
+Phase 3a; see §0.5 for the Phase-3 alignment.*
 
 > **Platform ≠ stack (correction, 2026-07-12).** This document originally bundled
 > the *platform* move (Kaggle → Modal) with the *stack* rebuild (fp16 + vLLM).
@@ -16,24 +16,54 @@ progress.*
 
 ---
 
-## 0. HARD PRECONDITION — do not begin until all of these are committed
+## 0. HARD PRECONDITION — GREEN (2026-07-13)
 
-- [ ] **B2 complete**, `artifacts/h2_b2_result.json` written, Branch A/B verdict
+- [x] **B2 complete**, `artifacts/h2_b2_result.json` written, Branch A verdict
       appended to [PRE-B2-HANDOFF.md] §3.
-- [ ] **DIAG-2** (register probes), **DIAG-3** (control authority), **DIAG-5**
-      (does the teacher-forced gain transfer to HumanEval?), **DIAG-4 item 3**
-      (entropy split) complete and written to [DIAGNOSTICS.md].
-- [ ] **DIAG-6** (large-k pass@k on the 26 oracle-empty problems — the headroom
-      ceiling) complete, *if it is going to be run on the old stack at all*.
+- [x] **DIAG-2** (register probes), **DIAG-3** (control authority), **DIAG-5**
+      (transfer), **DIAG-4 item 3** (entropy split) complete → [DIAGNOSTICS.md].
+- [x] **DIAG-6** — descoped ([DECISIONS.md] D12); its measurement relocates to
+      Phase 3a's benchmark screen.
+- [x] **Full diagnostic record closed** — DIAG-1..11 committed, synthesis reworked,
+      Phase 3 pre-registered ([PHASE_3.md]). Nothing pre-migration is left open.
 
-**Why this is a hard gate.** Every fix in this document changes sampling
-numerics. Switching precision, or swapping HF `generate()` for vLLM, will
-**permanently destroy the bit-for-bit Phase-0 lock** (lock_a/lock_b, 164/164
-byte-identical candidates, 204,553 tokens). That lock is one of the best assets
-this project has. Any comparison that straddles the migration is confounded by
-the stack change and is worthless.
+**Why this was a hard gate.** Every fix in this document changes sampling
+numerics. Switching precision, or swapping HF `generate()` for vLLM,
+**permanently destroys the bit-for-bit Phase-0 lock** (lock_a/lock_b, 164/164
+byte-identical candidates, 204,553 tokens). Any comparison that straddles the
+migration is confounded by the stack change. We migrate now, at a clean phase
+boundary (record closed), never mid-comparison — the old stack is tagged
+`pre-phase-m-hf-nf4` (M0) so it stays exactly recoverable.
 
-**Migrate at a clean phase boundary. Never mid-comparison.**
+---
+
+## 0.5. Phase-3 alignment — what the migration must deliver (2026-07-13)
+
+Phase M is no longer a standalone refactor; it is the prerequisite for
+[PHASE_3.md]. Three consequences shape the build:
+
+1. **Stage the migration to unblock Phase 3 in dependency order.** Phase 3b-lite
+   (B1 / ANCHOR / ABSTRACT-text — the H1/H2 gate) and the 3a benchmark screen are
+   **prompt-level, no register, no `prompt_embeds`.** They need only *plain vLLM
+   generation + fast execution + large-k sampling*. So the throughput that unblocks
+   the most Phase-3 work comes first and does **not** depend on the register path.
+   **M1 (the `prompt_embeds`/soft-prompt correctness gate) blocks only 3b-full
+   (REG+), not 3a or 3b-lite** — but it is kept as an early gate because if
+   `prompt_embeds` fails on the pinned vLLM, the REG+ arm and H3 are dead and Phase
+   3 reshapes around that (worth knowing before 3a spend).
+2. **Richer execution for the new benchmark.** Phase 3a selects a benchmark with
+   **≫3 tests/problem** and per-test names (the feedback-richness criterion). The
+   decoupled CPU execution stage (§1.1) must therefore capture **per-test results
+   (k/n passing + failing-test names)**, not the binary `frac_tests` HumanEval gave
+   (DIAG-9b/10 were handed ~2 bits). This is a driver upgrade, not just a port.
+3. **On-policy throughput.** Phase 3b-full trains REG+ with **GRPO / execution
+   reward** ([PHASE_3.md] §5). That is generation-bound; vLLM continuous batching is
+   exactly the enabler. The DIAG-10 `feedback_2x2` harness already demonstrated
+   cross-problem columnar batching (with HF) — Phase M swaps in the vLLM backend.
+
+**Scope of the M5 re-lock:** re-lock proves *stack* reproducibility on the retained
+HumanEval/MBPP problems. Phase-3 **baselines** re-lock separately, on the *selected*
+benchmark, at 3a — do not conflate the two locks.
 
 ---
 
@@ -198,8 +228,9 @@ Explore (1–2 business-day approval) and NAIRR become available at the same mom
 Sequential. Each gate must pass before the next begins. No gate may be tuned past.
 (Same discipline as Phases 0–2; it is the reason this project is trustworthy.)
 
-- [ ] **M0 — Precondition.** §0 checklist fully green. Tag the repo pre-migration
-      so the old stack is recoverable exactly. Record **D11** (§7) before any code.
+- [x] **M0 — Precondition (DONE 2026-07-13).** §0 checklist green (record closed,
+      DIAG-1..11). Repo tagged `pre-phase-m-hf-nf4`. **D11 settled → bf16 on L4**
+      ([DECISIONS.md] D11, §7).
 - [ ] **M1 — Correctness gate: does vLLM reproduce HF's soft-prompt semantics?**
       Fix a register `r`. Generate greedily (temp = 0) for ~20 problems under
       (a) HF + soft prompt, (b) vLLM + `prompt_embeds`. Compare token-for-token.
@@ -229,6 +260,19 @@ Sequential. Each gate must pass before the next begins. No gate may be tuned pas
 
 ---
 
+### Gate log
+
+| Gate | Date | Outcome | Notes |
+|---|---|---|---|
+| **M0** | 2026-07-13 | **PASS** | §0 green (DIAG-1..11 closed); repo tagged `pre-phase-m-hf-nf4`; D11 → bf16/L4 |
+| M1 | — | in progress | vLLM `prompt_embeds` vs HF soft-prompt greedy, ~20 problems |
+| M2 | — | — | throughput ≥ 20× |
+| M3 | — | — | B0/B1 statistical equivalence (bf16 upward shift expected) |
+| M4 | — | — | V-v2b revalidation on bf16 candidates |
+| M5 | — | — | new lock_a/lock_b; COMPUTE_ACCOUNTING 2nd amendment |
+
+---
+
 ## 6. What NOT to do
 
 - **Do not migrate before §0 is green.** The temptation will be strongest exactly
@@ -246,14 +290,13 @@ Sequential. Each gate must pass before the next begins. No gate may be tuned pas
 
 ---
 
-## 7. Open decision (record as D11 before starting)
+## 7. Precision decision — SETTLED at M0 (D11)
 
-**Precision:** fp16 (recommended — §3) vs staying 4-bit to preserve the verifier's
-training distribution. Choosing fp16 means accepting the M4 verifier retrain;
-choosing 4-bit means keeping a known-degraded generator and forfeiting most of the
-throughput win. Make the call explicitly, write it into [DECISIONS.md] (D11) with
-the reasoning, and don't revisit it silently. Reserved as **D11 (open)** now; it
-is settled at **M0**, not before.
+**Settled 2026-07-13 → half precision (bf16 on L4).** 4-bit NF4 was never justified
+at 1.5B (fp16 weights ~3.1 GB vs L4's 24 GB — never memory-bound), it dequantizes
+every forward pass at a 2–4× throughput cost, and it degrades the generator; Phase 3
+makes throughput load-bearing. Accepted: the **M4** verifier revalidation/retrain
+(substrate change under V) and a full re-lock. Full reasoning in [DECISIONS.md] D11.
 
 **Deliverables (produced as Phase M runs, not now):**
 
