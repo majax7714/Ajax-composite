@@ -133,21 +133,22 @@ retune.
       28 tok (not 156), median trained seq-prob 1.4e-2, 97.8% > 1e-9 — samplable.
       Refutes §1.3 arithmetic but **opens the 1.7×-teacher-forced → 0.000-sampled
       contradiction**: reframed as a wrong-object failure (imitation raises
-      P(specific string), goal is P(passing class)) → indicts D2(a) vs RL. Item 3
-      (entropy split) pending GPU. → `artifacts/diag4_*.json`
+      P(specific string), goal is P(passing class)) → indicts D2(a) vs RL.
+- [x] **DIAG-4 item 3** (Modal T4, 2026-07-13) entropy split. Reproduces the
+      −10.7% (0.1716→0.1529); **99.7% of the gain on DECISION tokens**, 0.34% on
+      boilerplate. **Prediction REFUTED** (predicted >80% boilerplate) → training
+      moved the right tokens teacher-forced; pure TF→sampled gap. → `artifacts/diag4_item3_*.json`
 
-  *After B2, run order (pre-registered 2026-07-12): DIAG-5 → DIAG-3 → DIAG-2 →
-  DIAG-4 item 3 → DIAG-6.*
-- [ ] **DIAG-5** (HumanEval re-analysis, GPU, **first after B2**) does the 1.7×
-      teacher-forced gain transfer to HumanEval? *Prediction:* shrinks/vanishes →
-      domain/length transfer failure (28-tok MBPP → 156-tok HumanEval). Survives →
-      teacher-forced/sampled gap, DIAG-3 decisive.
-- [ ] **DIAG-3** (MBPP val, GPU) control authority: does r move G's sampling?
-      *Prediction:* KL < 0.05 nats, pass-rate CI straddles 0 → ~zero authority.
-      **Directional hypothesis (pre-committed):** within-r_7 diversity <
-      within-r_0 ⇒ register is an *entropy killer* (narrows reach).
-- [ ] **DIAG-2** (MBPP val, GPU) register-probe: encoding vs transmission
-      failure. *Prediction:* weak `passed` probe, decodable clock → encoding.
+  *Post-B2 diagnostics ran on Modal T4 (Phase K), 2026-07-13, after GATE K1.*
+- [x] **DIAG-5** (Modal T4, 2026-07-13) transfer. r₀ steering ×1.33 seq on MBPP-val
+      but **×0.28 — REVERSES — on HumanEval**. **Prediction HELD (overshot):**
+      domain/length transfer failure (28-tok MBPP → 156-tok HumanEval). → `artifacts/diag5_*.json`
+- [x] **DIAG-3** (Modal T4, 2026-07-13) control authority. KL(r₀‖r₇) **0.117 nats**,
+      r₇ *more* diverse, **Δpass 0.000** CI [−0.06,+0.06]. Partly held; **entropy-
+      killer REFUTED** — register perturbs sampling but is directionless. → `artifacts/diag3_*.json`
+- [x] **DIAG-2** (Modal T4, 2026-07-13) register probes (problem-grouped CV).
+      passed_{t-1} AUROC **0.558** (weak, as predicted), **t not decodable** (no
+      clock). Encoding-failure part held, clock refuted → **starved at input**. → `artifacts/diag2_*.json`
 - [~] **DIAG-6** **DESCOPED → Phase 3** (2026-07-12, [DECISIONS.md] D12): ceiling
       already carried by pass@8 0.84 + DIAG-1 + DIAG-7; the large-k pass@k folds
       into Phase 3 benchmark selection.

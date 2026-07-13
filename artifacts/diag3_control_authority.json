@@ -1,0 +1,16 @@
+{
+  "_label": "EXPLORATORY / POST-HOC (Modal T4, Phase K).",
+  "n_problems": 42,
+  "within_r0_diversity": 0.2521271828334463,
+  "within_r7_diversity": 0.2973024071918781,
+  "across_diversity": 0.2815826910205436,
+  "mean_kl_r0_r7_nats": 0.11689709938530411,
+  "pass_r0": 0.5982142857142857,
+  "pass_r7": 0.5982142857142857,
+  "delta_pass_r7_minus_r0": {
+    "point": 0.0,
+    "lo": -0.05952380952380952,
+    "hi": 0.05654761904761905
+  },
+  "entropy_killer": false
+}

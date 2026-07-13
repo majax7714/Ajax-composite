@@ -1,0 +1,10 @@
+{
+  "_label": "EXPLORATORY / POST-HOC (Modal T4, Phase K). PROBLEM-GROUPED 6-fold CV ridge (leakage-free).",
+  "n_probe_rows": 294,
+  "n_problem_groups": 42,
+  "v_prev_R2_groupedCV": -63.15662434394602,
+  "passed_prev_AUROC_groupedCV": 0.5578885400313972,
+  "t_R2_groupedCV": -98.12421176960495,
+  "base_rate_passed_prev": 0.6190476190476191,
+  "note": "row-level CV (superseded) gave passed AUROC 0.874; grouped CV removes within-problem leakage."
+}

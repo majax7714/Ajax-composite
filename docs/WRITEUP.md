@@ -362,11 +362,19 @@ broken upstream. Two diagnostics have now reported ([DIAGNOSTICS.md]):
   resampling, they were low-probability, not unreachable: the genuine generative
   headroom on this benchmark is even smaller than 16%.
 
-What remains open is where the 1.7× teacher-forced gain dies. **DIAG-5** (does it
-transfer to HumanEval at all?) forks it: a domain/length transfer failure vs a
-teacher-forced/sampled gap the register cannot bridge (DIAG-3 control authority,
-carrying a pre-registered entropy-killer hypothesis). The "every link worked
-except the last" phrasing is retired in favor of this account.
+The full diagnostic record is now **closed** (7 diagnostics, [DIAGNOSTICS.md]
+synthesis) and the null is over-determined, each cause measured: no task headroom
+(DIAG-1/7 — pool coverage degrades monotonically in cross-step bandwidth,
+B1>FULL>B2); the register **starved at the input** (DIAG-2 — passed_{t-1} AUROC
+0.558, no clock); its authority **directionless** (DIAG-3 — KL 0.117 nats and
+*more* sample diversity, but Δpass 0.000; the entropy-killer hypothesis refuted);
+and a training objective that moved the right decision tokens teacher-forced
+(DIAG-4·3 — 99.7% of the −10.7% on decision tokens) yet **reversed out of domain**
+(DIAG-5 — r₀ steering ×1.33 MBPP but ×0.28 on HumanEval). None alone explains the
+null; together they make it inevitable. The "every link worked except the last"
+phrasing is retired in favor of this account; the productive next moves
+(on-policy set-membership training, richer U input, in-domain/length-matched
+data, a task with headroom) are Phase-3 design, not extensions of this record.
 
 ### 5.4 The conceptual mapping, honestly closed
 

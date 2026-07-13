@@ -166,3 +166,22 @@ numerics) → does not block" branch. The remaining diagnostics are within-stack
 mechanistic measurements (DIAG-5/4b are forward-pass NLL on *fixed* candidates;
 DIAG-2/3 are within-Modal comparisons), so they are valid under this drift.
 Logged as the first [COMPUTE_ACCOUNTING.md] amendment. Proceeding to DIAG-5.
+
+### Diagnostics — CLOSED (2026-07-13, Modal T4)
+
+All four post-B2 GPU diagnostics ran on Modal T4 after K1; DIAG-6 stays descoped
+(D12). Full results + synthesis in [DIAGNOSTICS.md]; one-liners:
+
+- **DIAG-5** — r₀ steering ×1.33 (MBPP-val) but **×0.28, reverses** (HumanEval):
+  domain/length transfer failure. *Prediction held.*
+- **DIAG-4 item 3** — reproduces −10.7% (0.1716→0.1529); **99.7% of the gain on
+  decision tokens**, not boilerplate. *Prediction refuted* → pure TF→sampled gap.
+- **DIAG-2** — passed_{t-1} AUROC **0.558** (grouped CV), no clock → **starved at
+  input**. *(Row-level CV first gave a leaky 0.87; grouped CV is the honest number.)*
+- **DIAG-3** — KL(r₀‖r₇) **0.117 nats**, r₇ *more* diverse, **Δpass 0.000**:
+  non-zero but **directionless** authority; entropy-killer *refuted*.
+
+Modal spend for the whole of Phase K ≈ **$1–2** (K1 + envcap free + 3 diagnostic
+runs), inside the free credit. The Kaggle quota wall is off the critical path.
+**The diagnostic record is closed; Phase 3 design may now begin** (not before,
+per §5). Phase M (fp16+vLLM) remains a later, separate refactor.

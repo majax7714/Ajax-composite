@@ -66,7 +66,7 @@ tightening §1.1 — the benchmark is even more saturated (DIAG-6 will bound it)
 
 ---
 
-## DIAG-2 — Encoding failure or transmission failure?  *(MBPP val · GPU · status: PENDING)*
+## DIAG-2 — Encoding failure or transmission failure?  *(MBPP val · Modal T4 · status: DONE 2026-07-13)*
 
 **Pre-registered prediction:** `passed_{t-1}` AUROC ≈ 0.55–0.65 (weak), step
 index `t` strongly decodable — i.e. mostly **encoding failure** (register starved
@@ -78,12 +78,26 @@ probes r_t → {v_{t-1} (R²), passed_{t-1} (AUROC), error_type_{t-1} (macro-F1)
 transmission failure; only-t ⇒ step counter. Output:
 `artifacts/diag2_register_probes.json`.
 
-**RESULT:** _pending_.
-**Prediction held?** _pending._
+**RESULT (2026-07-13, Modal T4 rollout on 42 MBPP-val problems, 294 probe rows).**
+*Methodology note, logged honestly:* a first pass used random-row 5-fold CV and
+got `passed_{t-1}` AUROC **0.87** — but rows are 7-per-problem and random splitting
+leaks a problem's own register directions across train/test. Re-fit with
+**problem-grouped** CV (leakage-free): **`passed_{t-1}` AUROC 0.558** (base rate
+0.62), `v_{t-1}` R² −63, **`t` R² −98** (not decodable).
+
+**Prediction held? Encoding-failure part YES; clock part NO.** `passed_{t-1}`
+AUROC 0.558 lands squarely in the predicted 0.55–0.65 *weak* band — the register
+carries only marginal decodable correctness signal, i.e. it is **near
+encoding failure, starved at the input** (confirms [PRE-B2-HANDOFF.md] §1.2's
+near-chance-φ prediction). But `t` is **not** decodable, so the "clock" half of the
+prediction is refuted — the register did not even learn a step counter. Read
+together with DIAG-3 (below): the register barely *encodes* useful signal yet still
+*perturbs* sampling — so the perturbation is uninformative, not a knows-but-can't-
+say transmission failure. → `artifacts/diag2_register_probes.json`
 
 ---
 
-## DIAG-3 — Control authority: does r move G's sampling at all?  *(MBPP val · GPU · status: PENDING)*
+## DIAG-3 — Control authority: does r move G's sampling at all?  *(MBPP val · Modal T4 · status: DONE 2026-07-13)*
 
 **Pre-registered prediction:** across-set edit distance statistically
 indistinguishable from within-set; mean token-level KL(r_0 ‖ r_7) < 0.05 nats;
@@ -106,8 +120,26 @@ diversity explicitly (the entropy-killer test). Produce the headline sentence
 "8 soft tokens driven by a 128-dim register shift G's distribution by ⟨X⟩."
 Output: `artifacts/diag3_control_authority.json`.
 
-**RESULT:** _pending_.
-**Prediction held?** _pending._
+**RESULT (2026-07-13, Modal T4, 42 MBPP-val problems, m=8 per set).** Diversity
+(mean normalized edit distance): within-r₀ **0.252**, within-r₇ **0.297**,
+across **0.282**. **Mean KL(r₀ ‖ r₇) = 0.117 nats** over the first 32 next-token
+positions. Pass rate: r₀ 0.598 vs r₇ 0.598, **Δ = 0.000, CI [−0.060, +0.057]**.
+
+**Headline:** 8 soft-prompt embeddings driven by a 128-dim register shift G's
+next-token distribution by **~0.12 nats** and *raise* within-set diversity, but
+move pass rate by **0.000**.
+
+**Prediction held? Partly — with one clean refutation.** *Pass-rate CI straddles 0*
+→ held: the register has **no correctness-directed** authority. But *mean KL 0.117
+nats* exceeds the predicted "< 0.05 / ~zero causal effect" — the register **does**
+measurably move sampling, more than predicted. And the **entropy-killer hypothesis
+is REFUTED**: within-r₇ diversity (0.297) is *higher* than within-r₀ (0.252), so
+r₇ *widens* the sampling distribution rather than narrowing it. Net reading: the
+register has **non-trivial but directionless control authority** — it perturbs and
+even diversifies G's sampling (KL 0.117, +diversity) without steering toward
+correct programs (Δpass 0). That the DIAG-7 pool-concentration effect is *not*
+r₇-diversity-narrowing means it has a different origin (out-of-domain HumanEval
+mis-steering, cf. DIAG-5), not entropy-killing. → `artifacts/diag3_control_authority.json`
 
 ---
 
@@ -262,16 +294,16 @@ generative mechanism would have to win.
 Benchmark characterization only — no register claim; if anything it deflates
 future headroom claims. Lowest priority under quota.
 
-**Output:** `artifacts/diag6_headroom_ceiling.json`.
-**Readiness:** GPU generation kernel, 26 problems × ~75 samples + execution
-(~2k sandboxed runs).
+**Output:** `artifacts/diag6_headroom_ceiling.json` (if ever run).
 
-**RESULT:** _pending_.
-**Prediction held?** _pending._
+**RESULT:** DESCOPED (not run) — [DECISIONS.md] D12. Its finding (low headroom
+ceiling) is already carried by pass@8 0.84 + DIAG-1 + DIAG-7; the large-k pass@k
+relocates to Phase-3 benchmark selection.
+**Prediction held?** n/a (not run).
 
 ---
 
-## DIAG-7 — Oracle pool coverage by cross-step channel: was every channel net-harmful?  *(CPU · committed data · status: PENDING)*
+## DIAG-7 — Oracle pool coverage by cross-step channel: was every channel net-harmful?  *(CPU · committed data · status: DONE 2026-07-12)*
 
 Added 2026-07-12 after B2 landed at 0.6220 < B1 0.6829 (Branch A). The sharp,
 zero-GPU test of the whole account. Known going in: only the *selected* pass@1
@@ -318,28 +350,57 @@ sharpenings, both from committed data:
   14-pt pool crash broke through to pass@1 (0.6220).
 - **FULL's mean passing-candidates/problem (4.811) exceeds B1's (4.671) despite
   lower coverage** — the register piles *redundant* passes onto already-solvable
-  problems while losing marginal ones. That is the **entropy-killer signature**
-  (DIAG-3's pre-registered directional hypothesis) surfacing in the pool
-  statistics on CPU, and it is consistent with DIAG-1 (B1 reaching more
+  problems while losing marginal ones (consistent with DIAG-1: B1 reaches more
   oracle-empty problems). B2's mean (3.640) is lowest — the text channel reduces
-  both coverage *and* richness.
+  both coverage *and* richness. *[Update 2026-07-13: this pool-concentration was
+  hypothesised as the DIAG-3 "entropy-killer" signature, but DIAG-3's direct
+  measurement REFUTED that — r₇ is more diverse than r₀. So the concentration is
+  mis-directed steering (cf. DIAG-5's out-of-domain reversal), not
+  diversity-narrowing.]*
 
-The account is now closed on the CPU side: at ~0.85 i.i.d. pool coverage there is
-almost nothing for cross-step conditioning to *add* and a great deal for anchoring
-on prior failures to *subtract*, so bandwidth buys harm. GPU diagnostics (DIAG-5
-transfer, DIAG-3 authority) remain to pin the register's internal mechanism, but
-the outcome-level story is complete and evidence-backed.
+The outcome-level account: at ~0.85 i.i.d. pool coverage there is almost nothing
+for cross-step conditioning to *add* and a great deal for anchoring on prior
+failures to *subtract*, so bandwidth buys harm. The GPU diagnostics (DIAG-2/3/5,
+done 2026-07-13) pin the internal mechanism; see the Synthesis below.
 
 ---
 
-## Roll-up (fill as diagnostics land)
+## Roll-up — all diagnostics closed (2026-07-13)
 
 | Diagnostic | Headline number | Prediction held? | What it implies about the null |
 |---|---|---|---|
 | DIAG-1 | FULL generative wins ≤ B1's (1 vs 2; 3 vs 5 oracle-empty) | partly (spirit yes, literal no) | register's generative effect is non-positive; "unreachable" set < 26 |
-| DIAG-2 | _pending (GPU)_ | _pending_ | encoding vs transmission failure |
-| DIAG-3 | _pending (GPU)_ | _pending_ | control authority of r; entropy-killer? (r_7 diversity < r_0?) |
-| DIAG-4 | 1.7× teacher-forced gain → 0.000 sampled | **no** (refutes §1.3 arithmetic, opens 1.7×→0 puzzle) | wrong-object failure: string-reproduction ≠ class steering; indicts D2(a) |
-| DIAG-5 | _pending (GPU, run first)_ | _pending_ | domain/length transfer vs teacher-forced/sampled gap |
+| DIAG-2 | passed_{t-1} AUROC **0.558** (grouped CV); t not decodable | encoding-failure part **yes**, clock part **no** | register barely encodes correctness, no clock → **starved at the input** (§1.2) |
+| DIAG-3 | KL(r₀‖r₇) **0.117 nats**, r₇ *more* diverse; Δpass **0.000** | partly; entropy-killer **refuted** | register perturbs sampling but **directionless** (non-zero authority, zero steering) |
+| DIAG-4·1-2 | median target seq-prob 1.4e-2 (samplable) | **no** (refutes §1.3 arithmetic) | opened the 1.7×→0 puzzle; targets were samplable |
+| DIAG-4·3 | **99.7%** of −10.7% gain on *decision* tokens | **no** (predicted boilerplate) | training moved the right tokens teacher-forced → pure TF→sampled gap |
+| DIAG-5 | r₀ steering ×1.33 MBPP but **×0.28 (reverses)** HumanEval | **yes** (overshot) | domain/length transfer failure (28-tok MBPP → 156-tok HumanEval) |
 | DIAG-6 | **descoped → Phase 3** (D12) | — | ceiling already carried by pass@8 + DIAG-1 + DIAG-7 |
-| DIAG-7 | pool coverage 0.848 > 0.823 > 0.707 (B1>FULL>B2) | **yes** (strict ordering) | every cross-step channel net-harmful, monotonic in bandwidth; register updates cost 2.4 pts of pool |
+| DIAG-7 | pool coverage 0.848 > 0.823 > 0.707 (B1>FULL>B2) | **yes** (strict) | every cross-step channel net-harmful, monotonic in bandwidth; updates cost 2.4 pts of pool |
+
+## Synthesis — what the null means (diagnostic record closed 2026-07-13)
+
+The H2 null is **over-determined**, and every candidate cause is now measured:
+
+1. **No task headroom** (DIAG-1, DIAG-7). pass@8 ≈ 0.85 at i.i.d. sampling; the
+   genuinely-unreachable set is < 26/164; and pool coverage degrades monotonically
+   in cross-step bandwidth (B1 > FULL > B2) — anchoring on a saturated task's own
+   failures is net-harmful, and the register *updates* cost 2.4 pts of pool.
+2. **The register is starved at the input** (DIAG-2). r_t carries only marginal
+   decodable correctness signal (passed AUROC 0.558) and not even a clock —
+   confirming §1.2's near-chance-φ prediction.
+3. **Its control authority is directionless** (DIAG-3). r₇ *does* move G's sampling
+   (KL 0.117 nats) and even widens diversity, but shifts pass rate by 0.000 — it
+   perturbs without steering (the entropy-killer hypothesis is refuted; DIAG-7's
+   pool concentration is out-of-domain mis-steering, not diversity-narrowing).
+4. **The training objective moved a proxy that doesn't survive sampling**
+   (DIAG-4·1-3, DIAG-5). Targets were samplable, and training concentrated its gain
+   on the *right* decision tokens teacher-forced (99.7%) — yet sampling stayed flat
+   (a pure teacher-forced→sampled gap), and the learned r₀ steering *reversed* out
+   of domain (×0.28 on HumanEval), overfit to MBPP length.
+
+None of these individually "explains" the null; together they make it inevitable.
+The productive next moves are already recorded: an on-policy set-membership
+objective ([DECISIONS.md] D2 post-hoc), a richer input into U ([PRE-B2-HANDOFF.md]
+§5), in-domain/length-matched training, and a task with genuine headroom — but
+those are Phase-3 design questions, not extensions of this record.
