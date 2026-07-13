@@ -231,16 +231,21 @@ Sequential. Each gate must pass before the next begins. No gate may be tuned pas
 - [x] **M0 — Precondition (DONE 2026-07-13).** §0 checklist green (record closed,
       DIAG-1..11). Repo tagged `pre-phase-m-hf-nf4`. **D11 settled → bf16 on L4**
       ([DECISIONS.md] D11, §7).
-- [ ] **M1 — Correctness gate: does vLLM reproduce HF's soft-prompt semantics?**
-      Fix a register `r`. Generate greedily (temp = 0) for ~20 problems under
-      (a) HF + soft prompt, (b) vLLM + `prompt_embeds`. Compare token-for-token.
-      *Gate:* near-identical greedy outputs (minor numerical divergence in the tail
-      is fine; systematic divergence at token 1–3 means the chat template is wrong
-      — §2 trap 1). If this fails, **stop** — the register path does not migrate
-      and nothing downstream is valid.
-- [ ] **M2 — Throughput gate.** Measure tok/s on the old and new stacks, same
-      workload; report the multiple. *Gate:* ≥ 20×. If under ~5×, something is
-      still wrong — find it before proceeding, don't accept a partial win.
+- [x] **M1 — Correctness gate: does vLLM reproduce HF's soft-prompt semantics?
+      PASS (2026-07-13).** Fixed register `r` → soft prompt; greedy (temp 0) on 20
+      HumanEval problems under (a) HF bf16 `inputs_embeds`, (b) vLLM bf16
+      `prompt_embeds`. **19/20 exact 48-token match, 0/20 early divergence;** the one
+      miss diverges at token 9 (bf16 tail numerics — the allowed "minor tail
+      divergence" branch). The `prompt_embeds` path splices the chat-templated
+      prompt correctly and the register survives the migration. *(Trap 2 hit live:
+      vLLM 0.11.0 ⊥ transformers 5.0 → pinned transformers 4.57.0.)*
+      → `runs/modal/m1_correctness.json`, `scripts/modal_phasem.py::m1`.
+- [x] **M2 — Throughput gate. PASS (2026-07-13).** Same L4, plain HumanEval
+      prompts (the 3a/3b-lite generation mode): HF bf16 batch-1 **28 tok/s** → vLLM
+      bf16 continuous batching **2809 tok/s** = **100×** on identical hardware
+      (**281×** over the documented old 4-bit/T4 ~10 tok/s effective). Gate ≥20×
+      cleared by 5×. Plain vLLM generation validated → 3a/3b-lite unblocked.
+      → `runs/modal/m2_throughput.json`, `scripts/modal_phasem.py::m2`.
 - [ ] **M3 — Statistical equivalence, not bit equivalence.** Re-run the Phase-0
       baseline (B0, B1) on the new stack. Bit-identity is not expected (different
       precision, different sampling impl). *Gate:* new pass@1 within a defensible
@@ -265,9 +270,9 @@ Sequential. Each gate must pass before the next begins. No gate may be tuned pas
 | Gate | Date | Outcome | Notes |
 |---|---|---|---|
 | **M0** | 2026-07-13 | **PASS** | §0 green (DIAG-1..11 closed); repo tagged `pre-phase-m-hf-nf4`; D11 → bf16/L4 |
-| M1 | — | in progress | vLLM `prompt_embeds` vs HF soft-prompt greedy, ~20 problems |
-| M2 | — | — | throughput ≥ 20× |
-| M3 | — | — | B0/B1 statistical equivalence (bf16 upward shift expected) |
+| **M1** | 2026-07-13 | **PASS** | vLLM `prompt_embeds` vs HF soft-prompt, greedy, 20 problems: **19/20 exact (48/48 tokens), 0/20 early divergence**; the lone miss diverges at token 9 (bf16 tail drift). Register path migrates faithfully. `runs/modal/m1_correctness.json` |
+| **M2** | 2026-07-13 | **PASS** | L4, 64 prompts × 256 tok: HF bf16 batch-1 **28 tok/s** → vLLM bf16 **2809 tok/s** = **100×** (281× vs old 4-bit/T4 ~10 tok/s). Gate ≥20× cleared 5×. `runs/modal/m2_throughput.json` |
+| M3 | — | next | B0/B1 statistical equivalence (bf16 upward shift expected) |
 | M4 | — | — | V-v2b revalidation on bf16 candidates |
 | M5 | — | — | new lock_a/lock_b; COMPUTE_ACCOUNTING 2nd amendment |
 

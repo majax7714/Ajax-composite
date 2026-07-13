@@ -165,6 +165,86 @@ def m1(n: int = 20, max_new: int = 48):
             "prefix_ge8": prefix_ge8, "results": results}
 
 
+@app.function(image=IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=3600)
+def m2(n_vllm: int = 64, gen_tokens: int = 256):
+    """M2 throughput gate. Same L4, same workload (plain HumanEval prompts — the
+    3a/3b-lite generation mode, no register): HF bf16 batch-1 `generate` vs vLLM
+    bf16 continuous batching. Reports aggregate tok/s and the multiple. Isolates the
+    stack win on identical hardware; also validates plain vLLM generation."""
+    import os
+    import time
+
+    os.chdir("/root/rgr")
+    import torch
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+
+    from rgr.data.humaneval import load_humaneval
+    from rgr.generator.formatting import SYSTEM_PROMPT, build_prompt
+    from rgr.types import SplitRole
+
+    tok = AutoTokenizer.from_pretrained(MODEL)
+    eos = tok.eos_token_id
+    problems = load_humaneval().checkout(SplitRole.HELDOUT_EVAL)[:n_vllm]
+
+    def prompt_text(p):
+        msgs = [{"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": build_prompt(p.prompt)}]
+        return tok.apply_chat_template(msgs, add_generation_prompt=True, tokenize=False)
+
+    prompts = [prompt_text(p) for p in problems]
+
+    # --- HF bf16 batch-1 baseline (force exactly gen_tokens for a fair rate) ---
+    print("HF bf16 batch-1 ...", flush=True)
+    hf = AutoModelForCausalLM.from_pretrained(MODEL, torch_dtype=torch.bfloat16).to("cuda").eval()
+    ids = tok(prompts[0], return_tensors="pt").input_ids.to("cuda")
+    with torch.no_grad():
+        hf.generate(ids, max_new_tokens=16, do_sample=False, pad_token_id=eos)  # warmup
+        torch.cuda.synchronize()
+        t0 = time.time()
+        hf.generate(ids, min_new_tokens=gen_tokens, max_new_tokens=gen_tokens,
+                    do_sample=False, pad_token_id=eos)
+        torch.cuda.synchronize()
+        hf_dt = time.time() - t0
+    hf_tok_s = gen_tokens / hf_dt
+    del hf
+    torch.cuda.empty_cache()
+
+    # --- vLLM continuous batching (force gen_tokens via ignore_eos for a fair rate) ---
+    print("vLLM bf16 continuous batching ...", flush=True)
+    from vllm import LLM, SamplingParams
+    llm = LLM(model=MODEL, dtype="bfloat16", gpu_memory_utilization=0.85,
+              max_model_len=2048, enforce_eager=False)
+    llm.generate(prompts[:2], SamplingParams(temperature=0.0, max_tokens=16))  # warmup
+    sp = SamplingParams(temperature=0.0, max_tokens=gen_tokens, ignore_eos=True)
+    t0 = time.time()
+    out = llm.generate(prompts, sp)
+    vllm_dt = time.time() - t0
+    total = sum(len(o.outputs[0].token_ids) for o in out)
+    vllm_tok_s = total / vllm_dt
+
+    return {"hf_batch1_tok_s": hf_tok_s, "vllm_agg_tok_s": vllm_tok_s,
+            "multiple_vs_hf_batch1": vllm_tok_s / hf_tok_s,
+            "n_vllm": n_vllm, "gen_tokens": gen_tokens, "vllm_total_tokens": total,
+            "vllm_wall_s": vllm_dt, "hf_wall_s": hf_dt,
+            "old_stack_effective_tok_s_documented": 10.0}
+
+
+@app.local_entrypoint()
+def m2_main(n_vllm: int = 64, gen_tokens: int = 256):
+    r = m2.remote(n_vllm, gen_tokens)
+    (REPO / "runs/modal").mkdir(parents=True, exist_ok=True)
+    (REPO / "runs/modal/m2_throughput.json").write_text(json.dumps(r, indent=2))
+    print(f"\n=== M2 — throughput ({n_vllm} prompts × {gen_tokens} tok, L4) ===")
+    print(f"HF bf16 batch-1:        {r['hf_batch1_tok_s']:.1f} tok/s")
+    print(f"vLLM bf16 aggregate:    {r['vllm_agg_tok_s']:.1f} tok/s "
+          f"({r['vllm_total_tokens']} tok in {r['vllm_wall_s']:.1f}s)")
+    print(f"multiple vs HF batch-1: {r['multiple_vs_hf_batch1']:.1f}×")
+    print(f"multiple vs old 4-bit/T4 effective (~10 tok/s): {r['vllm_agg_tok_s']/10:.0f}×")
+    gate = r["multiple_vs_hf_batch1"] >= 20 or r["vllm_agg_tok_s"] / 10 >= 20
+    print(f"\nM2 gate (≥20×): {'PASS' if gate else 'INVESTIGATE (<20×)'}")
+    print("wrote runs/modal/m2_throughput.json")
+
+
 @app.local_entrypoint()
 def m1_main(n: int = 20, max_new: int = 48):
     r = m1.remote(n, max_new)
