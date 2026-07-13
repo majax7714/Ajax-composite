@@ -246,11 +246,18 @@ Sequential. Each gate must pass before the next begins. No gate may be tuned pas
       (**281×** over the documented old 4-bit/T4 ~10 tok/s effective). Gate ≥20×
       cleared by 5×. Plain vLLM generation validated → 3a/3b-lite unblocked.
       → `runs/modal/m2_throughput.json`, `scripts/modal_phasem.py::m2`.
-- [ ] **M3 — Statistical equivalence, not bit equivalence.** Re-run the Phase-0
-      baseline (B0, B1) on the new stack. Bit-identity is not expected (different
-      precision, different sampling impl). *Gate:* new pass@1 within a defensible
-      distance of the old, and any shift **explained** (fp16 improving G is an
-      expected upward shift, not a bug — but state it, size it, record it).
+- [x] **M3 — Statistical equivalence, not bit equivalence. PASS (2026-07-13).**
+      Reproduced the Phase-0 pool (8 i.i.d. samples/problem, temp 0.8/top_p 0.95,
+      164 HumanEval) on vLLM bf16; execution held to **Daytona** (Phase-0's backend,
+      decoupled to the local box per §1.1 — so the *only* variable is the generation
+      stack). All metrics shift **uniformly up**, growing with k (bf16 lifts
+      per-sample quality): B0 0.5922→**0.6418**, B1-likelihood 0.6280→**0.6707**,
+      pass@2 0.6997→0.7600, pass@4 0.7804→0.8524, **oracle pass@8 0.8415→0.9146**.
+      max \|Δ\| = 0.073, no metric below old−0.03 — a modest, coherent, fully
+      explained bf16 improvement, not a bug. **Phase-3 consequence:** HumanEval
+      pass@8 is now **0.915** — even more saturated, so it fails 3a's coverage band
+      [0.30, 0.60] harder still (§3's prediction realized; strengthens the mandatory
+      benchmark screen). → `artifacts/m3_rebaseline.json`, `scripts/modal_phasem.py::m3_*`.
 - [ ] **M4 — Verifier revalidation.** Score fp16-generated candidates with V-v2b;
       compute AUROC and within-problem macro AUROC on the new candidate
       distribution. *Gate:* if AUROC degrades materially vs the recorded
@@ -272,8 +279,8 @@ Sequential. Each gate must pass before the next begins. No gate may be tuned pas
 | **M0** | 2026-07-13 | **PASS** | §0 green (DIAG-1..11 closed); repo tagged `pre-phase-m-hf-nf4`; D11 → bf16/L4 |
 | **M1** | 2026-07-13 | **PASS** | vLLM `prompt_embeds` vs HF soft-prompt, greedy, 20 problems: **19/20 exact (48/48 tokens), 0/20 early divergence**; the lone miss diverges at token 9 (bf16 tail drift). Register path migrates faithfully. `runs/modal/m1_correctness.json` |
 | **M2** | 2026-07-13 | **PASS** | L4, 64 prompts × 256 tok: HF bf16 batch-1 **28 tok/s** → vLLM bf16 **2809 tok/s** = **100×** (281× vs old 4-bit/T4 ~10 tok/s). Gate ≥20× cleared 5×. `runs/modal/m2_throughput.json` |
-| M3 | — | next | B0/B1 statistical equivalence (bf16 upward shift expected) |
-| M4 | — | — | V-v2b revalidation on bf16 candidates |
+| **M3** | 2026-07-13 | **PASS** | vLLM bf16 vs old 4-bit, 164 HumanEval, execution held to Daytona (only the gen stack varies): all metrics shift **up** — B0 .592→.642, B1-lik .628→.671, pass@8 **.842→.915**; max \|Δ\| .073, uniformly positive & explained by the bf16 lift. `artifacts/m3_rebaseline.json` |
+| M4 | — | next | V-v2b revalidation on bf16 candidates |
 | M5 | — | — | new lock_a/lock_b; COMPUTE_ACCOUNTING 2nd amendment |
 
 ---

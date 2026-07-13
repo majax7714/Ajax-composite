@@ -207,9 +207,9 @@ tok/s (100×; 281× vs old 4-bit/T4 effective ~10 tok/s).**
 
 - [x] M0 precondition + repo tag + **D11 → bf16/L4** · [x] **M1 vLLM≡HF soft-prompt
       19/20 exact greedy (register path migrates)** · [x] **M2 throughput 100×** ·
-      [ ] M3 stat-equivalent re-baseline (bf16 shift stated/sized) · [ ] M4 V-v2b
-      revalidation on bf16 candidates · [ ] M5 new lock_a/lock_b + COMPUTE_ACCOUNTING
-      amendment.
+      [x] **M3 re-baseline: all metrics shift up (bf16 lift), pass@8 .842→.915,
+      max |Δ| .073** · [ ] M4 V-v2b revalidation on bf16 candidates · [ ] M5 new
+      lock_a/lock_b + COMPUTE_ACCOUNTING amendment.
 
 ---
 

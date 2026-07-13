@@ -229,6 +229,117 @@ def m2(n_vllm: int = 64, gen_tokens: int = 256):
             "old_stack_effective_tok_s_documented": 10.0}
 
 
+@app.function(image=IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=3600)
+def m3_generate(n_problems: int = 164):
+    """M3 generation stage (L4, vLLM bf16). Reproduce the Phase-0 candidate pool:
+    n=t_max i.i.d. samples/problem, plain base model (no register), temp 0.8 /
+    top_p 0.95 / max 512 — the exact Phase-0 sampling. Returns per-problem
+    candidates with mean_logprob (for the likelihood rerank). Execution is
+    decoupled to the local entrypoint (Daytona), per [PHASE_M.md] §1.1."""
+    import os
+
+    os.chdir("/root/rgr")
+    from rgr.config import load_config
+    from rgr.data.humaneval import load_humaneval
+    from rgr.generator.formatting import SYSTEM_PROMPT, build_prompt, extract_code
+    from rgr.types import SplitRole
+    from vllm import LLM, SamplingParams
+
+    config = load_config("configs/phase0_harness.toml")
+    g = config.generator
+    n_samples = config.loop.t_max
+    problems = load_humaneval().checkout(SplitRole.HELDOUT_EVAL)[:n_problems]
+    print(f"M3: {len(problems)} problems × {n_samples} samples, temp {g.temperature}", flush=True)
+
+    from transformers import AutoTokenizer
+    tok = AutoTokenizer.from_pretrained(MODEL)
+
+    def prompt_text(p):
+        msgs = [{"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": build_prompt(p.prompt)}]
+        return tok.apply_chat_template(msgs, add_generation_prompt=True, tokenize=False)
+
+    prompts = [prompt_text(p) for p in problems]
+    llm = LLM(model=MODEL, dtype="bfloat16", gpu_memory_utilization=0.85, max_model_len=2048)
+    sp = SamplingParams(n=n_samples, temperature=g.temperature, top_p=g.top_p,
+                        max_tokens=g.max_new_tokens)
+    outs = llm.generate(prompts, sp)
+
+    cands = []
+    for req in outs:
+        row = []
+        for o in req.outputs:
+            ntok = len(o.token_ids)
+            clp = o.cumulative_logprob
+            mean_lp = (clp / ntok) if (clp is not None and ntok) else None
+            row.append({"text": o.text, "code": extract_code(o.text), "mean_logprob": mean_lp})
+        cands.append(row)
+    return {"problem_ids": [p.problem_id for p in problems], "n_samples": n_samples,
+            "candidates": cands}
+
+
+@app.local_entrypoint()
+def m3_main(n_problems: int = 164):
+    """M3 gate. Generate on L4 (vLLM bf16), execute locally via Daytona (same
+    backend as Phase-0 → the only variable is the generation stack), compute
+    B0/B1-likelihood/pass@k, compare to the recorded old-stack numbers."""
+    import os
+
+    os.chdir(str(REPO))
+    r = m3_generate.remote(n_problems)
+    (REPO / "runs/modal").mkdir(parents=True, exist_ok=True)
+    (REPO / "runs/modal/m3_candidates.json").write_text(json.dumps(r))
+
+    from rgr.config import load_config
+    from rgr.data.humaneval import load_humaneval
+    from rgr.evals.passk import mean_pass_at_k
+    from rgr.execution.sandbox import DaytonaBackend
+    from rgr.training.labels import ExecutionPool
+    from rgr.types import Candidate, SplitRole
+
+    config = load_config("configs/phase0_harness.toml")
+    problems = {p.problem_id: p for p in load_humaneval().checkout(SplitRole.HELDOUT_EVAL)}
+    pool = ExecutionPool(lambda: DaytonaBackend(config.execution.timeout_seconds), size=8)
+
+    counts, b1_lik_pass = [], 0
+    try:
+        for pid, row in zip(r["problem_ids"], r["candidates"]):
+            problem = problems[pid]
+            cs = [Candidate(text=c["text"], code=c["code"]) for c in row]
+            results = pool.execute_all(problem, cs)
+            passed = [e.passed for e in results]
+            counts.append((len(passed), sum(passed)))
+            lps = [c["mean_logprob"] if c["mean_logprob"] is not None else -1e9 for c in row]
+            b1_lik_pass += passed[max(range(len(lps)), key=lambda i: lps[i])]
+    finally:
+        pool.close()
+
+    n = len(counts)
+    new = {"B0_pass1": mean_pass_at_k(counts, 1),
+           "B1_likelihood_pass1": b1_lik_pass / n,
+           "pass@2": mean_pass_at_k(counts, 2), "pass@4": mean_pass_at_k(counts, 4),
+           "oracle_pass@8": mean_pass_at_k(counts, 8)}
+    OLD = {"B0_pass1": 0.5922, "B1_likelihood_pass1": 0.6280,
+           "pass@2": 0.6997, "pass@4": 0.7804, "oracle_pass@8": 0.8415}
+
+    result = {"_label": "M3 — B0/B1 statistical re-baseline on vLLM/bf16/L4 vs old HF/4-bit/T4",
+              "n_problems": n, "new_bf16": new, "old_4bit_documented": OLD,
+              "delta_new_minus_old": {k: new[k] - OLD[k] for k in OLD}}
+    (REPO / "artifacts/m3_rebaseline.json").write_text(json.dumps(result, indent=2))
+
+    print(f"\n=== M3 — statistical re-baseline ({n} HumanEval problems) ===")
+    print(f"{'metric':<22}{'old 4-bit':>11}{'new bf16':>11}{'Δ':>9}")
+    for k in ("B0_pass1", "B1_likelihood_pass1", "pass@2", "pass@4", "oracle_pass@8"):
+        print(f"{k:<22}{OLD[k]:>11.4f}{new[k]:>11.4f}{new[k]-OLD[k]:>+9.4f}")
+    up = all(new[k] - OLD[k] >= -0.03 for k in OLD)  # bf16 should not degrade G
+    big = max(abs(new[k] - OLD[k]) for k in OLD)
+    verdict = ("PASS (shifts modest & explained by bf16 lift)" if up and big <= 0.10
+               else "INSPECT" if big <= 0.15 else "FAIL (unexplained divergence)")
+    print(f"\nmax |Δ| = {big:.3f}; all metrics ≥ old−0.03: {up}")
+    print(f"M3 verdict: {verdict}")
+    print("wrote artifacts/m3_rebaseline.json")
+
+
 @app.local_entrypoint()
 def m2_main(n_vllm: int = 64, gen_tokens: int = 256):
     r = m2.remote(n_vllm, gen_tokens)
