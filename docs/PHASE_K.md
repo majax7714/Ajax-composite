@@ -150,4 +150,19 @@ DIAG-6 descope recorded ([DECISIONS.md] D12, done).
 
 | Date | Replay N | Byte-diff vs lock_a | Verdict | Notes |
 |---|---|---|---|---|
-| _pending_ | ~20 | _pending_ | _pending_ | Modal T4, image pinned to env lock |
+| 2026-07-13 | 20 | 1/20 byte-identical; 19/20 diverge (coherent) | **PROCEED (numeric drift)** | Modal T4, image torch 2.9.0/transformers 5.0.0/bnb 0.49.2, Qwen 2e1fd397 |
+
+**K1 verdict — PROCEED (numeric sampling drift, not systematic).** Byte-for-byte
+against `lock_a` (temp 0.8, stochastic) can only be identical on a *bit-identical*
+stack, which the reconstruction is not (torch 2.9 exact build / transformers /
+bnb differ from the unrecorded GPU stack). Inspection of the 19 divergences
+(`runs/modal/k1_replay.json` vs `lock_a`) shows **all are coherent Python taking
+a different valid sampling path** — `current_balance` vs `balance`, imports-first
+vs def-first, an extra newline — with `` ```python `` prefixes aligned on 20/20
+and **one full problem (all 8 stochastic candidates) byte-identical**, which
+requires near-identical numerics. No garbage, no quality collapse, no
+all-diverge-at-token-1. This is the spec's "small tail divergence (cuBLAS/driver
+numerics) → does not block" branch. The remaining diagnostics are within-stack
+mechanistic measurements (DIAG-5/4b are forward-pass NLL on *fixed* candidates;
+DIAG-2/3 are within-Modal comparisons), so they are valid under this drift.
+Logged as the first [COMPUTE_ACCOUNTING.md] amendment. Proceeding to DIAG-5.

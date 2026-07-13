@@ -77,4 +77,18 @@ a rerun.
 
 ---
 
-*Amendment log: (empty — and it should stay that way).*
+*Amendment log:*
+
+- **2026-07-13 — rented hardware change (Kaggle T4 → Modal T4), no unit change.**
+  The remaining exploratory diagnostics (DIAG-2/3/4-item-3/5) run on Modal T4
+  instead of Kaggle T4 (quota wall; [PHASE_K.md]). Same stack (HF `generate()` +
+  bitsandbytes NF4 + Qwen2.5-Coder-1.5B), same Turing sm75 silicon. **The budgeted
+  unit — one candidate generation — is unchanged**, and no H1/H2 headline number
+  is recomputed against a Modal number. GATE K1 (2026-07-13) confirmed the stack
+  transferred with **numeric sampling drift only** (1/20 temp-0.8 problems
+  byte-identical incl. one full 8-candidate match; 19/20 diverge into coherent
+  alternative solutions — no quality shift), which is expected for a
+  non-bit-identical library set and acceptable for mechanistic diagnostics. This
+  amendment records the platform change and the drift; it changes no reported
+  Phase-0/1/2 figure (those remain historical results of the retired Kaggle
+  stack, per [PHASE_M.md] §3 — never cross-compared).
