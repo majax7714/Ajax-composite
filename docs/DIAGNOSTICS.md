@@ -711,6 +711,33 @@ anchor. Sets the H1 prior; cannot change the Phase-3 design.
 significant at n≈24**; direction informative, magnitude not. **ABSTRACT < B1 = red
 flag.** Output: `artifacts/diag11_conditional_recovery.json`.
 
+**RESULT (2026-07-13, `scripts/diag11_conditional_recovery.py`, 24 step-0 failures).**
+
+| condition | recover *any* step 1–7 | sustained (pass @ step 7) |
+|---|---|---|
+| **B1** (i.i.d. resample) | **0.917** (22/24) | 0.500 (12/24) |
+| **ABSTRACT** (fb, no anchor) | **0.917** (22/24), Δ **+0.000** | 0.583 (14/24), Δ +0.083 |
+| **B2+fb** (fb + anchor) | **0.542** (13/24), Δ **−0.375** | 0.167 (4/24) |
+
+**Verdict: no benefit signal (again), no red flag — and the metric itself is
+ceiling-saturated, which is the point. Prediction partly held.** On the primary
+recover-*any* metric ABSTRACT ties B1 **exactly** (+0.000), not the predicted "few
+points." But that metric is **near-ceiling (22/24 recover by resampling alone)**:
+the step-0 failures on this saturated subset are **low-probability draws, not hard
+problems** (a direct restatement of DIAG-1's resampling-recovery finding), so there
+is *no room* to show benefit — exactly the "can't detect benefit without headroom"
+limit of §0, now shown numerically. On the more discriminating **sustained** metric
+ABSTRACT edges B1 (+0.083, ~2 problems) — favorable direction, **<1 SE at n=24**,
+not significant. **No red flag** (ABSTRACT ≥ B1 on both). **Sharpest secondary — the
+anchoring tax replicates hard on recovery:** B2+fb recovers only **13/24 vs B1's
+22/24** and sustains just 4/24 — conditioning on the failed candidate *prevents* the
+recovery that plain resampling achieves (−9 problems). That strengthens DIAG-10's
+*real* result (the anchor harms) while leaving the *benefit* question exactly where
+§0 put it: **untestable here, deferred to Phase 3a's headroom gate.** **H1 prior:
+unchanged ~50/50** — no positive evidence, no red flag; the ceiling reinforces that
+the mandatory 3a coverage screen is the only place H1 can be honestly tested. →
+`artifacts/diag11_conditional_recovery.json`
+
 ---
 
 ## Roll-up — all diagnostics closed (2026-07-13)
@@ -730,6 +757,7 @@ flag.** Output: `artifacts/diag11_conditional_recovery.json`.
 | DIAG-9 | adjacent same-error **0.85**; pass 0.61→0.40 | *magnitude corrected by 9b* | text channel anti-refines; local error-echo (see 9b) |
 | DIAG-9b | within-problem chance **0.743** (not 0.42); B2 adjacent 0.851 > non-adj 0.660; no_code 0.01→0.055 | **partly** (B1 0.74 vs pred 0.60–0.70) | DIAG-9's excess retracted; anchoring survives as **local +0.19**; decline partly no_code collapse |
 | DIAG-10 | ABSTRACT +0.088 vs B2+fb −0.162 (same feedback, ±candidate); gap +0.225. *vs B1 +0.062: null (½ SE)* | anchoring **yes**; benefit **untested** | **candidate anchor causes the collapse** (real, licenses Phase 3). Benefit vs B1 is null-uninformative → Phase 3 **hypothesis**, not premise |
+| DIAG-11 | recover-any: B1 0.917 = ABSTRACT 0.917; B2+fb 0.542 (−0.375) | partly (ceiling-saturated) | benefit untestable here (22/24 recover by resampling); **anchor prevents recovery** (−9 problems) — H1 prior ~50/50 |
 
 ## Synthesis — what the null means (diagnostic record closed 2026-07-13; reworked after review)
 

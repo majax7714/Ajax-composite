@@ -62,6 +62,14 @@ ABSTRACT < B1, that is a red flag** worth knowing before spending Phase 3's budg
 Cannot change Phase 3's design (§4 gate is mandatory regardless); it sets the **H1
 prior**. Output: `artifacts/diag11_conditional_recovery.json`.
 
+**RESULT (done 2026-07-13):** recover-any B1 **0.917** = ABSTRACT **0.917** (Δ+0.000),
+B2+fb 0.542 (Δ−0.375); sustained@step7 B1 0.500, ABSTRACT 0.583 (+0.083, <1 SE),
+B2+fb 0.167. **No benefit signal, no red flag** — the recover-any metric is
+ceiling-saturated (22/24 recover by resampling alone → these failures are
+low-probability draws, not hard problems, so benefit is untestable here, per §0). The
+**anchor prevents recovery** (B2+fb 13/24 vs B1 22/24) — replicates the DIAG-10 harm.
+**H1 prior stays ~50/50.** Full write-up: [DIAGNOSTICS.md] DIAG-11.
+
 ---
 
 ## 2. The reframe — what the paper is now about
@@ -185,7 +193,8 @@ measured) — the negative becomes *data*. **That is the paper.**
 
 ## 7. Honest priors, on the record
 
-- **H1: ~50/50.** DIAG-11 will move it. Rich feedback + headroom + no anchor is
+- **H1: ~50/50.** DIAG-11 (done) left it there — recover-any was ceiling-saturated
+  (no signal either way), no red flag. Rich feedback + headroom + no anchor is
   refinement's best shot; if it fails there it fails everywhere.
 - **H2: ~85% ANCHOR < B1.** Mechanism measured; no reason it vanishes with headroom.
 - **H3: ~30%.** The register must justify a 128-dim bottleneck against raw text in an

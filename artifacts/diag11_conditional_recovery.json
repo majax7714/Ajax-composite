@@ -1,0 +1,28 @@
+{
+  "_label": "EXPLORATORY / POST-HOC (re-analysis of DIAG-10). Sets H1 prior; does not reopen H2 or change Phase-3 design.",
+  "n_step0_failures": 24,
+  "n_problems_total": 80,
+  "recovery": {
+    "b1": {
+      "recovered_any_step_1_7": 22,
+      "recovery_rate_any": 0.9166666666666666,
+      "recovered_at_step7": 12,
+      "recovery_rate_at_step7": 0.5
+    },
+    "abstract": {
+      "recovered_any_step_1_7": 22,
+      "recovery_rate_any": 0.9166666666666666,
+      "recovered_at_step7": 14,
+      "recovery_rate_at_step7": 0.5833333333333334
+    },
+    "b2_fb": {
+      "recovered_any_step_1_7": 13,
+      "recovery_rate_any": 0.5416666666666666,
+      "recovered_at_step7": 4,
+      "recovery_rate_at_step7": 0.16666666666666666
+    }
+  },
+  "abstract_minus_b1_recovery_any": 0.0,
+  "b2fb_minus_b1_recovery_any": -0.375,
+  "predicted": "ABSTRACT > B1 by a few pts, n.s. at n~24; ABSTRACT < B1 = red flag"
+}
