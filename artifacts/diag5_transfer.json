@@ -1,0 +1,20 @@
+{
+  "_label": "EXPLORATORY / POST-HOC (Modal T4, Phase K). r_0(k=0) teacher-forced steering.",
+  "mbpp_val": {
+    "n": 200,
+    "mean_len": 41.725,
+    "mean_nll_untrained": 0.15481054782867432,
+    "mean_nll_trained": 0.14805655181407928,
+    "per_token_mult": 1.006776855681398,
+    "seq_prob_mult_at_mean_len": 1.3255274871281755
+  },
+  "humaneval": {
+    "n": 200,
+    "mean_len": 135.66,
+    "mean_nll_untrained": 0.10729192942380905,
+    "mean_nll_trained": 0.11675818264484406,
+    "per_token_mult": 0.9905784107095228,
+    "seq_prob_mult_at_mean_len": 0.2768742320099325
+  },
+  "note": "per_token_mult / seq_prob_mult_at_mean_len are untrained->trained. Transfer = compare mbpp_val vs humaneval multipliers."
+}

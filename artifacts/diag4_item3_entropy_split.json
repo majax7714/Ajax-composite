@@ -1,0 +1,17 @@
+{
+  "_label": "EXPLORATORY / POST-HOC (Modal T4, Phase K). DIAG-4 item 3, faithful full k~U val_loss.",
+  "n_examples": 240,
+  "n_tokens": 12632,
+  "val_mean_nll_untrained": 0.17162087559700012,
+  "val_mean_nll_trained": 0.1528727263212204,
+  "reproduces_0.1713_0.1530": [
+    0.1716,
+    0.1529
+  ],
+  "median_untrained_nll": 0.0015422129072248936,
+  "total_improvement": 145.67132568359375,
+  "share_low_entropy": 0.0034285234287381172,
+  "share_high_entropy": 0.9965713620185852,
+  "mean_improve_low": 7.907497638370842e-05,
+  "mean_improve_high": 0.022984780371189117
+}

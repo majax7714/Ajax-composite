@@ -20,6 +20,7 @@ import modal
 
 REPO = Path(__file__).parents[1]
 STAGE = REPO / ".modal_stage"
+sys.path.insert(0, str(REPO / "src"))  # local entrypoints import pure-stdlib rgr.evals
 
 # Artifacts the Modal container needs, staged under .modal_stage/ mirroring repo layout.
 NEED = {
@@ -34,6 +35,7 @@ NEED = {
     "runs/kaggle/phase1_data/runs/phase1/labels.jsonl": "artifacts/phase1_labels.jsonl",
     "runs/kaggle/phase2_score/runs/phase2/v_scores.json": "artifacts/v_scores.json",
     "runs/kaggle/phase1_v2b/runs/phase1_v2b/heldout_scores.json": "artifacts/heldout_scores.json",
+    "runs/kaggle/lock_a/runs/phase0/lock_a.jsonl": "artifacts/lock_a.jsonl",
 }
 
 
@@ -69,6 +71,7 @@ IMAGE = (
         "tokenizers==0.22.2",
         "safetensors==0.7.0",
         "huggingface_hub==1.11.0",
+        "daytona",  # sandbox execution for DIAG-2/3 pass labels (matches Kaggle runner)
     )
     .env({"PYTHONPATH": "/root/rgr/src", "HF_HOME": "/cache/hf", "TOKENIZERS_PARALLELISM": "false"})
     .add_local_dir(str(STAGE), "/root/rgr")
@@ -121,6 +124,461 @@ def k1(n: int = 20) -> list[dict]:
         })
         print(f"  {i+1}/{n} {p.problem_id}", flush=True)
     return out
+
+
+def _load_config_and_gen():
+    import os
+
+    os.chdir("/root/rgr")
+    import torch
+
+    from rgr.config import load_config
+    from rgr.generator.model import Generator
+    config = load_config("configs/phase2_register.toml")
+    torch.manual_seed(config.run.seed)
+    gen = Generator(config.generator)
+    print(f"loading {config.generator.model_name} (4bit={config.generator.load_4bit}) ...", flush=True)
+    gen.load()
+    return config, gen
+
+
+def _build_register_modules(config, gen, trained: bool):
+    """Trained (from register_modules.pt) or untrained (seed-17 init, == training
+    base_val). Mirrors load_register_stack / stage_train construction exactly."""
+    import torch
+
+    from rgr.generator.injection import RegisterInjector
+    from rgr.register.encoder import ProblemRegisterEncoder
+    from rgr.register.update import RegisterUpdate
+    d_r, k_soft, d_model = config.register.d_r, config.register.k_soft_tokens, gen.d_model
+    torch.manual_seed(config.run.seed)  # deterministic init (== stage_train base_val)
+    inj = RegisterInjector(d_r, k_soft, d_model).to(gen.device).float()
+    enc = ProblemRegisterEncoder(d_r, d_model, embed_problem=gen.embed_problem).to(gen.device).float()
+    upd = RegisterUpdate(d_r, d_model, rms_normalize=config.register.rms_normalize,
+                         max_update_norm=config.register.max_update_norm).to(gen.device).float()
+    if trained:
+        ck = torch.load("artifacts/register_modules.pt", weights_only=True, map_location=gen.device)
+        inj.load_state_dict(ck["modules"]["injector"])
+        enc.proj.load_state_dict(ck["modules"]["w0"])
+        upd.load_state_dict(ck["modules"]["updater"])
+    for m in (inj, enc, upd):
+        m.eval()
+    return inj, enc, upd
+
+
+@app.function(image=IMAGE, gpu="T4", volumes={"/cache": VOL}, timeout=5400)
+def nll_diag(cap: int = 200):
+    """DIAG-5 (transfer) + DIAG-4 item 3 (entropy split). r_0 (k=0) teacher-forced
+    per-token NLL of passing candidates under trained vs untrained soft prompt, on
+    MBPP-val and HumanEval. Forward passes only — no generation, no execution."""
+    import json
+
+    import numpy as np
+    import torch
+
+    from rgr.data.humaneval import load_humaneval
+    from rgr.data.mbpp import load_mbpp
+    from rgr.generator.formatting import SYSTEM_PROMPT, build_prompt
+    from rgr.types import SplitRole
+
+    config, gen = _load_config_and_gen()
+    model, tok = gen._model, gen._tokenizer
+    device = gen.device
+    embed_layer = model.get_input_embeddings()
+    inj_t, enc_t, _ = _build_register_modules(config, gen, trained=True)
+    inj_u, enc_u, _ = _build_register_modules(config, gen, trained=False)
+    max_new = config.generator.max_new_tokens
+
+    def chat_ids(prompt_text):
+        msgs = [{"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": build_prompt(prompt_text)}]
+        enc = tok.apply_chat_template(msgs, add_generation_prompt=True, return_tensors="pt")
+        return getattr(enc, "input_ids", enc)[0].to(device)
+
+    @torch.no_grad()
+    def per_token_nll(problem, target_text, inj, enc):
+        r0 = enc.init(problem)  # (d_r,)  r_0 = W_0·phi(problem)
+        soft = inj(r0.unsqueeze(0)).to(model.dtype)[0]  # (k_soft, d_model)
+        p_ids = chat_ids(problem.prompt)
+        t_ids = tok(target_text, return_tensors="pt", add_special_tokens=False,
+                    truncation=True, max_length=max_new).input_ids[0].to(device)
+        if len(t_ids) < 2:
+            return None
+        ids = torch.cat([p_ids, t_ids])
+        embeds = torch.cat([soft, embed_layer(ids)]).unsqueeze(0)
+        logits = model(inputs_embeds=embeds).logits[0].float()
+        start = soft.shape[0] + len(p_ids)          # first target position
+        pred = logits[start - 1:start - 1 + len(t_ids)]  # logits predicting each target token
+        logp = torch.log_softmax(pred, -1)
+        return (-logp[range(len(t_ids)), t_ids]).cpu().numpy()
+
+    # ---- candidate pools ----
+    mbpp = {p.problem_id: p for p in load_mbpp().problems}
+    val_pids = set()
+    mbpp_targets = []  # (problem, text)
+    for line in open("artifacts/phase1_labels.jsonl"):
+        r = json.loads(line)
+        if str(r["split"]) == "val" and (r["passed"] is True or str(r["passed"]).lower() == "true") and r.get("text"):
+            mbpp_targets.append((mbpp[r["problem_id"]], r["text"]))
+            val_pids.add(r["problem_id"])
+    he = {p.problem_id: p for p in load_humaneval().checkout(SplitRole.HELDOUT_EVAL)}
+    he_targets = []
+    for line in open("artifacts/lock_a.jsonl"):
+        r = json.loads(line)
+        for s in r["steps"]:
+            if s["execution"]["passed"] and s.get("text"):
+                he_targets.append((he[r["problem_id"]], s["text"]))
+
+    def collect(targets):
+        rng = np.random.RandomState(config.run.seed)
+        idx = rng.permutation(len(targets))[:cap]
+        trained_tok, untr_tok = [], []
+        for i in idx:
+            problem, text = targets[i]
+            nt = per_token_nll(problem, text, inj_t, enc_t)
+            nu = per_token_nll(problem, text, inj_u, enc_u)
+            if nt is None or nu is None:
+                continue
+            trained_tok.append(nt); untr_tok.append(nu)
+        return trained_tok, untr_tok
+
+    out = {"cap": cap, "n_mbpp": len(mbpp_targets), "n_he": len(he_targets)}
+    for name, targets in (("mbpp_val", mbpp_targets), ("humaneval", he_targets)):
+        tr, un = collect(targets)
+        mean_tr = float(np.mean([t.mean() for t in tr]))
+        mean_un = float(np.mean([u.mean() for u in un]))
+        # implied seq-prob multiplier at mean length
+        mean_len = float(np.mean([len(t) for t in tr]))
+        mult = float(np.exp((mean_un - mean_tr) * mean_len))
+        out[name] = {"n": len(tr), "mean_len": mean_len,
+                     "mean_nll_untrained": mean_un, "mean_nll_trained": mean_tr,
+                     "per_token_mult": float(np.exp(mean_un - mean_tr)),
+                     "seq_prob_mult_at_mean_len": mult}
+        # DIAG-4 item 3 (MBPP val only): entropy split by untrained per-token NLL
+        if name == "mbpp_val":
+            all_un = np.concatenate(un); all_tr = np.concatenate(tr)
+            improve = all_un - all_tr                 # per-token NLL improvement
+            med = float(np.median(all_un))
+            low = all_un <= med                       # low-entropy (boilerplate) tokens
+            tot = float(improve.sum())
+            out["diag4_item3"] = {
+                "entropy_proxy": "untrained per-token NLL (low = boilerplate)",
+                "median_untrained_nll": med,
+                "total_improvement": tot,
+                "share_on_low_entropy": float(improve[low].sum() / tot) if tot else None,
+                "share_on_high_entropy": float(improve[~low].sum() / tot) if tot else None,
+                "n_tokens": int(all_un.size),
+            }
+    return out
+
+
+@app.local_entrypoint()
+def nll_main(cap: int = 200):
+    import json as _json
+    r = nll_diag.remote(cap)
+    (REPO / "artifacts/diag5_transfer.json").write_text(_json.dumps({
+        "_label": "EXPLORATORY / POST-HOC (Modal T4, Phase K). r_0(k=0) teacher-forced steering.",
+        "mbpp_val": r["mbpp_val"], "humaneval": r["humaneval"],
+        "note": "per_token_mult / seq_prob_mult_at_mean_len are untrained->trained. "
+                "Transfer = compare mbpp_val vs humaneval multipliers.",
+    }, indent=2))
+    (REPO / "artifacts/diag4_item3_entropy_split.json").write_text(_json.dumps({
+        "_label": "EXPLORATORY / POST-HOC (Modal T4, Phase K). DIAG-4 item 3.",
+        **r["diag4_item3"],
+    }, indent=2))
+    print("\n=== DIAG-5 transfer (r_0 steering, untrained->trained) ===")
+    for d in ("mbpp_val", "humaneval"):
+        s = r[d]
+        print(f"  {d:10s} n={s['n']:4d} len~{s['mean_len']:.0f}  NLL {s['mean_nll_untrained']:.4f}->{s['mean_nll_trained']:.4f}"
+              f"  per-tok x{s['per_token_mult']:.3f}  seq x{s['seq_prob_mult_at_mean_len']:.2f}")
+    e = r["diag4_item3"]
+    print(f"=== DIAG-4 item 3: {e['share_on_low_entropy']*100:.1f}% of the NLL improvement on low-entropy (boilerplate) tokens ===")
+    print("wrote artifacts/diag5_transfer.json + artifacts/diag4_item3_entropy_split.json")
+
+
+@app.function(image=IMAGE, gpu="T4", volumes={"/cache": VOL}, timeout=5400)
+def entropy_full():
+    """DIAG-4 item 3, FAITHFUL: reproduce the full k~U val_loss (should recover
+    0.1713->0.1530) per-token, trained vs untrained, then split the improvement by
+    token entropy. Exact stage_train construction (stored phi/v_scores/labels)."""
+    import json
+
+    import numpy as np
+    import torch
+
+    from rgr.data.mbpp import load_mbpp
+    from rgr.generator.formatting import SYSTEM_PROMPT, build_prompt
+    from rgr.training.imitation import build_examples
+
+    config, gen = _load_config_and_gen()
+    model, tok = gen._model, gen._tokenizer
+    device = gen.device
+    embed_layer = model.get_input_embeddings()
+    inj_t, enc_t, upd_t = _build_register_modules(config, gen, trained=True)
+    inj_u, enc_u, upd_u = _build_register_modules(config, gen, trained=False)
+    tcfg = config.extra["register_train"]
+    per_problem, k_max = int(tcfg.get("examples_per_problem", 12)), int(tcfg.get("k_max", 7))
+    max_new = config.generator.max_new_tokens
+
+    def fn(pid):
+        return pid.replace("/", "__") + ".npy"
+    records = [json.loads(l) for l in open("artifacts/phase1_labels.jsonl")]
+    by_pid = {}
+    for r in records:
+        by_pid.setdefault(r["problem_id"], []).append(r)
+    for rows in by_pid.values():
+        rows.sort(key=lambda r: int(r["idx"]))
+    v_scores = json.load(open("artifacts/v_scores.json"))
+    problems = {p.problem_id: p for p in load_mbpp().problems}
+    val_pids = {r["problem_id"] for r in records if str(r["split"]) == "val"}
+    passed = {pid: [(x["passed"] is True or str(x["passed"]).lower() == "true") for x in by_pid[pid]]
+              for pid in val_pids}
+    examples = build_examples(passed, per_problem=per_problem, k_max=k_max, seed=config.run.seed)
+    phi = {pid: torch.tensor(np.load(f"artifacts/phase1_phi/{fn(pid)}").astype(np.float32)) for pid in val_pids}
+    phi_p = {pid: torch.tensor(np.load(f"artifacts/phase1_phi_problems/{fn(pid)}").astype(np.float32)) for pid in val_pids}
+
+    def chat_ids(prompt_text):
+        msgs = [{"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": build_prompt(prompt_text)}]
+        e = tok.apply_chat_template(msgs, add_generation_prompt=True, return_tensors="pt")
+        return getattr(e, "input_ids", e)[0].to(device)
+
+    @torch.no_grad()
+    def per_token(ex, inj, enc, upd):
+        pid = ex.problem_id
+        r = enc.proj(phi_p[pid].to(device))  # r_0 = W_0·phi(problem)
+        for i in ex.prefix_idx:
+            r = upd.forward(r.unsqueeze(0), phi[pid][i].unsqueeze(0).to(device),
+                            torch.tensor([float(v_scores[pid][i])], device=device))[0]
+        soft = inj(r.unsqueeze(0)).to(model.dtype)[0]
+        p_ids = chat_ids(problems[pid].prompt)
+        t_ids = tok(by_pid[pid][ex.target_idx]["text"], return_tensors="pt", add_special_tokens=False,
+                    truncation=True, max_length=max_new).input_ids[0].to(device)
+        if len(t_ids) < 2:
+            return None
+        ids = torch.cat([p_ids, t_ids])
+        logits = model(inputs_embeds=torch.cat([soft, embed_layer(ids)]).unsqueeze(0)).logits[0].float()
+        start = soft.shape[0] + len(p_ids)
+        logp = torch.log_softmax(logits[start - 1:start - 1 + len(t_ids)], -1)
+        return (-logp[range(len(t_ids)), t_ids]).cpu().numpy()
+
+    un_all, tr_all = [], []
+    for ex in examples:
+        nu = per_token(ex, inj_u, enc_u, upd_u)
+        nt = per_token(ex, inj_t, enc_t, upd_t)
+        if nu is None or nt is None:
+            continue
+        un_all.append(nu); tr_all.append(nt)
+    mean_un = float(np.mean([u.mean() for u in un_all]))
+    mean_tr = float(np.mean([t.mean() for t in tr_all]))
+    un = np.concatenate(un_all); tr = np.concatenate(tr_all)
+    improve = un - tr
+    med = float(np.median(un))
+    low = un <= med
+    tot = float(improve.sum())
+    return {
+        "n_examples": len(un_all), "n_tokens": int(un.size),
+        "val_mean_nll_untrained": mean_un, "val_mean_nll_trained": mean_tr,
+        "reproduces_0.1713_0.1530": [round(mean_un, 4), round(mean_tr, 4)],
+        "median_untrained_nll": med, "total_improvement": tot,
+        "share_low_entropy": float(improve[low].sum() / tot) if tot else None,
+        "share_high_entropy": float(improve[~low].sum() / tot) if tot else None,
+        "mean_improve_low": float(improve[low].mean()), "mean_improve_high": float(improve[~low].mean()),
+    }
+
+
+@app.local_entrypoint()
+def entropy_main():
+    import json as _json
+    r = entropy_full.remote()
+    (REPO / "artifacts/diag4_item3_entropy_split.json").write_text(_json.dumps(
+        {"_label": "EXPLORATORY / POST-HOC (Modal T4, Phase K). DIAG-4 item 3, faithful full k~U val_loss.",
+         **r}, indent=2))
+    print("\n=== DIAG-4 item 3 (faithful full-prefix) ===")
+    print(f"  reproduced val NLL: {r['val_mean_nll_untrained']:.4f} -> {r['val_mean_nll_trained']:.4f} "
+          f"(training reported 0.1713 -> 0.1530)")
+    print(f"  total improvement {r['total_improvement']:.3f} over {r['n_tokens']} tokens")
+    print(f"  share on LOW-entropy (boilerplate) tokens: {r['share_low_entropy']*100:.1f}%")
+    print(f"  share on HIGH-entropy (decision) tokens:   {r['share_high_entropy']*100:.1f}%")
+    print("wrote artifacts/diag4_item3_entropy_split.json")
+
+
+@app.function(image=IMAGE, gpu="T4", volumes={"/cache": VOL}, timeout=7200)
+def rollout_diag(n_problems: int = 42, m: int = 8):
+    """DIAG-2 (register probes) + DIAG-3 (control authority) on MBPP val.
+    FULL rollout capturing r_0..r_7 + v; paired r_0/r_7 sampling for edit/KL/
+    diversity; inline Daytona execution for pass labels. Trained modules + V-v2b."""
+    import difflib
+    import json
+
+    import numpy as np
+    import torch
+
+    from rgr.data.mbpp import load_mbpp
+    from rgr.execution.sandbox import DaytonaBackend
+    from rgr.generator.formatting import build_prompt
+    from rgr.training.labels import ExecutionPool
+    from rgr.verifier.qlora import QloraVerifier
+
+    config, gen = _load_config_and_gen()
+    inj, enc, upd = _build_register_modules(config, gen, trained=True)
+    gen.injector = inj
+    verifier = QloraVerifier(str(REPO_A := "artifacts/v2b_lora"))
+    print("loading V-v2b ...", flush=True)
+    verifier.load()
+
+    val_pids = [r["problem_id"] for r in map(json.loads, open("artifacts/phase1_labels.jsonl"))
+                if str(r["split"]) == "val"]
+    val_pids = sorted(set(val_pids))[:n_problems]
+    problems = {p.problem_id: p for p in load_mbpp().problems}
+    val = [problems[pid] for pid in val_pids if pid in problems]
+    print(f"MBPP val: {len(val)} problems", flush=True)
+
+    T = config.loop.t_max
+    rows = []           # DIAG-2 probe rows: r_t -> v_{t-1}, passed_{t-1}, t
+    d3 = []             # DIAG-3 per-problem
+    pool = ExecutionPool(lambda: DaytonaBackend(config.execution.timeout_seconds), size=4)
+
+    @torch.no_grad()
+    def kl_first32(problem, r0, r7):
+        """KL(P_r0 || P_r7) over first 32 next-token positions, teacher-forced on a
+        greedy-ish reference (the r0 sample tokens)."""
+        model, tok = gen._model, gen._tokenizer
+        emb = model.get_input_embeddings()
+        p_ids = tok(build_prompt(problem.prompt), return_tensors="pt").input_ids[0].to(gen.device)
+
+        def logits_for(r):
+            soft = inj(r.unsqueeze(0)).to(model.dtype)[0]
+            ids = p_ids
+            embeds = torch.cat([soft, emb(ids)]).unsqueeze(0)
+            lg = model(inputs_embeds=embeds).logits[0].float()
+            return lg[-32:]  # last 32 positions' next-token logits (prompt-conditioned)
+        a = torch.log_softmax(logits_for(r0), -1)
+        b = torch.log_softmax(logits_for(r7), -1)
+        kl = (a.exp() * (a - b)).sum(-1)  # per-position KL
+        return float(kl.mean())
+
+    try:
+        for pi, problem in enumerate(val):
+            # ---- FULL rollout, capture r_t + v_t + candidates ----
+            r = enc.init(problem)
+            regs, vs, cands = [r.detach().float().cpu().numpy()], [], []
+            for t in range(T):
+                cand = gen.generate(problem, r)
+                v = verifier.score(problem, cand, None)
+                vs.append(v); cands.append(cand)
+                if t < T - 1:
+                    r = upd.update(r, cand, v)
+                    regs.append(r.detach().float().cpu().numpy())
+            passed = [e.passed for e in pool.execute_all(problem, cands)]
+            for t in range(1, T):  # probe r_t from previous step's v/passed
+                rows.append({"r": regs[t].tolist(), "v_prev": vs[t - 1],
+                             "passed_prev": int(passed[t - 1]), "t": t})
+
+            # ---- DIAG-3: paired r_0 vs r_7 sampling ----
+            r0 = enc.init(problem)
+            r7 = torch.tensor(regs[-1], device=gen.device)
+            s0 = gen.sample_batch(build_prompt(problem.prompt), m, register=r0)
+            s7 = gen.sample_batch(build_prompt(problem.prompt), m, register=r7)
+            p0 = [e.passed for e in pool.execute_all(problem, s0)]
+            p7 = [e.passed for e in pool.execute_all(problem, s7)]
+
+            def div(cands_):
+                codes = [c.code or c.text for c in cands_]
+                sims = [difflib.SequenceMatcher(None, codes[i], codes[j]).ratio()
+                        for i in range(len(codes)) for j in range(i + 1, len(codes))]
+                return 1.0 - (sum(sims) / len(sims) if sims else 1.0)  # mean normalized edit distance
+
+            def cross(a, b):
+                ca = [c.code or c.text for c in a]; cb = [c.code or c.text for c in b]
+                sims = [difflib.SequenceMatcher(None, x, y).ratio() for x in ca for y in cb]
+                return 1.0 - sum(sims) / len(sims)
+            d3.append({
+                "within_r0": div(s0), "within_r7": div(s7), "across": cross(s0, s7),
+                "pass_r0": sum(p0) / m, "pass_r7": sum(p7) / m,
+                "kl_r0_r7": kl_first32(problem, r0, r7),
+            })
+            if (pi + 1) % 10 == 0:
+                print(f"  {pi+1}/{len(val)} problems", flush=True)
+    finally:
+        pool.close()
+    return {"probe_rows": rows, "diag3": d3, "n_problems": len(val), "T": T, "m": m}
+
+
+@app.local_entrypoint()
+def rollout_main(n_problems: int = 42, m: int = 8):
+    import json as _json
+
+    import numpy as np
+
+    from rgr.evals.calibration import auroc
+
+    r = rollout_diag.remote(n_problems, m)
+    (REPO / "runs/modal").mkdir(parents=True, exist_ok=True)
+    (REPO / "runs/modal/rollout_diag.json").write_text(_json.dumps(r))
+
+    # ---- DIAG-2 probes: 5-fold CV ridge r_t -> target ----
+    rows = r["probe_rows"]
+    X = np.array([row["r"] for row in rows], float)
+    X = (X - X.mean(0)) / (X.std(0) + 1e-8)
+    n = len(X)
+    rng = np.random.RandomState(17)
+    folds = rng.permutation(n) % 5
+
+    def cv_predict(y, lam=10.0):
+        pred = np.zeros(n)
+        for f in range(5):
+            tr, te = folds != f, folds == f
+            Xt, yt = X[tr], y[tr]
+            w = np.linalg.solve(Xt.T @ Xt + lam * np.eye(X.shape[1]), Xt.T @ yt)
+            pred[te] = X[te] @ w
+        return pred
+
+    def r2(y, p):
+        return float(1 - ((y - p) ** 2).sum() / (((y - y.mean()) ** 2).sum() + 1e-12))
+
+    v_prev = np.array([row["v_prev"] for row in rows], float)
+    passed_prev = np.array([row["passed_prev"] for row in rows], float)
+    tvar = np.array([row["t"] for row in rows], float)
+    diag2 = {
+        "n_probe_rows": n,
+        "v_prev_R2_cv": r2(v_prev, cv_predict(v_prev)),
+        "passed_prev_AUROC_cv": (auroc(list(cv_predict(passed_prev)), [bool(x) for x in passed_prev])
+                                 if len(set(passed_prev)) == 2 else None),
+        "t_R2_cv": r2(tvar, cv_predict(tvar)),
+        "base_rate_passed_prev": float(passed_prev.mean()),
+    }
+    (REPO / "artifacts/diag2_register_probes.json").write_text(_json.dumps(
+        {"_label": "EXPLORATORY / POST-HOC (Modal T4, Phase K). 5-fold CV ridge probes r_t->target.",
+         **diag2}, indent=2))
+
+    # ---- DIAG-3 aggregate ----
+    d3 = r["diag3"]
+    def mean(k): return float(np.mean([x[k] for x in d3]))
+    from rgr.evals.bootstrap import bootstrap_ci
+    pr = [(x["pass_r7"], x["pass_r0"]) for x in d3]
+    dpass = bootstrap_ci(pr, lambda s: sum(a - b for a, b in s) / len(s))
+    diag3 = {
+        "n_problems": len(d3),
+        "within_r0_diversity": mean("within_r0"), "within_r7_diversity": mean("within_r7"),
+        "across_diversity": mean("across"), "mean_kl_r0_r7_nats": mean("kl_r0_r7"),
+        "pass_r0": mean("pass_r0"), "pass_r7": mean("pass_r7"),
+        "delta_pass_r7_minus_r0": {"point": dpass.point, "lo": dpass.lo, "hi": dpass.hi},
+        "entropy_killer": mean("within_r7") < mean("within_r0"),
+    }
+    (REPO / "artifacts/diag3_control_authority.json").write_text(_json.dumps(
+        {"_label": "EXPLORATORY / POST-HOC (Modal T4, Phase K).", **diag3}, indent=2))
+
+    print("\n=== DIAG-2 register probes (5-fold CV) ===")
+    print(f"  v_prev R2 {diag2['v_prev_R2_cv']:.3f} | passed_prev AUROC {diag2['passed_prev_AUROC_cv']} "
+          f"(base {diag2['base_rate_passed_prev']:.2f}) | t R2 {diag2['t_R2_cv']:.3f}")
+    print("=== DIAG-3 control authority ===")
+    print(f"  diversity within-r0 {diag3['within_r0_diversity']:.3f} vs within-r7 {diag3['within_r7_diversity']:.3f} "
+          f"| across {diag3['across_diversity']:.3f} | KL {diag3['mean_kl_r0_r7_nats']:.4f} nats")
+    print(f"  pass r0 {diag3['pass_r0']:.3f} vs r7 {diag3['pass_r7']:.3f} "
+          f"| Δ {diag3['delta_pass_r7_minus_r0']['point']:+.3f} CI [{diag3['delta_pass_r7_minus_r0']['lo']:+.3f},{diag3['delta_pass_r7_minus_r0']['hi']:+.3f}]")
+    print(f"  entropy-killer (r7 diversity < r0): {diag3['entropy_killer']}")
+    print("wrote artifacts/diag2_register_probes.json + artifacts/diag3_control_authority.json")
 
 
 @app.local_entrypoint()

@@ -111,7 +111,7 @@ Output: `artifacts/diag3_control_authority.json`.
 
 ---
 
-## DIAG-4 — Settle the training-objective units  *(CPU-first · items 1–2 DONE 2026-07-12; item 3 pending GPU)*
+## DIAG-4 — Settle the training-objective units  *(items 1–2 DONE 2026-07-12 CPU; item 3 DONE 2026-07-13 Modal T4)*
 
 **Pre-registered prediction:** > 80% of the −10.7% teacher-forced loss
 improvement sits on low-entropy (boilerplate) tokens; post-training sequence
@@ -154,12 +154,30 @@ barely relate. The imitation loss is string-reproduction; the null is a
 which indicts the imitation-first call (D2(a)) in favour of RL's set-membership
 reward ([DECISIONS.md] D2). "Training was not a no-op" **stands**, but what the
 training *bought* is the open question. **DIAG-5** (does the teacher-forced gain
-transfer to HumanEval?) and the entropy split (item 3, pending GPU) adjudicate the
-1.7×→0 gap. See [PRE-B2-HANDOFF.md] §1.3.
+transfer to HumanEval?) and the entropy split (item 3) adjudicate the 1.7×→0 gap.
+See [PRE-B2-HANDOFF.md] §1.3.
+
+**RESULT (item 3, 2026-07-13, Modal T4 — faithful full k~U reproduction).** The
+full prefix construction reproduces the training loss **exactly** (val NLL
+0.1716 → 0.1529 untrained→trained, vs the reported 0.1713 → 0.1530). Splitting the
+per-token improvement (12,632 tokens, entropy proxy = untrained per-token NLL,
+median 0.0015): **99.7% of the −10.7% gain sits on HIGH-entropy (decision) tokens,
+only 0.34% on low-entropy (boilerplate)** — mean improvement 0.023/token on
+decision tokens vs 8e-5 on boilerplate.
+
+**Prediction held? NO — refuted, and the *opposite* is true.** The pre-registered
+call was ">80% of the improvement on low-entropy (boilerplate) tokens" (i.e.
+training moved a mechanically-irrelevant quantity). Instead the training moved
+almost entirely the **algorithmic-decision tokens** under teacher forcing. This
+*strengthens* "training was not a no-op" and **sharpens the 1.7×→0 puzzle**: the
+register demonstrably improved exactly the high-entropy decision tokens
+teacher-forced, yet free sampling did not change (H2 null). The disconnect is
+therefore a pure **teacher-forced→sampled gap** on the decision tokens, not a
+"moved the wrong tokens" artifact. → `artifacts/diag4_item3_entropy_split.json`
 
 ---
 
-## DIAG-5 — Does the teacher-forced gain transfer to HumanEval?  *(re-analysis · GPU · status: PENDING — run BEFORE DIAG-2)*
+## DIAG-5 — Does the teacher-forced gain transfer to HumanEval?  *(Modal T4 · status: DONE 2026-07-13)*
 
 Added 2026-07-12 after DIAG-4 surfaced the 1.7×-teacher-forced → 0.000-sampled
 contradiction. This is the decisive fork between the two explanations of it.
@@ -188,11 +206,28 @@ and it separates the two live explanations. DIAG-2's encoding/transmission
 question only matters once DIAG-5 says the gain reaches the eval domain at all.
 
 **Output:** `artifacts/diag5_transfer.json`.
-**Readiness:** small GPU forward pass (trained + untrained soft prompt over
-HumanEval passing candidates); shares plumbing with DIAG-4 item 3.
 
-**RESULT:** _pending_.
-**Prediction held?** _pending._
+**RESULT (2026-07-13, Modal T4).** Measured the trained-vs-untrained r₀ (k=0,
+static) steering NLL on passing candidates in each domain:
+
+| domain | target len | untrained → trained NLL | seq-prob mult (untrained→trained) |
+|---|---|---|---|
+| MBPP-val (in-domain) | ~42 tok | 0.1548 → 0.1481 | **×1.33** (helps) |
+| HumanEval (held-out) | ~136 tok | 0.1073 → **0.1168** | **×0.28** (actively hurts) |
+
+**Prediction held? YES — and overshot.** The gain did not merely vanish on
+HumanEval, it **reversed**: the trained injection *lowers* the likelihood of the
+HumanEval passing targets. The register learned MBPP-specific (short-target)
+steering that mis-fires on the 3.3× longer HumanEval functions — a **domain/length
+transfer failure**, dovetailing with DIAG-4 (targets median 28 tok MBPP vs 156
+HumanEval). Per the fork, this makes DIAG-3 *secondary* to the domain/length story
+— though DIAG-4 item 3 (gain concentrated on decision tokens, yet flat sampling)
+keeps the teacher-forced→sampled gap live as well; both point at the same fix
+(train in-domain / length-matched, and on-policy). **Scope caveat:** this measures
+the k=0 *static* r₀ steering (the trained W₀+injector), a core component used at
+every step-0 and by B1; the full k~U objective's HumanEval transfer was not
+separately measured (would need HumanEval prefix construction), but the r₀
+reversal already demonstrates the overfit. → `artifacts/diag5_transfer.json`
 
 ---
 
