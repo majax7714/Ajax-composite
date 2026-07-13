@@ -144,6 +144,15 @@ Selected benchmark; matched compute throughout (unchanged budgeted unit,
 | **ABSTRACT-text** | rich feedback as text, no candidate | the Phase-3 bet |
 | **REG+** | same feedback, through a learned register | the register's last stand |
 
+> **Verifier note (from Phase M / M4, 2026-07-13).** V-v2b does **not** survive the
+> bf16 substrate change: its within-problem reranking edge over likelihood collapsed
+> from +0.15 to +0.016 (global AUROC still holds, 0.772). So **B1's verifier-rerank
+> and any V-dependent selection require a verifier retrained on the *selected
+> benchmark's* bf16 candidates** — this retrain folds into 3b (do not reuse V-v2b as
+> a reranker on the new stack without revalidating). On a headroom-bearing benchmark
+> (pass rate ~0.3–0.6, vs HumanEval's 0.65) reranking matters more, so a good
+> verifier is worth more there than the M4 numbers on saturated HumanEval suggest.
+
 ### 3b-lite (NO training — prompt-level; runs first)
 
 B1 / ANCHOR / ABSTRACT-text answer the decisive questions for a few dollars before

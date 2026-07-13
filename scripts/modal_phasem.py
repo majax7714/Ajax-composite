@@ -261,19 +261,31 @@ def m3_generate(n_problems: int = 164):
 
     prompts = [prompt_text(p) for p in problems]
     llm = LLM(model=MODEL, dtype="bfloat16", gpu_memory_utilization=0.85, max_model_len=2048)
+    # logprobs=1 populates cumulative_logprob (the sampled-token logprobs) so the
+    # likelihood rerank (B1) has real scores.
     sp = SamplingParams(n=n_samples, temperature=g.temperature, top_p=g.top_p,
-                        max_tokens=g.max_new_tokens)
+                        max_tokens=g.max_new_tokens, logprobs=1)
     outs = llm.generate(prompts, sp)
+
+    def mean_logprob(o):
+        ntok = len(o.token_ids)
+        if not ntok:
+            return None
+        if o.cumulative_logprob is not None:
+            return o.cumulative_logprob / ntok
+        if o.logprobs:  # fallback: sum the sampled tokens' logprobs
+            tot = 0.0
+            for i, tid in enumerate(o.token_ids):
+                d = o.logprobs[i]
+                if d and tid in d:
+                    tot += d[tid].logprob
+            return tot / ntok
+        return None
 
     cands = []
     for req in outs:
-        row = []
-        for o in req.outputs:
-            ntok = len(o.token_ids)
-            clp = o.cumulative_logprob
-            mean_lp = (clp / ntok) if (clp is not None and ntok) else None
-            row.append({"text": o.text, "code": extract_code(o.text), "mean_logprob": mean_lp})
-        cands.append(row)
+        cands.append([{"text": o.text, "code": extract_code(o.text),
+                       "mean_logprob": mean_logprob(o)} for o in req.outputs])
     return {"problem_ids": [p.problem_id for p in problems], "n_samples": n_samples,
             "candidates": cands}
 
@@ -301,18 +313,21 @@ def m3_main(n_problems: int = 164):
     problems = {p.problem_id: p for p in load_humaneval().checkout(SplitRole.HELDOUT_EVAL)}
     pool = ExecutionPool(lambda: DaytonaBackend(config.execution.timeout_seconds), size=8)
 
-    counts, b1_lik_pass = [], 0
+    counts, b1_lik_pass, labels = [], 0, []
     try:
         for pid, row in zip(r["problem_ids"], r["candidates"]):
             problem = problems[pid]
             cs = [Candidate(text=c["text"], code=c["code"]) for c in row]
-            results = pool.execute_all(problem, cs)
-            passed = [e.passed for e in results]
+            passed = [e.passed for e in pool.execute_all(problem, cs)]
+            labels.append([bool(x) for x in passed])
             counts.append((len(passed), sum(passed)))
             lps = [c["mean_logprob"] if c["mean_logprob"] is not None else -1e9 for c in row]
             b1_lik_pass += passed[max(range(len(lps)), key=lambda i: lps[i])]
     finally:
         pool.close()
+    # persist labels aligned to m3_candidates.json so M4 reuses them (no re-exec)
+    (REPO / "runs/modal/m3_labels.json").write_text(json.dumps(
+        {"problem_ids": r["problem_ids"], "labels": labels}))
 
     n = len(counts)
     new = {"B0_pass1": mean_pass_at_k(counts, 1),

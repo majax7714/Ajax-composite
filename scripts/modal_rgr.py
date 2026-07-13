@@ -823,3 +823,110 @@ def feedback_main(n_problems: int = 164, chunk: int = 24):
     print(f"  abstract {[round(x,3) for x in traj_nocode['abstract']]}")
     print(f"  b2_fb    {[round(x,3) for x in traj_nocode['b2_fb']]}")
     print("wrote artifacts/diag10_feedback_2x2.json")
+
+
+# ---------------------------------------------------------------------------
+# Phase M — M4 verifier revalidation. The verifier stack is UNCHANGED (this T4
+# QLoRA image); only its INPUT candidate distribution shifted (4-bit → bf16, the
+# M3 pool). Score the M3 bf16 candidates with V-v2b and compare AUROC to the
+# recorded 0.7951 (global) / 0.7189 (within-problem). [PHASE_M.md] §5 M4.
+# ---------------------------------------------------------------------------
+
+@app.function(image=IMAGE, gpu="T4", volumes={"/cache": VOL}, timeout=5400)
+def m4_score(payload: dict) -> dict:
+    """Score bf16 (M3) candidates with the unchanged V-v2b. payload = {problem_ids,
+    codes: [[code|None × 8] per problem]}. Returns per-candidate V scores, with the
+    deployment rule code=None → 0.0 (matches QloraVerifier.score)."""
+    import os
+
+    os.chdir("/root/rgr")
+    from rgr.data.humaneval import load_humaneval
+    from rgr.types import SplitRole
+    from rgr.verifier.qlora import QloraVerifier
+
+    problems = {p.problem_id: p for p in load_humaneval().checkout(SplitRole.HELDOUT_EVAL)}
+    verifier = QloraVerifier("artifacts/v2b_lora")
+    print("loading V-v2b ...", flush=True)
+    verifier.load()
+
+    out = []
+    for pid, row in zip(payload["problem_ids"], payload["codes"]):
+        prob = problems[pid]
+        valid = [(i, cd) for i, cd in enumerate(row) if cd is not None]
+        vs = [0.0] * len(row)
+        if valid:
+            scored = verifier.score_texts([(prob.prompt, cd) for _, cd in valid])
+            for (i, _), s in zip(valid, scored):
+                vs[i] = s
+        out.append(vs)
+    return {"problem_ids": payload["problem_ids"], "v_scores": out}
+
+
+@app.local_entrypoint()
+def m4_main():
+    """M4 gate. Score the M3 bf16 pool with V-v2b (T4); reuse M3's saved labels
+    (runs/modal/m3_labels.json — no re-execution). Compute global + within-problem
+    AUROC for BOTH V and likelihood, vs the recorded V 0.7951/0.7189 & likelihood
+    within 0.568 — so we see whether V still beats likelihood on the new pool (H1)."""
+    import json as _json
+    import os
+
+    os.chdir(str(REPO))
+    from rgr.evals.calibration import auroc
+
+    m3 = _json.loads((REPO / "runs/modal/m3_candidates.json").read_text())
+    lab = _json.loads((REPO / "runs/modal/m3_labels.json").read_text())
+    assert m3["problem_ids"] == lab["problem_ids"], "candidates/labels misaligned — re-run m3"
+    codes = [[c["code"] for c in row] for row in m3["candidates"]]
+    logp = [[c["mean_logprob"] for c in row] for row in m3["candidates"]]
+    labels = lab["labels"]
+
+    scored = m4_score.remote({"problem_ids": m3["problem_ids"], "codes": codes})
+    vscores = scored["v_scores"]
+
+    def clean(row):
+        return [s if s is not None else -1e9 for s in row]
+
+    def glob(scores):
+        fs = [s for row in scores for s in clean(row)]
+        fl = [bool(x) for row in labels for x in row]
+        return auroc(fs, fl)
+
+    def within(scores):
+        per = [auroc(clean(sv), [bool(x) for x in lb])
+               for sv, lb in zip(scores, labels) if len({bool(x) for x in lb}) == 2]
+        return (sum(per) / len(per) if per else float("nan")), len(per)
+
+    v_g, l_g = glob(vscores), glob(logp)
+    v_w, ntwo = within(vscores)
+    l_w, _ = within(logp)
+    pos = sum(x for row in labels for x in row) / sum(len(row) for row in labels)
+
+    OLD = {"V_global": 0.7951, "V_within": 0.7189, "lik_within": 0.568}
+    material = 0.05
+    v_holds = v_w >= OLD["V_within"] - material
+    beats_lik = v_w > l_w + 0.03
+    if v_holds:
+        verdict = "PASS — V-v2b reranking survives the substrate change"
+    elif beats_lik:
+        verdict = ("DEGRADED-BUT-BEATS-LIKELIHOOD — V within-problem dropped but still "
+                   "outranks likelihood; retrain on bf16 to restore the margin (H1 edge survives)")
+    else:
+        verdict = "RETRAIN — V lost its reranking edge on bf16 candidates"
+
+    result = {"_label": "M4 — V-v2b revalidation on the bf16 (M3) candidate pool",
+              "positive_rate_bf16": pos, "n_two_class_problems": ntwo,
+              "n_candidates": sum(len(r) for r in labels),
+              "V": {"global_auroc": v_g, "within_problem_auroc": v_w},
+              "likelihood": {"global_auroc": l_g, "within_problem_auroc": l_w},
+              "recorded_old_4bit": OLD, "verdict": verdict}
+    (REPO / "artifacts/m4_verifier_revalidation.json").write_text(_json.dumps(result, indent=2))
+
+    print(f"\n=== M4 — V-v2b revalidation on bf16 candidates ===")
+    print(f"positive (pass) rate on bf16 pool: {pos:.3f} (old 4-bit ≈ 0.28); "
+          f"two-class problems {ntwo}/{len(labels)}")
+    print(f"{'':<16}{'V (new)':>10}{'lik (new)':>11}{'V (old)':>10}{'lik (old)':>11}")
+    print(f"{'global AUROC':<16}{v_g:>10.4f}{l_g:>11.4f}{OLD['V_global']:>10.4f}{0.6961:>11.4f}")
+    print(f"{'within-problem':<16}{v_w:>10.4f}{l_w:>11.4f}{OLD['V_within']:>10.4f}{OLD['lik_within']:>11.4f}")
+    print(f"\nM4 verdict: {verdict}")
+    print("wrote artifacts/m4_verifier_revalidation.json")

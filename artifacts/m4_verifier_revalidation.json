@@ -1,0 +1,20 @@
+{
+  "_label": "M4 \u2014 V-v2b revalidation on the bf16 (M3) candidate pool",
+  "positive_rate_bf16": 0.6478658536585366,
+  "n_two_class_problems": 92,
+  "n_candidates": 1312,
+  "V": {
+    "global_auroc": 0.7718551056786351,
+    "within_problem_auroc": 0.6461988871635611
+  },
+  "likelihood": {
+    "global_auroc": 0.6809447415329768,
+    "within_problem_auroc": 0.6305577122153209
+  },
+  "recorded_old_4bit": {
+    "V_global": 0.7951,
+    "V_within": 0.7189,
+    "lik_within": 0.568
+  },
+  "verdict": "RETRAIN \u2014 V lost its reranking edge on bf16 candidates"
+}

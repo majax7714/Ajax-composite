@@ -251,19 +251,29 @@ Sequential. Each gate must pass before the next begins. No gate may be tuned pas
       164 HumanEval) on vLLM bf16; execution held to **Daytona** (Phase-0's backend,
       decoupled to the local box per §1.1 — so the *only* variable is the generation
       stack). All metrics shift **uniformly up**, growing with k (bf16 lifts
-      per-sample quality): B0 0.5922→**0.6418**, B1-likelihood 0.6280→**0.6707**,
-      pass@2 0.6997→0.7600, pass@4 0.7804→0.8524, **oracle pass@8 0.8415→0.9146**.
-      max \|Δ\| = 0.073, no metric below old−0.03 — a modest, coherent, fully
-      explained bf16 improvement, not a bug. **Phase-3 consequence:** HumanEval
-      pass@8 is now **0.915** — even more saturated, so it fails 3a's coverage band
-      [0.30, 0.60] harder still (§3's prediction realized; strengthens the mandatory
-      benchmark screen). → `artifacts/m3_rebaseline.json`, `scripts/modal_phasem.py::m3_*`.
-- [ ] **M4 — Verifier revalidation.** Score fp16-generated candidates with V-v2b;
-      compute AUROC and within-problem macro AUROC on the new candidate
-      distribution. *Gate:* if AUROC degrades materially vs the recorded
-      0.7951 / 0.7189 on 4-bit candidates, regenerate labels and retrain V on the
-      new stack. H1 is the one result that carried load; it must survive the
-      migration or be re-established.
+      per-sample quality): B0 0.5922→**0.6479**, B1-likelihood 0.6280→**0.7256**,
+      pass@2 0.6997→0.7544, pass@4 0.7804→0.8342, **oracle pass@8 0.8415→0.9024**.
+      max \|Δ\| = 0.098, no metric below old−0.03 — a modest, coherent, fully
+      explained bf16 improvement, not a bug. *(A logprob-populate bug — vLLM's
+      `cumulative_logprob` is null unless `logprobs` is set — made the first run's
+      B1-likelihood bogus; fixed with `SamplingParams(logprobs=1)` and re-run on a
+      fresh draw.)* **Phase-3 consequence:** HumanEval pass@8 is now **0.902** —
+      even more saturated, so it fails 3a's coverage band [0.30, 0.60] harder still
+      (§3's prediction realized; strengthens the mandatory benchmark screen).
+      → `artifacts/m3_rebaseline.json`, `scripts/modal_phasem.py::m3_*`.
+- [x] **M4 — Verifier revalidation. DONE → RETRAIN required (2026-07-13).** Scored
+      the bf16 (M3) pool with the *unchanged* V-v2b (its own T4 QLoRA stack; only its
+      input distribution changed) and reused M3's labels. **Global AUROC 0.7719**
+      (vs 0.7951; still clears likelihood 0.6809), but **within-problem 0.6462 vs
+      likelihood 0.6306** — V's reranking edge collapsed from **+0.151 → +0.016**
+      (V ↓ 0.7189→0.6462, likelihood ↑ 0.568→0.6306; pool now 65% positive, only
+      92/164 two-class). The bf16 candidate distribution stale-d V's within-problem
+      boundary — the exact substrate change [DECISIONS.md] D11 accepted. **Action:**
+      V must be retrained on the deployment (bf16) distribution before it reranks in
+      Phase 3b. Since 3a abandons HumanEval for a headroom-bearing benchmark, the
+      retrain **folds into Phase 3b's verifier training on the selected benchmark**,
+      not a standalone HumanEval retrain. → `artifacts/m4_verifier_revalidation.json`,
+      `scripts/modal_rgr.py::m4_*`.
 - [ ] **M5 — Re-lock.** New bit-for-bit reproducibility lock on the new stack: two
       independent runs, same seed policy, byte-identical candidates — the new
       lock_a/lock_b. Freeze new baselines. Update [COMPUTE_ACCOUNTING.md]: the
@@ -279,8 +289,8 @@ Sequential. Each gate must pass before the next begins. No gate may be tuned pas
 | **M0** | 2026-07-13 | **PASS** | §0 green (DIAG-1..11 closed); repo tagged `pre-phase-m-hf-nf4`; D11 → bf16/L4 |
 | **M1** | 2026-07-13 | **PASS** | vLLM `prompt_embeds` vs HF soft-prompt, greedy, 20 problems: **19/20 exact (48/48 tokens), 0/20 early divergence**; the lone miss diverges at token 9 (bf16 tail drift). Register path migrates faithfully. `runs/modal/m1_correctness.json` |
 | **M2** | 2026-07-13 | **PASS** | L4, 64 prompts × 256 tok: HF bf16 batch-1 **28 tok/s** → vLLM bf16 **2809 tok/s** = **100×** (281× vs old 4-bit/T4 ~10 tok/s). Gate ≥20× cleared 5×. `runs/modal/m2_throughput.json` |
-| **M3** | 2026-07-13 | **PASS** | vLLM bf16 vs old 4-bit, 164 HumanEval, execution held to Daytona (only the gen stack varies): all metrics shift **up** — B0 .592→.642, B1-lik .628→.671, pass@8 **.842→.915**; max \|Δ\| .073, uniformly positive & explained by the bf16 lift. `artifacts/m3_rebaseline.json` |
-| M4 | — | next | V-v2b revalidation on bf16 candidates |
+| **M3** | 2026-07-13 | **PASS** | vLLM bf16 vs old 4-bit, 164 HumanEval, execution held to Daytona (only the gen stack varies): all metrics shift **up** — B0 .592→**.648**, B1-lik .628→**.726**, pass@8 **.842→.902**; max \|Δ\| .098, uniformly positive & explained by bf16 lift. *(logprob-populate bug in the first run made B1-lik bogus; fixed with `logprobs=1` + fresh draw.)* `artifacts/m3_rebaseline.json` |
+| **M4** | 2026-07-13 | **DONE → RETRAIN** | V-v2b on the bf16 pool: **global AUROC 0.772** (still > likelihood 0.681), but **within-problem 0.646 vs likelihood 0.631** — the reranking edge collapsed from **+0.15 → +0.016** (V ↓ 0.719→0.646, likelihood ↑ 0.568→0.631). The substrate change stale-d V's within-problem boundary → **verifier retrain required on the deployment distribution** (fold into Phase 3b on the selected benchmark). `artifacts/m4_verifier_revalidation.json` |
 | M5 | — | — | new lock_a/lock_b; COMPUTE_ACCOUNTING 2nd amendment |
 
 ---
