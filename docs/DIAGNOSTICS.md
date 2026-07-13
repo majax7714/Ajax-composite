@@ -524,6 +524,94 @@ step degrades. Together with DIAG-8 (surface anchoring) this is the semantic
 confirmation that the bandwidth→harm ordering (DIAG-7) is real content-anchoring:
 conditioning on a *failed* candidate makes G loop on the same mistake. →
 `artifacts/diag9_error_persistence.json`
+*[Baseline corrected 2026-07-13 by DIAG-9b — the Σp_t²=0.422 chance rate ignores
+within-problem error clustering; see DIAG-9b for the honest effect size.]*
+
+---
+
+## DIAG-9b — Corrected chance baseline for the error-type persistence  *(CPU · committed data · pre-registered 2026-07-13, before the run)*
+
+External review flagged that DIAG-9's 0.851-vs-0.422 comparison uses the **wrong
+null**: Σp_t² over the pooled 715 failing steps assumes error types are drawn
+independently from the global distribution, but they **cluster within problems** (a
+problem with a runtime edge case throws runtime errors on every sample, anchored or
+not). This is the same class of error as DIAG-2's random-row CV leakage — a baseline
+that ignores within-problem structure — so the +0.43 excess is inflated by an
+unknown amount and could in principle be *entirely* per-problem homogeneity.
+
+**Correct baseline (free, on disk):** the within-problem same-error-type agreement
+of **B1's i.i.d. samples** — the true chance that two failures *of the same problem*
+share a type. Run **FULL** (register, no text anchor) too. For B2, also split
+adjacent vs non-adjacent failing pairs (isolates the *specific shown candidate*
+from problem-level homogeneity). Plus a free sub-check: **no_code rate by step
+index** — if it rises across B2 steps, part of the 0.61→0.40 decline is
+output-discipline collapse under the longer prompt (a different failure, fixable by
+prefilling), not anchoring.
+
+**Pre-registered prediction:** B1 within-problem agreement **~0.60–0.70**, FULL ≈
+B1; B2's excess over the B1 baseline **shrinks but stays positive** (anchoring real,
+smaller honest effect size). If B1 also lands ~0.85, DIAG-9's semantic-anchoring
+conclusion **collapses** and Phase 3 would be resting on an artifact — the number
+decides it either way.
+
+**Output:** `artifacts/diag9b_persistence_baseline.json` (`scripts/diag9b_persistence_baseline.py`).
+
+---
+
+## DIAG-10 — Does execution feedback help at all? The 2×2  *(Modal T4 · HumanEval-as-dev (D13) · pre-registered 2026-07-13, before the run)*
+
+Phase 3's entire design rests on one **untested** assumption: that execution
+feedback helps. B2 had *no* execution feedback — only the previous candidate + a
+verifier scalar (confirmed: `build_feedback_prompt` uses `score`, not the error).
+So "give U an abstraction of the error" is currently a well-motivated *guess*.
+DIAG-9's trajectory metric (per-step pass) works on a saturated benchmark — B2's
+0.61→0.40 decline is an anti-refinement signature independent of headroom — so this
+is answerable on HumanEval (now a **dev set**, D13) for ~$1–2, no training, no new
+architecture, prompt-level only.
+
+**The 2×2** (feedback × candidate); two cells exist, two are new:
+
+| | no execution feedback | + execution feedback |
+|---|---|---|
+| **no candidate** | B1 (have: i.i.d., flat) | **ABSTRACT** ← new |
+| **+ candidate** | B2-raw (have: 0.61→0.40) | **B2+fb** ← new |
+
+Feedback = the previous step's `error_type` (∈ {wrong_answer, runtime, syntax,
+timeout, no_code}; `frac_tests` is binary on HumanEval and per-test names are
+unavailable — the honest signal is the error class). **ABSTRACT** = feedback with
+the candidate text *removed* (anchor gone, signal kept); **B2+fb** = feedback *with*
+the candidate. ABSTRACT and B2+fb share B1/B2-raw's step-0 (un-conditioned
+`build_prompt`), so all trajectories start at the same point.
+
+**Primary metric:** per-step pass-rate trajectory, directly comparable to B2-raw's
+measured 0.61→0.40. On-stack anchors: Modal B1 (should be flat) and the shared
+step-0 (should reproduce ~0.61) validate the cross-stack comparison to committed
+B2-raw.
+
+**Decision rules (pre-registered):**
+- **ABSTRACT flattens or rises** → feedback-without-anchoring works; Phase 3's
+  central bet is on **empirical** footing.
+- **ABSTRACT also declines** → anchoring wasn't the only problem, feedback doesn't
+  rescue it, and **Phase 3's central bet is dead** — learned for $2, not after
+  building a benchmark screen and a training loop.
+- **B2+fb vs ABSTRACT** isolates whether *removing* the candidate is necessary
+  (B2+fb declines while ABSTRACT flattens) or the anchor is merely a nuisance the
+  feedback overrides (both flatten).
+
+**Pre-registered prediction:** step-0 ≈ 0.61 (anchor holds); B1 flat ~0.55–0.61;
+**ABSTRACT flattens** — ends ≥ 0.55, well above B2-raw's 0.40 (the anchor, not the
+absence of a latent, drove most of the decline); **B2+fb** lands *between* B2-raw
+and ABSTRACT (execution feedback helps over the verifier scalar, but the candidate
+anchor still costs) — i.e. feedback helps **and** removing the candidate is
+necessary, the ideal Phase-3-supporting result. Genuine uncertainty: if the coarse
+error-class signal is too weak to use, ABSTRACT could decline too — that is the
+outcome that kills the bet, and it is on the record.
+
+**Held-out note:** runs on HumanEval, reclassified to **dev set** at D13 (already
+burned by B0/B1/FULL/B2 + diagnostics); spends no confirmatory budget. Phase 3 needs
+a fresh test set regardless.
+
+**Output:** `artifacts/diag10_feedback_2x2.json` (`scripts/modal_rgr.py::feedback_2x2`).
 
 ---
 

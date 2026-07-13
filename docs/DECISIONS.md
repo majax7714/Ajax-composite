@@ -181,3 +181,23 @@ pass@k is the natural instrument. Not dropped — relocated.
 
 *Revisit if:* Phase 3 benchmark selection needs the ceiling on the *current*
 HumanEval set specifically (unlikely — Phase 3 changes the benchmark).
+
+## D13 — HumanEval reclassified from held-out to dev set (2026-07-13)
+
+HumanEval has now been **peeked** for B0, B1, FULL, B2, and seven diagnostics
+(DIAG-1/5/7/7b/8/9 read its candidates; DIAG-10 will generate on it). As a
+held-out confirmatory set it is **burned** — no honest confirmatory claim can rest
+on it again. Rather than pretend otherwise, it is **explicitly reclassified as a
+dev set** from 2026-07-13: free to iterate on, including DIAG-10's new generation,
+because nothing confirmatory is being claimed from it.
+
+**Consequence for Phase 3:** a *fresh* held-out benchmark is required regardless of
+this decision (Phase 3 also needs a task with genuine generative headroom — pass@8
+here is 0.84, [DIAGNOSTICS.md] DIAG-1/7 — so HumanEval fails the headroom screen
+too). Candidate fresh sets to select at Phase-3 design: MBPP+/EvalPlus test split,
+LiveCodeBench, or a contamination-controlled slice. The dev/test split is to be
+frozen at Phase-3 design before any generation on the new test set.
+
+*This is what makes DIAG-10 cheap and honest:* it runs on HumanEval-as-dev, spends
+no confirmatory budget, and its trajectory metric (per-step pass decline) needs
+only the same model+harness, not a headroom-sweet-spot task.
