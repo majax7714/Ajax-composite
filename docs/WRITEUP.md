@@ -390,11 +390,14 @@ worked except the last" phrasing is retired. **The prioritization this hands
 Phase 3:** in-domain/length-matched training fixes only W₀ (U already fails
 in-domain); the single lever that touches U is **enriching what it conditions on —
 a compact abstraction of *why* the last attempt failed, explicitly not the failed
-candidate text** — and **DIAG-10 measures that this works**: feeding the loop the
-prior step's error class with the candidate *removed* reverses the anti-refinement
-(ABSTRACT +0.088 vs candidate-anchored B2+fb −0.162, a +0.225 late-step gap
-attributable entirely to the anchor). That, an on-policy set-membership objective,
-and a task with headroom are Phase-3 design, not extensions of this record.
+candidate text** — and **DIAG-10 shows removing the candidate removes the *harm***:
+with identical execution feedback, the candidate-anchored channel anti-refines while
+the abstraction channel does not (ABSTRACT +0.088 vs B2+fb −0.162, +0.225 late-step
+gap, several SE). Whether the abstraction adds *benefit* is untested — ABSTRACT ties
+the B1 control on this saturated subset, a null that is uninformative (no headroom,
+~2-bit signal). So feedback-benefit is Phase 3's **hypothesis** (its H1 gate), not an
+established result. That, an on-policy set-membership objective, and a task with
+genuine headroom are Phase-3 design, not extensions of this record.
 
 ### 5.4 The conceptual mapping, honestly closed
 

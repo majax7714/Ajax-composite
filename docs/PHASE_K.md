@@ -215,11 +215,13 @@ without any GPU (no Modal spend, no new held-out access):
 - **DIAG-10 (Modal T4, ~$1)** — the feedback×candidate 2×2 tests the one assumption
   Phase 3 rests on. **ABSTRACT (feedback, no candidate) +0.088 vs B2+fb
   (feedback+candidate) −0.162** from a shared step-0 of 0.700 — identical feedback,
-  differ only in the candidate, +0.225 late-step gap. **Feedback-without-anchoring
-  works and the candidate anchor causes the collapse — Phase 3's central bet is
-  confirmed on empirical footing, not assumed.** (D13: HumanEval is now a dev set;
-  this spent no confirmatory budget.) Phase K Modal total now ≈ **$2–3**, still
-  inside the free credit.
+  differ only in the candidate, +0.225 late-step gap (several SE). **REAL result: the
+  candidate anchor causes the refinement collapse** — this licenses Phase 3's design.
+  *[Corrected: against the B1 control (+0.062) ABSTRACT's +0.088 is null (½ SE) — so
+  feedback **benefit** is untested; the metric can't detect benefit without headroom
+  and the signal was ~2 bits. "Abstraction pays" is Phase 3's H1 hypothesis, not a
+  confirmed premise. See [PHASE_3.md] §0.]* (D13: HumanEval is now a dev set; this
+  spent no confirmatory budget.) Phase K Modal total ≈ **$2–3**, inside the free credit.
 
 **The diagnostic record is closed; Phase 3 design may now begin** (not before,
 per §5). Phase M (fp16+vLLM) remains a later, separate refactor.

@@ -663,28 +663,53 @@ Per-step pass-rate trajectories:
 *\*committed reference, cross-stack/cross-N; the internal 2×2 (b1/ABSTRACT/B2+fb, same
 80 problems, same stack, shared step-0) is what carries the verdict.*
 
-**Verdict: Phase 3's central bet is CONFIRMED, and the pre-registered prediction
-held (cleanly, for once).** Per the decision rule: **ABSTRACT flattens — indeed
-*rises* (+0.088), staying ≥0.70 at every step — so feedback-without-anchoring works
-and Phase 3 is on empirical footing.** The sharp isolation: ABSTRACT and B2+fb carry
-the **identical** execution feedback and differ *only* in whether the failed
-candidate text is in the prompt; ABSTRACT rises while B2+fb declines, a **+0.225 gap
-by steps 4–7** — so **the candidate anchor, not the absence of a latent state, is
-what drives the refinement collapse, and removing it is *necessary*, not merely
-nice.** Two corroborating reads: (a) B2+fb (−0.162) declines *less* than b2-raw
-(−0.21) — execution `error_type` helps somewhat over the verifier scalar even with
-the candidate present, so **feedback helps *and* the anchor hurts**, the ideal
-Phase-3-supporting pattern; (b) no_code ≈ 0 on this subset for both new conditions,
-so here the B2+fb decline is genuine content-anchoring, not output-collapse (the
-committed 164-run's rising no_code, DIAG-9b, is a *second*, smaller co-cause).
-**This is the direct causal test the proxy metrics (DIAG-8/9/9b) could only gesture
-at:** intervene on the candidate and the anti-refinement reverses. *Prediction:*
-step-0 0.700 (vs predicted ~0.61 — subset base rate a touch higher), b1 flat ✓,
-ABSTRACT flattens/rises ✓, B2+fb between b2-raw and ABSTRACT ✓ — held on every
-clause. **Caveats:** n=80 subset (per-step SE ~0.05; the ABSTRACT-vs-B2+fb gap is
-several SE, the ABSTRACT-over-step0 lift is ~1 SE — the *direction* is robust, the
-absolute lift modest); HumanEval-dev is saturated (0.70 pool), so this measures
-*trajectory shape*, not headroom. → `artifacts/diag10_feedback_2x2.json`
+**Verdict — what DIAG-10 established, and what it did NOT.**
+
+> ~~**Phase 3's central bet is CONFIRMED** … ABSTRACT flattens — indeed rises
+> (+0.088) … so feedback-without-anchoring works and Phase 3 is on empirical
+> footing.~~ **[SUPERSEDED 2026-07-13 — over-read; the decision rule was wrong.**
+> The pre-registered rule used *flatness* as the bar, but the correct control is
+> **B1**, which *also* rises (+0.062). ABSTRACT +0.088 vs B1 +0.062 is **0.025 —
+> half an SE**; both are noise around flat. Against B1, **ABSTRACT shows no benefit;
+> it shows no *harm*.** See the corrected split below.]**
+
+**✅ REAL — the candidate anchor causes the refinement collapse.** ABSTRACT and
+B2+fb carry the **identical** execution feedback and differ *only* in whether the
+failed candidate text is in the prompt; ABSTRACT +0.088 vs B2+fb −0.162, a **+0.225
+gap by steps 4–7 — several SE, same stack, same 80 problems, shared step-0.** A clean
+causal intervention: put the failed candidate in the prompt and refinement
+anti-refines; take it out and the collapse disappears. (Corroborating: B2+fb −0.162
+declines *less* than b2-raw −0.21, so `error_type` helps *somewhat* over the verifier
+scalar even with the candidate — but not enough to overcome the anchor.) **This is
+the result that licenses Phase 3's design.**
+
+**❌ NOT ESTABLISHED — that feedback provides positive benefit.** ABSTRACT vs the
+correct control B1 is null (half an SE). And the null is **uninformative, not
+negative**: (i) the trajectory metric detects *harm* without headroom but cannot
+detect *benefit* without headroom — on a 0.70-coverage subset most step-0 failures
+are problems the model simply cannot do; (ii) on HumanEval `frac_tests` is binary and
+per-test names are unavailable, so ABSTRACT received only a **5-way `error_type` ≈ 2
+bits**. Two sufficient explanations (no headroom, no signal), unseparated. **So "the
+abstraction channel *pays*" is Phase 3's HYPOTHESIS, not its premise** — the
+anchoring finding licenses the design; the benefit claim must be earned (Phase 3a
+headroom + 3b-lite H1, [PHASE_3.md]). DIAG-11 (conditional recovery) extracts the
+only benefit signal available from data already on disk and sets the H1 prior.
+**Caveats:** n=80 subset, SE ~0.05; saturated benchmark measures trajectory *shape*,
+not headroom; b2-raw row is cross-stack/cross-N. → `artifacts/diag10_feedback_2x2.json`
+
+---
+
+## DIAG-11 — Conditional recovery on step-0 failures  *(CPU · committed DIAG-10 data · pre-registered 2026-07-13, [PHASE_3.md] §1, before the run)*
+
+The only benefit signal extractable from data already on disk. On the step-0-failed
+subset (24 of 80 dev problems; shared step-0 ⇒ the subset is identical across
+conditions), fraction **recovered** (any of steps 1–7 passes) for each condition:
+B1 = i.i.d.-resampling chance, ABSTRACT = feedback no anchor, B2+fb = feedback +
+anchor. Sets the H1 prior; cannot change the Phase-3 design.
+
+**Pre-registered prediction:** ABSTRACT recovery **> B1 by a few points, not
+significant at n≈24**; direction informative, magnitude not. **ABSTRACT < B1 = red
+flag.** Output: `artifacts/diag11_conditional_recovery.json`.
 
 ---
 
@@ -704,7 +729,7 @@ absolute lift modest); HumanEval-dev is saturated (0.70 pool), so this measures
 | DIAG-8 | B2 adjacent edit-dist **0.35×** B1 i.i.d.; tighter in 154/163 | direction **yes**, magnitude undershot | B2 pool crash is **content anchoring**, not a formatting artifact |
 | DIAG-9 | adjacent same-error **0.85**; pass 0.61→0.40 | *magnitude corrected by 9b* | text channel anti-refines; local error-echo (see 9b) |
 | DIAG-9b | within-problem chance **0.743** (not 0.42); B2 adjacent 0.851 > non-adj 0.660; no_code 0.01→0.055 | **partly** (B1 0.74 vs pred 0.60–0.70) | DIAG-9's excess retracted; anchoring survives as **local +0.19**; decline partly no_code collapse |
-| DIAG-10 | ABSTRACT +0.088 vs B2+fb −0.162 (same feedback, ±candidate); gap +0.225 | **yes** (held cleanly) | **feedback-without-anchoring works**; the candidate anchor causes the collapse; **Phase 3 bet confirmed** |
+| DIAG-10 | ABSTRACT +0.088 vs B2+fb −0.162 (same feedback, ±candidate); gap +0.225. *vs B1 +0.062: null (½ SE)* | anchoring **yes**; benefit **untested** | **candidate anchor causes the collapse** (real, licenses Phase 3). Benefit vs B1 is null-uninformative → Phase 3 **hypothesis**, not premise |
 
 ## Synthesis — what the null means (diagnostic record closed 2026-07-13; reworked after review)
 
@@ -768,13 +793,18 @@ learned prompt); it is **enrich what U conditions on** — a compact abstraction
 *why* the last attempt failed (which test, what class), explicitly *not* the failed
 candidate text.
 
-**DIAG-10 turns this from inference into a measured result.** The prompt-level proxy
-for exactly this design — feed the loop the previous step's *error class* with the
-candidate **removed** (ABSTRACT) vs kept (B2+fb) — reverses the anti-refinement:
-ABSTRACT *rises* +0.088 while B2+fb declines −0.162, a +0.225 late-step gap
-attributable **entirely to the candidate anchor** (identical feedback otherwise). So
-"condition on an abstraction of the error, not the candidate" is no longer a
-well-motivated guess — it is the one intervention shown to flip the trajectory, and
-it is the load-bearing premise Phase 3 is cleared to build on. Everything else is
-secondary to giving U that signal. These are Phase-3 design questions, not extensions
-of this record.
+**DIAG-10 measures half of this and leaves the other half to Phase 3.** The
+prompt-level proxy — feed the loop the previous step's *error class* with the
+candidate **removed** (ABSTRACT) vs kept (B2+fb) — shows the anti-refinement is
+caused by the candidate anchor: ABSTRACT +0.088 vs B2+fb −0.162, a +0.225 late-step
+gap attributable **entirely to the candidate** (identical feedback otherwise). So
+"condition on an abstraction of the error, **not** the candidate" is no longer a
+guess — removing the candidate provably removes the *harm*. **What DIAG-10 does not
+establish is that the abstraction adds *benefit*:** ABSTRACT vs the correct control
+B1 is null (half an SE), and on a saturated 0.70-coverage subset with a ~2-bit
+error signal the metric *cannot* detect benefit even if present. **That the
+abstraction channel pays is therefore Phase 3's hypothesis (its H1 gate,
+[PHASE_3.md] §5), not a settled premise.** Everything else is secondary to giving U
+that signal — but the signal must be tested for benefit on a benchmark with genuine
+headroom and richer feedback before the register is rebuilt. These are Phase-3
+design questions, not extensions of this record.
