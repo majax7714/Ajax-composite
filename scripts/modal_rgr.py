@@ -623,3 +623,192 @@ def main(n: int = 20):
     # strong evidence of near-identical numerics (8 stochastic candidates aligned).
     print(f"K1: {exact}/{len(records)} byte-identical, {len(first_div)} coherent-drift "
           f"candidates (INSPECT divergent text before ruling drift vs systematic).")
+
+
+# ---------------------------------------------------------------------------
+# DIAG-10 — does execution feedback help? The 2x2 (feedback x candidate).
+# HumanEval-as-dev (D13). Prompt-level only, base generator, NO register, NO
+# verifier. Conditions run on Modal: b1 (i.i.d.), abstract (feedback, no
+# candidate), b2_fb (feedback + candidate). b2-raw comes from committed data.
+# Pre-registered docs/DIAGNOSTICS.md DIAG-10 (before this ran).
+# ---------------------------------------------------------------------------
+
+_DIAG10_ERR = {
+    "wrong_answer": "it ran but returned wrong answers on some tests.",
+    "runtime": "it raised a runtime error.",
+    "syntax": "it had a syntax error.",
+    "timeout": "it ran too long (likely an infinite loop or inefficiency).",
+    "no_code": "no Python code block could be found in the response.",
+    "sandbox": "it could not be evaluated.",
+    "": "it passed the tests.",
+}
+
+
+@app.function(image=IMAGE, gpu="T4", volumes={"/cache": VOL}, timeout=14400)
+def feedback_2x2(n_problems: int = 164, chunk: int = 24):
+    """The 2x2. Per condition, an 8-step columnar rollout with batched distinct-
+    prompt generation (input_ids path, register=None) + concurrent Daytona exec.
+    Returns per-condition per-problem step trajectories (passed, error_type, code)."""
+    import os
+
+    os.chdir("/root/rgr")
+    from concurrent.futures import ThreadPoolExecutor
+
+    import torch
+
+    from rgr.data.humaneval import load_humaneval
+    from rgr.execution.sandbox import DaytonaBackend
+    from rgr.generator.formatting import SYSTEM_PROMPT, build_prompt, extract_code
+    from rgr.types import Candidate, SplitRole
+
+    config, gen = _load_config_and_gen()          # base Qwen 4-bit, no register
+    tok, model = gen._tokenizer, gen._model
+    tok.padding_side = "left"
+    if tok.pad_token_id is None:
+        tok.pad_token = tok.eos_token
+    gcfg = gen.config
+    T = config.loop.t_max
+    problems = load_humaneval().checkout(SplitRole.HELDOUT_EVAL)[:n_problems]
+    N = len(problems)
+    print(f"DIAG-10: {N} HumanEval-dev problems, T={T}, temp={gcfg.temperature}", flush=True)
+
+    @torch.no_grad()
+    def gen_batch(prompts: list[str]) -> list[str]:
+        texts: list[str] = []
+        for i in range(0, len(prompts), chunk):
+            sub = prompts[i:i + chunk]
+            msgs = [[{"role": "system", "content": SYSTEM_PROMPT},
+                     {"role": "user", "content": pr}] for pr in sub]
+            enc = tok.apply_chat_template(
+                msgs, add_generation_prompt=True, return_tensors="pt",
+                padding=True, return_dict=True,
+            ).to(gen.device)
+            out = model.generate(
+                **enc, do_sample=gcfg.temperature > 0, temperature=gcfg.temperature or None,
+                top_p=gcfg.top_p, max_new_tokens=gcfg.max_new_tokens,
+                pad_token_id=tok.eos_token_id,
+            )
+            gen_only = out[:, enc["input_ids"].shape[1]:]
+            texts.extend(tok.decode(row, skip_special_tokens=True) for row in gen_only)
+        return texts
+
+    K = 8
+    backends = [DaytonaBackend(config.execution.timeout_seconds) for _ in range(K)]
+    tp = ThreadPoolExecutor(max_workers=K)
+
+    def execute_pairs(probs, cands):
+        def run(args):
+            idx, prob, cand = args
+            return backends[idx % K].execute(prob, cand)
+        jobs = [(i, probs[i], cands[i]) for i in range(len(cands))]
+        results = [None] * len(jobs)
+        for start in range(0, len(jobs), K):
+            chunk_jobs = jobs[start:start + K]
+            for off, res in enumerate(tp.map(run, chunk_jobs)):
+                results[start + off] = res
+        return results
+
+    def abstract_prompt(problem, prev_code, err):
+        base = build_prompt(problem.prompt)
+        return (base + "\n\nYour previous attempt was executed against the tests: "
+                + _DIAG10_ERR.get(err, _DIAG10_ERR["sandbox"])
+                + " Write a corrected, complete solution as a single fenced Python code block.")
+
+    def b2fb_prompt(problem, prev_code, err):
+        base = build_prompt(problem.prompt)
+        if prev_code is None:
+            body = ("Your previous response contained no code block. "
+                    + "Write a complete solution as a single fenced Python code block.")
+        else:
+            body = ("Your previous attempt:\n```python\n" + prev_code + "\n```\n"
+                    + "It was executed against the tests: " + _DIAG10_ERR.get(err, _DIAG10_ERR["sandbox"])
+                    + " Write an improved complete solution as a single fenced Python code block.")
+        return base + "\n\n" + body
+
+    def rollout(condition):
+        traj = [[] for _ in range(N)]
+        prev_code = [None] * N
+        prev_err = [None] * N
+        for step in range(T):
+            if step == 0 or condition == "b1":
+                prompts = [build_prompt(p.prompt) for p in problems]
+            elif condition == "abstract":
+                prompts = [abstract_prompt(problems[j], prev_code[j], prev_err[j]) for j in range(N)]
+            elif condition == "b2_fb":
+                prompts = [b2fb_prompt(problems[j], prev_code[j], prev_err[j]) for j in range(N)]
+            texts = gen_batch(prompts)
+            cands = [Candidate(text=t, code=extract_code(t)) for t in texts]
+            results = execute_pairs(problems, cands)
+            for j in range(N):
+                e = results[j]
+                traj[j].append({"step": step, "passed": bool(e.passed),
+                                "error_type": e.error_type, "code": cands[j].code})
+                prev_code[j], prev_err[j] = cands[j].code, e.error_type
+            pr = sum(traj[j][step]["passed"] for j in range(N)) / N
+            print(f"  [{condition}] step {step}: pass {pr:.3f}", flush=True)
+        return traj
+
+    out = {}
+    try:
+        for cond in ("b1", "abstract", "b2_fb"):
+            print(f"--- condition {cond} ---", flush=True)
+            out[cond] = rollout(cond)
+    finally:
+        for b in backends:
+            try:
+                b._teardown()
+            except Exception:
+                pass
+        tp.shutdown(wait=False)
+    return {"conditions": out, "n_problems": N, "T": T,
+            "problem_ids": [p.problem_id for p in problems]}
+
+
+@app.local_entrypoint()
+def feedback_main(n_problems: int = 164, chunk: int = 24):
+    import json as _json
+
+    r = feedback_2x2.remote(n_problems, chunk)
+    (REPO / "runs/modal").mkdir(parents=True, exist_ok=True)
+    (REPO / "runs/modal/diag10_feedback_2x2.json").write_text(_json.dumps(r))
+
+    conds = r["conditions"]
+    T, N = r["T"], r["n_problems"]
+
+    def pass_by_step(traj):
+        return [sum(traj[j][k]["passed"] for j in range(len(traj))) / len(traj) for k in range(T)]
+
+    def no_code_by_step(traj):
+        return [sum(traj[j][k]["error_type"] == "no_code" for j in range(len(traj))) / len(traj)
+                for k in range(T)]
+
+    traj_pass = {c: pass_by_step(conds[c]) for c in conds}
+    traj_nocode = {c: no_code_by_step(conds[c]) for c in conds}
+    # slope step0 -> last, and mean(steps 1..last) vs step0 (refinement lift)
+    summary = {}
+    for c, pr in traj_pass.items():
+        summary[c] = {"step0": pr[0], "last": pr[-1], "slope_0_to_last": pr[-1] - pr[0],
+                      "mean_1_to_last": sum(pr[1:]) / (T - 1)}
+
+    result = {
+        "_label": "DIAG-10 — feedback x candidate 2x2 (Modal T4, HumanEval-dev D13). "
+                  "EXPLORATORY; does not reopen H2. b2-raw reference is committed (0.61->0.40).",
+        "n_problems": N, "T": T,
+        "pass_by_step": traj_pass,
+        "no_code_by_step": traj_nocode,
+        "summary": summary,
+        "b2_raw_committed_reference": [0.610, 0.494, 0.457, 0.451, 0.433, 0.402, 0.390, 0.402],
+    }
+    (REPO / "artifacts/diag10_feedback_2x2.json").write_text(_json.dumps(result, indent=2))
+
+    print(f"\n=== DIAG-10 — feedback x candidate 2x2 ({N} HumanEval-dev problems) ===")
+    print(f"{'step':<6}" + "".join(f"{k:>8}" for k in range(T)))
+    for c in ("b1", "abstract", "b2_fb"):
+        print(f"{c:<10}" + "".join(f"{v:>8.3f}" for v in traj_pass[c]))
+    print(f"{'b2-raw*':<10}" + "".join(f"{v:>8.3f}" for v in result["b2_raw_committed_reference"]))
+    print("  (* committed reference, cross-stack — anchor via b1 flatness + shared step-0)")
+    print("\nslope step0->last:  " + "  ".join(f"{c} {summary[c]['slope_0_to_last']:+.3f}" for c in conds))
+    print("no_code by step (abstract / b2_fb):")
+    print(f"  abstract {[round(x,3) for x in traj_nocode['abstract']]}")
+    print(f"  b2_fb    {[round(x,3) for x in traj_nocode['b2_fb']]}")
+    print("wrote artifacts/diag10_feedback_2x2.json")
