@@ -171,6 +171,12 @@ retune.
       B1 within-problem **0.743** (not 0.42); B2 gross homogeneity ≈ B1 (no excess),
       but adjacent 0.851 > non-adjacent 0.660 (**local +0.19** anchoring); no_code
       rises 0.01→0.055 (part of the decline is output-collapse). → `artifacts/diag9b_*.json`
+- [x] **DIAG-10** (Modal T4, 2026-07-13, 80 HumanEval-dev, D13) feedback×candidate
+      2×2. **Prediction HELD:** ABSTRACT (feedback, no candidate) **+0.088** vs B2+fb
+      (feedback+candidate) **−0.162** from shared step-0 0.700 — identical feedback,
+      differ only in candidate, **+0.225** late-step gap. **Feedback-without-anchoring
+      works; the candidate anchor causes the collapse → Phase 3 bet confirmed.** →
+      `artifacts/diag10_*.json`
 
 Predictions are on the record so they can be wrong; outcomes get appended to
 [PRE-B2-HANDOFF.md] §3–4, [DIAGNOSTICS.md], and the gate log below (one line per

@@ -650,6 +650,42 @@ a fresh test set regardless.
 
 **Output:** `artifacts/diag10_feedback_2x2.json` (`scripts/modal_rgr.py::feedback_2x2`).
 
+**RESULT (2026-07-13, Modal T4, 80 HumanEval-dev problems, shared step-0 = 0.700).**
+Per-step pass-rate trajectories:
+
+| condition (feedback × candidate) | step0 → step7 | slope |
+|---|---|---|
+| **b1** (none × none, i.i.d.) | 0.700 → 0.762 | **+0.062** (flat) |
+| **ABSTRACT** (exec-fb × **no** candidate) | 0.700 → **0.787** (stays ≥0.70 throughout) | **+0.088** |
+| **B2+fb** (exec-fb × candidate) | 0.700 → **0.537** | **−0.162** |
+| b2-raw* (verifier-scalar × candidate) | 0.610 → 0.402 | −0.21 |
+
+*\*committed reference, cross-stack/cross-N; the internal 2×2 (b1/ABSTRACT/B2+fb, same
+80 problems, same stack, shared step-0) is what carries the verdict.*
+
+**Verdict: Phase 3's central bet is CONFIRMED, and the pre-registered prediction
+held (cleanly, for once).** Per the decision rule: **ABSTRACT flattens — indeed
+*rises* (+0.088), staying ≥0.70 at every step — so feedback-without-anchoring works
+and Phase 3 is on empirical footing.** The sharp isolation: ABSTRACT and B2+fb carry
+the **identical** execution feedback and differ *only* in whether the failed
+candidate text is in the prompt; ABSTRACT rises while B2+fb declines, a **+0.225 gap
+by steps 4–7** — so **the candidate anchor, not the absence of a latent state, is
+what drives the refinement collapse, and removing it is *necessary*, not merely
+nice.** Two corroborating reads: (a) B2+fb (−0.162) declines *less* than b2-raw
+(−0.21) — execution `error_type` helps somewhat over the verifier scalar even with
+the candidate present, so **feedback helps *and* the anchor hurts**, the ideal
+Phase-3-supporting pattern; (b) no_code ≈ 0 on this subset for both new conditions,
+so here the B2+fb decline is genuine content-anchoring, not output-collapse (the
+committed 164-run's rising no_code, DIAG-9b, is a *second*, smaller co-cause).
+**This is the direct causal test the proxy metrics (DIAG-8/9/9b) could only gesture
+at:** intervene on the candidate and the anti-refinement reverses. *Prediction:*
+step-0 0.700 (vs predicted ~0.61 — subset base rate a touch higher), b1 flat ✓,
+ABSTRACT flattens/rises ✓, B2+fb between b2-raw and ABSTRACT ✓ — held on every
+clause. **Caveats:** n=80 subset (per-step SE ~0.05; the ABSTRACT-vs-B2+fb gap is
+several SE, the ABSTRACT-over-step0 lift is ~1 SE — the *direction* is robust, the
+absolute lift modest); HumanEval-dev is saturated (0.70 pool), so this measures
+*trajectory shape*, not headroom. → `artifacts/diag10_feedback_2x2.json`
+
 ---
 
 ## Roll-up — all diagnostics closed (2026-07-13)
@@ -668,6 +704,7 @@ a fresh test set regardless.
 | DIAG-8 | B2 adjacent edit-dist **0.35×** B1 i.i.d.; tighter in 154/163 | direction **yes**, magnitude undershot | B2 pool crash is **content anchoring**, not a formatting artifact |
 | DIAG-9 | adjacent same-error **0.85**; pass 0.61→0.40 | *magnitude corrected by 9b* | text channel anti-refines; local error-echo (see 9b) |
 | DIAG-9b | within-problem chance **0.743** (not 0.42); B2 adjacent 0.851 > non-adj 0.660; no_code 0.01→0.055 | **partly** (B1 0.74 vs pred 0.60–0.70) | DIAG-9's excess retracted; anchoring survives as **local +0.19**; decline partly no_code collapse |
+| DIAG-10 | ABSTRACT +0.088 vs B2+fb −0.162 (same feedback, ±candidate); gap +0.225 | **yes** (held cleanly) | **feedback-without-anchoring works**; the candidate anchor causes the collapse; **Phase 3 bet confirmed** |
 
 ## Synthesis — what the null means (diagnostic record closed 2026-07-13; reworked after review)
 
@@ -722,13 +759,22 @@ Phase-3 fixes, they do **not** address the same component:
 | fix | fixes W₀? | fixes U (the thesis mechanism)? |
 |---|---|---|
 | in-domain / length-matched training | **yes** | **no** — U already fails in-domain |
-| richer input into U (abstraction of the error, not the candidate) | no | **yes — the only lever that touches U** |
+| richer input into U (abstraction of the error, not the candidate) | no | **yes — the only lever that touches U — and DIAG-10 shows it works** |
 | on-policy set-membership objective ([DECISIONS.md] D2) | partial (TF→sampled gap) | helps, but useless without a signal to update on |
 | task with genuine headroom | — | prerequisite (else nothing to gain) |
 
 So Phase 3's **first-order** move is not "retrain in-domain" (that only rescues the
 learned prompt); it is **enrich what U conditions on** — a compact abstraction of
 *why* the last attempt failed (which test, what class), explicitly *not* the failed
-candidate text (DIAG-8/9 show conditioning on the candidate anchors G to its own
-mistake). Everything else is secondary to giving U a signal. These are Phase-3
-design questions, not extensions of this record.
+candidate text.
+
+**DIAG-10 turns this from inference into a measured result.** The prompt-level proxy
+for exactly this design — feed the loop the previous step's *error class* with the
+candidate **removed** (ABSTRACT) vs kept (B2+fb) — reverses the anti-refinement:
+ABSTRACT *rises* +0.088 while B2+fb declines −0.162, a +0.225 late-step gap
+attributable **entirely to the candidate anchor** (identical feedback otherwise). So
+"condition on an abstraction of the error, not the candidate" is no longer a
+well-motivated guess — it is the one intervention shown to flip the trajectory, and
+it is the load-bearing premise Phase 3 is cleared to build on. Everything else is
+secondary to giving U that signal. These are Phase-3 design questions, not extensions
+of this record.

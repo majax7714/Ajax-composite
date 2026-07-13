@@ -390,8 +390,11 @@ worked except the last" phrasing is retired. **The prioritization this hands
 Phase 3:** in-domain/length-matched training fixes only W₀ (U already fails
 in-domain); the single lever that touches U is **enriching what it conditions on —
 a compact abstraction of *why* the last attempt failed, explicitly not the failed
-candidate text.** That, an on-policy set-membership objective, and a task with
-headroom are Phase-3 design, not extensions of this record.
+candidate text** — and **DIAG-10 measures that this works**: feeding the loop the
+prior step's error class with the candidate *removed* reverses the anti-refinement
+(ABSTRACT +0.088 vs candidate-anchored B2+fb −0.162, a +0.225 late-step gap
+attributable entirely to the anchor). That, an on-policy set-membership objective,
+and a task with headroom are Phase-3 design, not extensions of this record.
 
 ### 5.4 The conceptual mapping, honestly closed
 

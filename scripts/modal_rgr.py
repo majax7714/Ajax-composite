@@ -725,27 +725,38 @@ def feedback_2x2(n_problems: int = 164, chunk: int = 24):
                     + " Write an improved complete solution as a single fenced Python code block.")
         return base + "\n\n" + body
 
+    def run_step(prompts):
+        cands = [Candidate(text=t, code=extract_code(t)) for t in gen_batch(prompts)]
+        results = execute_pairs(problems, cands)
+        recs = [{"passed": bool(e.passed), "error_type": e.error_type, "code": c.code}
+                for c, e in zip(cands, results)]
+        return recs
+
+    # Shared step 0 (un-conditioned build_prompt) — identical start for all
+    # conditions, per the pre-registered design.
+    print("--- shared step 0 ---", flush=True)
+    step0 = run_step([build_prompt(p.prompt) for p in problems])
+    for j in range(N):
+        step0[j]["step"] = 0
+    print(f"  [step0] pass {sum(r['passed'] for r in step0)/N:.3f}", flush=True)
+
     def rollout(condition):
-        traj = [[] for _ in range(N)]
-        prev_code = [None] * N
-        prev_err = [None] * N
-        for step in range(T):
-            if step == 0 or condition == "b1":
+        traj = [[dict(step0[j])] for j in range(N)]
+        prev_code = [step0[j]["code"] for j in range(N)]
+        prev_err = [step0[j]["error_type"] for j in range(N)]
+        for step in range(1, T):
+            if condition == "b1":
                 prompts = [build_prompt(p.prompt) for p in problems]
             elif condition == "abstract":
                 prompts = [abstract_prompt(problems[j], prev_code[j], prev_err[j]) for j in range(N)]
             elif condition == "b2_fb":
                 prompts = [b2fb_prompt(problems[j], prev_code[j], prev_err[j]) for j in range(N)]
-            texts = gen_batch(prompts)
-            cands = [Candidate(text=t, code=extract_code(t)) for t in texts]
-            results = execute_pairs(problems, cands)
+            recs = run_step(prompts)
             for j in range(N):
-                e = results[j]
-                traj[j].append({"step": step, "passed": bool(e.passed),
-                                "error_type": e.error_type, "code": cands[j].code})
-                prev_code[j], prev_err[j] = cands[j].code, e.error_type
-            pr = sum(traj[j][step]["passed"] for j in range(N)) / N
-            print(f"  [{condition}] step {step}: pass {pr:.3f}", flush=True)
+                recs[j]["step"] = step
+                traj[j].append(recs[j])
+                prev_code[j], prev_err[j] = recs[j]["code"], recs[j]["error_type"]
+            print(f"  [{condition}] step {step}: pass {sum(r['passed'] for r in recs)/N:.3f}", flush=True)
         return traj
 
     out = {}

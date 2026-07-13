@@ -205,5 +205,21 @@ without any GPU (no Modal spend, no new held-out access):
   from input starvation (fix = richer input into U — the only lever that touches the
   thesis mechanism). See [DIAGNOSTICS.md] Synthesis.
 
+### DIAG-9b + DIAG-10 (2026-07-13) — two more review catches before Phase 3
+
+- **DIAG-9b (free CPU)** — DIAG-9's persistence baseline (Σp_t²=0.42) ignored
+  within-problem error clustering (same class as the CV leakage). Correct chance =
+  B1 within-problem **0.743**; B2's gross excess vanished, but a **local +0.19**
+  adjacent-vs-non-adjacent anchoring survives, and no_code rises 0.01→0.055 (part of
+  the decline is output-collapse). DIAG-9's magnitude retracted; direction survives.
+- **DIAG-10 (Modal T4, ~$1)** — the feedback×candidate 2×2 tests the one assumption
+  Phase 3 rests on. **ABSTRACT (feedback, no candidate) +0.088 vs B2+fb
+  (feedback+candidate) −0.162** from a shared step-0 of 0.700 — identical feedback,
+  differ only in the candidate, +0.225 late-step gap. **Feedback-without-anchoring
+  works and the candidate anchor causes the collapse — Phase 3's central bet is
+  confirmed on empirical footing, not assumed.** (D13: HumanEval is now a dev set;
+  this spent no confirmatory budget.) Phase K Modal total now ≈ **$2–3**, still
+  inside the free credit.
+
 **The diagnostic record is closed; Phase 3 design may now begin** (not before,
 per §5). Phase M (fp16+vLLM) remains a later, separate refactor.
