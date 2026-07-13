@@ -26,6 +26,7 @@ data/cache/
 .DS_Store
 # Modal upload staging (contains artifacts + the Daytona key)
 .modal_stage/
+.modal_stage_m/
 
 # Credentials — never commit
 rgb-daytona.txt
