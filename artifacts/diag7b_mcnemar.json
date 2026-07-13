@@ -1,0 +1,40 @@
+{
+  "_label": "EXPLORATORY / POST-HOC correction \u2014 does not reopen the H2 gate or revise the held DIAG-7 ordering prediction",
+  "n_problems": 164,
+  "pool_covered_counts": {
+    "B1": 139,
+    "FULL": 135,
+    "B2": 116
+  },
+  "test": "McNemar exact two-sided binomial on discordant pairs",
+  "predicted": "FULL_vs_B1 non-significant (p>=0.2); B2 pairs significant",
+  "pairs": {
+    "FULL_vs_B1": {
+      "discordant_x_only": 4,
+      "discordant_y_only": 8,
+      "concordant_both": 131,
+      "concordant_neither": 21,
+      "n_discordant": 12,
+      "p_exact_two_sided": 0.3876953125,
+      "significant_at_0.05": false
+    },
+    "B1_vs_B2": {
+      "discordant_x_only": 27,
+      "discordant_y_only": 4,
+      "concordant_both": 112,
+      "concordant_neither": 21,
+      "n_discordant": 31,
+      "p_exact_two_sided": 3.39532271027565e-05,
+      "significant_at_0.05": true
+    },
+    "FULL_vs_B2": {
+      "discordant_x_only": 24,
+      "discordant_y_only": 5,
+      "concordant_both": 111,
+      "concordant_neither": 24,
+      "n_discordant": 29,
+      "p_exact_two_sided": 0.0005461126565933228,
+      "significant_at_0.05": true
+    }
+  }
+}

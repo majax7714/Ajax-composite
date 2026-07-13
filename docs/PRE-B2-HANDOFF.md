@@ -75,6 +75,17 @@ wrong for H2. It optimized the control (verification) and starved the treatment
 > *Every* cross-step channel we built was **net-harmful** — the register's updates
 > actively shrink the reachable pool, they don't merely fail to grow it. See
 > [DIAGNOSTICS.md] DIAG-7.
+>
+> > **[CORRECTED 2026-07-13 — DIAG-7b (McNemar).** The "register updates cost
+> > 2.4 pts / actively shrink the reachable pool" clause above **over-reads a
+> > 4-problem, non-significant paired difference** (FULL 135 vs B1 139; exact
+> > p = 0.39). Honest statement: the register step is **null on coverage, not a
+> > demonstrated shrinker** — point estimate on the harm side, within paired
+> > noise. Only B2's 23-problem text-channel crash is statistically established
+> > (p < 1e-3), and DIAG-8/9 show *that* harm is genuine **content anchoring**.
+> > The monotone ordering and the outcome-level "saturated task → bandwidth buys
+> > harm" reading stand; the causal significance attached to FULL vs B1 does not.
+> > See [DIAGNOSTICS.md] DIAG-7b/8/9.]**
 
 ### 1.2 The register was fed a representation already measured near-chance
 

@@ -154,9 +154,19 @@ retune.
       into Phase 3 benchmark selection.
 - [x] **DIAG-7** (CPU, 2026-07-12) oracle pool coverage by cross-step channel.
       **Prediction HELD:** pass@8 **B1 0.848 > FULL 0.823 > B2 0.707**, strict,
-      monotonic in channel bandwidth. Register updates (FULL vs B1) cost 2.4 pts
-      of pool; text channel 14. **Every cross-step channel net-harmful** — the
-      capstone mechanistic result. → `artifacts/diag7_*.json`
+      monotonic in channel bandwidth. *[Corrected 2026-07-13 by DIAG-7b: the
+      FULL−B1 gap is non-significant — the register step is null, not a proven
+      shrinker; only the text channel's crash is established.]* → `artifacts/diag7_*.json`
+- [x] **DIAG-7b** (CPU, 2026-07-13) McNemar on paired coverage. FULL−B1 exact
+      **p = 0.39 (n.s.)**; B1−B2 and FULL−B2 **p < 1e-3**. Retracts DIAG-7's
+      "updates cost 2.4 pts / shrink the pool" overclaim. → `artifacts/diag7b_*.json`
+- [x] **DIAG-8** (CPU, 2026-07-13) anchoring vs prompt degradation. B2 adjacent
+      edit-dist **0.35×** B1 i.i.d., tighter than its own non-adjacent pairs in
+      154/163 problems → **content anchoring**, not a formatting artifact. →
+      `artifacts/diag8_*.json`
+- [x] **DIAG-9** (CPU, 2026-07-13) semantic anchoring + refinement trajectory.
+      Same-error persistence **0.85** (chance 0.42); pass rate **0.61→0.40** across
+      steps → B2 loops on its failure mode & **anti-refines**. → `artifacts/diag9_*.json`
 
 Predictions are on the record so they can be wrong; outcomes get appended to
 [PRE-B2-HANDOFF.md] §3–4, [DIAGNOSTICS.md], and the gate log below (one line per

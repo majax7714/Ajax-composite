@@ -1,0 +1,27 @@
+{
+  "_label": "EXPLORATORY / POST-HOC \u2014 does not reopen the H2 gate",
+  "n_problems": 164,
+  "metric": "1 - difflib.SequenceMatcher(None,a,b).ratio() on extracted code (== DIAG-3)",
+  "predicted": "partial anchoring: d_consec ~= 0.75 * d_b1_all, < d_b2_all",
+  "primary_real_code_only": {
+    "d_consec_B2_adjacent": 0.1386931448024845,
+    "d_b2_all_pairs": 0.258323616356542,
+    "d_b1_all_pairs_iid": 0.3959609477937708,
+    "ratio_consec_over_b1_iid": 0.350269756589027,
+    "ratio_consec_over_b2_all": 0.5368968844530971,
+    "problems_consec_tighter_than_b2_allpairs": 154,
+    "problems_with_valid_consec": 163,
+    "verdict_anchoring": true
+  },
+  "sensitivity_coerce_no_code_to_empty": {
+    "d_consec_B2_adjacent": 0.15578175644142536,
+    "d_b2_all_pairs": 0.2790539993898233,
+    "d_b1_all_pairs_iid": 0.3959609477937708,
+    "ratio_consec_over_b1_iid": 0.3934270723146201,
+    "ratio_consec_over_b2_all": 0.5582495028992819,
+    "problems_consec_tighter_than_b2_allpairs": 154,
+    "problems_with_valid_consec": 164,
+    "verdict_anchoring": true
+  },
+  "verdict": "anchoring (content)"
+}

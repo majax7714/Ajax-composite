@@ -1,0 +1,34 @@
+{
+  "_label": "EXPLORATORY / POST-HOC \u2014 does not reopen the H2 gate",
+  "n_problems": 164,
+  "n_steps": 8,
+  "error_type_marginals_failing": {
+    "wrong_answer": 360,
+    "runtime": 289,
+    "syntax": 14,
+    "no_code": 51,
+    "sandbox": 1
+  },
+  "total_failing_steps": 715,
+  "obs_adjacent_failing_match_rate": 0.8513986013986014,
+  "chance_independence_sum_pt2": 0.42235610543302854,
+  "modal_type_share": 0.5034965034965035,
+  "excess_over_independence": 0.4290424959655728,
+  "n_adjacent_failing_pairs": 572,
+  "pass_rate_by_step": [
+    0.6097560975609756,
+    0.49390243902439024,
+    0.4573170731707317,
+    0.45121951219512196,
+    0.4329268292682927,
+    0.4024390243902439,
+    0.3902439024390244,
+    0.4024390243902439
+  ],
+  "pass_step0_unanchored": 0.6097560975609756,
+  "pass_mean_steps_1_to_last": 0.43292682926829273,
+  "pass_slope_step0_to_last": -0.20731707317073167,
+  "predicted": "persistence modestly above independence; pass rate flat across steps",
+  "verdict_semantic_anchoring": true,
+  "verdict_refines": false
+}

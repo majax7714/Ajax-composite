@@ -343,11 +343,17 @@ a hair below, i.e. the text channel was *even more* harmful than predicted). Two
 sharpenings, both from committed data:
 
 - **FULL vs B1 isolates the register updates** (both inject r₀; FULL updates r_t,
-  B1 freezes it) → the register updates **cost 2.4 pts of pool coverage** (0.8232
-  vs 0.8476, 135 vs 139 problems). So the register is not merely non-positive
-  (DIAG-1) — its updates *actively shrink the reachable pool*. The verifier
-  reselected FULL back to 0.6829, masking the pool damage at pass@1; for B2 the
-  14-pt pool crash broke through to pass@1 (0.6220).
+  B1 freezes it). ~~the register updates **cost 2.4 pts of pool coverage** (0.8232
+  vs 0.8476, 135 vs 139 problems) … its updates *actively shrink the reachable
+  pool*.~~ **[SUPERSEDED 2026-07-13 by the DIAG-7 McNemar correction above.**
+  The FULL−B1 gap is a **4-problem, non-significant** paired difference (discordant
+  4/8, exact p = 0.39) — the same evidence strength DIAG-1 refused to call "harm."
+  Corrected reading: **no evidence the register updates improve *or* shrink pool
+  coverage; the point estimate is on the harm side but within paired noise.** The
+  register is **non-positive** (DIAG-1) and **null** here — not a demonstrated
+  shrinker.**]** The verifier reselected FULL back to 0.6829; for B2 the pool crash
+  (23 problems, p < 1e-4 — *the only established coverage effect*) broke through to
+  pass@1 (0.6220).
 - **FULL's mean passing-candidates/problem (4.811) exceeds B1's (4.671) despite
   lower coverage** — the register piles *redundant* passes onto already-solvable
   problems while losing marginal ones (consistent with DIAG-1: B1 reaches more
@@ -383,6 +389,25 @@ estimate stays on the harm side but within paired noise; B1 vs B2 and FULL vs B2
 **significant** (the 23-problem B2 crash is real and large). Corrected headline if
 it lands: *no evidence the register improves pool coverage (measured six ways, all
 null); only the text channel's degradation is statistically established.*
+
+**RESULT (2026-07-13, `scripts/diag7b_mcnemar.py`, committed data).** Covered:
+B1 139, FULL 135, B2 116 / 164.
+
+| pair | discordant (X-only / Y-only) | exact p (2-sided) | verdict |
+|---|---|---|---|
+| **FULL vs B1** | 4 / 8 | **0.388** | **n.s.** |
+| B1 vs B2 | 27 / 4 | 4e-5 | significant |
+| FULL vs B2 | 24 / 5 | 5e-4 | significant |
+
+**Expectation held? YES.** The FULL−B1 gap is **not significant** (p 0.39; the
+review's guess of ~6/2, p≈0.3 was close — actual 4/8). The point estimate sits on
+the harm side but is within paired noise, so **the DIAG-7 "register updates cost
+2.4 pts / actively shrink the pool" phrasing is retracted** (see the corrected
+DIAG-7 bullet, tagged *superseded*). Both B2 pairs are strongly significant — the
+23-problem text-channel crash is the *only* statistically established coverage
+effect. Corrected headline stands: **no evidence the register improves pool
+coverage (null six ways); only the text channel's degradation is established.**
+→ `artifacts/diag7b_mcnemar.json`
 
 ---
 
@@ -422,6 +447,34 @@ diversity-narrowing and the review's caution keep the degradation branch open.
 
 **Output:** `artifacts/diag8_anchoring.json` (`scripts/diag8_anchoring.py`).
 
+**RESULT (2026-07-13, `scripts/diag8_anchoring.py`, committed data; primary =
+real-code pairs, `no_code`→"" as sensitivity).**
+
+| quantity | value |
+|---|---|
+| `d_consec` (B2 adjacent) | **0.139** |
+| `d_b2_all` (B2 all-pairs) | 0.258 |
+| `d_b1_all` (B1 i.i.d.) | **0.396** |
+| ratio `d_consec / d_b1_all` | **0.35** |
+| ratio `d_consec / d_b2_all` | 0.54 |
+| B2 adjacent tighter than its own non-adjacent pairs | **154/163 problems** |
+
+**Verdict: ANCHORING (content) — decisively, and stronger than predicted.** Both
+pre-registered conditions are met with room to spare: `d_consec` (0.139) < `d_b1_all`
+(0.396) **and** < `d_b2_all` (0.258). Consecutive B2 candidates are only **35% as
+far apart as B1's i.i.d. draws** and roughly half as far as B2's own non-adjacent
+pairs — in 94% of problems the step *G was shown* pulls the next candidate toward
+itself. **Prediction held in direction, undershot in magnitude:** I called "partial
+anchoring, ratio ~0.75"; the real anchoring is severe (0.35), not partial. The
+sensitivity run (`no_code`→"") gives the same verdict (ratio 0.39). *Metric note:
+identical to DIAG-3, but DIAG-3's 0.252/0.297 were **MBPP-val**; DIAG-8 is
+**HumanEval** (longer functions, higher absolute distances), so only the
+within-DIAG-8 relative comparison carries the verdict.* This **rules out the
+prompt-degradation explanation**: B2's 0.707 is not a formatting artifact — the
+text channel genuinely makes G rewrite variations of its own prior attempt. → the
+Phase-3 "condition on an *abstraction* of the error, not the failed candidate"
+design is now empirically motivated, not assumed. → `artifacts/diag8_anchoring.json`
+
 ---
 
 ## DIAG-9 — Semantic anchoring & refinement trajectory: does B2 loop on its own failure mode?  *(CPU · committed data · pre-registered 2026-07-13, before the run)*
@@ -450,6 +503,28 @@ and asks whether the text channel *refines at all*. Uses B2's committed per-step
 
 **Output:** `artifacts/diag9_error_persistence.json` (`scripts/diag9_error_persistence.py`).
 
+**RESULT (2026-07-13, `scripts/diag9_error_persistence.py`, committed data).** Error
+types among 715 failing steps: wrong_answer 360, runtime 289, no_code 51, syntax 14,
+sandbox 1.
+
+- **Error-type persistence:** among adjacent step pairs where **both** fail, the
+  observed same-error-type rate is **0.851** vs an independence baseline Σp_t² =
+  **0.422** (and modal-share 0.503) — **excess +0.43, far above chance.** When B2
+  fails twice in a row it repeats the *same* failure mode 85% of the time.
+- **Refinement trajectory:** pass rate by step = **[0.61, 0.49, 0.46, 0.45, 0.43,
+  0.40, 0.39, 0.40]** — a **monotone decline** from the un-anchored step 0 (0.61) to
+  ~0.40 (slope −0.21). Step 0 is itself the i.i.d. control (un-anchored, 191-tok
+  prompt); every anchored step is *worse* than it.
+
+**Verdict: SEMANTIC ANCHORING confirmed; the text channel anti-refines. Prediction
+held in direction, undershot in magnitude** — I called "modestly above chance,
+flat"; it is *massively* above chance (0.85 vs 0.42) and *declining*, not flat. B2
+does not refine its prior attempt — it locks onto its own failure mode and each
+step degrades. Together with DIAG-8 (surface anchoring) this is the semantic
+confirmation that the bandwidth→harm ordering (DIAG-7) is real content-anchoring:
+conditioning on a *failed* candidate makes G loop on the same mistake. →
+`artifacts/diag9_error_persistence.json`
+
 ---
 
 ## Roll-up — all diagnostics closed (2026-07-13)
@@ -463,31 +538,68 @@ and asks whether the text channel *refines at all*. Uses B2's committed per-step
 | DIAG-4·3 | **99.7%** of −10.7% gain on *decision* tokens | **no** (predicted boilerplate) | training moved the right tokens teacher-forced → pure TF→sampled gap |
 | DIAG-5 | r₀ steering ×1.33 MBPP but **×0.28 (reverses)** HumanEval | **yes** (overshot) | domain/length transfer failure (28-tok MBPP → 156-tok HumanEval) |
 | DIAG-6 | **descoped → Phase 3** (D12) | — | ceiling already carried by pass@8 + DIAG-1 + DIAG-7 |
-| DIAG-7 | pool coverage 0.848 > 0.823 > 0.707 (B1>FULL>B2) | **yes** (strict) | every cross-step channel net-harmful, monotonic in bandwidth; updates cost 2.4 pts of pool |
+| DIAG-7 | pool coverage 0.848 > 0.823 > 0.707 (B1>FULL>B2) | **yes** (strict) | text channel net-harmful & monotonic in bandwidth; register (FULL−B1) null, *not* a proven shrinker (see 7b) |
+| DIAG-7b | FULL−B1 p=**0.39 n.s.**; B2 pairs p<1e-3 | expectation **yes** | only B2's 23-problem crash is a *significant* coverage effect; register null six ways |
+| DIAG-8 | B2 adjacent edit-dist **0.35×** B1 i.i.d.; tighter in 154/163 | direction **yes**, magnitude undershot | B2 pool crash is **content anchoring**, not a formatting artifact |
+| DIAG-9 | same-error persistence **0.85** (chance 0.42); pass 0.61→0.40 | direction **yes**, magnitude undershot | B2 loops on its own failure mode & **anti-refines** — semantic confirmation of DIAG-8 |
 
-## Synthesis — what the null means (diagnostic record closed 2026-07-13)
+## Synthesis — what the null means (diagnostic record closed 2026-07-13; reworked after review)
 
-The H2 null is **over-determined**, and every candidate cause is now measured:
+> *Supersedes the earlier flat "over-determined: four causes, together inevitable"
+> framing. That was true but shapeless — it obscured that **two components fail for
+> two different reasons**, and the diagnostics cleanly separate them. The sharper
+> structure below is the load-bearing result and it hands Phase 3 a prioritization
+> the flat list lost.*
 
-1. **No task headroom** (DIAG-1, DIAG-7). pass@8 ≈ 0.85 at i.i.d. sampling; the
-   genuinely-unreachable set is < 26/164; and pool coverage degrades monotonically
-   in cross-step bandwidth (B1 > FULL > B2) — anchoring on a saturated task's own
-   failures is net-harmful, and the register *updates* cost 2.4 pts of pool.
-2. **The register is starved at the input** (DIAG-2). r_t carries only marginal
-   decodable correctness signal (passed AUROC 0.558) and not even a clock —
-   confirming §1.2's near-chance-φ prediction.
-3. **Its control authority is directionless** (DIAG-3). r₇ *does* move G's sampling
-   (KL 0.117 nats) and even widens diversity, but shifts pass rate by 0.000 — it
-   perturbs without steering (the entropy-killer hypothesis is refuted; DIAG-7's
-   pool concentration is out-of-domain mis-steering, not diversity-narrowing).
-4. **The training objective moved a proxy that doesn't survive sampling**
-   (DIAG-4·1-3, DIAG-5). Targets were samplable, and training concentrated its gain
-   on the *right* decision tokens teacher-forced (99.7%) — yet sampling stayed flat
-   (a pure teacher-forced→sampled gap), and the learned r₀ steering *reversed* out
-   of domain (×0.28 on HumanEval), overfit to MBPP length.
+RGR has two learned parts, and each fails a different way:
 
-None of these individually "explains" the null; together they make it inevitable.
-The productive next moves are already recorded: an on-policy set-membership
-objective ([DECISIONS.md] D2 post-hoc), a richer input into U ([PRE-B2-HANDOFF.md]
-§5), in-domain/length-matched training, and a task with genuine headroom — but
-those are Phase-3 design questions, not extensions of this record.
+**Component W₀ — the static injection (trained r₀ + injector). A *transfer*
+failure.** DIAG-5: the trained r₀ steering is **×1.33 in-domain (MBPP)** and
+**×0.28 — it reverses — out-of-domain (HumanEval)**. It learned *real,
+correctly-directed* steering on 28-token MBPP one-liners and mis-fires on 136-token
+HumanEval functions. DIAG-4 supplies the mechanism (targets samplable; 99.7% of the
+teacher-forced gain on the *right* decision tokens): the objective was not
+degenerate, the learned prompt just **overfit to length/domain**. W₀ is, in the
+end, *prompt-tuning that didn't generalize* — useful to know, but not the thesis.
+
+**Component U — the recurrent update dynamics. A *mechanism* failure, in-domain.**
+This is the actual RGR hypothesis (cross-step state that gates refinement). DIAG-3
+ran on **MBPP val — U's own training domain** — and got r₀→r₇ pass **0.598 → 0.598,
+Δ = 0.000**. U fails where it was trained; that is not transfer, it is mechanism.
+DIAG-2 (also in-domain) gives the cause. The in-domain causal chain is now fully
+measured and closed:
+
+> **φ(candidate) near-chance → r_t carries almost no correctness signal (passed
+> AUROC 0.558) → U's updates are uninformative → KL 0.117 nats of *directionless*
+> perturbation (r₇ even more diverse, entropy-killer refuted) → Δpass 0.000.**
+
+One cause, one word: **input starvation.** U cannot steer because it was never
+handed a usable error signal to update on.
+
+**Why none of it could have won anyway — the outcome frame (DIAG-1 / 7 / 8 / 9).**
+The task is saturated (pass@8 ≈ 0.85 i.i.d.; genuinely-unreachable set < 26/164), so
+cross-step conditioning has almost nothing to *add*. And conditioning on a *failed*
+candidate actively subtracts: DIAG-8 shows B2's consecutive candidates are only
+**0.35×** as far apart as i.i.d. draws (content anchoring, not a formatting
+artifact — the prompt-degradation confound is *ruled out*), and DIAG-9 shows B2
+repeats its **same error type 85%** of the time and **anti-refines** (pass
+0.61→0.40 across steps). Only the text channel's crash is statistically established
+(DIAG-7b: FULL−B1 p = 0.39 n.s.; B2 pairs p < 1e-3) — so the honest coverage
+statement is *the register is null six ways; the text channel demonstrably hurts.*
+
+**The prioritization the flat list hid (this is the point).** Of the recorded
+Phase-3 fixes, they do **not** address the same component:
+
+| fix | fixes W₀? | fixes U (the thesis mechanism)? |
+|---|---|---|
+| in-domain / length-matched training | **yes** | **no** — U already fails in-domain |
+| richer input into U (abstraction of the error, not the candidate) | no | **yes — the only lever that touches U** |
+| on-policy set-membership objective ([DECISIONS.md] D2) | partial (TF→sampled gap) | helps, but useless without a signal to update on |
+| task with genuine headroom | — | prerequisite (else nothing to gain) |
+
+So Phase 3's **first-order** move is not "retrain in-domain" (that only rescues the
+learned prompt); it is **enrich what U conditions on** — a compact abstraction of
+*why* the last attempt failed (which test, what class), explicitly *not* the failed
+candidate text (DIAG-8/9 show conditioning on the candidate anchors G to its own
+mistake). Everything else is secondary to giving U a signal. These are Phase-3
+design questions, not extensions of this record.

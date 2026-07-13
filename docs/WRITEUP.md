@@ -269,20 +269,25 @@ mean compute — and is future work, explicitly outside the original gates.
 3. **Selection headroom remains large** (0.671 achieved vs 0.842 oracle at
    n=8): better verifiers still have ~17 points to claim, independent of
    any iteration mechanism.
-4. **Every cross-step channel was net-harmful, monotonically in bandwidth.**
-   Oracle pool coverage (pass@8) is ordered **B1 0.848 > FULL 0.823 > B2
-   0.707** by the amount each condition conditions on prior failed attempts
-   (none / 128-dim latent / full previous-candidate text; DIAG-7,
-   [DIAGNOSTICS.md]). Isolating the register updates (FULL vs B1, same r₀
-   injection) costs 2.4 points of pool coverage — so the register does not
-   merely fail to help, its updates *shrink the reachable pool* by anchoring
-   the generator onto shown-wrong candidates; the verifier reselected FULL
-   back to a 0.6829 tie, masking the damage, while B2's 14-point pool crash
-   broke through to pass@1. This was structurally guaranteed: at ~0.85 i.i.d.
-   pool coverage there is almost nothing for cross-step conditioning to add
-   and much for anchoring to subtract. The null is therefore not "the register
-   did nothing" but "conditioning on a saturated task's own failures is
-   net-harmful, and the harm scales with channel bandwidth."
+4. **Pool coverage falls with cross-step bandwidth; the text channel's harm
+   is real, the register's is null.** Oracle pool coverage (pass@8) is ordered
+   **B1 0.848 > FULL 0.823 > B2 0.707** by how much each condition conditions
+   on prior failed attempts (none / 128-dim latent / full previous-candidate
+   text; DIAG-7, [DIAGNOSTICS.md]). Paired McNemar (DIAG-7b) shows the register
+   step (FULL vs B1, a 4-problem gap) is **not significant** (exact p = 0.39);
+   only B2's 23-problem crash is established (p < 1e-3). So the register is
+   **null on coverage, not a demonstrated shrinker** — the point estimate is on
+   the harm side but within paired noise. The text channel's harm, however, is
+   **content anchoring**, not a formatting artifact: conditioning on the failed
+   candidate makes B2's consecutive candidates only **0.35× as diverse** as
+   i.i.d. draws (DIAG-8) and repeat the **same error type 85%** of the time
+   while pass rate *declines* 0.61→0.40 across steps (DIAG-9) — G loops on its
+   own mistake. This was structurally primed: at ~0.85 i.i.d. pool coverage
+   there is almost nothing for cross-step conditioning to add and much for
+   anchoring on a *shown-wrong* candidate to subtract. The null is therefore not
+   "the register did nothing" but "on a saturated task, conditioning on prior
+   *failures* is at best inert (latent register) and at worst actively harmful
+   (raw text), scaling with channel bandwidth."
 
 ### 5.2 Honest bounds on the negative
 
@@ -362,19 +367,28 @@ broken upstream. Two diagnostics have now reported ([DIAGNOSTICS.md]):
   resampling, they were low-probability, not unreachable: the genuine generative
   headroom on this benchmark is even smaller than 16%.
 
-The full diagnostic record is now **closed** (7 diagnostics, [DIAGNOSTICS.md]
-synthesis) and the null is over-determined, each cause measured: no task headroom
-(DIAG-1/7 — pool coverage degrades monotonically in cross-step bandwidth,
-B1>FULL>B2); the register **starved at the input** (DIAG-2 — passed_{t-1} AUROC
-0.558, no clock); its authority **directionless** (DIAG-3 — KL 0.117 nats and
-*more* sample diversity, but Δpass 0.000; the entropy-killer hypothesis refuted);
-and a training objective that moved the right decision tokens teacher-forced
-(DIAG-4·3 — 99.7% of the −10.7% on decision tokens) yet **reversed out of domain**
-(DIAG-5 — r₀ steering ×1.33 MBPP but ×0.28 on HumanEval). None alone explains the
-null; together they make it inevitable. The "every link worked except the last"
-phrasing is retired in favor of this account; the productive next moves
-(on-policy set-membership training, richer U input, in-domain/length-matched
-data, a task with headroom) are Phase-3 design, not extensions of this record.
+The full diagnostic record is now **closed** (10 diagnostics, [DIAGNOSTICS.md]
+synthesis). The null is not a flat over-determination but a **two-component**
+failure, one per learned part. **W₀ (static injection) is a *transfer* failure:**
+its trained steering is ×1.33 in-domain but *reverses* to ×0.28 out-of-domain
+(DIAG-5) — a learned prompt overfit to MBPP length, with the objective itself sound
+(DIAG-4: samplable targets, 99.7% of the gain on the right decision tokens). **U
+(the update dynamics — the actual RGR hypothesis) is a *mechanism* failure,
+in-domain:** on MBPP val (U's training domain) r₀→r₇ moves pass rate by exactly
+0.000, and the reason is a closed causal chain — φ near-chance → r_t barely encodes
+correctness (DIAG-2, passed AUROC 0.558, no clock) → uninformative updates → KL
+0.117 nats of *directionless* perturbation (DIAG-3; entropy-killer refuted) → Δpass
+0.000. One word: **input starvation.** The outcome frame explains why neither could
+have won: the task is saturated (DIAG-1/7), and conditioning on a failed candidate
+anchors G to its own mistake (DIAG-8: consecutive candidates 0.35× as diverse as
+i.i.d.; DIAG-9: same error type 85%, pass 0.61→0.40), while the register's own
+coverage effect is null not harmful (DIAG-7b: FULL−B1 p = 0.39). The "every link
+worked except the last" phrasing is retired. **The prioritization this hands
+Phase 3:** in-domain/length-matched training fixes only W₀ (U already fails
+in-domain); the single lever that touches U is **enriching what it conditions on —
+a compact abstraction of *why* the last attempt failed, explicitly not the failed
+candidate text.** That, an on-policy set-membership objective, and a task with
+headroom are Phase-3 design, not extensions of this record.
 
 ### 5.4 The conceptual mapping, honestly closed
 

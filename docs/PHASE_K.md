@@ -183,5 +183,24 @@ All four post-B2 GPU diagnostics ran on Modal T4 after K1; DIAG-6 stays descoped
 
 Modal spend for the whole of Phase K ≈ **$1–2** (K1 + envcap free + 3 diagnostic
 runs), inside the free credit. The Kaggle quota wall is off the critical path.
+
+### Review pass (2026-07-13) — 3 additions, all free CPU on committed data
+
+An external review of the closed synthesis surfaced three fixable issues; addressed
+without any GPU (no Modal spend, no new held-out access):
+
+- **DIAG-7b (McNemar)** — retracts DIAG-7's "register updates cost 2.4 pts / shrink
+  the pool": the FULL−B1 gap is a 4-problem, **non-significant** difference (exact
+  p = 0.39); only B2's 23-problem crash is established. Register is null on coverage.
+- **DIAG-8 + DIAG-9** — resolve DIAG-7's anchoring-vs-formatting confound: B2's
+  consecutive candidates are **0.35×** as diverse as i.i.d. (DIAG-8) and repeat the
+  **same error type 85%** while pass rate declines 0.61→0.40 (DIAG-9) → **content
+  anchoring** confirmed, so "condition on an abstraction, not the candidate" is now
+  empirically motivated for Phase 3.
+- **Synthesis reworked** — from a flat "four causes" to a **two-component** account:
+  W₀ = transfer failure (fix = in-domain training), U = in-domain mechanism failure
+  from input starvation (fix = richer input into U — the only lever that touches the
+  thesis mechanism). See [DIAGNOSTICS.md] Synthesis.
+
 **The diagnostic record is closed; Phase 3 design may now begin** (not before,
 per §5). Phase M (fp16+vLLM) remains a later, separate refactor.
