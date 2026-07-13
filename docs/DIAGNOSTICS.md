@@ -363,6 +363,93 @@ for cross-step conditioning to *add* and a great deal for anchoring on prior
 failures to *subtract*, so bandwidth buys harm. The GPU diagnostics (DIAG-2/3/5,
 done 2026-07-13) pin the internal mechanism; see the Synthesis below.
 
+### DIAG-7 — Correction: significance of the FULL−B1 gap  *(pre-registered 2026-07-13, before the McNemar run)*
+
+External review flagged that the sharpening bullet above — "the register updates
+**cost 2.4 pts** of pool coverage … its updates *actively shrink the reachable
+pool*" — over-reads a **4-problem** paired difference (FULL 135/164 vs B1 139/164).
+This is the same evidence strength DIAG-1 correctly *refused* to call "the register
+hurts" (n=26, Δ=2). The DIAG-7 causal phrasing is therefore inconsistent with
+DIAG-1 and is the one to fix. **The pre-registered DIAG-7 *prediction* (ordering
+B1>FULL>B2 with point values) is untouched and still held** — only the interpretive
+prose claiming a *significant* FULL−B1 harm is under correction (append, don't
+revise).
+
+**Test (pre-registered):** McNemar on the paired per-problem coverage discordance,
+exact binomial (small counts), for FULL vs B1, B1 vs B2, FULL vs B2.
+
+**Pre-registered expectation:** FULL vs B1 **non-significant** (p ≳ 0.2) — the point
+estimate stays on the harm side but within paired noise; B1 vs B2 and FULL vs B2
+**significant** (the 23-problem B2 crash is real and large). Corrected headline if
+it lands: *no evidence the register improves pool coverage (measured six ways, all
+null); only the text channel's degradation is statistically established.*
+
+---
+
+## DIAG-8 — Anchoring (content) vs prompt degradation (format): why does B2's pool crash?  *(CPU · committed data · pre-registered 2026-07-13, before the run)*
+
+DIAG-7's most novel finding — pool coverage degrades monotonically in channel
+bandwidth — confounds **bandwidth** with two mechanisms Phase 3 must tell apart:
+(a) **anchoring (content):** conditioning on the failed candidate makes G generate
+variations on its own mistake; (b) **prompt degradation (format):** an instruct
+model never trained to condition on a prior attempt simply generates worse under
+the unfamiliar ~2× prompt, regardless of content. DIAG-7 inferred (a) and measured
+neither; DIAG-3 already refuted the *diversity-narrowing* form of anchoring **for
+the register**, so (a) is weaker than it looks. Load-bearing: under (a) "low
+bandwidth is a feature" motivates Phase 3's abstraction-not-candidate design; under
+(b) B2's 0.707 is a formatting artifact and Phase 3 changes shape.
+
+**Metric:** normalized edit distance `1 − difflib.SequenceMatcher(None,a,b).ratio()`
+on extracted `code` — the exact DIAG-3 metric (numbers compare directly to DIAG-3's
+within-r₀ 0.252 / within-r₇ 0.297). Three quantities, mean over the 164 problems:
+- `d_consec` — B2 adjacent pairs `dist(code[i], code[i−1])`, i=1..7 (the anchored
+  transitions; step 0 is un-anchored, prompt 191 tok vs ~360 for steps 1–7);
+- `d_b2_all` — B2 all C(8,2) pairs (B2's intrinsic-diversity control; holds B2
+  generation fixed);
+- `d_b1_all` — B1 all C(8,2) pairs (i.i.d. baseline).
+
+**Decision rule (pre-registered):**
+- **Anchoring** if `d_consec < d_b1_all` **and** `d_consec < d_b2_all` — chained
+  candidates cluster, both vs i.i.d. and vs B2's own non-adjacent pairs. Bandwidth
+  story holds.
+- **Prompt degradation** if `d_consec ≈ d_b2_all ≈ d_b1_all` yet B2 pass rate lower
+  — B2 no more clustered than i.i.d., just worse. 0.707 is a formatting artifact.
+
+**Pre-registered prediction:** *partial anchoring* — `d_consec ≈ 0.75 × d_b1_all`
+(roughly a quarter tighter), and below `d_b2_all` too. Genuine prior: an instruct
+model handed its own prior attempt predominantly edits it; but DIAG-3's refuted
+diversity-narrowing and the review's caution keep the degradation branch open.
+
+**Output:** `artifacts/diag8_anchoring.json` (`scripts/diag8_anchoring.py`).
+
+---
+
+## DIAG-9 — Semantic anchoring & refinement trajectory: does B2 loop on its own failure mode?  *(CPU · committed data · pre-registered 2026-07-13, before the run)*
+
+DIAG-8 tests anchoring at the surface (edit distance); DIAG-9 tests it semantically
+and asks whether the text channel *refines at all*. Uses B2's committed per-step
+`error_type` and `frac_tests`.
+
+**Metrics:**
+- **error-type persistence:** P(`error_type[i]` == `error_type[i−1]` | both steps
+  fail) vs the chance rate (share of the modal error type among failing steps).
+  Excess ⇒ B2 stuck on the same failure mode.
+- **refinement trajectory:** mean `frac_tests` by step index 0..7 — does
+  conditioning on the prior attempt raise the fraction of tests passed across steps
+  (genuine refinement) or stay flat/decline (net-harm)?
+
+**Decision rule / pre-registered prediction:**
+- If error-type persists **above** chance **and** frac_tests is **flat/declining** →
+  semantic content-anchoring confirmed: B2 loops on its own failure mode,
+  "refinement" doesn't refine (corroborates DIAG-8 anchoring + DIAG-7 net-harm).
+- If error-type at chance and frac_tests flat → no semantic anchoring; degradation
+  is generic.
+- **Prediction (committed):** error-type persistence **modestly above** chance;
+  frac_tests **flat across steps** (no monotone climb) — the text channel neither
+  refines nor productively diversifies.
+
+**Output:** `artifacts/diag9_error_persistence.json` (`scripts/diag9_error_persistence.py`).
+
 ---
 
 ## Roll-up — all diagnostics closed (2026-07-13)
