@@ -217,6 +217,8 @@ cannot exceed the i.i.d. envelope even on its best-case stratum with rich feedba
 the refinement direction is dead, a clean final negative that forecloses F2's escape
 hatch.
 
+**Add-on (Addendum III §4) — cross feedback-richness × temperature.** The escape-distance law reframes ABSTRACT's mechanism as *directed escape*: temperature supplies escape energy, rich feedback supplies escape direction. So run ABSTRACT (and B1-50) across T ∈ {0.8, 1.2} × feedback ∈ {~2-bit `error_class`, rich abstraction}. **Prediction:** the two are *substitutes at the margin* (either buys some escape) but *complements in the limit* (only rich-feedback × high-T gives directed escape; undirected escape at high T is just resampling, so 2-bit × high-T ≈ B1-50). If rich feedback adds nothing that temperature alone cannot buy (pure substitutes), that is a **deflationary result about the whole self-refinement paradigm** — worth stating plainly, first.
+
 ---
 
 ## 4. The adjusted claim (what this is all for)
@@ -307,10 +309,49 @@ collect the pull without paying the tax). Output: `artifacts/dmeasure_conditioni
 (E0 coverage 0.65 / 0.92 / 0.90.)
 
 - **(a) E1 ≈ E2 — FALSIFIED.** Framing produces a large, consistent split in *both* axes at every T. But the split runs **opposite to Tsui**: the pre-registered trigger was "E2 *pulls markedly less* (anchors less) → Tsui on code." Instead E2 **anchors *more*** (lower edit distance to the failed artifact: 0.043/0.068/0.157 vs E1 0.075/0.176/0.309) while **repairing *less*** (coverage 0.10/0.22/0.40 vs E1 0.20/0.52/0.62). So provenance/framing matters, but "your previous attempt — improve it" is a *better* repair scaffold than "someone else's submission — write a correct solution," which is the reverse of a self-anchoring blind spot. **Caveat (honest):** E1↔E2 differ in provenance label *and* instruction verb ("improve" vs "write correct") — a bundled contrast, so the repair-rate gap is not cleanly attributable to provenance alone. Not clean Tsui, not clean provenance-irrelevance.
-- **(b) E5 neutral attractor — SIGN CONFIRMED (emphatically), magnitude reframed.** Aim the attractor at a *correct* artifact and coverage → **1.00 at every temperature** (TAX negative — conditioning *adds* pass-coverage vs i.i.d.). At greedy it near-reproduces the correct code (PULL 0.020 → sim 0.98). The attractor amplifies **whatever it is aimed at**: aimed at failure, coverage collapses to 0.10–0.62; aimed at success, 1.00. The "pulls as hard as E1" clause is not directly testable (different target artifact), but reproduction-strength is symmetric across sign. This is the empirical charter for **BEST-SO-FAR**.
+- **(b) E5 neutral attractor — SIGN CONFIRMED (emphatically), magnitude reframed.** Aim the attractor at a *correct* artifact and coverage → **1.00 at every temperature** (TAX negative — conditioning *adds* pass-coverage vs i.i.d.). At greedy it near-reproduces the correct code (PULL 0.020 → sim 0.98). The attractor amplifies **whatever it is aimed at**: aimed at failure, coverage collapses to 0.10–0.62; aimed at success, 1.00. The "pulls as hard as E1" clause is not directly testable (different target artifact), but reproduction-strength is symmetric across sign. This is the empirical charter for **BEST-SO-FAR**. **[RETRACTED — Addendum III §1. E5 (a *fully correct* artifact) is answer-leakage: greedy coverage 1.00 at PULL 0.020 = 98% string copy of the answer we handed it. That charters nothing about the *partial-credit* regime BEST-SO-FAR lives in. What survives: E5's PULL (0.020/0.066/0.168) ≈ E2's (0.043/0.068/0.157) → the attractor's strength is invariant to whether the target is correct — content-blindness, the defensible "neutral attractor." The real BEST-SO-FAR premise test is D2c/E6.]**
 - **(c) TAX monotone↑ in T, →0 at greedy — FALSIFIED as measured.** E1 TAX is *largest* at greedy and *decreases* in T (0.45 → 0.40 → 0.28). Two reasons: (i) the metric is pass-coverage tax, not the diversity tax the prediction imagined; (ii) greedy ns=1 vs T>0 ns=8 confounds the greedy row. The clean unconfounded facts (matched ns at T>0): conditioning on a **failure** costs 0.28–0.70 pass-coverage; conditioning on a **success** gains it. **Self-Debug reconciliation survives, but via a different mechanism than predicted:** Self-Debug helps not because greedy dodges a diversity tax, but because execution-guided repair aims the attractor at a *corrected* target (E5-like, negative tax) rather than a raw failed one (E1/E2-like, positive tax).
 
-**Headline.** Anchoring is a **neutral distributional attractor** whose sign is set entirely by its target: every harm in the RGR record traces to conditioning on failures, and E5 shows the same mechanism yields total success when aimed at a correct artifact. Directly motivates BEST-SO-FAR (aim it at the best candidate seen). Provenance is *not* irrelevant, but the effect is a framing/instruction bundle opposite to Tsui's self-anchoring direction, not a "self" blind spot.
+**Headline.** Anchoring is a **neutral distributional attractor** whose sign is set entirely by its target: every harm in the RGR record traces to conditioning on failures, and E5 shows the same mechanism yields total success when aimed at a correct artifact. Directly motivates BEST-SO-FAR (aim it at the best candidate seen). Provenance is *not* irrelevant, but the effect is a framing/instruction bundle opposite to Tsui's self-anchoring direction, not a "self" blind spot. **[SUPERSEDED — Addendum III §1/§6-D2a. The "opposite to Tsui" directional read overclaims: E1↔E2 confounds attribution with the *verb* ("improve it" vs "write a correct solution"), and the verb alone predicts the whole split a priori. E1 vs E2 is therefore *uninterpretable* for provenance; the Tsui question is OPEN pending the D2a 2×2. No related-work/provenance claim may be made until D2a returns.]**
+
+## Addendum III (2026-07-14) — the escape-distance reframe *(D-measure re-read; predictions above stand)*
+
+D-measure's own writeup buried the finding and leaned on a leaked answer (E5). Corrections, append-only:
+
+**§1 — E5 retracted as "charter"; content-blindness kept.** See the inline `[RETRACTED]` on the (b) bullet. E5 conditioned on a *fully correct* solution → the model copies it (greedy PULL 0.020, coverage 1.00). That is answer-leakage, and it is the degenerate endpoint (copying is optimal), not the partial-credit regime BEST-SO-FAR occupies. The defensible residue: **E5 PULL ≈ E2 PULL** → attractor strength is invariant to target correctness = **content-blindness**. The mechanism does not know what it points at.
+
+**§2 — the escape-distance law (the actual finding).** Sort every failure-conditioned cell by PULL:
+
+| PULL (escape distance) | coverage |
+|---|---|
+| 0.043 (E2, T=0) | 0.10 |
+| 0.068 (E2, T=0.8) | 0.22 |
+| 0.075 (E1, T=0) | 0.20 |
+| 0.157 (E2, T=1.2) | 0.40 |
+| 0.176 (E1, T=0.8) | 0.52 |
+| 0.309 (E1, T=1.2) | 0.62 |
+
+Monotone across two conditions × three temperatures (one trivial inversion). **When conditioned on a failure, the single variable that predicts repair is how far you escape it** — not provenance, not framing. Anchoring *is* failure-to-escape. E1 vs E2 differ only in escape distance; temperature is an escape knob; E5 is the degenerate case where escape is unnecessary. One variable subsumes the run and absorbs the prior record: DIAG-8's 0.35× diversity, DIAG-9b's error-echo, DIAG-7's coverage collapse are all *low escape distance* measured three ways.
+
+**§3 — temperature is an anti-anchoring intervention, dose-responsive (the cleanest result, ns=8 throughout — no confound).** Hold ns=8, move T 0.8→1.2:
+
+| condition | T=0.8 → 1.2 | Δ coverage |
+|---|---|---|
+| E0 (no anchor) | 0.92 → 0.90 | −0.02 — flat |
+| E1 (anchored) | 0.52 → 0.62 | +0.10 |
+| E2 (more anchored) | 0.22 → 0.40 | +0.18 |
+
+Temperature rescues **only** the anchored conditions (unanchored E0 is already saturated), and the effect is **dose-responsive**: E2 (more anchored, lower PULL) gains ~2× E1. This belongs in the paper as a first-class finding. (D2b re-reports it on the confound-free mean-per-sample-pass metric.)
+
+**§4 — prediction (c) was falsified *backwards*; the corrected reconciliation is sharper.** I predicted TAX rises with T, →0 at greedy. It *falls* (0.45→0.40→0.28): higher T buys escape, so **greedy is the worst case for anchoring, not the safe one** (PULL 0.043–0.075 = near-total reproduction). The "greedy has no pool to collapse" reconciliation is *refuted*, not repaired. Corrected: **escape needs a direction.** Self-Debug conditions on a failure *and supplies rich execution feedback* (traces, line-by-line) that tells the model where to diverge:
+
+- B2, no feedback → *undirected* escape → the model copies (PULL 0.075–0.309, coverage collapse).
+- B2+fb, ~2 bits (5-way `error_class`) → not enough to direct escape → still declined (−0.162).
+- Self-Debug, traces + explanations → *directed* escape → it works.
+
+**Escape requires direction; direction requires rich feedback.** This is R3's thesis with a mechanism. It predicts a **feedback-richness × temperature interaction** (substitutes at the margin — both buy escape; complements in the limit — T supplies escape *energy*, feedback supplies *direction*; undirected escape at high T is just resampling). Folded into R3 (§ below). *If they are pure substitutes, feedback does nothing temperature couldn't do more cheaply — a deflationary result about self-refinement we'd be first to state.*
+
+**Follow-ups (all parallel to R2; none gates it):** D2b (metric fix, free CPU — *running*) · D2a (verb×provenance 2×2, cheap GPU on committed pools — *running*, **blocks any Tsui/provenance claim**) · D2c/E6 (partial-credit conditioning — the real BEST-SO-FAR premise test, rides R2's enriched pools). Outputs: `dmeasure_conditioning.json` (per_sample_D2b), `dmeasure_d2a_verb_provenance.json`, `dmeasure_d2c_partial_credit.json`.
 
 ## BEST-SO-FAR — point the attractor at a success *(pre-registered; rides R2's enriched pools)*
 
@@ -324,3 +365,14 @@ oracle-BEST doesn't help, verifier-BEST can't). Primary: pass@1 matched compute.
 favourite. Depends on §1 (per-test frac) + R2 (feedback-rich pool). Convergence to name:
 BEST-SO-FAR = "condition on the lowest-energy candidate seen" = the original relaxation
 dynamics, needing exactly the graded landscape the feedback-richness criterion hunted for.
+
+**REVISED predictions (Addendum III §5 — original above stands).** The escape-distance law deflates BEST-SO-FAR: if conditioning reproduces at 83–98% fidelity, conditioning on an 11/27 candidate yields an ~11/27 candidate — you anchor to a *better failure*, you don't fix the remaining tests.
+
+| condition | original | revised |
+|---|---|---|
+| BEST > LAST | ~80% | ~80% — **stands** (anchors somewhere strictly better) |
+| BEST vs B1 | (unstated) | **≈ hold-at-best, no gain** over the pool's best — reproduction fidelity forbids improvement |
+| BEST vs ABSTRACT | "genuinely open" | **ABSTRACT favoured** — ABSTRACT supplies *direction*; BEST supplies only a starting point |
+| BEST+ABSTRACT | "the favourite" | **the only condition with a mechanism** — best candidate = good start, abstraction = the escape *direction* |
+
+D2c/E6 (partial-credit conditioning) is the premise test: if a ~40–60% candidate reproduces at ~same frac_tests, BEST-alone is dead and BEST+ABSTRACT carries the phase; if frac_tests *climbs*, the attractor does more than copy and BEST-SO-FAR is a bigger result than scoped. ORACLE-first ranking unchanged.

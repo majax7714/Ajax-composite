@@ -564,3 +564,297 @@ def r1b2d_gen_main(k: int = 8):
     pas = sum(1 for r in rows if r.get("passed"))
     print(f"R1b.2d gen: {len(rows)} MBPP candidates (train {tr}, val {va}), "
           f"passed {pas} ({pas/len(rows):.3f}). wrote runs/modal/r1b2d_mbpp_labeled.json")
+
+
+@app.function(image=IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=7200)
+def dmeasure_gen(artifacts: list, n: int = 8):
+    """D-measure — single-step conditioning. For each problem × condition × temp,
+    generate samples and compute PULL (edit distance to the conditioned artifact).
+    Execution/TAX done by the local entrypoint. [PHASE_3R Addendum II §3]."""
+    import difflib
+    import os
+
+    os.chdir("/root/rgr")
+    from transformers import AutoTokenizer
+
+    from rgr.generator.formatting import SYSTEM_PROMPT, build_prompt, extract_code
+    from vllm import LLM, SamplingParams
+
+    tok = AutoTokenizer.from_pretrained(MODEL)
+    llm = LLM(model=MODEL, dtype="bfloat16", gpu_memory_utilization=0.90,
+              max_model_len=4096, seed=17)
+
+    def chat(user):
+        return tok.apply_chat_template(
+            [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": user}],
+            add_generation_prompt=True, tokenize=False)
+
+    def user_prompt(a, cond):
+        base = build_prompt(a["prompt"])
+        if cond == "E0":
+            return base
+        if cond == "E1":
+            return (base + f"\n\nYour previous attempt:\n```python\n{a['fail']}\n```\n"
+                    "Write an improved complete solution as a single fenced Python code block.")
+        if cond == "E2":
+            return (base + f"\n\nA submission from another programmer:\n```python\n{a['fail']}\n```\n"
+                    "Write a correct complete solution as a single fenced Python code block.")
+        if cond == "E5":
+            return (base + f"\n\nA previous attempt:\n```python\n{a['correct']}\n```\n"
+                    "Write a complete solution as a single fenced Python code block.")
+
+    conds = ["E0", "E1", "E2", "E5"]
+    temps = [0.0, 0.8, 1.2]
+    out = []
+    for T in temps:
+        ns = 1 if T == 0.0 else n
+        items = [(a, c) for a in artifacts for c in conds]
+        prompts = [chat(user_prompt(a, c)) for a, c in items]
+        sp = SamplingParams(n=ns, temperature=T, top_p=0.95, max_tokens=512,
+                            seed=17, logprobs=None)
+        outs = llm.generate(prompts, sp)
+        for (a, c), req in zip(items, outs):
+            codes = [extract_code(o.text) for o in req.outputs]
+            art = a["fail"] if c in ("E1", "E2") else (a["correct"] if c == "E5" else None)
+            pulls = [1.0 - difflib.SequenceMatcher(None, cd, art).ratio()
+                     for cd in codes if cd and art] if art else []
+            out.append({"pid": a["pid"], "cond": c, "temp": T, "codes": codes,
+                        "pull": (sum(pulls) / len(pulls)) if pulls else None})
+    return {"results": out}
+
+
+@app.local_entrypoint()
+def dmeasure_main(n_problems: int = 60):
+    """Build artifacts from the bf16 M3 pool (a failed + a correct candidate per
+    problem), generate conditioned samples (L4), execute locally (Daytona) → TAX +
+    pass, aggregate PULL/TAX per condition × temperature."""
+    import json as _json
+    import os
+    import statistics as _st
+    from collections import defaultdict
+
+    os.chdir(str(REPO))
+    from rgr.config import load_config
+    from rgr.data.humaneval import load_humaneval
+    from rgr.execution.sandbox import DaytonaBackend
+    from rgr.training.labels import ExecutionPool
+    from rgr.types import Candidate, SplitRole
+
+    m3 = _json.loads((REPO / "runs/modal/m3_candidates.json").read_text())
+    labels = _json.loads((REPO / "runs/modal/m3_labels.json").read_text())["labels"]
+    he = {p.problem_id: p for p in load_humaneval().checkout(SplitRole.HELDOUT_EVAL)}
+    arts = []
+    for pid, row, lab in zip(m3["problem_ids"], m3["candidates"], labels):
+        fail = next((c["code"] for c, p in zip(row, lab) if not p and c["code"]), None)
+        good = next((c["code"] for c, p in zip(row, lab) if p and c["code"]), None)
+        if fail and good:
+            arts.append({"pid": pid, "prompt": he[pid].prompt, "fail": fail, "correct": good})
+        if len(arts) >= n_problems:
+            break
+
+    gen = dmeasure_gen.remote(arts)
+    (REPO / "runs/modal").mkdir(parents=True, exist_ok=True)
+    (REPO / "runs/modal/dmeasure_gen.json").write_text(_json.dumps(gen))
+
+    # execute all generated samples locally (Daytona) for pass/coverage
+    cfg = load_config("configs/phase0_harness.toml")
+    pool = ExecutionPool(lambda: DaytonaBackend(cfg.execution.timeout_seconds), size=8)
+    passed = {}  # (pid,cond,temp) -> [bool per sample]
+    try:
+        for r in gen["results"]:
+            prob = he[r["pid"]]
+            cands = [Candidate(text="", code=cd) for cd in r["codes"]]
+            passed[(r["pid"], r["cond"], r["temp"])] = [e.passed for e in pool.execute_all(prob, cands)]
+    finally:
+        pool.close()
+
+    # aggregate: PULL (mean) and coverage per (cond,temp); TAX = cov(E0) - cov(cond)
+    pull = defaultdict(list)
+    cov = defaultdict(list)  # (cond,temp) -> per-problem covered(0/1)
+    for r in gen["results"]:
+        key = (r["cond"], r["temp"])
+        if r["pull"] is not None:
+            pull[key].append(r["pull"])
+        ps = passed[(r["pid"], r["cond"], r["temp"])]
+        cov[key].append(1.0 if any(ps) else 0.0)
+
+    summary = {}
+    for c in ["E0", "E1", "E2", "E5"]:
+        for T in [0.0, 0.8, 1.2]:
+            k = (c, T)
+            summary[f"{c}@{T}"] = {
+                "pull": (sum(pull[k]) / len(pull[k])) if pull[k] else None,
+                "coverage": (sum(cov[k]) / len(cov[k])) if cov[k] else None,
+                "tax_vs_E0": ((sum(cov[('E0', T)]) / len(cov[('E0', T)])) -
+                              (sum(cov[k]) / len(cov[k]))) if (cov[k] and cov[('E0', T)]) else None,
+            }
+    result = {"_label": "D-measure — single-step conditioning; PULL + TAX by condition×temp",
+              "n_problems": len(arts), "summary": summary}
+    (REPO / "artifacts/dmeasure_conditioning.json").write_text(_json.dumps(result, indent=2))
+    print(f"\n=== D-measure ({len(arts)} problems) — PULL (edit-dist to artifact) / coverage / TAX ===")
+    print(f"{'cond@T':<10}{'PULL':>8}{'coverage':>10}{'TAX_vs_E0':>11}")
+    for c in ["E0", "E1", "E2", "E5"]:
+        for T in [0.0, 0.8, 1.2]:
+            s = summary[f"{c}@{T}"]
+            pl = f"{s['pull']:.3f}" if s['pull'] is not None else "  -  "
+            tx = f"{s['tax_vs_E0']:+.3f}" if s['tax_vs_E0'] is not None else "  -  "
+            print(f"{c+'@'+str(T):<10}{pl:>8}{s['coverage']:>10.3f}{tx:>11}")
+    print("\nkey: E1≈E2 → provenance irrelevant; E5 pull≈E1 but high coverage → neutral attractor;")
+    print("     TAX rising in T, ~0 at greedy → Self-Debug reconciliation.")
+    print("wrote artifacts/dmeasure_conditioning.json")
+
+
+# ---- D2a: verb × provenance 2×2 [PHASE_3R Addendum III §6-D2a] ----
+# E1/E2 confound attribution ("your"/"someone else's") with verb ("improve"/"write
+# correct"). All four cells condition on the SAME failed artifact; only the prompt
+# changes. E1 vs E2' isolates PROVENANCE (same verb); E1 vs E1' isolates the VERB.
+_D2A = {  # cond -> (attribution_line, instruction)
+    "E1":  ("Your previous attempt:",                "Write an improved complete solution as a single fenced Python code block."),
+    "E1p": ("Your previous attempt:",                "Write a correct complete solution as a single fenced Python code block."),
+    "E2p": ("A submission from another programmer:",  "Write an improved complete solution as a single fenced Python code block."),
+    "E2":  ("A submission from another programmer:",  "Write a correct complete solution as a single fenced Python code block."),
+}
+
+
+@app.function(image=IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=7200)
+def dmeasure_d2a_gen(artifacts: list, n: int = 8):
+    """Generate the verb×provenance 2×2, all conditioned on a['fail']. PULL = edit
+    distance to that (single, shared) failed artifact — directly comparable across cells."""
+    import difflib
+    import os
+
+    os.chdir("/root/rgr")
+    from transformers import AutoTokenizer
+
+    from rgr.generator.formatting import SYSTEM_PROMPT, build_prompt, extract_code
+    from vllm import LLM, SamplingParams
+
+    tok = AutoTokenizer.from_pretrained(MODEL)
+    llm = LLM(model=MODEL, dtype="bfloat16", gpu_memory_utilization=0.90,
+              max_model_len=4096, seed=17)
+
+    def chat(user):
+        return tok.apply_chat_template(
+            [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": user}],
+            add_generation_prompt=True, tokenize=False)
+
+    def user_prompt(a, cond):
+        attrib, instr = _D2A[cond]
+        return (build_prompt(a["prompt"]) + f"\n\n{attrib}\n```python\n{a['fail']}\n```\n" + instr)
+
+    conds = ["E1", "E1p", "E2p", "E2"]
+    temps = [0.0, 0.8, 1.2]
+    out = []
+    for T in temps:
+        ns = 1 if T == 0.0 else n
+        items = [(a, c) for a in artifacts for c in conds]
+        prompts = [chat(user_prompt(a, c)) for a, c in items]
+        sp = SamplingParams(n=ns, temperature=T, top_p=0.95, max_tokens=512,
+                            seed=17, logprobs=None)
+        outs = llm.generate(prompts, sp)
+        for (a, c), req in zip(items, outs):
+            codes = [extract_code(o.text) for o in req.outputs]
+            art = a["fail"]  # every cell conditions on the same failed artifact
+            pulls = [1.0 - difflib.SequenceMatcher(None, cd, art).ratio()
+                     for cd in codes if cd]
+            out.append({"pid": a["pid"], "cond": c, "temp": T, "codes": codes,
+                        "pull": (sum(pulls) / len(pulls)) if pulls else None})
+    return {"results": out}
+
+
+@app.local_entrypoint()
+def dmeasure_d2a_main(n_problems: int = 60):
+    """Verb×provenance 2×2 on the committed bf16 M3 pool. Reports PULL, coverage, and
+    mean per-sample pass for E1/E1'/E2'/E2, plus the two isolating contrasts."""
+    import json as _json
+    import os
+    from collections import defaultdict
+
+    os.chdir(str(REPO))
+    from rgr.config import load_config
+    from rgr.data.humaneval import load_humaneval
+    from rgr.execution.sandbox import DaytonaBackend
+    from rgr.training.labels import ExecutionPool
+    from rgr.types import Candidate, SplitRole
+
+    m3 = _json.loads((REPO / "runs/modal/m3_candidates.json").read_text())
+    labels = _json.loads((REPO / "runs/modal/m3_labels.json").read_text())["labels"]
+    he = {p.problem_id: p for p in load_humaneval().checkout(SplitRole.HELDOUT_EVAL)}
+    arts = []
+    for pid, row, lab in zip(m3["problem_ids"], m3["candidates"], labels):
+        fail = next((c["code"] for c, p in zip(row, lab) if not p and c["code"]), None)
+        good = next((c["code"] for c, p in zip(row, lab) if p and c["code"]), None)
+        if fail and good:
+            arts.append({"pid": pid, "prompt": he[pid].prompt, "fail": fail, "correct": good})
+        if len(arts) >= n_problems:
+            break
+
+    gen = dmeasure_d2a_gen.remote(arts)
+    (REPO / "runs/modal").mkdir(parents=True, exist_ok=True)
+    (REPO / "runs/modal/dmeasure_d2a_gen.json").write_text(_json.dumps(gen))
+
+    cfg = load_config("configs/phase0_harness.toml")
+    pool = ExecutionPool(lambda: DaytonaBackend(cfg.execution.timeout_seconds), size=8)
+    passed = {}
+    try:
+        for r in gen["results"]:
+            prob = he[r["pid"]]
+            cands = [Candidate(text="", code=cd) for cd in r["codes"]]
+            passed[(r["pid"], r["cond"], r["temp"])] = [bool(e.passed) for e in pool.execute_all(prob, cands)]
+    finally:
+        pool.close()
+
+    pull = defaultdict(list)
+    cover = defaultdict(list)
+    meanp = defaultdict(list)
+    for r in gen["results"]:
+        k = (r["cond"], r["temp"])
+        if r["pull"] is not None:
+            pull[k].append(r["pull"])
+        ps = passed[(r["pid"], r["cond"], r["temp"])]
+        if ps:
+            cover[k].append(1.0 if any(ps) else 0.0)
+            meanp[k].append(sum(ps) / len(ps))
+
+    def avg(d, k):
+        return (sum(d[k]) / len(d[k])) if d[k] else None
+
+    conds, temps = ["E1", "E1p", "E2p", "E2"], [0.0, 0.8, 1.2]
+    cells = {}
+    for c in conds:
+        for T in temps:
+            k = (c, T)
+            cells[f"{c}@{T}"] = {"pull": avg(pull, k), "coverage": avg(cover, k),
+                                 "mean_pass": avg(meanp, k), "ns": 1 if T == 0.0 else 8}
+    result = {"_label": "D2a — verb×provenance 2×2, all on a['fail']",
+              "legend": {"E1": "self+improve", "E1p": "self+write-correct",
+                         "E2p": "other+improve", "E2": "other+write-correct"},
+              "n_problems": len(arts), "cells": cells}
+    (REPO / "artifacts/dmeasure_d2a_verb_provenance.json").write_text(_json.dumps(result, indent=2))
+
+    print("\n=== D2a — verb × provenance 2×2 (all conditioned on the SAME failed artifact) ===")
+    print(f"{'cell':<8}{'attrib+verb':<22}{'PULL':>8}{'mean_pass':>11}{'cov':>7}")
+    for c in conds:
+        for T in temps:
+            s = cells[f"{c}@{T}"]
+            pl = f"{s['pull']:.3f}" if s['pull'] is not None else "  -  "
+            mp = f"{s['mean_pass']:.3f}" if s['mean_pass'] is not None else "  -  "
+            lab = result["legend"][c] if T == 0.0 else ""
+            print(f"{c+'@'+str(T):<8}{lab:<22}{pl:>8}{mp:>11}{s['coverage']:>7.2f}")
+
+    def cmp(a, b, T):
+        sa, sb = cells[f"{a}@{T}"], cells[f"{b}@{T}"]
+        if None in (sa["pull"], sb["pull"]):
+            return
+        print(f"  T={T}: {a} PULL {sa['pull']:.3f} mean_pass {sa['mean_pass']:.3f}  vs  "
+              f"{b} PULL {sb['pull']:.3f} mean_pass {sb['mean_pass']:.3f}   "
+              f"ΔPULL {sa['pull']-sb['pull']:+.3f} Δpass {sa['mean_pass']-sb['mean_pass']:+.3f}")
+
+    print("\n-- PROVENANCE (E1 vs E2', same 'improve' verb, self vs other) --")
+    for T in temps:
+        cmp("E1", "E2p", T)
+    print("-- VERB (E1 vs E1', same 'your' attribution, improve vs write-correct) --")
+    for T in temps:
+        cmp("E1", "E1p", T)
+    print("\nprediction: verb explains most; provenance little. E1≈E2' → provenance "
+          "near-irrelevant, distinct from Tsui. wrote artifacts/dmeasure_d2a_verb_provenance.json")

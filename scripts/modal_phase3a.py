@@ -193,6 +193,64 @@ def bcb_generate(n_problems: int = 60, k: int = 50, seed: int = 17,
     return {"problems": problems, "k": k}
 
 
+BASE_MODEL = "Qwen/Qwen2.5-Coder-1.5B"  # completion model — deeper pass@k tail (R2)
+# truncate a base-model completion at the first top-level construct after the body
+_BASE_STOP = ["\ndef ", "\nclass ", "\nif __name__", "\n@", "\nprint(",
+              "\nassert ", "\n# Test", "\n```", "\nExample"]
+
+
+@app.function(image=GEN_IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=7200)
+def r2_generate(n_problems: int = 200, k: int = 50, seed: int = 17,
+                dataset: str = "bigcode/bigcodebench", arch: str = "base",
+                temperature: float = 1.0, top_p: float = 1.0):
+    """R2 tail-un-suppression sweep [PHASE_3R.md R2]. Random samples only (D15).
+    arch='base' → completion model on `complete_prompt` (code = prompt+continuation,
+    truncated at the next top-level construct); arch='instruct' → chat on
+    `instruct_prompt` (fenced extraction). top_p/temperature swept to lift the tail
+    nucleus/Instruct-collapse suppress. Returns the same shape bcb_exec consumes."""
+    import random as _rnd
+    from datasets import load_dataset
+    from transformers import AutoTokenizer
+    from vllm import LLM, SamplingParams
+
+    ds = load_dataset(dataset, split="v0.1.4")
+    order = list(range(len(ds)))
+    _rnd.Random(seed).shuffle(order)              # random-sample only
+    idx = order[:min(n_problems, len(ds))]
+    model = BASE_MODEL if arch == "base" else MODEL
+    tok = AutoTokenizer.from_pretrained(model)
+    SYS = ("You are a Python programming assistant. Answer with a single fenced "
+           "Python code block containing a complete solution, and nothing else.")
+
+    if arch == "base":
+        prompts = [ds[i]["complete_prompt"] for i in idx]
+        stop = _BASE_STOP
+    else:
+        prompts = [tok.apply_chat_template(
+            [{"role": "system", "content": SYS},
+             {"role": "user", "content": ds[i]["instruct_prompt"]}],
+            add_generation_prompt=True, tokenize=False) for i in idx]
+        stop = None
+
+    llm = LLM(model=model, dtype="bfloat16", gpu_memory_utilization=0.90,
+              max_model_len=4096, seed=seed)
+    sp = SamplingParams(n=k, temperature=temperature, top_p=top_p, max_tokens=1024,
+                        seed=seed, stop=stop)
+    outs = llm.generate(prompts, sp)
+
+    problems = []
+    for j, i in enumerate(idx):
+        if arch == "base":
+            # code = signature/docstring prompt + generated body (a full module)
+            codes = [ds[i]["complete_prompt"] + o.text for o in outs[j].outputs]
+        else:
+            codes = [_extract_code(o.text) for o in outs[j].outputs]
+        problems.append({"task_id": ds[i]["task_id"], "test": ds[i]["test"],
+                         "entry_point": ds[i]["entry_point"], "codes": codes})
+    return {"problems": problems, "k": k, "arch": arch,
+            "temperature": temperature, "top_p": top_p}
+
+
 @app.function(image=EXEC_IMAGE, timeout=7200, cpu=32.0, memory=65536)
 def bcb_exec(problems: list, timeout_s: int = 10, max_workers: int = 16) -> list:
     """Execute each candidate's code+unittest, HARDENED so a single candidate can
@@ -348,6 +406,56 @@ def exec_only(tag: str = "screen"):
     c = json.loads(Path(f"runs/modal/bcb_cand_{tag}.json").read_text())
     results = bcb_exec.remote(c["problems"])
     _finalize(c["problems"], results, c["dataset"], c["model"], c["k"], tag)
+
+
+@app.local_entrypoint()
+def r2_smoke(n_problems: int = 8, k: int = 8, arch: str = "base",
+             temperature: float = 1.0, dataset: str = "bigcode/bigcodebench"):
+    """Validate the base completion prompt/extraction path before the full R2 sweep
+    (pre-registered caveat: 'validate the prompt/extraction path before trusting any
+    number'). Prints a sample module, non-empty-body rate, and pass stats."""
+    from pathlib import Path
+    gen = r2_generate.remote(n_problems, k, 17, dataset, arch, temperature, 1.0)
+    probs = gen["problems"]
+    Path("runs/modal").mkdir(parents=True, exist_ok=True)
+    Path(f"runs/modal/r2_smoke_{arch}.json").write_text(json.dumps(gen))
+    results = bcb_exec.remote(probs, 8, 16)
+    # non-empty / runnable diagnostics
+    ncodes = sum(len(p["codes"]) for p in probs)
+    nnull = sum(1 for p in probs for c in p["codes"] if not c or len(c.strip()) < 5)
+    passed = sum(r["passed"] for res in results for r in res)
+    fracs = [r["frac"] for res in results for r in res if "frac" in r]
+    print(f"\n=== R2 smoke: {arch} @ T={temperature}, top_p=1.0 "
+          f"({n_problems} problems × k={k}) ===")
+    print(f"candidates {ncodes} | empty/degenerate {nnull} ({nnull/max(1,ncodes):.2f}) | "
+          f"passed {passed} ({passed/max(1,ncodes):.2f})")
+    if fracs:
+        print(f"frac_tests: mean {sum(fracs)/len(fracs):.3f}  "
+              f">0 {sum(f>0 for f in fracs)/len(fracs):.2f}  ==1 {sum(f>=1 for f in fracs)/len(fracs):.2f}")
+    print("--- sample extracted module (problem 0, candidate 0) ---")
+    print((probs[0]["codes"][0] or "<none>")[:600])
+    print("--- errors ---")
+    from collections import Counter
+    print(dict(Counter(r["err"] for res in results for r in res)))
+
+
+@app.local_entrypoint()
+def r2_screen(n_problems: int = 200, k: int = 50, dataset: str = "bigcode/bigcodebench",
+              arch: str = "base", temperature: float = 1.0, workers: int = 16):
+    """One R2 sweep cell: generate (random samples) → persist → exec (fixed judge) →
+    score pass@8 / pass@50−pass@8 against the gate. tag = r2_<arch>_T<temp>."""
+    from pathlib import Path
+    tag = f"r2_{arch}_T{str(temperature).replace('.', '')}"
+    gen = r2_generate.remote(n_problems, k, 17, dataset, arch, temperature, 1.0)
+    Path("runs/modal").mkdir(parents=True, exist_ok=True)
+    Path(f"runs/modal/bcb_cand_{tag}.json").write_text(json.dumps(
+        {"problems": gen["problems"], "k": k, "dataset": dataset,
+         "model": (BASE_MODEL if arch == "base" else MODEL),
+         "arch": arch, "temperature": temperature, "top_p": 1.0}))
+    results = bcb_exec.remote(gen["problems"], 8, workers)
+    _finalize(gen["problems"], results,
+              f"{dataset} [{arch}, T={temperature}, top_p=1.0]",
+              BASE_MODEL if arch == "base" else MODEL, k, tag)
 
 
 @app.local_entrypoint()
