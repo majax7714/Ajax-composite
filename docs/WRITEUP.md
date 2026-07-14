@@ -10,8 +10,10 @@ that reframing drives a stack rebuild (Phase M) and a pre-registered benchmark s
 and run records; sources cited inline as `[file]`. This is the canonical results
 document for the whole experiment; §§1–5 are the register experiment (Phases 0–2 +
 its diagnostic teardown, complete and frozen); §6 is the throughput/stack rebuild
-(Phase M, complete); §7 is the current phase (Phase 3 — reframe + benchmark screen,
-in progress). Read §7.4 for live status.*
+(Phase M, complete); §7 is Phase 3 (reframe + benchmark screen, complete: gate
+NEGATIVE/F2); §9 is the **current phase (Phase 3R** — auditing the two live claims
+H1 and F2, plus pinning the anchoring *mechanism*; in progress). Read §9.5 for live
+status. Every §4.2/§7.4 claim now carries a Phase-3R audit banner pointing into §9.*
 
 ---
 
@@ -69,6 +71,22 @@ could not i.i.d.-sample?) rather than a search for a heavy-tailed code benchmark
 may not exist. A methodological result falls out too: subset screening on the *first
 n* problems was ~2× optimistic vs random — caught by the confirmation step before any
 training was built on it.
+
+**Phase 3R (§9, in progress).** Before H1 and F2 are called final, both are audited
+against the Phase-0 choices they inherit. **R1** asks whether H1 is a *quantization
+artifact*: on bf16 the stack-invariant Selection-Efficiency metric shows likelihood
+alone (SE 0.305) nearly reproduces the 4-bit verifier benefit (SE 0.315) — the decider
+is a bf16 verifier retrain, running. **R2** asks whether F2's shallow tail is
+*decoding-induced* (top-p 0.95 + T 0.8 + Instruct all suppress the improbable tail);
+it re-screens with a base completion model, top-p 1.0, and a temperature sweep — base
+path validated, sweep running. Spun off from the DIAG-8 anchoring finding, **D-measure**
+converts "conditioning on a failure is harmful" into a law: repair is governed by
+**escape distance** (how far a generation diverges from the failed artifact), the
+benefit is a **coverage/diversity** effect not a per-sample-quality one (D2b), the
+attractor is **content-blind** and **provenance-independent** — distinct from Tsui's
+self-anchoring blind spot (D2a) — and the reconciliation with the self-refinement
+literature is that **escape requires direction, and direction requires rich feedback**.
+That last statement is the hypothesis R3 (conditional reachability) now tests directly.
 
 ---
 
@@ -174,13 +192,17 @@ pool 84.15% of the time, but self-fluency selection recovers only 62.80% —
 
 ### 4.2 H1: execution-grounded confidence beats self-fluency — PASS *(under audit — R1b)*
 
-> **⚠ Under audit ([PHASE_3R.md] R1).** R1a cleared H1 of the vLLM logprob bug (it was
-> port-introduced, never touched the HF Phase-1 likelihood arm; the Phase-0 lock has
-> 0/1312 null `mean_logprob`). But R1b is open: Phase-M/M4 showed V-v2b's within-problem
-> edge over likelihood collapsing +0.15 → +0.016 on the *non-quantized* bf16 candidate
-> distribution, raising the possibility that H1 partly measured "V beats
-> *quantization-corrupted* likelihood." **No H1 claim is final until R1b closes.** The
-> numbers below stand as originally computed on the retired 4-bit stack.
+> **⚠ Under audit ([PHASE_3R.md] R1; full detail §9.1).** R1a cleared H1 of the vLLM
+> logprob bug (port-introduced, never touched the HF Phase-1 likelihood arm; Phase-0
+> lock 0/1312 null `mean_logprob`). **R1b is the open, high-stakes leg:** on the
+> stack-invariant Selection-Efficiency metric (SE = (selected−random)/(oracle−random)),
+> bf16 *likelihood alone* reaches SE 0.305 — nearly the entire 4-bit V benefit
+> (SE 0.315) — so H1's edge may have been "V beats *quantization-corrupted* likelihood."
+> Free checks closed the mundane escapes (R1b.2b: V does discriminate subtle
+> wrong_answer-only failures, within-AUROC 0.751; R1b.2c: not a length artifact). **The
+> decider is R1b.2d — a bf16 verifier retrain, running now; kill line: retrained-V bf16
+> SE ≤ 0.305 → H1 does not survive de-quantization.** No H1 claim is final until it
+> lands. Numbers below stand as originally computed on the retired 4-bit stack.
 
 Evaluation set: the frozen Phase-0 candidates (1,312 held-out HumanEval
 candidates with execution labels and stored mean token log-probabilities).
@@ -559,6 +581,16 @@ entire reason a confirmation step exists.
 
 ### 7.4 Finding F2 — sample-based refinement has almost no runway on code at 0.5–1.5B
 
+> **⚠ Under audit ([PHASE_3R.md] R2; full detail §9.2).** F2's ≤0.12 headroom was
+> measured under three inherited tail-suppressors — top-p 0.95 (nucleus truncates the
+> improbable tail), temperature 0.8 (never swept), and Instruct tuning (entropy-collapsed
+> vs a base model's deeper pass@k tail). Its honest current scope is "*instruct* Qwen at
+> T=0.8/top-p=0.95 has a shallow tail." R2 re-screens with the tail un-suppressed
+> (base completion model, top-p 1.0, T∈{0.8,1.0,1.2}); **base path validated, sweep
+> running.** If any config clears pass@8∈[0.30,0.60] ∧ headroom≥0.15, F2 narrows to the
+> frozen config and the gate flips to PASS; if none does across base+instruct × 3 temps
+> un-truncated, F2 is *strengthened* (structural, decoding confound ruled out).
+
 F1's implication was pursued to **LiveCodeBench** (contamination-controlled; 400
 problems, ~27 test cases each; easy/medium/hard) via a new hardened stdin/stdout judge
 (per-case run, short-circuit on first failure, process-group-kill + rlimit sandboxing,
@@ -643,16 +675,144 @@ execution (12,100 runs; sandbox-fault rates 0.2% / 0.0% / 0.3%, faults scored as
 failures), and hardened subprocess judges (process-group kill + rlimits) for the
 Phase-3 benchmark screens ([scripts/modal_phase3a.py], [scripts/modal_lcb.py]).
 
+## 9. Phase 3R — auditing the two live claims, and the anchoring mechanism
+
+Phase 3 published two load-bearing results on *inherited* Phase-0 choices: **H1** (an
+execution verifier beats likelihood) and **F2** (no code benchmark here has a reachable
+tail). Phase 3R ([PHASE_3R.md]) refuses to call either final until the unexamined
+assumption each rests on is tested, and — spun off from the DIAG-8 anchoring finding —
+pins down the *mechanism* of refinement harm. Order: **R1 → R2 → R3** (cheapest/highest-
+stakes first). Standing rule unchanged: **append, never revise**; pre-register before
+running; honest negatives. A judge fix predates all of it: the Phase-3a stdin/stdout and
+BigCodeBench executors short-circuited on the first failing test, destroying the per-test
+`frac_tests` signal R3/BEST-SO-FAR need; both now run all cases and emit
+`{passed, n_tests, n_passed, frac, failing[], err, exc}` (committed `d6cbf37`).
+
+### 9.1 R1 — is H1 a quantization artifact? *(the H1 audit)*
+
+M4's flag (§6): V-v2b's within-problem edge over likelihood collapses +0.15 → +0.016 on
+bf16. The audit reframes H1 on a **stack-invariant** metric — **Selection Efficiency**,
+SE = (selected pass@1 − random pass@1) / (oracle pass@8 − random pass@1):
+
+- **R1a (closed — bug-clear).** The vLLM `cumulative_logprob` bug was port-only; the HF
+  Phase-1 likelihood arm was never touched (lock_a 0/1312 null). H1's number is not a
+  logprob-population artifact.
+- **R1b (open — the real question).** On bf16, **likelihood alone reaches SE 0.305**,
+  nearly the whole 4-bit verifier benefit (**SE 0.315**) — H1 may have measured "V beats
+  *quantization-corrupted* likelihood." Free CPU checks closed the mundane escapes:
+  **R1b.2b** — V is not just a brokenness detector (it discriminates *subtle*,
+  wrong_answer-only failures at within-AUROC **0.751**); **R1b.2c** — the bf16 likelihood
+  advantage is not a length artifact (sum-logprob / shortest-candidate do not rescue it).
+- **R1b.2d (running — the decider).** Retrain V on the bf16 MBPP distribution and re-score.
+  **Pre-committed kill line: retrained-V bf16 SE ≤ 0.305 → H1 does not survive
+  de-quantization.** Predicted SE ~0.33–0.38 (partial survival). Verdict pending.
+  [artifacts/r1b2b_stratified_auroc.json, r1b2c_length_bias.json].
+
+### 9.2 R2 — is F2's shallow tail structural or decoding-induced? *(the F2 audit)*
+
+F2 was measured under three independent **tail-suppressors**: `top_p=0.95` (nucleus
+truncates the improbable tail — the exact thing refinement hunts), `temperature=0.8`
+(never swept), and **Instruct** tuning (SFT/RLHF collapse generation entropy; base
+completion models have far deeper pass@k tails — the Codex/AlphaCode reason to sample
+from base models). R2 re-screens **BigCodeBench-Complete + LiveCodeBench-easy** across
+generator {**base**, Instruct} × `top_p=1.0` × T ∈ {0.8, 1.0, 1.2}, random samples, fixed
+judge. **Decision rule:** any config with pass@8 ∈ [0.30,0.60] **and** pass@50−pass@8 ≥
+0.15 → F2 retracted-as-structural, scope narrowed to the frozen config, **gate PASSES**;
+no config clears across base+instruct × 3 temps un-truncated → **F2 strengthened**
+(structural, decoding confound ruled out). **Base completion path validated** (smoke:
+64/64 well-formed modules, 0 degenerate, mean `frac_tests` 0.269, 44% pass ≥1 test —
+graded feedback present). Base BigCodeBench sweep (n=200, k=50) running; verdict pending.
+**Prediction:** a trade-off curve (base + hotter T deepens the tail but drops pass@8);
+most-likely one base point clears → F2 retracted-as-structural, with real uncertainty.
+
+### 9.3 The anchoring mechanism — D-measure *(the DIAG-8 spin-off, closed)*
+
+DIAG-8 showed conditioning on a failed candidate halves diversity. D-measure asks *what
+that anchoring is*: single-step conditioning on committed HumanEval pools, conditions
+E0 (i.i.d.) / E1 (self-fail) / E2 (foreign-fail) / E5 (correct), temps {0, 0.8, 1.2},
+measuring **PULL** = 1 − edit-similarity to the conditioned artifact. All pre-registered,
+append-only ([PHASE_3R.md] Addenda II/III):
+
+- **The escape-distance law.** Conditioned on a failure, the single variable that
+  predicts repair is **PULL** — how far the generation *escapes* the artifact. Coverage
+  is monotone in PULL across conditions × temperatures (0.043→0.62). Provenance and
+  framing are downstream of escape distance; the law absorbs DIAG-7/8/9b (all *low
+  escape*, measured three ways).
+- **It is a coverage/diversity law, not per-sample quality (D2b).** On the confound-free
+  **mean-per-sample-pass** metric (greedy pass@1 vs T>0 pass@8 had corrupted the earlier
+  read), escape is **flat** — E1 sits ~0.20 at every T. Escape buys pass@8 by *spreading*
+  the samples so one lands, not by improving each; conditioning **relocates** the
+  distribution. [artifacts/dmeasure_conditioning.json → per_sample_D2b].
+- **Temperature is an anti-anchoring intervention, dose-responsive.** ns=8 clean:
+  T 0.8→1.2 lifts coverage only for anchored conditions (E0 −0.02 flat, E1 +0.10,
+  E2 +0.18), and the *more*-anchored condition benefits ~2×.
+- **The attractor is content-blind (E5).** Conditioning strength is invariant to whether
+  the target is correct: E5 PULL (0.020/0.066/0.168) ≈ E2 PULL — the mechanism does not
+  know what it points at. *(The earlier "E5 = empirical charter for BEST-SO-FAR" was
+  **retracted**: E5-on-a-correct-artifact is answer-leakage, 98% copy; the partial-credit
+  premise test is D2c/E6, pending R2's pools.)*
+- **Provenance is near-irrelevant — distinct from Tsui (D2a).** A verb×provenance 2×2
+  on the *same* failed artifact: "self vs other" moves PULL ≤0.028 (→+0.006 pass), while
+  the instruction verb ("improve it" vs "write a correct solution") moves it **3–4×**.
+  The mechanism is **provenance-independent distributional conditioning** — not Tsui's
+  *self*-anchoring blind spot; orthogonal to it (whose-output is inert, escape distance
+  is live). [artifacts/dmeasure_d2a_verb_provenance.json].
+- **Self-Debug reconciliation: escape needs direction.** Prediction (c) (TAX→0 at greedy)
+  was falsified *backwards* — greedy is the *worst* case for anchoring (PULL 0.04–0.08 =
+  near-total copy). Corrected: rich execution feedback supplies the **direction** to
+  escape; undirected escape (raw resample, or a ~2-bit `error_class`) does not.
+  **Escape requires direction; direction requires rich feedback** — R3's thesis with a
+  mechanism, and it explains the split B2 (no feedback, copies) vs B2+fb (2 bits, still
+  declines) vs Self-Debug (traces, works).
+
+### 9.4 R3 + BEST-SO-FAR *(pre-registered; ride R2's enriched pools)*
+
+- **R3 — conditional reachability (the central claim).** On the **pass@50 = 0** stratum
+  (problems i.i.d. sampling provably fails in 50 tries), does an
+  **error-abstraction-conditioned** model reach a solution i.i.d. cannot? Channels
+  B1-50 / ANCHOR / ABSTRACT, matched compute, absolute recovery *count*. Add-on
+  (Addendum III §4): cross **feedback-richness × temperature** — predicted substitutes at
+  the margin, complements in the limit (rich-feedback × high-T = directed escape;
+  2-bit × high-T ≈ resampling). Prediction: ABSTRACT > 0 and > ANCHOR. Kill: ABSTRACT ≈ 0
+  forecloses the refinement direction.
+- **BEST-SO-FAR — aim the attractor at a success.** Channels B1 / LAST / BEST /
+  ABSTRACT / BEST+ABSTRACT on R2's feedback-rich pool, **oracle-first** ranking, matched
+  compute. **Deflated by the escape-distance law** (Addendum III §5): since conditioning
+  reproduces at 83–98% fidelity, BEST-alone ≈ **hold-at-best** (copying an 11/27 candidate
+  yields ~11/27 — no repair); **BEST+ABSTRACT is the only condition with a mechanism**
+  (best candidate = start point, abstraction = escape direction). **D2c/E6** is the
+  premise test: condition on a ~40–60%-tests artifact, measure the generated candidate's
+  `frac_tests` — flat → BEST-alone dead; climbing → a bigger result than scoped.
+
+### 9.5 Live status (2026-07-14)
+
+**Closed:** judge fix; R1a; R1b.2a/b/c; D-measure incl. Addendum II (judge/D-measure
+pre-reg) and Addendum III (escape-distance law, temperature dose-response,
+content-blindness, D2a provenance/Tsui, D2b metric fix). **Running:** R1b.2d (H1
+de-quantization verdict), R2 base BigCodeBench sweep (F2 gate). **Pending:** R2
+instruct + LiveCodeBench arms, R3, BEST-SO-FAR, D2c/E6 (ride R2's enriched pools). No
+claim has been reversed; every prediction stands with its recorded outcome, including
+two D-measure predictions falsified (one backwards) and corrected in place by appended
+notes.
+
 ---
 
 *Appendix pointers. Architecture [ARCHITECTURE.md]; decision log **D1–D16**
 [DECISIONS.md] (D11 precision, D14 statistical reproducibility, D15 retracted, D16 =
 Finding F1); phase/gate log [PHASES.md]; metric estimators [METRICS.md].
 Plans: [PHASE_M.md] (stack rebuild), [PHASE_3.md] (benchmark screen + 3b/3c design),
-[DIAGNOSTICS.md] (DIAG-1..11). Verdict artifacts: Phases 0–2
+[PHASE_3R.md] (the H1/F2 audits + D-measure, Addenda I–III), [DIAGNOSTICS.md]
+(DIAG-1..11). Verdict artifacts: Phases 0–2
 [artifacts/h1_result.json, h1_v2b_result.json, h2_result.json, h2_b2_result.json];
 diagnostics [artifacts/diag{1..11}_*.json]; Phase M
 [artifacts/m3_rebaseline.json, m4_verifier_revalidation.json, m5_relock.json];
-Phase 3a [artifacts/phase3a_screen_{complete,c05b,confirm,confirm15,confirmhard}.json,
-phase3a_characterization.json]. Difficulty proxies
+Phase 3a [artifacts/phase3a_screen_{complete,c05b,confirm,confirm15,confirmhard,
+lcb_easy,lcb_med}.json, phase3a_characterization.json]; Phase 3R
+[artifacts/r1b2b_stratified_auroc.json, r1b2c_length_bias.json,
+dmeasure_conditioning.json (incl. per_sample_D2b), dmeasure_d2a_verb_provenance.json;
+pending: r1b2d retrain, r2 sweep screens, dmeasure_d2c_partial_credit.json].
+Scripts: [scripts/modal_rgr.py] (T4 verifier/retrain), [scripts/modal_phasem.py]
+(L4 gates + D-measure/D2a), [scripts/modal_phase3a.py] (BigCodeBench screen + R2),
+[scripts/modal_lcb.py] (LiveCodeBench), [scripts/dmeasure_analysis.py] (D2b),
+[scripts/r1b2_analysis.py] (R1b.2a/b/c). Difficulty proxies
 [artifacts/phase0_difficulty_proxy.csv].*
