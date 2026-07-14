@@ -207,22 +207,22 @@ def lcb_exec(question_ids: list, codes: list, cap_private: int = 12,
         return "\n".join(l.rstrip() for l in s.strip("\n").split("\n")).rstrip()
 
     def run_case(code, stdin_str):
+        """Return (status, stdout, exception_line). status ∈ {ok, runtime, timeout}."""
         with tempfile.TemporaryDirectory() as d:
             (Path(d) / "s.py").write_text(PRE + code)
             (Path(d) / "in.txt").write_text(stdin_str)
-            outf = Path(d) / "o.txt"
-            with open(d + "/in.txt") as fin, open(outf, "wb") as fout:
+            outf, errf = Path(d) / "o.txt", Path(d) / "e.txt"
+            with open(d + "/in.txt") as fin, open(outf, "wb") as fout, open(errf, "wb") as ferr:
                 try:
                     p = subprocess.Popen([sys.executable, "s.py"], stdin=fin, stdout=fout,
-                                         stderr=subprocess.DEVNULL, cwd=d, start_new_session=True)
+                                         stderr=ferr, cwd=d, start_new_session=True)
                 except Exception:
-                    return None
+                    return "runtime", "", ""
                 try:
                     p.wait(timeout=timeout_s)
+                    status = "ok" if p.returncode == 0 else "runtime"
                 except subprocess.TimeoutExpired:
-                    p_ok = False
-                else:
-                    p_ok = (p.returncode == 0)
+                    status = "timeout"
                 try:
                     os.killpg(os.getpgid(p.pid), signal.SIGKILL)
                 except (ProcessLookupError, PermissionError):
@@ -231,22 +231,37 @@ def lcb_exec(question_ids: list, codes: list, cap_private: int = 12,
                     p.wait(timeout=5)
                 except Exception:
                     pass
-            return outf.read_text(errors="replace") if p_ok else None
+            out = outf.read_text(errors="replace")
+            elines = [l for l in errf.read_text(errors="replace").strip().splitlines() if l.strip()]
+        return status, out, (elines[-1][:200] if elines else "")
 
     def judge(args):
+        """R3/BEST-SO-FAR fix: run ALL cases (no short-circuit), record per-case
+        results — frac_tests, failing case ids, error class, first exception."""
         code, qid = args
+        base = {"passed": False, "n_tests": 0, "n_passed": 0, "frac": 0.0,
+                "failing": [], "err": "no_code", "exc": ""}
         if code is None:
-            return {"passed": False, "err": "no_code"}
+            return base
         cases = by_id.get(qid, [])
         if not cases:
-            return {"passed": False, "err": "no_tests"}
-        for c in cases:
-            out = run_case(code, c["input"])
-            if out is None:
-                return {"passed": False, "err": "runtime"}
-            if norm(out) != norm(c["output"]):
-                return {"passed": False, "err": "wrong_answer"}
-        return {"passed": True, "err": ""}
+            return {**base, "err": "no_tests"}
+        n_passed, failing, first_err, first_exc = 0, [], "", ""
+        for i, c in enumerate(cases):
+            status, out, exc = run_case(code, c["input"])
+            if status != "ok":
+                failing.append(i)
+                first_err = first_err or status
+                first_exc = first_exc or exc
+            elif norm(out) != norm(c["output"]):
+                failing.append(i)
+                first_err = first_err or "wrong_answer"
+            else:
+                n_passed += 1
+        n = len(cases)
+        return {"passed": n_passed == n, "n_tests": n, "n_passed": n_passed,
+                "frac": n_passed / n, "failing": failing,
+                "err": "" if n_passed == n else first_err, "exc": first_exc}
 
     results = []
     with ThreadPoolExecutor(max_workers=32) as tp:

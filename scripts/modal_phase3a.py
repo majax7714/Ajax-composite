@@ -220,9 +220,18 @@ def bcb_exec(problems: list, timeout_s: int = 10, max_workers: int = 16) -> list
         "except Exception: pass\n"
         "_sk.setdefaulttimeout(4)\n\n"
     )
-    RUNNER = ("\n\nimport unittest as _ut\n"
+    # Emit per-test detail (failing method names + first exception) so the pool can
+    # serve R3/BEST-SO-FAR, not just pass/fail. [PHASE_3R Addendum II §1]
+    RUNNER = ("\n\nimport unittest as _ut, json as _json\n"
               "_r = _ut.main(argv=[''], exit=False, verbosity=0).result\n"
-              "print('BCBRESULT', _r.testsRun, len(_r.failures), len(_r.errors))\n")
+              "_fe = list(_r.failures) + list(_r.errors)\n"
+              "_fail = [str(t).split()[0] for t, _tb in _fe]\n"
+              "_exc = ''\n"
+              "if _fe:\n"
+              "    _ls = [l for l in _fe[0][1].strip().splitlines() if l.strip()]\n"
+              "    _exc = _ls[-1][:200] if _ls else ''\n"
+              "print('BCBRESULT', _json.dumps({'n': _r.testsRun, 'f': len(_r.failures),"
+              " 'e': len(_r.errors), 'fail': _fail, 'exc': _exc}))\n")
 
     def run_one(args):
         code, test = args
@@ -254,17 +263,20 @@ def bcb_exec(problems: list, timeout_s: int = 10, max_workers: int = 16) -> list
                     pass
             out = outf.read_text(errors="replace")
         if timed_out:
-            return {"passed": False, "frac": 0.0, "err": "timeout"}
+            return {"passed": False, "frac": 0.0, "n_tests": 0, "n_passed": 0,
+                    "failing": [], "exc": "", "err": "timeout"}
         line = next((l for l in out.splitlines() if l.startswith("BCBRESULT")), None)
         if line:
-            _, n, f, e = line.split()
-            n, f, e = int(n), int(f), int(e)
+            d = json.loads(line[len("BCBRESULT"):].strip())
+            n, f, e = d["n"], d["f"], d["e"]
             ok = n > 0 and f == 0 and e == 0
-            return {"passed": ok, "frac": (n - f - e) / n if n else 0.0,
-                    "err": "" if ok else "wrong_answer"}
+            return {"passed": ok, "n_tests": n, "n_passed": n - f - e,
+                    "frac": (n - f - e) / n if n else 0.0, "failing": d.get("fail", []),
+                    "exc": d.get("exc", ""), "err": "" if ok else "wrong_answer"}
         err = ("import" if ("ModuleNotFoundError" in out or "ImportError" in out)
                else "syntax" if "SyntaxError" in out else "runtime")
-        return {"passed": False, "frac": 0.0, "err": err}
+        return {"passed": False, "frac": 0.0, "n_tests": 0, "n_passed": 0,
+                "failing": [], "exc": "", "err": err}
 
     results = []
     with ThreadPoolExecutor(max_workers=max_workers) as tp:
