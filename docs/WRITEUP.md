@@ -1,9 +1,17 @@
-# Register-Gated Refinement: an execution-grounded verifier carries load; a learned cross-step register does not
+# Register-Gated Refinement, and When Cross-Step Conditioning Pays — a full experimental record
 
-*Draft v1 — 2026-07-12. All numbers trace to committed artifacts and run
-records; sources cited inline as `[file]`. B2 (in-context refinement baseline)
-is now complete: pass@1 0.6220, it does not beat B1 (Branch A; §5.3,
-[artifacts/h2_b2_result.json]) and does not change the H2 FAIL verdict.*
+*An execution-grounded verifier carries load; a learned cross-step register does
+not; the register null, once fully localized, reframes the question — from "does
+this architecture work" to "on what task can iterative refinement pay at all" — and
+that reframing drives a stack rebuild (Phase M) and a pre-registered benchmark search
+(Phase 3) whose first hard result is itself a negative worth publishing.*
+
+*Living record — last updated 2026-07-14. All numbers trace to committed artifacts
+and run records; sources cited inline as `[file]`. This is the canonical results
+document for the whole experiment; §§1–5 are the register experiment (Phases 0–2 +
+its diagnostic teardown, complete and frozen); §6 is the throughput/stack rebuild
+(Phase M, complete); §7 is the current phase (Phase 3 — reframe + benchmark screen,
+in progress). Read §7.4 for live status.*
 
 ---
 
@@ -32,7 +40,27 @@ stale, and imitation training verifiably steered teacher-forced likelihood
 (−10.7% validation loss) — the steering simply did not survive sampling.
 Under the pre-committed kill criterion, the register claim is dead at this
 scale and training regime. We report the negative with its full causal
-localization: every link in the chain worked except the last one.
+localization (§5.3): a **two-component** failure — the static injection is a
+transfer failure, the update dynamics a mechanism failure from input starvation.
+
+**Beyond the register (§§6–7).** Eleven diagnostics turn the bare null into a
+positive question: cross-step conditioning can only pay where the task has
+*reachable-but-improbable* headroom, and it must condition on an **abstraction** of
+the error, not the failed candidate (conditioning on the candidate anchors the model
+to its own mistake — measured, DIAG-8/10). Pursuing that question required a stack
+rebuild — **Phase M** ports the generator from HF/4-bit to vLLM/bf16 for a **100×
+throughput** gain (validated register path, re-based baselines, and two carry-forward
+findings: the verifier must be retrained on the new candidate distribution, and
+bit-for-bit reproducibility gives way to a statistical standard) — and a
+pre-registered **Phase 3** benchmark screen. Phase 3's first hard result is a
+documented negative (**Finding F1**): across BigCodeBench at 0.5B and 1.5B, no
+configuration offers the reachable tail refinement needs — headroom (pass@50 − pass@8)
+is structurally ~0.10, never the required ≥0.15, the same "solve-within-8-or-not"
+shape that sank HumanEval. The search continues on competitive (stdin/stdout)
+benchmarks, whose deep pass@k tails are the structural feature function-call
+benchmarks lack. A methodological result falls out of the screen too: subset
+screening on the *first n* problems was ~2× optimistic vs random — caught by the
+confirmation step before any training was built on it.
 
 ---
 
@@ -408,23 +436,162 @@ splits that mapping: the *external grounding* leg is supported (H1); the
 *state-gated memory* leg is not (H2), in its minimal functional form; the
 *settling* leg was never reached. No substrate claim was made and none is.
 
-## 6. Reproducibility
+## 6. Phase M — the stack rebuild that made Phase 3 feasible
+
+Phase 3 is materially larger than Phases 0–2 (more conditions, a large-k pass@k
+screen, on-policy training), so throughput stopped being a convenience and became a
+prerequisite. Phase M ([PHASE_M.md]) is a **no-science-change** port of the stack —
+HF `generate()` + bitsandbytes 4-bit NF4 on Kaggle/Modal T4 → **vLLM continuous
+batching + bf16 on Modal L4** ([DECISIONS.md] D11) — done at a clean phase boundary,
+with the old stack tagged (`pre-phase-m-hf-nf4`) so every pre-migration number stays
+a historical result, never cross-compared (§8). Five sequential gates, each passed
+before the next:
+
+- **M1 — the register path survives vLLM.** vLLM's `prompt_embeds` reproduces HF's
+  soft-prompt injection: 19/20 problems byte-identical greedy over 48 tokens, 0/20
+  diverging in the first 3 (the chat-template-splice failure signature). The
+  make-or-break gate for any future register work; it passes.
+- **M2 — throughput.** Same L4, same workload: HF bf16 batch-1 **28 tok/s** → vLLM
+  bf16 continuous batching **2809 tok/s** = **100×** (281× over the old 4-bit/T4
+  effective rate). The quota wall is gone; a DIAG-10-scale study now runs in minutes.
+- **M3 — statistical re-baseline.** Reproduced the Phase-0 pool on bf16, execution
+  held to Daytona so only the generation stack varies. All metrics shift **uniformly
+  up and grow with k** — B0 0.5922→0.6479, B1-likelihood 0.6280→0.7256, oracle pass@8
+  0.8415→**0.9024** — a modest, coherent, fully explained bf16 quality lift
+  ([artifacts/m3_rebaseline.json]). (A logprob-population bug that would have
+  corrupted the likelihood-rerank number was caught and fixed here.)
+- **M4 — verifier revalidation → retrain required.** V-v2b scored on the *new* bf16
+  candidate distribution keeps its global AUROC (0.772) but its within-problem
+  reranking edge over likelihood **collapses from +0.15 to +0.016**
+  ([artifacts/m4_verifier_revalidation.json]). The substrate change staled V's
+  decision boundary; a verifier retrain on the deployment distribution is required
+  and folds into Phase 3.
+- **M5 — reproducibility becomes statistical.** vLLM's throughput kernels are **not
+  bit-deterministic** run-to-run (greedy 143/164 byte-identical across two seeded
+  runs). The Phase-0 bit-lock cannot be reconstructed; it is retired for a
+  **statistical** standard — aggregate pass@k/AUROC reproduce within sampling noise
+  (M3's two independent draws agreed to ~1 pt), which the CI-gated comparisons already
+  assume ([DECISIONS.md] D14). An honest reduction in rigor, accepted as the cost of
+  100× throughput.
+
+Phase M is complete; total spend a few dollars inside Modal's free credit.
+
+## 7. Phase 3 — when does cross-step conditioning pay?
+
+### 7.1 The reframe
+
+The register null is not the end of a question but the start of a sharper one. The
+diagnostics (§5.3) establish two things the design of any refinement experiment must
+respect: (i) conditioning on a *failed candidate* is actively harmful — it anchors
+the generator to its own mistake (DIAG-8: consecutive candidates 0.35× as diverse as
+i.i.d.; DIAG-10: the candidate-anchored channel anti-refines while the same feedback
+*without* the candidate does not, a +0.225 late-step gap); so a refinement channel
+must carry an **abstraction of the error**, not the attempt. And (ii) whether such a
+channel adds *benefit* is untestable on a saturated task — DIAG-10/11 could measure
+harm but not benefit, because a task with pass@8 ≈ 0.9 has no headroom to add to.
+Phase 3 therefore stops asking about the register specifically and asks the general
+question the record has earned: **on what task, at what scale, can cross-step
+conditioning pay — and what task *structure* is required for the question to even be
+answerable?** The register becomes one mechanism to be tested *inside* that frame,
+after a qualifying task is found.
+
+### 7.2 The benchmark screen (a mandatory pre-registered gate)
+
+We have twice run a refinement mechanism on a saturated task and twice gotten an
+uninformative null. Never again: Phase 3a selects the task on its **pass@k curve**,
+not by name, against three pre-registered criteria ([PHASE_3.md] §4) — **coverage
+band** pass@8 ∈ [0.30, 0.60], **reachable headroom** pass@50 − pass@8 ≥ 0.15, and
+**feedback richness** ≫3 tests/problem (so execution yields a gradient, not a binary
+— the same partial-credit signal the register was starved of). A task clearing all
+three has correct-but-improbable solutions the model can be *steered* toward, and a
+rich enough error signal to steer with.
+
+### 7.3 Finding F1 — function-call benchmarks have a shallow reachable tail
+
+BigCodeBench (1140 problems, ~5 unittest methods each — the richest feedback of the
+function-call benchmarks) was the lead candidate. It fails, and the failure is
+precise and structural. On **random** samples (see the method note below), across
+every difficulty × scale point:
+
+| config (random, k=50) | pass@8 | pass@50 − pass@8 |
+|---|---|---|
+| Complete @ 1.5B | 0.302 | +0.108 |
+| Complete @ 0.5B | 0.161 | +0.092 |
+| Hard @ 1.5B (all 148) | 0.118 | +0.112 |
+
+**The binding failure is headroom, not coverage** — it is structurally ~0.09–0.11
+everywhere, never ≥0.15, *even where coverage lands in the band* (Complete@1.5B).
+Whatever Qwen-Coder can solve on BigCodeBench it reaches within ~8 i.i.d. samples;
+50 samples add only ~0.10. This is the **same "solve-within-8-or-not" shape that made
+HumanEval useless for refinement** — one coverage level down, same structure — so it
+is not a scale problem a different model fixes; it is a property of function-call
+benchmarks with deterministic unit tests. **F1** ([DECISIONS.md] D16): refinement
+needs a task whose **pass@k keeps climbing with k** — a deep tail of
+reachable-but-improbable solutions — which the function-call family structurally
+lacks. The result is negative but load-bearing: it converts "we couldn't find a task"
+into "here is the *structural property* a task must have," and points directly at
+competitive (stdin/stdout) benchmarks, where a model stumbles onto a correct approach
+only occasionally over many samples.
+
+**Method note (a second finding).** The initial screens used the *first n* problems
+of each split; the full-benchmark confirmation showed first-n is **~2× easier than a
+random draw** — (Complete, 0.5B) fell from pass@8 0.340 (first-40) to 0.161
+(random-400). The premature "gate PASS + benchmark selected" that rested on the biased
+subset was withdrawn (D15 retracted); all screening is **random-sample only** now.
+The confirmation step caught the bias *before* Phase 3b was built on it — which is the
+entire reason a confirmation step exists.
+
+### 7.4 Live status (2026-07-14)
+
+Pursuing F1's implication: **LiveCodeBench** (contamination-controlled; 400 problems,
+~27 test cases each; easy/medium/hard tiers) is being screened via a new hardened
+stdin/stdout judge (run the program per test case, short-circuit on first failure,
+process-group-kill + rlimit sandboxing, normalized output comparison — validated).
+Easy and medium tiers (random n=100, k=50) are **in flight**. Two outcomes, both
+informative: a competitive tier lands in-band with deep headroom → the gate passes and
+3b gets a real task; or competitive is too hard at 1.5B → the negative broadens to "no
+available benchmark hosts the experiment at this scale," itself the sharpest Phase-3
+result about where refinement can live, and a mandate for a larger generator or a
+redesign. Phase 3b (the refinement channel study — B1 / anchored / abstraction /
+register at matched compute) and 3c (the coverage-vs-scale sweep, already partly
+traced by F1's three points) are gated behind a qualifying task. *This section updates
+as LiveCodeBench lands.*
+
+## 8. Reproducibility
 
 Everything needed to reproduce is committed: pinned datasets (SHA256),
-frozen configs ([configs/]), the compute-accounting rule (frozen before
-any run, amendment log empty), seed policy (17 throughout), per-record
-compute ledgers embedded in every result file, and the full gate log with
-dates and both failed verifier attempts ([PHASES.md]). The Phase-0
-reproduction was exact: byte-identical candidates across independent runs.
-Infrastructure: Kaggle T4 kernels for all GPU stages (~25 T4-hours total),
-Daytona sandboxes for all execution (12,100 sandboxed runs across
-Phases 0–2; per-run sandbox-fault rates 0.2% / 0.0% / 0.3%, faults scored
-as failures).
+frozen configs ([configs/]), the compute-accounting rule (frozen before any run;
+its **amendment log** now records two stack moves — Kaggle→Modal T4, then the Phase-M
+rebuild to vLLM/bf16/L4 — with the budgeted unit "one candidate generation" unchanged
+through both), seed policy (17 throughout), per-record compute ledgers, and the full
+gate log with dates and both failed verifier attempts ([PHASES.md]).
+
+**Two reproducibility regimes, by stack.** On the retired HF/4-bit stack the Phase-0
+reproduction was **exact** — byte-identical candidates on 164/164 problems across
+independent runs (the bit-lock). On the current vLLM/bf16 stack that is unattainable
+(M5): the throughput kernels are not bit-deterministic, so reproducibility is
+**statistical** — aggregate pass@k/AUROC reproduce within sampling noise ([DECISIONS.md]
+D14). **Numbers never cross the stack boundary:** every Phase-0/1/2 figure is a
+historical result of the retired stack (recoverable at tag `pre-phase-m-hf-nf4`), never
+compared to a post-migration number; Phase M's M3 re-baseline established a *new*
+reference, not a correction of the old.
+
+Infrastructure: Kaggle then Modal T4 for Phases 0–2 and the diagnostics (~25+
+T4-hours), Modal L4 (vLLM) for Phase M and Phase 3, Daytona sandboxes for Phase-0–2
+execution (12,100 runs; sandbox-fault rates 0.2% / 0.0% / 0.3%, faults scored as
+failures), and hardened subprocess judges (process-group kill + rlimits) for the
+Phase-3 benchmark screens ([scripts/modal_phase3a.py], [scripts/modal_lcb.py]).
 
 ---
 
-*Appendix pointers: architecture detail [ARCHITECTURE.md]; decision log
-D1–D10 [DECISIONS.md]; metric estimators [METRICS.md]; verdict artifacts
-[artifacts/h1_result.json, artifacts/h1_v2b_result.json,
-artifacts/h2_result.json]; per-problem difficulty proxies
+*Appendix pointers. Architecture [ARCHITECTURE.md]; decision log **D1–D16**
+[DECISIONS.md] (D11 precision, D14 statistical reproducibility, D15 retracted, D16 =
+Finding F1); phase/gate log [PHASES.md]; metric estimators [METRICS.md].
+Plans: [PHASE_M.md] (stack rebuild), [PHASE_3.md] (benchmark screen + 3b/3c design),
+[DIAGNOSTICS.md] (DIAG-1..11). Verdict artifacts: Phases 0–2
+[artifacts/h1_result.json, h1_v2b_result.json, h2_result.json, h2_b2_result.json];
+diagnostics [artifacts/diag{1..11}_*.json]; Phase M
+[artifacts/m3_rebaseline.json, m4_verifier_revalidation.json, m5_relock.json];
+Phase 3a [artifacts/phase3a_screen_{complete,c05b,confirm,confirm15,confirmhard}.json,
+phase3a_characterization.json]. Difficulty proxies
 [artifacts/phase0_difficulty_proxy.csv].*
