@@ -1,0 +1,46 @@
+{
+  "load::livecodebench/code_generation_lite::{'version_tag': 'release_v5'}": "FAIL RuntimeError('Dataset scripts are no longer supported, but found code_generation_lite.py')",
+  "load::livecodebench/code_generation_lite::{}": "FAIL RuntimeError('Dataset scripts are no longer supported, but found code_generation_lite.py')",
+  "load::livecodebench/code_generation::{}": "OK",
+  "loaded_as": "livecodebench/code_generation {}",
+  "n": 400,
+  "columns": [
+    "question_title",
+    "question_content",
+    "platform",
+    "question_id",
+    "contest_id",
+    "contest_date",
+    "starter_code",
+    "difficulty",
+    "public_test_cases",
+    "private_test_cases",
+    "metadata"
+  ],
+  "difficulty_dist": {
+    "hard": 90,
+    "easy": 142,
+    "medium": 168
+  },
+  "field::public_test_cases": {
+    "type": "str",
+    "len": 230,
+    "preview": "[{\"input\": \"DD??S\\n\", \"output\": \"676\\n\", \"testtype\": \"stdin\"}, {\"input\": \"????????????????????????????????????????\\n\", \"output\": \"858572093\\n\", \"testtype\": \"stdin\"}, {\"input\": \"?D??S\\n\", \"output\": \"136604\\n\", \"testtype\": \"stdin\"}]",
+    "as_json_len": 3,
+    "decode": "json"
+  },
+  "field::private_test_cases": {
+    "type": "str",
+    "len": 5880987,
+    "preview": "[{\"input\": \"vgxgpuamkxkszhkbpphykinkezplvfjaqmopodotkrjzrimlvumuarenexcfycebeurgvjyospdhvuyfvtvnrdyluacvrayggwnpnzijdifyervjaoalcgxovldqfzaorahdigyojknviaztpcmxlvovafhjphvshyfiqqtqbxjjmqngqjhwkcexecmdkmzakbzrkjwqdyuxdvoossjoatryxmbwxbwexnagmaygzyfnzpqftobtaotuayxmwvzllkujidhukzwzcltgqngguftuahalwvjw",
+    "as_json_len": 24,
+    "decode": "json"
+  },
+  "fields_present": {
+    "question_content": true,
+    "starter_code": true,
+    "difficulty": true,
+    "public_test_cases": true,
+    "private_test_cases": true
+  }
+}

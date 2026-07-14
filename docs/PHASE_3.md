@@ -180,20 +180,37 @@ Output: `artifacts/phase3a_screen.json`, `scripts/modal_phase3a.py`.
 > first) to re-decide. This is the confirmation step doing exactly its job — catching
 > a non-representative subset before 3b was built on it. Random-sample results:
 >
-> | config (random n=400, k=50) | pass@8 | headroom | verdict |
+> | config (random n≈150–400, k=50) | pass@8 | headroom | verdict |
 > |---|---|---|---|
-> | Complete @ 0.5B | **0.161** | +0.092 | below band + shallow headroom |
-> | Complete @ 1.5B | **0.302** | +0.108 | in-band edge, **headroom < 0.15** |
-> | Hard @ 1.5B | *running* | — | (expected below band — too hard) |
+> | Complete @ 0.5B | 0.161 | +0.092 | below band + shallow headroom |
+> | Complete @ 1.5B | 0.302 | +0.108 | in-band edge, headroom < 0.15 |
+> | Hard @ 1.5B (all 148) | 0.118 | +0.112 | below band + shallow headroom |
 >
-> **Emerging conclusion:** BigCodeBench-Complete has a **shallow reachable tail
-> (~0.10)** at both 0.5B and 1.5B — pass@50 adds only ~0.10 over pass@8. That's the
-> same "solve-within-8-or-not" shape HumanEval had, one level down. If Hard@1.5B is
-> below-band as expected, **no BigCodeBench config satisfies both criteria on
-> representative samples** → the decision is (a) build a stdin/stdout harness and
-> screen a competitive benchmark (LiveCodeBench/CodeContests — the class most likely
-> to have a deep reachable tail), or (b) accept the gate's pending **negative**
-> finding for the BigCodeBench family at these scales.
+> ### FINDING F1 — BigCodeBench has a shallow reachable tail; it cannot host the refinement experiment at 0.5–1.5B
+>
+> **No BigCodeBench configuration satisfies the gate on representative random
+> samples.** Across all three (difficulty × model) points, the **headroom
+> (pass@50 − pass@8) is structurally ~0.09–0.11 — never the required ≥0.15** — even
+> where coverage lands in the band (Complete@1.5B, pass@8 0.302). The reachable tail
+> is shallow: whatever Qwen-Coder can solve on BigCodeBench it reaches within ~8
+> i.i.d. samples; 50 samples add only ~0.10. This is the **same "solve-within-8-or-
+> not" shape that made HumanEval useless for refinement** (pass@8 0.85 there, ~0.16–
+> 0.30 here — lower level, same structure), so it is *not* a coverage-level problem
+> that a different model scale fixes; it is a property of function-call benchmarks
+> with deterministic unit tests. **This is a real, useful negative** ([DECISIONS.md]
+> D16): it says the register/refinement experiment needs a task whose *pass@k keeps
+> climbing with k* — i.e. many "reachable-but-improbable" solutions per problem —
+> which function-call/unit-test benchmarks structurally lack. It sharpens what to look
+> for: **competitive (stdin/stdout) problems**, where a model stumbles onto a correct
+> approach only occasionally over many samples (deep tail). Hence option (a).
+>
+> **Method note (also a finding):** the first-n screening shortcut was wrong — first-n
+> problems were ~2× easier than random on BigCodeBench. All screening is now
+> **random-sample only**. The confirmation step caught this before 3b was built on it.
+>
+> **Proceeding on BOTH tracks (per direction 2026-07-14):** F1/D16 is documented as a
+> result *and* option (a) — the LiveCodeBench (stdin/stdout, deep-tail) screen — is
+> pursued to test whether *any* available task hosts the experiment. Results ↓.
 
 **Part A — feedback richness (criterion 2), done 2026-07-13.** Loaded candidate
 benchmarks (`characterize`): **BigCodeBench** n=1140, **~5 unittest methods/problem →

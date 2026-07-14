@@ -277,3 +277,36 @@ the tested set.
 intermediate-difficulty benchmark at 1.5B (LiveCodeBench/CodeContests, needs a
 stdin/stdout execution harness; APPS failed to load on `datasets` 5.0); or (b) the
 full-benchmark run on (Complete, 0.5B) contradicts the n=40 subset estimate.
+
+## D16 — Finding F1: BigCodeBench cannot host the refinement experiment at 0.5–1.5B (2026-07-14, Phase 3a)
+
+The 3a gate needs a task with reachable-but-improbable headroom (pass@8 ∈ [0.30,0.60]
+AND pass@50 − pass@8 ≥ 0.15) plus rich feedback. On **random** samples (the first-n
+shortcut was retired after it proved ~2× optimistic), **no BigCodeBench configuration
+qualifies**:
+
+| config (random, k=50) | pass@8 | headroom |
+|---|---|---|
+| Complete @ 0.5B | 0.161 | +0.092 |
+| Complete @ 1.5B | 0.302 | +0.108 |
+| Hard @ 1.5B (all 148) | 0.118 | +0.112 |
+
+**The binding failure is headroom, not coverage:** it is structurally ~0.09–0.11
+everywhere, never ≥0.15 — even where coverage is in-band. BigCodeBench's reachable
+tail is shallow (solve-within-8-or-not), the same shape that sank HumanEval, because
+function-call/unit-test benchmarks lack "reachable-but-improbable" solution diversity.
+A different model scale does not fix a structural property.
+
+**This is a documented, useful negative** — it refines the experiment: refinement
+needs a task whose **pass@k keeps climbing with k** (a deep reachable tail), which
+points at **competitive (stdin/stdout)** benchmarks, not function-call ones. It also
+retires the first-n screening shortcut (random-only from here).
+
+*Consequence:* pursue option (a) — screen LiveCodeBench (stdin/stdout, difficulty
+tiers) with a new I/O-comparison harness. If no competitive tier qualifies either,
+the gate's negative stands at this model scale and *that* is the Phase-3 result
+(where refinement can and cannot live), with the coverage/headroom structure
+characterized. Either way F1 stands.
+
+*Revisit if:* a larger model (3B/7B) or a different task family is brought in — the
+headroom structure may differ; F1 is scoped to 0.5–1.5B on function-call benchmarks.
