@@ -211,6 +211,42 @@ Output: `artifacts/phase3a_screen.json`, `scripts/modal_phase3a.py`.
 > **Proceeding on BOTH tracks (per direction 2026-07-14):** F1/D16 is documented as a
 > result *and* option (a) — the LiveCodeBench (stdin/stdout, deep-tail) screen — is
 > pursued to test whether *any* available task hosts the experiment. Results ↓.
+>
+> ### 4.2.1 LiveCodeBench (option a) + FINDING F2 — GATE OUTCOME: NEGATIVE
+>
+> LiveCodeBench (`code_generation`, contamination-controlled, ~27 test cases/problem;
+> new hardened stdin/stdout judge — per-case run, short-circuit, process-group-kill +
+> rlimits, normalized compare — validated), stdin-type problems, random n, k=50 @ 1.5B:
+> **easy pass@8 0.541 (in band) headroom +0.122**; **medium pass@8 0.067 (below band)
+> headroom +0.087.** Competitive is deeper-tailed than function-call (+0.122 vs ~0.10)
+> but *still* short of 0.15, and the medium tier trades depth for coverage below band.
+>
+> **Complete Phase-3a sweep (random, k=50) — no config qualifies; headroom capped ~0.12:**
+>
+> | benchmark / tier | scale | pass@8 | headroom |
+> |---|---|---|---|
+> | BigCodeBench-Complete | 0.5B | 0.161 | +0.092 |
+> | BigCodeBench-Complete | 1.5B | 0.302 *(band)* | +0.108 |
+> | BigCodeBench-Hard | 1.5B | 0.118 | +0.112 |
+> | LiveCodeBench-easy | 1.5B | 0.541 *(band)* | +0.122 |
+> | LiveCodeBench-medium | 1.5B | 0.067 | +0.087 |
+>
+> **FINDING F2 (D16 extended): the gate returns a NEGATIVE.** No configuration reaches
+> pass@50 − pass@8 ≥ 0.15 across two families, two paradigms, three tiers, two scales;
+> the in-band configs all have shallow tails. Structural: code solutions are
+> gettable-or-not within a few samples (peaked per-problem distribution), so pass@k
+> saturates and sample-based refinement has almost no runway at 0.5–1.5B — and scaling
+> *up* raises coverage/saturation, worsening headroom (BigCodeBench 0.5B→1.5B: coverage
+> +0.14, headroom +0.02). This closes the loop on the register null: HumanEval had no
+> headroom, and *no tested code benchmark at this scale has enough*. **3b/3c do NOT
+> proceed** on a task that fails the screen (the exact error that produced H2). The fork
+> (writeup §7.4): (i) a heavier-tailed task family (agentic/synthesis; likely off the
+> code-benchmark shelf), (ii) **redefine "reachable" toward feedback-driven recovery**
+> — does an error abstraction let the model reach solutions it could not i.i.d.-sample
+> (the DIAG-10 direction; does not need i.i.d. headroom) — **recommended**, or (iii)
+> accept F2 as the Phase-3 result. Next step is pre-registering the 3b redesign around
+> (ii); a design decision, not an extension of this record. **Phase 3a: COMPLETE,
+> outcome NEGATIVE.**
 
 **Part A — feedback richness (criterion 2), done 2026-07-13.** Loaded candidate
 benchmarks (`characterize`): **BigCodeBench** n=1140, **~5 unittest methods/problem →

@@ -53,14 +53,22 @@ throughput** gain (validated register path, re-based baselines, and two carry-fo
 findings: the verifier must be retrained on the new candidate distribution, and
 bit-for-bit reproducibility gives way to a statistical standard) — and a
 pre-registered **Phase 3** benchmark screen. Phase 3's first hard result is a
-documented negative (**Finding F1**): across BigCodeBench at 0.5B and 1.5B, no
-configuration offers the reachable tail refinement needs — headroom (pass@50 − pass@8)
-is structurally ~0.10, never the required ≥0.15, the same "solve-within-8-or-not"
-shape that sank HumanEval. The search continues on competitive (stdin/stdout)
-benchmarks, whose deep pass@k tails are the structural feature function-call
-benchmarks lack. A methodological result falls out of the screen too: subset
-screening on the *first n* problems was ~2× optimistic vs random — caught by the
-confirmation step before any training was built on it.
+documented negative that generalizes. Across **two benchmark families** (BigCodeBench,
+LiveCodeBench), two execution paradigms (unit test, stdin/stdout), three difficulty
+tiers, and two model scales, **no configuration offers the reachable tail refinement
+needs — pass@50 − pass@8 is capped at ~0.09–0.12, never the required ≥0.15** (Finding
+F2). The gate returns a **negative**, and it is structural: a code model at this scale
+solves a problem within a few samples or not at all (a peaked, not heavy-tailed,
+per-problem solution distribution), so pass@k saturates and sample-based refinement
+has almost no runway — the same "solve-within-8-or-not" shape that sank HumanEval,
+now shown to be a property of the whole task family, not an unlucky choice. **That
+negative — a precise statement of where iterative refinement can and cannot live — is
+the substantive Phase-3 result**, and it redirects the next experiment toward
+feedback-driven recovery (does an error abstraction let the model reach solutions it
+could not i.i.d.-sample?) rather than a search for a heavy-tailed code benchmark that
+may not exist. A methodological result falls out too: subset screening on the *first
+n* problems was ~2× optimistic vs random — caught by the confirmation step before any
+training was built on it.
 
 ---
 
@@ -541,21 +549,66 @@ subset was withdrawn (D15 retracted); all screening is **random-sample only** no
 The confirmation step caught the bias *before* Phase 3b was built on it — which is the
 entire reason a confirmation step exists.
 
-### 7.4 Live status (2026-07-14)
+### 7.4 Finding F2 — sample-based refinement has almost no runway on code at 0.5–1.5B
 
-Pursuing F1's implication: **LiveCodeBench** (contamination-controlled; 400 problems,
-~27 test cases each; easy/medium/hard tiers) is being screened via a new hardened
-stdin/stdout judge (run the program per test case, short-circuit on first failure,
-process-group-kill + rlimit sandboxing, normalized output comparison — validated).
-Easy and medium tiers (random n=100, k=50) are **in flight**. Two outcomes, both
-informative: a competitive tier lands in-band with deep headroom → the gate passes and
-3b gets a real task; or competitive is too hard at 1.5B → the negative broadens to "no
-available benchmark hosts the experiment at this scale," itself the sharpest Phase-3
-result about where refinement can live, and a mandate for a larger generator or a
-redesign. Phase 3b (the refinement channel study — B1 / anchored / abstraction /
-register at matched compute) and 3c (the coverage-vs-scale sweep, already partly
-traced by F1's three points) are gated behind a qualifying task. *This section updates
-as LiveCodeBench lands.*
+F1's implication was pursued to **LiveCodeBench** (contamination-controlled; 400
+problems, ~27 test cases each; easy/medium/hard) via a new hardened stdin/stdout judge
+(per-case run, short-circuit on first failure, process-group-kill + rlimit sandboxing,
+normalized comparison — validated). Competitive benchmarks were the best hope: a deep
+pass@k tail is their characteristic structure. They are deeper — but not enough. The
+**complete Phase-3a sweep** (random samples, k=50):
+
+| benchmark / tier | scale | pass@8 | pass@50 − pass@8 |
+|---|---|---|---|
+| BigCodeBench-Complete | 0.5B | 0.161 | +0.092 |
+| BigCodeBench-Complete | 1.5B | 0.302 *(in band)* | +0.108 |
+| BigCodeBench-Hard | 1.5B | 0.118 | +0.112 |
+| LiveCodeBench-easy | 1.5B | 0.541 *(in band)* | +0.122 |
+| LiveCodeBench-medium | 1.5B | 0.067 | +0.087 |
+
+**FINDING F2 ([DECISIONS.md] D16): no configuration provides the reachable headroom
+the gate requires (pass@50 − pass@8 ≥ 0.15); across the whole sweep it is capped at
+~0.09–0.12** — two benchmark families, two execution paradigms (unittest and
+stdin/stdout), three difficulty tiers, two model scales. The configs that land *in*
+the coverage band (BigCodeBench-Complete@1.5B, LiveCodeBench-easy@1.5B) have shallow
+tails; the ones with any more depth are below the band. **The gate returns a
+NEGATIVE.**
+
+The interpretation is structural and, we think, the real result of Phase 3. For a
+code model at this scale, a problem is largely **gettable-or-not within a few
+samples** — the solution distribution per problem is peaked, not heavy-tailed — so
+pass@k **saturates fast** (pass@50 ≈ pass@8 + ~0.1 everywhere). Iterative refinement
+needs the opposite: *reachable-but-improbable* solutions to steer a model toward. That
+regime barely exists on code benchmarks here. And it does **not** yield to scale in
+the obvious direction: a larger generator raises coverage (more saturation → *less*
+headroom, BigCodeBench 0.5B→1.5B moved coverage +0.14 but headroom only +0.02), so
+"use a bigger model" makes it worse, not better. This closes the loop on the original
+register null: HumanEval had no headroom (pass@8 0.85) — and it turns out *no* tested
+code benchmark at 0.5–1.5B has enough. The register experiment was starved of runway
+not by an unlucky benchmark choice but by a property of the whole task family.
+
+**The fork (a decision for the next stage), and why F2 is the useful output.** Per the
+pre-registration, a benchmark clearing the gate does not exist at this scale, so 3b/3c
+do not proceed on a task that fails the screen (the exact error that produced the H2
+null). The documented failure sharpens the next experiment far more than a forced pass
+would: it says the refinement paradigm, to be testable, needs a task whose per-problem
+**solution distribution is heavy-tailed** — e.g. genuinely open-ended generation
+(agentic/multi-file, proof search, program synthesis with many valid targets), or an
+*intermediate*-reward signal that creates a gradient where pass/fail is flat — not
+another unit-tested function benchmark. Options on the table: (i) an intermediate model
+scale / a benchmark with a heavier tail (untested — but the cap looks structural);
+(ii) redefine the "reachable" axis away from i.i.d. resampling toward *feedback-driven*
+recovery (does the model reach a solution it could not i.i.d.-sample, given an error
+abstraction — the DIAG-10 direction — which does not require i.i.d. headroom); (iii)
+accept F2 as the Phase-3 result and write the register/refinement story as *where and
+why sample-based refinement has runway on code, and where it does not*. **Direction
+(ii) is the most promising** — it is the one path the diagnostics actively support and
+the one that does not depend on finding a heavy-tailed code benchmark that may not
+exist. Pre-registration of the 3b redesign around it is the next step; it is a design
+decision, not an extension of this record.
+
+*Phase 3a is complete: gate outcome NEGATIVE (F2). Phase 3b/3c are held pending the
+redesign the fork above describes.*
 
 ## 8. Reproducibility
 

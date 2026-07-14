@@ -310,3 +310,33 @@ characterized. Either way F1 stands.
 
 *Revisit if:* a larger model (3B/7B) or a different task family is brought in — the
 headroom structure may differ; F1 is scoped to 0.5–1.5B on function-call benchmarks.
+
+### D16 extended (2026-07-14) — FINDING F2: the gate returns a NEGATIVE
+
+The LiveCodeBench screen (option a) completes the sweep. Competitive (stdin/stdout)
+was the best hope for a deep reachable tail; it is deeper than function-call but still
+short:
+
+| benchmark / tier | scale | pass@8 | headroom |
+|---|---|---|---|
+| BigCodeBench-Complete | 0.5B | 0.161 | +0.092 |
+| BigCodeBench-Complete | 1.5B | 0.302 (band) | +0.108 |
+| BigCodeBench-Hard | 1.5B | 0.118 | +0.112 |
+| LiveCodeBench-easy | 1.5B | 0.541 (band) | +0.122 |
+| LiveCodeBench-medium | 1.5B | 0.067 | +0.087 |
+
+**F2:** no configuration reaches pass@50 − pass@8 ≥ 0.15 — capped at ~0.09–0.12 across
+two families, two execution paradigms, three tiers, two scales. Structural: code
+solutions are gettable-or-not within a few samples, so pass@k saturates and
+sample-based refinement has almost no runway at 0.5–1.5B; scaling the generator UP
+worsens it (more coverage → more saturation → less headroom). **The 3a gate outcome is
+NEGATIVE.** 3b/3c do not proceed on a benchmark that fails the screen.
+
+**Consequence / next-stage fork** (writeup §7.4): (i) heavier-tailed task family
+(agentic/synthesis, off the code-benchmark shelf); (ii) **redefine the "reachable"
+axis toward feedback-driven recovery** — does an error abstraction let the model reach
+solutions it could not i.i.d.-sample (the DIAG-10 direction; does not require i.i.d.
+headroom) — **recommended**; (iii) accept F2 as the Phase-3 result and write
+"where/why sample-based refinement has runway on code." The next action is
+pre-registering the 3b redesign around (ii). F2 stands regardless; scoped to the
+tested benchmarks/scales.
