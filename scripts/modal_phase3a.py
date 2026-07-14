@@ -156,14 +156,19 @@ def _extract_code(text):
 
 @app.function(image=GEN_IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=7200)
 def bcb_generate(n_problems: int = 60, k: int = 50, seed: int = 17,
-                 dataset: str = "bigcode/bigcodebench", model: str = MODEL):
+                 dataset: str = "bigcode/bigcodebench", model: str = MODEL,
+                 shuffle: bool = False):
     """Generate k i.i.d. samples per BigCodeBench-instruct problem (vLLM bf16)."""
+    import random as _rnd
     from datasets import load_dataset
     from transformers import AutoTokenizer
     from vllm import LLM, SamplingParams
 
     ds = load_dataset(dataset, split="v0.1.4")
-    idx = list(range(min(n_problems, len(ds))))
+    order = list(range(len(ds)))
+    if shuffle:
+        _rnd.Random(seed).shuffle(order)
+    idx = order[:min(n_problems, len(ds))]
     tok = AutoTokenizer.from_pretrained(model)
     SYS = ("You are a Python programming assistant. Answer with a single fenced "
            "Python code block containing a complete solution, and nothing else.")
@@ -188,7 +193,7 @@ def bcb_generate(n_problems: int = 60, k: int = 50, seed: int = 17,
     return {"problems": problems, "k": k}
 
 
-@app.function(image=EXEC_IMAGE, timeout=7200, cpu=16.0, memory=32768)
+@app.function(image=EXEC_IMAGE, timeout=7200, cpu=32.0, memory=65536)
 def bcb_exec(problems: list, timeout_s: int = 10, max_workers: int = 16) -> list:
     """Execute each candidate's code+unittest, HARDENED so a single candidate can
     never wedge the pool:
@@ -310,16 +315,16 @@ def _finalize(problems: list, results: list, dataset: str, model: str, k: int, t
 
 @app.local_entrypoint()
 def screen_main(n_problems: int = 60, k: int = 50, dataset: str = "bigcode/bigcodebench",
-                model: str = MODEL, tag: str = "screen"):
+                model: str = MODEL, tag: str = "screen", shuffle: bool = False, workers: int = 16):
     """Generate (vLLM) → persist candidates → execute (hardened) → score. Candidates
     are saved before execution so a slow/failed exec can be re-run via exec_only
     without regenerating."""
     from pathlib import Path
-    gen = bcb_generate.remote(n_problems, k, 17, dataset, model)
+    gen = bcb_generate.remote(n_problems, k, 17, dataset, model, shuffle)
     Path("runs/modal").mkdir(parents=True, exist_ok=True)
     Path(f"runs/modal/bcb_cand_{tag}.json").write_text(
         json.dumps({"problems": gen["problems"], "k": k, "dataset": dataset, "model": model}))
-    results = bcb_exec.remote(gen["problems"])
+    results = bcb_exec.remote(gen["problems"], 8, workers)
     _finalize(gen["problems"], results, dataset, model, k, tag)
 
 
