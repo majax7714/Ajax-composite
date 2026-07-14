@@ -232,3 +232,38 @@ documents the drift level, not as a bit-lock.
 A bit-reproducible *verification* mode (greedy + `enforce_eager` + a deterministic
 attention backend, at a throughput cost) could be pursued if a future result ever
 needs exact replay; it is not the deployment mode and is not built now.
+
+## D15 — Phase-3 benchmark + generator scale: (BigCodeBench-Complete, Qwen2.5-Coder-0.5B) (2026-07-13, Phase 3a)
+
+The 3a screen (GATE, [PHASE_3.md] §4) selects the task on its pass@k curve. Exactly
+one screened config clears both criteria — coverage pass@8 ∈ [0.30, 0.60], headroom
+pass@50 − pass@8 ≥ 0.15, and ≫3 tests/problem:
+
+| config | pass@8 | headroom | import-fail | verdict |
+|---|---|---|---|---|
+| BigCodeBench-Complete @ 1.5B | 0.579 | +0.071 | 0.000 | too easy (shallow headroom) |
+| **BigCodeBench-Complete @ 0.5B** | **0.340** | **+0.185** | 0.006 | **SELECTED** |
+| BigCodeBench-Hard @ 1.5B | 0.175 | +0.175 | 0.130 | too hard (below band) |
+
+**Decision:** Phase 3b runs on **BigCodeBench-Complete with Qwen2.5-Coder-0.5B-Instruct
+as the frozen generator G.** BigCodeBench's rich unittest feedback (~5 methods/problem,
+D15 satisfies the "gradient to descend" criterion) plus the 0.5B coverage regime give
+the reachable-but-improbable headroom the register experiment needs — the thing
+HumanEval (0.90) never had.
+
+**Consequence (accepted):** the RGR stack is **rebuilt at 0.5B** — register injection
+(`prompt_embeds` re-validated at 0.5B, an M1-style check), U, and the verifier all
+retrain on 0.5B/BigCodeBench candidates. This is a scale change from Phases 0–2's
+1.5B; those results stay historical (already the rule since D11/D14). M4 already told
+us V-v2b must be retrained regardless.
+
+*Reasoning for accepting the scale change:* no 1.5B-native BigCodeBench config lands
+in the band — the two 1.5B splits bracket the sweet spot (too easy on Complete, too
+hard on Hard). Keeping 1.5B would require an intermediate-difficulty benchmark not in
+the tested set.
+
+*Revisit if:* (a) 0.5B proves too weak for a meaningful register signal in 3b-full
+(the model may lack the capability for conditioning to exploit) → screen an
+intermediate-difficulty benchmark at 1.5B (LiveCodeBench/CodeContests, needs a
+stdin/stdout execution harness; APPS failed to load on `datasets` 5.0); or (b) the
+full-benchmark run on (Complete, 0.5B) contradicts the n=40 subset estimate.
