@@ -233,7 +233,17 @@ A bit-reproducible *verification* mode (greedy + `enforce_eager` + a determinist
 attention backend, at a throughput cost) could be pursued if a future result ever
 needs exact replay; it is not the deployment mode and is not built now.
 
-## D15 — Phase-3 benchmark + generator scale: (BigCodeBench-Complete, Qwen2.5-Coder-0.5B) (2026-07-13, Phase 3a)
+## D15 — Phase-3 benchmark + generator scale: (BigCodeBench-Complete, Qwen2.5-Coder-0.5B) — **RETRACTED 2026-07-14**
+
+> **RETRACTED.** The selection below rested on the n=40 screen using the **first** 40
+> BigCodeBench problems. The full-benchmark confirmation (n=400 **random**, k=50)
+> showed first-n is ~2× easier than a random draw: (Complete, 0.5B) is pass@8 **0.161
+> / headroom +0.092** on a representative sample — it **does not** qualify (below the
+> [0.30,0.60] band, headroom < 0.15). D15 is void; Phase 3a is re-opened and being
+> re-screened on random samples ([PHASE_3.md] §4.2 correction banner). The original
+> reasoning is kept below for the record.
+
+*(Original entry, 2026-07-13 — now retracted:)*
 
 The 3a screen (GATE, [PHASE_3.md] §4) selects the task on its pass@k curve. Exactly
 one screened config clears both criteria — coverage pass@8 ∈ [0.30, 0.60], headroom

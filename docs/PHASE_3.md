@@ -169,6 +169,22 @@ Output: `artifacts/phase3a_screen.json`, `scripts/modal_phase3a.py`.
 
 ### 4.2 Screen results
 
+> **⚠ CORRECTION (2026-07-14) — the confirmation run refutes the first-n screens;
+> GATE re-opened, D15 voided.** All the coverage screens below used the *first* n
+> problems of each split. The full-benchmark confirmation (n=400 **random**, k=50)
+> showed **first-n is ~2× easier than a random draw**: (Complete, 0.5B) fell from
+> pass@8 **0.340 → 0.161** and headroom **+0.185 → +0.092** — **does NOT qualify**
+> (below band, shallow headroom). So every first-n coverage number below is
+> optimistically biased and the "GATE PASS / D15 selection" that follows is
+> **withdrawn**. Re-screening the candidates on *random* samples (Complete@1.5B
+> first) to re-decide. This is the confirmation step doing exactly its job — catching
+> a non-representative subset before 3b was built on it. Random-sample results:
+>
+> | config (random n=400, k=50) | pass@8 | headroom | verdict |
+> |---|---|---|---|
+> | Complete @ 0.5B | **0.161** | +0.092 | does not qualify (was 0.340/+0.185 on first-40) |
+> | Complete @ 1.5B | *running* | — | — |
+
 **Part A — feedback richness (criterion 2), done 2026-07-13.** Loaded candidate
 benchmarks (`characterize`): **BigCodeBench** n=1140, **~5 unittest methods/problem →
 PASS ≫3**; EvalPlus MBPP+ (n=378) / HumanEval+ (n=164) ~4 asserts (PASS, marginal by
@@ -206,9 +222,10 @@ image; **import-failure rate 0.000** — the env covers the sampled problems).
 | **BigCodeBench-Complete @ 0.5B** | **0.340** | **+0.185** | ✅ **sweet spot (qualifies)** |
 | BigCodeBench-Hard @ 1.5B | 0.175 | +0.175 | too hard — below band |
 
-**SELECTED for Phase 3b: (BigCodeBench-Complete, Qwen2.5-Coder-0.5B-Instruct)** — the
-one config satisfying both criteria, with a clean env (0.6% import failure). See
-[DECISIONS.md] **D15** for the scale-change consequence (RGR stack rebuilds at 0.5B).
+~~**SELECTED for Phase 3b: (BigCodeBench-Complete, Qwen2.5-Coder-0.5B-Instruct)**~~
+**[VOIDED 2026-07-14 by the random-sample confirmation — see the correction banner
+at the top of §4.2; this selection rested on the biased first-40 subset. D15
+retracted.]**
 
 **Harness note:** the first Hard/0.5B attempts wedged — `subprocess.run(capture_output)`
 deadlocks when a candidate spawns a grandchild holding the stdout pipe. **Fixed**
@@ -216,13 +233,10 @@ deadlocks when a candidate spawns a grandchild holding the stdout pipe. **Fixed*
 socket timeout); the 0.5B screen then ran clean (2 timeouts / 2000 candidates). This
 executor is reused by Phase 3b.
 
-**GATE 3a: PASS** — exactly one screened config satisfies both criteria:
-**(BigCodeBench-Complete, 0.5B)**. Hard@1.5B is out (coverage below band); the two
-1.5B configs bracket the sweet spot (too easy / too hard), so no 1.5B-native
-BigCodeBench config qualifies — the selection carries a **scale change to 0.5B**
-([DECISIONS.md] D15). *Screen caveat:* first-n (not random) n=40–60 subsets, SE
-~0.06–0.08; a **full-benchmark run on (Complete, 0.5B)** is the immediate next step
-to confirm the point estimates before 3b.
+~~**GATE 3a: PASS** — exactly one screened config satisfies both criteria:
+(BigCodeBench-Complete, 0.5B).~~ **[GATE RE-OPENED 2026-07-14 — the confirmation run
+withdrew this; the first-n subsets were unrepresentative (see banner). On random
+samples, 0.5B does not qualify. Re-deciding after the Complete@1.5B random screen.]**
 
 **Bonus — Phase-3c is partly free:** the three screens already trace the predicted
 **inverted-U of headroom vs coverage** (§6): headroom peaks (+0.185) at the middle
