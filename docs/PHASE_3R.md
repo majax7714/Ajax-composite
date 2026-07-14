@@ -47,6 +47,24 @@ labelled), best-of-8 pass@1 for V and likelihood; then (2) **retrain V on the bf
 distribution** (regenerate MBPP-train candidates + labels on bf16, retrain the QLoRA
 cross-encoder) and retest, isolating staleness from the quantization effect.
 
+**R1b.1 RESULT (2026-07-14, stale 4-bit-trained V on the bf16 M3 pool,
+`artifacts/r1b_h2h_stale_v.json`):**
+
+| metric | V | likelihood | edge (V − lik) | retired 4-bit H1 |
+|---|---|---|---|---|
+| within-problem AUROC (primary) | 0.6462 | 0.6306 | **+0.016** | +0.151 |
+| pooled AUROC (secondary) | 0.7719 | 0.6809 | +0.091 | +0.099 |
+| best-of-8 pass@1 | 0.6646 | **0.7256** | **−0.061** | (V 0.6707 vs lik 0.6280, +0.043) |
+
+**The verifier's edge over likelihood is gone, and on best-of-8 pass@1 it *reverses*:
+on the non-quantized generator, likelihood-reranking (0.7256) beats the stale verifier
+(0.6646).** This is the "H1 partly measured quantization-corrupted self-fluency"
+signature — bf16 likelihood is a much stronger baseline (0.628→0.726). Pooled AUROC
+still favours V (+0.091), but pooled mixes cross-problem difficulty (§4.2's own
+caveat); the *within-problem* number — what reranking uses — is +0.016. The decisive
+question is now R1b.2: does a V **retrained on the bf16 distribution** recover the
+edge, or is the edge intrinsically gone off the quantized generator?
+
 **Pre-registered prediction (committed before running):** the edge is **partially
 restored but far below the original +0.15** — I expect retrained-V within-problem
 minus likelihood ≈ **+0.03 to +0.08** (best-of-8 V a few points above likelihood but

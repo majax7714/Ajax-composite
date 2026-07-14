@@ -930,3 +930,71 @@ def m4_main():
     print(f"{'within-problem':<16}{v_w:>10.4f}{l_w:>11.4f}{OLD['V_within']:>10.4f}{OLD['lik_within']:>11.4f}")
     print(f"\nM4 verdict: {verdict}")
     print("wrote artifacts/m4_verifier_revalidation.json")
+
+
+@app.local_entrypoint()
+def r1b_h2h():
+    """R1b part 1 — full H1 head-to-head on the bf16 M3 pool with the EXISTING
+    (stale, 4-bit-trained) V-v2b. Within-problem macro AUROC (primary) + pooled
+    (secondary) + best-of-8 and best-of-50 pass@1 for V and likelihood. Compared to
+    the retired-4-bit H1 numbers. R1b part 2 (retrain V on bf16) fills the retrained
+    column. [PHASE_3R.md] R1b."""
+    import json as _json
+    import os
+
+    os.chdir(str(REPO))
+    from rgr.evals.calibration import auroc
+
+    m3 = _json.loads((REPO / "runs/modal/m3_candidates.json").read_text())
+    lab = _json.loads((REPO / "runs/modal/m3_labels.json").read_text())
+    assert m3["problem_ids"] == lab["problem_ids"]
+    codes = [[c["code"] for c in row] for row in m3["candidates"]]
+    logp = [[c["mean_logprob"] for c in row] for row in m3["candidates"]]
+    labels = lab["labels"]
+    vsc = m4_score.remote({"problem_ids": m3["problem_ids"], "codes": codes})["v_scores"]
+
+    def clean(row):
+        return [s if s is not None else -1e9 for s in row]
+
+    def within(scores):
+        per = [auroc(clean(sv), [bool(x) for x in lb])
+               for sv, lb in zip(scores, labels) if len({bool(x) for x in lb}) == 2]
+        return sum(per) / len(per)
+
+    def pooled(scores):
+        fs = [s for row in scores for s in clean(row)]
+        fl = [bool(x) for row in labels for x in row]
+        return auroc(fs, fl)
+
+    def best_of(scores, kk):
+        # pass@1 of the argmax-score candidate among the first kk samples, per problem
+        hit = 0
+        for sv, lb in zip(scores, labels):
+            idx = max(range(min(kk, len(sv))), key=lambda i: clean(sv)[i])
+            hit += bool(lb[idx])
+        return hit / len(labels)
+
+    tbl = {
+        "V": {"within": within(vsc), "pooled": pooled(vsc),
+              "bo8": best_of(vsc, 8), "bo50": best_of(vsc, 50)},
+        "likelihood": {"within": within(logp), "pooled": pooled(logp),
+                       "bo8": best_of(logp, 8), "bo50": best_of(logp, 50)},
+    }
+    tbl["edge_within_V_minus_lik"] = tbl["V"]["within"] - tbl["likelihood"]["within"]
+    tbl["edge_bo8_V_minus_lik"] = tbl["V"]["bo8"] - tbl["likelihood"]["bo8"]
+    tbl["_stack"] = "bf16 M3 pool, STALE 4-bit-trained V-v2b (R1b part 1)"
+    tbl["_retired_4bit_H1"] = {"V_within": 0.7189, "lik_within": 0.5680,
+                               "V_bo8": 0.6707, "lik_bo8": 0.6280, "edge_within": 0.151}
+    (REPO / "artifacts/r1b_h2h_stale_v.json").write_text(_json.dumps(tbl, indent=2))
+
+    print("\n=== R1b.1 — H1 head-to-head on bf16 pool (STALE 4-bit-trained V) ===")
+    print(f"{'metric':<22}{'V':>10}{'likelihood':>12}{'edge (V−lik)':>14}")
+    print(f"{'within-problem AUROC':<22}{tbl['V']['within']:>10.4f}{tbl['likelihood']['within']:>12.4f}"
+          f"{tbl['edge_within_V_minus_lik']:>+14.4f}")
+    print(f"{'pooled AUROC':<22}{tbl['V']['pooled']:>10.4f}{tbl['likelihood']['pooled']:>12.4f}")
+    print(f"{'best-of-8 pass@1':<22}{tbl['V']['bo8']:>10.4f}{tbl['likelihood']['bo8']:>12.4f}"
+          f"{tbl['edge_bo8_V_minus_lik']:>+14.4f}")
+    print(f"{'best-of-50 pass@1':<22}{tbl['V']['bo50']:>10.4f}{tbl['likelihood']['bo50']:>12.4f}")
+    print(f"\nretired 4-bit H1: V within 0.7189 vs lik 0.5680 (edge +0.151); "
+          f"bo8 V 0.6707 vs lik 0.6280")
+    print("wrote artifacts/r1b_h2h_stale_v.json")
