@@ -187,27 +187,32 @@ image; **import-failure rate 0.000** — the env covers the sampled problems).
   can solve it solves within ~8 samples; the rest stay unreachable even at 50. Little
   "reachable-but-improbable" middle → **does not qualify** on criterion 1's headroom
   sub-condition. `artifacts/phase3a_screen_complete.json`.
-- **BigCodeBench-Hard** and **0.5B-generator-on-Complete** (both pre-registered
-  fallbacks): **blocked by an execution-harness limit.** BigCodeBench's library-heavy
-  unittests hang (network, plotting, infinite loops in weak-model code) to the
-  per-candidate timeout; at k=50 × 40–60 problems the subprocess+ThreadPool harness
-  can't finish in reasonable wall-clock (two runs killed after >45 min in the exec
-  stage). A hardened harness is needed — process-group kill so a timed-out test can't
-  leave orphans, a tighter bound (≤6 s), and/or the official `bigcodebench` sandboxed
-  evaluator — before Hard/0.5B/other candidates can be screened at k=50.
+- **0.5B-generator on BigCodeBench-Complete (n=40, k=50):** pass@1 0.153, **pass@8
+  0.340** (in-band), **pass@50 0.525**, **headroom +0.185 ≥ 0.15**. **QUALIFIES both
+  criteria.** The pre-registered "push coverage down" lever works: 1.5B was too
+  strong (shallow headroom); the weaker 0.5B on the same benchmark lands in the sweet
+  spot *with* rich per-test feedback. `artifacts/phase3a_screen_c05b.json`.
+- **BigCodeBench-Hard @ 1.5B (n=60, k=50):** *[running — decides whether a
+  1.5B-native config also qualifies, preferred for scale-continuity with Phases 0–2.]*
 
-**3a status: UNDECIDED.** Criterion 2 satisfied (BigCodeBench feedback-rich).
-Criterion 1: BigCodeBench-Complete@1.5B has in-band coverage but **shallow headroom**
-(the "solve-fast-or-not-at-all" shape); the fallbacks that might find deeper headroom
-are gated on the harness fix. *Screen caveat:* first-n (not random), n=40–60 subsets
-(SE ~0.06–0.08) — the headroom gap (0.071 vs 0.15) is outside noise, but coverage
-points are subset-sensitive; the full-benchmark run comes after selection.
+**Harness note:** the first Hard/0.5B attempts wedged — `subprocess.run(capture_output)`
+deadlocks when a candidate spawns a grandchild holding the stdout pipe. **Fixed**
+(process-group isolation + file output + `os.killpg` on timeout + RLIMIT_CPU/AS +
+socket timeout); the 0.5B screen then ran clean (2 timeouts / 2000 candidates). This
+executor is reused by Phase 3b.
 
-**Next options (user's call):** (a) harden the BigCodeBench execution harness and
-re-screen Hard + 0.5B (most direct); (b) treat "1.5B on this benchmark family has too
-little reachable-but-improbable headroom" as the gate's *negative* finding pending
-(b) more evidence; (c) build an I/O-comparison harness for a stdin/stdout benchmark
-(LiveCodeBench; APPS failed to load on `datasets` 5.0).
+**GATE 3a: PASS** — a benchmark satisfying both criteria exists (BigCodeBench-Complete
++ 0.5B generator). Selection between that and Hard@1.5B (pending) is below. *Screen
+caveat:* first-n (not random) n=40–60 subsets, SE ~0.06–0.08; the *full*-benchmark
+run on the selected config comes next (§4), and confirms the point estimates before
+3b.
+
+**Selection implication:** if the qualifying config uses the **0.5B** generator, the
+RGR stack (register injection, verifier) retrains at 0.5B — a scale change from
+Phases 0–2. If **Hard@1.5B** also qualifies, that keeps the 1.5B substrate (M1's
+`prompt_embeds` validation, less rework) and is preferred. This is also the first
+point on the **Phase-3c coverage-vs-model-size curve** (BigCodeBench's headroom
+regime sits at ~0.5B scale).
 
 ---
 
