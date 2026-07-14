@@ -77,6 +77,75 @@ V−likelihood stays ≈0, H1 does not generalize off the quantized generator an
 headline changes to "neither carried load; the verifier gain was substantially a
 quantization artifact." **Blocking: no H1 claim in any draft until R1b closes.**
 
+### R1b.2 — the addendum: SE metric + three free checks, then the retrain
+
+**Selection Efficiency (primary, stack-invariant):**
+`SE = (selected_pass@1 − random_pass@1) / (oracle_pass@8 − random_pass@1)`.
+
+| selector | stack | pass@1 | SE |
+|---|---|---|---|
+| likelihood | 4-bit | 0.6280 | 0.144 |
+| V-v2b | 4-bit | 0.6707 | **0.315** |
+| **likelihood** | **bf16** | **0.7256** | **0.305** |
+| V-v2b (stale) | bf16 | 0.665 | 0.067 |
+
+**Headline: bf16 likelihood (SE 0.305) reproduces the entire 4-bit verifier benefit
+(SE 0.315) for free.** The whole of H1's gain was obtainable by not quantizing the
+generator. And likelihood's improvement is not a pool effect — it gained +0.098 pass@1
+while B0 gained +0.056 and oracle +0.061 (the ranking signal itself got better: the
+direct signature of 4-bit corrupting the logits).
+
+**R1b.2a — pool composition (4-bit, free).** Failing-candidate error shares: wrong_answer
+0.707, runtime 0.234, no_code 0.022, timeout 0.017, syntax 0.015. *(bf16 composition
+deferred to the consolidated pool below.)* `artifacts/r1b2b_stratified_auroc.json`.
+
+**R1b.2b — stratified within-problem AUROC (4-bit) — PREDICTION REFUTED.** The
+smoking-gun hypothesis was "V is near chance on the subtle (wrong_answer-only) stratum
+→ V learned brokenness, not correctness." It is **wrong**: V discriminates *better* on
+subtle than obvious.
+
+| stratum (4-bit) | V AUROC | lik AUROC | edge | n |
+|---|---|---|---|---|
+| subtle (wrong_answer only) | **0.751** | 0.580 | +0.171 | 43 |
+| obvious (any broken) | 0.690 | 0.557 | +0.133 | 47 |
+
+**V learned real correctness signal** (0.751 on subtly-wrong code), not brokenness.
+This *partially rescues* V and reframes the question: not "did V learn correctness"
+(it did) but "is that signal *redundant* with a clean generator's own likelihood."
+
+**R1b.2c — length-bias check (bf16, free) — PREDICTION HELD; no rescue for H1.**
+bf16 likelihood favours *longer* candidates (corr +0.261) which are slightly *less*
+correct (corr −0.163), so length bias mildly *hurts* likelihood — yet it still hits
+SE 0.305; selecting by length alone is terrible (SE −0.222); length-controlled
+(sum-logprob) SE 0.281 ≫ stale-V 0.067. **The bf16 likelihood baseline is genuine, not
+a length artifact.** `artifacts/r1b2c_length_bias.json`.
+
+*Net of the free checks:* neither shortcut settles it. V learned real correctness (2b),
+but bf16 likelihood genuinely captures it too (2c), so the 4-bit V "edge" plausibly
+existed only because 4-bit **corrupted the likelihood baseline** (SE 0.144). The
+decisive test is whether an on-distribution V beats *clean* likelihood (SE 0.305).
+
+**R1b.2d — the retrain (GPU; run after the consolidated bf16 pool).** Regenerate
+Phase-1 labels from the **bf16** generator on MBPP-train, retrain V-v2b with the
+identical D9 recipe (4-bit QLoRA cross-encoder, r16/α32, same schedule — only the
+candidate distribution changes), evaluate on the bf16 pool. Optional off-diagonal
+(scoring only): score the *4-bit* pool with the bf16-trained V (a large edge there
+proves the 4-bit pool is simply easier to discriminate).
+
+**Pre-registered kill criterion for H1 (committed before running):** if retrained-V's
+SE on bf16 ≤ bf16 likelihood's **0.305**, H1 does not survive de-quantization.
+- retrained SE ≈ 0.31+ → **staleness**; H1 stands restated ("beats likelihood *if
+  trained on the deployment distribution*").
+- retrained SE ≈ 0.05–0.10 → **artifact**; even on-distribution V can't beat free
+  likelihood on a clean generator.
+- retrained SE ≈ 0.15–0.25 → **partial**; report the decomposition honestly.
+
+**Pre-registered prediction:** given 2b (V learned real correctness) but 2c (likelihood
+genuine), I now expect **partial, edge-of-significant** — retrained-V SE ≈ **0.33–0.38**,
+a *small* real edge over likelihood's 0.305 (V's correctness signal is partly
+complementary, partly redundant). H1 survives **weakened**, with the quantization
+caveat front and centre. The artifact outcome (SE ≈ likelihood) stays live.
+
 ---
 
 ## R2 — Re-screen with the tail un-suppressed *(pre-registered before run)*

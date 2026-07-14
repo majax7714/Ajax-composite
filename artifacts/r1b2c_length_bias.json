@@ -1,0 +1,10 @@
+{
+  "pool": "bf16 M3",
+  "length_proxy": "char length of extracted code",
+  "corr_length_meanlogprob": 0.26145695807081826,
+  "corr_length_correctness": -0.16348530370155862,
+  "likelihood_SE": 0.3053428530356029,
+  "sumlogprob_SE": 0.2813838708131677,
+  "shortest_SE": -0.22175475585797144,
+  "stale_V_SE_ref": 0.067
+}
