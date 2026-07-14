@@ -343,6 +343,18 @@ Monotone across two conditions × three temperatures (one trivial inversion). **
 
 Temperature rescues **only** the anchored conditions (unanchored E0 is already saturated), and the effect is **dose-responsive**: E2 (more anchored, lower PULL) gains ~2× E1. This belongs in the paper as a first-class finding. (D2b re-reports it on the confound-free mean-per-sample-pass metric.)
 
+**D2b RESULTS (2026-07-14, re-executed committed pool; confound-free metric).** Reporting **mean per-sample pass** (consistent across T; greedy is just pass@1) alongside coverage sharpens the mechanism and forces one honest correction:
+
+| cell (ns=8) | PULL | mean_pass | cov(any) |
+|---|---|---|---|
+| E1 @0.8 / 1.2 | 0.176 / 0.309 | 0.237 / **0.200** | 0.52 / 0.62 |
+| E2 @0.8 / 1.2 | 0.068 / 0.157 | 0.108 / 0.129 | 0.22 / 0.40 |
+| Δ mean_pass, T 0.8→1.2 | | E0 **−0.181** · E1 −0.037 · E2 **+0.021** | Δcov: E0 −0.02 · E1 +0.10 · E2 +0.18 |
+
+- **Escape-distance law is a *coverage* (pass@k) law, not a per-sample-quality law.** Coverage is monotone in PULL (clean), but **mean per-sample pass is flat** — E1 sits at ~0.20 at every temperature. Escape buys pass@8 by **spreading the 8 samples so one lands**, not by making each attempt better. Refines §2: "how far you escape predicts *coverage*" — via diversity.
+- **Temperature dose-response holds on coverage, and the ordering survives on mean_pass** (E2 +0.021 > E1 −0.037 > E0 −0.181), so the "more-anchored-benefits-more" claim is robust — but it too is a coverage/diversity effect. For unanchored E0 the extra temperature just *degrades* per-sample quality (−0.181) with coverage already saturated.
+- **Consequence for R3/BEST-SO-FAR:** conditioning **relocates the distribution** (coverage) without lifting per-sample quality. "Reach what i.i.d. can't" is a diversity/coverage phenomenon — consistent with R3's distribution-shift framing, and it sharpens the BEST-SO-FAR deflation (§5): copying a near-miss won't raise its per-sample frac_tests, exactly as predicted. Output: `dmeasure_conditioning.json` → `per_sample_D2b`.
+
 **§4 — prediction (c) was falsified *backwards*; the corrected reconciliation is sharper.** I predicted TAX rises with T, →0 at greedy. It *falls* (0.45→0.40→0.28): higher T buys escape, so **greedy is the worst case for anchoring, not the safe one** (PULL 0.043–0.075 = near-total reproduction). The "greedy has no pool to collapse" reconciliation is *refuted*, not repaired. Corrected: **escape needs a direction.** Self-Debug conditions on a failure *and supplies rich execution feedback* (traces, line-by-line) that tells the model where to diverge:
 
 - B2, no feedback → *undirected* escape → the model copies (PULL 0.075–0.309, coverage collapse).

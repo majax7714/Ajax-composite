@@ -62,5 +62,82 @@
       "coverage": 1.0,
       "tax_vs_E0": -0.09999999999999998
     }
+  },
+  "per_sample_D2b": {
+    "_note": "D2b (Add.III \u00a76): mean per-sample pass = one consistent metric across T (greedy ns=1, T>0 ns=8; coverage_any_pass is the confounded published number). Re-executed committed runs/modal/dmeasure_gen.json via Daytona.",
+    "cells": {
+      "E0@0.0": {
+        "ns": 1,
+        "mean_per_sample_pass": 0.65,
+        "coverage_any_pass": 0.65,
+        "pull": null
+      },
+      "E0@0.8": {
+        "ns": 8,
+        "mean_per_sample_pass": 0.5875,
+        "coverage_any_pass": 0.9166666666666666,
+        "pull": null
+      },
+      "E0@1.2": {
+        "ns": 8,
+        "mean_per_sample_pass": 0.40625,
+        "coverage_any_pass": 0.9,
+        "pull": null
+      },
+      "E1@0.0": {
+        "ns": 1,
+        "mean_per_sample_pass": 0.2,
+        "coverage_any_pass": 0.2,
+        "pull": 0.07511510419816915
+      },
+      "E1@0.8": {
+        "ns": 8,
+        "mean_per_sample_pass": 0.2375,
+        "coverage_any_pass": 0.5166666666666667,
+        "pull": 0.17583480319225625
+      },
+      "E1@1.2": {
+        "ns": 8,
+        "mean_per_sample_pass": 0.2,
+        "coverage_any_pass": 0.6166666666666667,
+        "pull": 0.3094718039958376
+      },
+      "E2@0.0": {
+        "ns": 1,
+        "mean_per_sample_pass": 0.1,
+        "coverage_any_pass": 0.1,
+        "pull": 0.0431160527790606
+      },
+      "E2@0.8": {
+        "ns": 8,
+        "mean_per_sample_pass": 0.10833333333333334,
+        "coverage_any_pass": 0.21666666666666667,
+        "pull": 0.06781132873328596
+      },
+      "E2@1.2": {
+        "ns": 8,
+        "mean_per_sample_pass": 0.12916666666666668,
+        "coverage_any_pass": 0.4,
+        "pull": 0.15665568083591422
+      },
+      "E5@0.0": {
+        "ns": 1,
+        "mean_per_sample_pass": 1.0,
+        "coverage_any_pass": 1.0,
+        "pull": 0.019620253934481177
+      },
+      "E5@0.8": {
+        "ns": 8,
+        "mean_per_sample_pass": 0.9583333333333334,
+        "coverage_any_pass": 1.0,
+        "pull": 0.06634013961085727
+      },
+      "E5@1.2": {
+        "ns": 8,
+        "mean_per_sample_pass": 0.79375,
+        "coverage_any_pass": 1.0,
+        "pull": 0.16762800081157422
+      }
+    }
   }
 }
