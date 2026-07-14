@@ -156,7 +156,7 @@ def _extract_code(text):
 
 @app.function(image=GEN_IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=7200)
 def bcb_generate(n_problems: int = 60, k: int = 50, seed: int = 17,
-                 dataset: str = "bigcode/bigcodebench"):
+                 dataset: str = "bigcode/bigcodebench", model: str = MODEL):
     """Generate k i.i.d. samples per BigCodeBench-instruct problem (vLLM bf16)."""
     from datasets import load_dataset
     from transformers import AutoTokenizer
@@ -164,7 +164,7 @@ def bcb_generate(n_problems: int = 60, k: int = 50, seed: int = 17,
 
     ds = load_dataset(dataset, split="v0.1.4")
     idx = list(range(min(n_problems, len(ds))))
-    tok = AutoTokenizer.from_pretrained(MODEL)
+    tok = AutoTokenizer.from_pretrained(model)
     SYS = ("You are a Python programming assistant. Answer with a single fenced "
            "Python code block containing a complete solution, and nothing else.")
 
@@ -175,7 +175,7 @@ def bcb_generate(n_problems: int = 60, k: int = 50, seed: int = 17,
             add_generation_prompt=True, tokenize=False)
 
     prompts = [prompt(i) for i in idx]
-    llm = LLM(model=MODEL, dtype="bfloat16", gpu_memory_utilization=0.90,
+    llm = LLM(model=model, dtype="bfloat16", gpu_memory_utilization=0.90,
               max_model_len=4096, seed=seed)
     sp = SamplingParams(n=k, temperature=0.8, top_p=0.95, max_tokens=1024, seed=seed)
     outs = llm.generate(prompts, sp)
@@ -235,7 +235,7 @@ def bcb_exec(problems: list, timeout_s: int = 12) -> list:
 
 
 @app.local_entrypoint()
-def screen_main(n_problems: int = 60, k: int = 50, dataset: str = "bigcode/bigcodebench"):
+def screen_main(n_problems: int = 60, k: int = 50, dataset: str = "bigcode/bigcodebench", model: str = MODEL):
     from collections import Counter
     from math import comb
     from pathlib import Path
@@ -243,7 +243,7 @@ def screen_main(n_problems: int = 60, k: int = 50, dataset: str = "bigcode/bigco
     def pass_at_k(n, c, kk):
         return 1.0 if n - c < kk else 1.0 - comb(n - c, kk) / comb(n, kk)
 
-    gen = bcb_generate.remote(n_problems, k, 17, dataset)
+    gen = bcb_generate.remote(n_problems, k, 17, dataset, model)
     problems = gen["problems"]
     results = bcb_exec.remote(problems)
 
@@ -260,7 +260,7 @@ def screen_main(n_problems: int = 60, k: int = 50, dataset: str = "bigcode/bigco
     p8, p50 = mean_pak(8), mean_pak(min(k, 50))
     in_band = 0.30 <= p8 <= 0.60
     headroom = (p50 - p8) >= 0.15
-    result = {"benchmark": dataset, "n_problems": len(counts), "k": k,
+    result = {"benchmark": dataset, "generator": model, "n_problems": len(counts), "k": k,
               "pass@1": mean_pak(1), "pass@8": p8, "pass@50": p50,
               "pass50_minus_pass8": p50 - p8, "import_failure_rate": import_rate,
               "error_breakdown": dict(errs),
