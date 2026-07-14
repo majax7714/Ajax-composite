@@ -133,6 +133,40 @@ that is the exact error that produced the H2 null.** Select on criteria, run the
 *full* benchmark, difficulty-stratified results as secondary (no cherry-picked
 subset). (Absorbs DIAG-6, descoped at [DECISIONS.md] D12.)
 
+### 4.1 Screen execution plan + pre-registration (committed 2026-07-13, before running)
+
+The reference stack has HumanEval 0.902 / MBPP-ish saturated and **test-poor**
+(HumanEval binary-executed; MBPP median 3 asserts) — both fail criterion 2. So the
+screen must reach for richer, harder benchmarks. **Two-part screen:**
+
+- **Part A — feedback richness (criterion 2), cheap, no generation.** Load each
+  candidate's metadata and report tests-per-problem + execution paradigm
+  (function-call vs stdin/stdout). Pure dataset property.
+- **Part B — coverage (criterion 1), GPU.** For the feedback-rich, tractable
+  candidate(s): generate **k=50** on a representative subset with vLLM bf16, execute,
+  compute pass@8 and pass@50.
+
+Tractability note: function-call benchmarks (BigCodeBench, EvalPlus MBPP+/HumanEval+)
+reuse an assert/unittest driver; stdin/stdout benchmarks (APPS, CodeContests,
+LiveCodeBench) need a separate I/O-comparison harness. Screen the tractable
+feedback-rich candidates first; expand only if none qualifies.
+
+**Pre-registered predictions:**
+- *Criterion 2:* BigCodeBench (unittest, many methods) and EvalPlus MBPP+/HumanEval+
+  (dozens–hundreds of augmented tests) and APPS/CodeContests/LiveCodeBench (many I/O
+  cases) all **pass ≫3**; plain MBPP (3) / HumanEval (binary) **fail** (already shown).
+- *Criterion 1:* **BigCodeBench is the most likely qualifier** — Qwen2.5-Coder-1.5B
+  bf16 pass@8 predicted **≈ 0.40–0.55** (in-band), with pass@50 − pass@8 ≥ 0.15.
+  EvalPlus MBPP+/HumanEval+ likely **too easy** (pass@8 > 0.60 — same easy problems,
+  just more tests). APPS/CodeContests likely **too hard** (pass@50 ≈ low → no
+  foothold). **Prediction: the gate PASSES with BigCodeBench.** Genuine uncertainty:
+  BigCodeBench-Complete may land a hair above 0.60 (Qwen2.5-Coder is strong for 1.5B);
+  if so, **BigCodeBench-Hard** is the in-band fallback.
+- If BigCodeBench also exceeds 0.60, the 0.5B generator (push coverage down) or the
+  Hard split is the next lever before declaring the program dead at 1.5B.
+
+Output: `artifacts/phase3a_screen.json`, `scripts/modal_phase3a.py`.
+
 ---
 
 ## 5. Phase 3b — the refinement channel study
