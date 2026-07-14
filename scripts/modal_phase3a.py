@@ -188,16 +188,33 @@ def bcb_generate(n_problems: int = 60, k: int = 50, seed: int = 17,
     return {"problems": problems, "k": k}
 
 
-@app.function(image=EXEC_IMAGE, timeout=7200, cpu=16.0)
-def bcb_exec(problems: list, timeout_s: int = 12) -> list:
-    """Execute each candidate's code+unittest; return per-candidate pass + frac +
-    error class (import failures counted separately to gauge env coverage)."""
+@app.function(image=EXEC_IMAGE, timeout=7200, cpu=16.0, memory=32768)
+def bcb_exec(problems: list, timeout_s: int = 10, max_workers: int = 16) -> list:
+    """Execute each candidate's code+unittest, HARDENED so a single candidate can
+    never wedge the pool:
+      • own session (start_new_session) → the whole process group is killable;
+      • stdout/stderr → a FILE, never a PIPE → no grandchild-holds-the-pipe deadlock
+        (the exact bug that stuck the earlier runs);
+      • on timeout, os.killpg(SIGKILL) reaps the candidate AND any children it spawned;
+      • a per-process rlimit preamble bounds CPU seconds (infinite loops die fast),
+        memory (2 GB), and socket timeout (network tests fail fast).
+    Returns per-candidate pass + frac + error class."""
+    import os
+    import signal
     import subprocess
     import sys
     import tempfile
     from concurrent.futures import ThreadPoolExecutor
     from pathlib import Path
 
+    PREAMBLE = (
+        "import resource as _rs, socket as _sk\n"
+        "try:\n"
+        f"    _rs.setrlimit(_rs.RLIMIT_CPU, ({timeout_s}, {timeout_s}))\n"
+        "    _rs.setrlimit(_rs.RLIMIT_AS, (2*1024**3, 2*1024**3))\n"
+        "except Exception: pass\n"
+        "_sk.setdefaulttimeout(4)\n\n"
+    )
     RUNNER = ("\n\nimport unittest as _ut\n"
               "_r = _ut.main(argv=[''], exit=False, verbosity=0).result\n"
               "print('BCBRESULT', _r.testsRun, len(_r.failures), len(_r.errors))\n")
@@ -206,36 +223,53 @@ def bcb_exec(problems: list, timeout_s: int = 12) -> list:
         code, test = args
         if code is None:
             return {"passed": False, "frac": 0.0, "err": "no_code"}
-        src = code + "\n\n" + test + RUNNER
         with tempfile.TemporaryDirectory() as d:
-            p = Path(d) / "cand.py"
-            p.write_text(src)
-            try:
-                r = subprocess.run([sys.executable, str(p)], capture_output=True,
-                                   text=True, timeout=timeout_s, cwd=d)
-            except subprocess.TimeoutExpired:
-                return {"passed": False, "frac": 0.0, "err": "timeout"}
-        out = r.stdout + "\n" + r.stderr
+            (Path(d) / "cand.py").write_text(PREAMBLE + code + "\n\n" + test + RUNNER)
+            outf = Path(d) / "o.txt"
+            timed_out = False
+            with open(outf, "wb") as fh:
+                try:
+                    proc = subprocess.Popen([sys.executable, "cand.py"], stdout=fh,
+                                            stderr=subprocess.STDOUT, cwd=d,
+                                            start_new_session=True)
+                except Exception:
+                    return {"passed": False, "frac": 0.0, "err": "spawn"}
+                try:
+                    proc.wait(timeout=timeout_s)
+                except subprocess.TimeoutExpired:
+                    timed_out = True
+                # reap the whole session (candidate + any grandchildren) unconditionally
+                try:
+                    os.killpg(os.getpgid(proc.pid), signal.SIGKILL)
+                except (ProcessLookupError, PermissionError):
+                    pass
+                try:
+                    proc.wait(timeout=5)
+                except Exception:
+                    pass
+            out = outf.read_text(errors="replace")
+        if timed_out:
+            return {"passed": False, "frac": 0.0, "err": "timeout"}
         line = next((l for l in out.splitlines() if l.startswith("BCBRESULT")), None)
         if line:
             _, n, f, e = line.split()
             n, f, e = int(n), int(f), int(e)
             ok = n > 0 and f == 0 and e == 0
-            return {"passed": ok, "frac": (n - f - e) / n if n else 0.0, "err": "" if ok else "wrong_answer"}
-        err = ("import" if "ModuleNotFoundError" in out or "ImportError" in out
+            return {"passed": ok, "frac": (n - f - e) / n if n else 0.0,
+                    "err": "" if ok else "wrong_answer"}
+        err = ("import" if ("ModuleNotFoundError" in out or "ImportError" in out)
                else "syntax" if "SyntaxError" in out else "runtime")
         return {"passed": False, "frac": 0.0, "err": err}
 
     results = []
-    with ThreadPoolExecutor(max_workers=16) as tp:
+    with ThreadPoolExecutor(max_workers=max_workers) as tp:
         for prob in problems:
-            res = list(tp.map(run_one, [(c, prob["test"]) for c in prob["codes"]]))
-            results.append(res)
+            results.append(list(tp.map(run_one, [(c, prob["test"]) for c in prob["codes"]])))
     return results
 
 
-@app.local_entrypoint()
-def screen_main(n_problems: int = 60, k: int = 50, dataset: str = "bigcode/bigcodebench", model: str = MODEL):
+def _finalize(problems: list, results: list, dataset: str, model: str, k: int, tag: str):
+    """Score pass@k from execution results, write the artifact, print the verdict."""
     from collections import Counter
     from math import comb
     from pathlib import Path
@@ -243,39 +277,60 @@ def screen_main(n_problems: int = 60, k: int = 50, dataset: str = "bigcode/bigco
     def pass_at_k(n, c, kk):
         return 1.0 if n - c < kk else 1.0 - comb(n - c, kk) / comb(n, kk)
 
-    gen = bcb_generate.remote(n_problems, k, 17, dataset, model)
-    problems = gen["problems"]
-    results = bcb_exec.remote(problems)
-
     counts, errs = [], Counter()
     for res in results:
-        c = sum(r["passed"] for r in res)
-        counts.append((len(res), c))
+        counts.append((len(res), sum(r["passed"] for r in res)))
         errs.update(r["err"] for r in res)
-    import_rate = errs.get("import", 0) / sum(errs.values())
+    import_rate = errs.get("import", 0) / max(1, sum(errs.values()))
 
     def mean_pak(kk):
         return sum(pass_at_k(n, c, kk) for n, c in counts) / len(counts)
 
     p8, p50 = mean_pak(8), mean_pak(min(k, 50))
-    in_band = 0.30 <= p8 <= 0.60
-    headroom = (p50 - p8) >= 0.15
+    in_band, headroom = 0.30 <= p8 <= 0.60, (p50 - p8) >= 0.15
     result = {"benchmark": dataset, "generator": model, "n_problems": len(counts), "k": k,
               "pass@1": mean_pak(1), "pass@8": p8, "pass@50": p50,
               "pass50_minus_pass8": p50 - p8, "import_failure_rate": import_rate,
               "error_breakdown": dict(errs),
               "criterion1_coverage_band[0.30,0.60]": in_band,
-              "criterion1_headroom>=0.15": headroom,
-              "criterion2_feedback_rich": True,  # ~5 unittest methods (Part A)
+              "criterion1_headroom>=0.15": headroom, "criterion2_feedback_rich": True,
               "gate": "PASS" if (in_band and headroom) else "does-not-qualify"}
-    Path("artifacts/phase3a_screen.json").write_text(json.dumps(result, indent=2))
-    print(f"\n=== Phase 3a — coverage screen: {dataset} ({len(counts)} problems, k={k}) ===")
+    Path("artifacts").mkdir(exist_ok=True)
+    Path(f"artifacts/phase3a_screen_{tag}.json").write_text(json.dumps(result, indent=2))
+    print(f"\n=== Phase 3a screen: {dataset} @ {model.split('/')[-1]} "
+          f"({len(counts)} problems, k={k}) ===")
     print(f"pass@1 {result['pass@1']:.3f}  pass@8 {p8:.3f}  pass@50 {p50:.3f}  "
           f"(pass@50−pass@8 = {p50-p8:+.3f})")
     print(f"coverage band [0.30,0.60]: {in_band}   headroom ≥0.15: {headroom}")
-    print(f"import-failure rate (env coverage): {import_rate:.3f}   errors: {dict(errs)}")
-    print(f"\n3a gate (BigCodeBench): {result['gate']}")
-    print("wrote artifacts/phase3a_screen.json")
+    print(f"import-failure rate: {import_rate:.3f}   errors: {dict(errs)}")
+    print(f"\n3a gate ({tag}): {result['gate']}")
+    print(f"wrote artifacts/phase3a_screen_{tag}.json")
+    return result
+
+
+@app.local_entrypoint()
+def screen_main(n_problems: int = 60, k: int = 50, dataset: str = "bigcode/bigcodebench",
+                model: str = MODEL, tag: str = "screen"):
+    """Generate (vLLM) → persist candidates → execute (hardened) → score. Candidates
+    are saved before execution so a slow/failed exec can be re-run via exec_only
+    without regenerating."""
+    from pathlib import Path
+    gen = bcb_generate.remote(n_problems, k, 17, dataset, model)
+    Path("runs/modal").mkdir(parents=True, exist_ok=True)
+    Path(f"runs/modal/bcb_cand_{tag}.json").write_text(
+        json.dumps({"problems": gen["problems"], "k": k, "dataset": dataset, "model": model}))
+    results = bcb_exec.remote(gen["problems"])
+    _finalize(gen["problems"], results, dataset, model, k, tag)
+
+
+@app.local_entrypoint()
+def exec_only(tag: str = "screen"):
+    """Re-execute persisted candidates (runs/modal/bcb_cand_<tag>.json) — no
+    regeneration. For iterating on the executor after a slow run."""
+    from pathlib import Path
+    c = json.loads(Path(f"runs/modal/bcb_cand_{tag}.json").read_text())
+    results = bcb_exec.remote(c["problems"])
+    _finalize(c["problems"], results, c["dataset"], c["model"], c["k"], tag)
 
 
 @app.local_entrypoint()
