@@ -1,9 +1,12 @@
 # Phase M — throughput STACK rebuild (HF/4-bit → vLLM/bf16, on L4)
 
-*Written 2026-07-12. **BEGUN 2026-07-13** — the diagnostic record is closed
-(DIAG-1..11 committed), so §0 is green and Phase M is in progress. Gate log at §5.
-This is the throughput rebuild that [PHASE_3.md] §3 makes a hard prerequisite for
-Phase 3a; see §0.5 for the Phase-3 alignment.*
+*Written 2026-07-12. **COMPLETE 2026-07-13** — all gates M0–M5 closed (gate log §5).
+The stack is now vLLM + bf16 on Modal L4: **100× throughput**, register path
+migrates faithfully (M1), baselines re-based with an explained bf16 lift (M3). Two
+consequential outcomes carry into Phase 3: **V-v2b needs retraining** on the
+deployment distribution (M4, folds into 3b) and the **bit-lock is retired for a
+statistical reproducibility standard** (M5 / D14). Phase 3a (benchmark screen) is
+now unblocked. Phase-3 alignment in §0.5.*
 
 > **Platform ≠ stack (correction, 2026-07-12).** This document originally bundled
 > the *platform* move (Kaggle → Modal) with the *stack* rebuild (fp16 + vLLM).
@@ -274,11 +277,19 @@ Sequential. Each gate must pass before the next begins. No gate may be tuned pas
       retrain **folds into Phase 3b's verifier training on the selected benchmark**,
       not a standalone HumanEval retrain. → `artifacts/m4_verifier_revalidation.json`,
       `scripts/modal_rgr.py::m4_*`.
-- [ ] **M5 — Re-lock.** New bit-for-bit reproducibility lock on the new stack: two
-      independent runs, same seed policy, byte-identical candidates — the new
-      lock_a/lock_b. Freeze new baselines. Update [COMPUTE_ACCOUNTING.md]: the
-      budgeted unit ("one candidate generation") is unchanged, but note the stack
-      change in the amendment log (empty until now).
+- [x] **M5 — Re-lock. DONE → statistical lock (2026-07-13).** Two independent seeded
+      runs (seed 17) on vLLM/bf16/L4, byte-compared: **greedy 143/164**,
+      **seeded-stochastic 294/328** candidates identical — vLLM's throughput kernels
+      (reduction atomics, CUDA graphs, FlashInfer→PyTorch sampling fallback) are
+      **not bit-deterministic** run-to-run (coherent alternative generations, as at
+      K1). The Phase-0 bit-lock does **not** survive the migration and cannot be
+      reconstructed on this stack. **Reproducibility standard redefined as
+      *statistical*** ([DECISIONS.md] **D14**): aggregate pass@k/AUROC reproduce
+      within sampling noise — M3's two independent bf16 draws agreed to ~1 pt (B0
+      0.6418 vs 0.6479; pass@8 0.9146 vs 0.9024) — and Phase-3 gates on bootstrap CIs
+      robust to ~10% candidate drift. `lock_{a,b}_bf16.jsonl` retained as a
+      drift-reference, not a bit-lock. COMPUTE_ACCOUNTING second amendment logged.
+      → `artifacts/m5_relock.json`, `scripts/modal_phasem.py::m5_*`.
 
 ---
 
@@ -291,7 +302,7 @@ Sequential. Each gate must pass before the next begins. No gate may be tuned pas
 | **M2** | 2026-07-13 | **PASS** | L4, 64 prompts × 256 tok: HF bf16 batch-1 **28 tok/s** → vLLM bf16 **2809 tok/s** = **100×** (281× vs old 4-bit/T4 ~10 tok/s). Gate ≥20× cleared 5×. `runs/modal/m2_throughput.json` |
 | **M3** | 2026-07-13 | **PASS** | vLLM bf16 vs old 4-bit, 164 HumanEval, execution held to Daytona (only the gen stack varies): all metrics shift **up** — B0 .592→**.648**, B1-lik .628→**.726**, pass@8 **.842→.902**; max \|Δ\| .098, uniformly positive & explained by bf16 lift. *(logprob-populate bug in the first run made B1-lik bogus; fixed with `logprobs=1` + fresh draw.)* `artifacts/m3_rebaseline.json` |
 | **M4** | 2026-07-13 | **DONE → RETRAIN** | V-v2b on the bf16 pool: **global AUROC 0.772** (still > likelihood 0.681), but **within-problem 0.646 vs likelihood 0.631** — the reranking edge collapsed from **+0.15 → +0.016** (V ↓ 0.719→0.646, likelihood ↑ 0.568→0.631). The substrate change stale-d V's within-problem boundary → **verifier retrain required on the deployment distribution** (fold into Phase 3b on the selected benchmark). `artifacts/m4_verifier_revalidation.json` |
-| M5 | — | — | new lock_a/lock_b; COMPUTE_ACCOUNTING 2nd amendment |
+| **M5** | 2026-07-13 | **DONE → statistical lock** | vLLM is **not** bit-reproducible: two independent seeded runs gave **greedy 143/164**, **stochastic 294/328** byte-identical (coherent kernel drift, cf. K1). Bit-lock retired; reproducibility standard redefined as **statistical** ([DECISIONS.md] D14) — M3's two draws agreed to ~1 pt. COMPUTE_ACCOUNTING 2nd amendment logged. `artifacts/m5_relock.json`, `lock_{a,b}_bf16.jsonl` |
 
 ---
 

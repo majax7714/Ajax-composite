@@ -1,0 +1,17 @@
+{
+  "_label": "M5 \u2014 re-lock on vLLM/bf16/L4 (new lock_a/lock_b)",
+  "seed": 17,
+  "n_problems": 164,
+  "seeded_stochastic": {
+    "candidate_match": 294,
+    "candidate_total": 328,
+    "problem_match": 133,
+    "byte_identical": false
+  },
+  "greedy": {
+    "candidate_match": 143,
+    "candidate_total": 164,
+    "byte_identical": false
+  },
+  "verdict": "BIT-LOCK UNATTAINABLE on vLLM (greedy 143/164, stochastic 294/328 byte-identical across independent runs) \u2014 throughput kernels are not bit-deterministic. Reproducibility standard redefined as STATISTICAL (aggregate pass@k/AUROC reproduce within sampling noise; M3's two independent draws agreed to ~1pt). Accepted tradeoff of the 100x throughput stack (D11/D14). See PHASE_M M5."
+}

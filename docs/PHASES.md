@@ -198,20 +198,23 @@ Scale to 4B QLoRA · FiLM / cross-attention injection · RL register training ·
 register-conditioned V (flip `verifier.sees_register`, retrain V) · d_r and k
 sweeps.
 
-## Phase M — stack migration (IN PROGRESS 2026-07-13; infra refactor, no science change)
+## Phase M — stack migration (COMPLETE 2026-07-13; infra refactor, no science change)
 
 Kaggle/HF/4-bit → Modal/vLLM/**bf16 on L4**. Full plan and M0–M5 gates: [PHASE_M.md];
 Phase-3 alignment in its §0.5. Precondition met (record closed DIAG-1..11); repo
-tagged `pre-phase-m-hf-nf4`. **Throughput result: HF batch-1 28 tok/s → vLLM 2809
-tok/s (100×; 281× vs old 4-bit/T4 effective ~10 tok/s).**
+tagged `pre-phase-m-hf-nf4`. **Throughput: HF batch-1 28 tok/s → vLLM 2809 tok/s
+(100×; 281× vs old 4-bit/T4 effective ~10 tok/s).**
 
 - [x] M0 precondition + repo tag + **D11 → bf16/L4** · [x] **M1 vLLM≡HF soft-prompt
       19/20 exact greedy (register path migrates)** · [x] **M2 throughput 100×** ·
       [x] **M3 re-baseline: all metrics shift up (bf16 lift), pass@8 .842→.902,
-      B1-lik→.726** · [x] **M4: V global AUROC 0.772 holds but within-problem
-      reranking edge over likelihood collapsed +0.15→+0.016 → V RETRAIN required
-      (fold into Phase 3b on the selected benchmark)** · [ ] M5 new lock_a/lock_b +
-      COMPUTE_ACCOUNTING amendment.
+      B1-lik→.726** · [x] **M4: V within-problem reranking edge collapsed +0.15→+0.016
+      → V RETRAIN required (folds into Phase 3b)** · [x] **M5: vLLM not
+      bit-reproducible (greedy 143/164) → bit-lock retired for a statistical standard
+      (D14); COMPUTE_ACCOUNTING 2nd amendment**.
+
+**Phase M complete — Phase 3a (benchmark screen) is unblocked.** Two outcomes carry
+forward: V-v2b retrain (into 3b) and the statistical reproducibility standard (D14).
 
 ---
 

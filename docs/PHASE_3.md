@@ -91,14 +91,17 @@ not the thesis.
 
 ---
 
-## 3. Prerequisite — Phase M must land first
+## 3. Prerequisite — Phase M ✅ COMPLETE (2026-07-13)
 
 Phase 3 is materially bigger (more conditions, harder benchmark, longer solutions, a
-large-k screen). Throughput is now **load-bearing**. Complete [PHASE_M.md] — fp16 +
-vLLM (`enable_prompt_embeds`) + L4, decoupled CPU execution, batching across problems
-not steps, gates M1–M5 incl. **M4 verifier revalidation** — before 3a. **Re-lock
-baselines on the new stack.** No Phase-3 number may be compared to any pre-migration
-number ([COMPUTE_ACCOUNTING.md]; §8 out-of-scope).
+large-k screen), so throughput was load-bearing. [PHASE_M.md] is **done** — vLLM +
+bf16 + L4, `prompt_embeds` register path validated (M1), decoupled CPU execution,
+100× throughput (M2), baselines re-based with an explained bf16 lift (M3). Two
+outcomes bind Phase 3: **(a) V-v2b must be retrained on the deployment distribution**
+— its within-problem reranking edge collapsed on bf16 (M4) — folded into 3b on the
+selected benchmark; **(b) reproducibility is now statistical, not bit-for-bit** (M5 /
+[DECISIONS.md] D14) — Phase-3's bootstrap-CI gates already assume this. No Phase-3
+number may be compared to any pre-migration number ([COMPUTE_ACCOUNTING.md]; §8).
 
 ---
 
@@ -227,8 +230,9 @@ measured) — the negative becomes *data*. **That is the paper.**
 
 1. **DIAG-11** (free, CPU, non-blocking) — sets the H1 prior. *[done — see §1 / [DIAGNOSTICS.md]]*
 2. **Correct the DIAG-10 verdict + roll-up row** per §0 (append, not revise). *[done 2026-07-13]*
-3. **Phase M** — stack migration, gates M1–M5, re-lock.
-4. **Phase 3a** — benchmark screen. GATE: both criteria.
+3. **Phase M** ✅ — stack migration, gates M0–M5 done (vLLM/bf16/L4, 100×; V-retrain
+   + statistical-lock outcomes carried into 3b / D14).
+4. **Phase 3a** ← NEXT — benchmark screen. GATE: both criteria.
 5. **Phase 3b-lite** — B1 / ANCHOR / ABSTRACT-text. No training. GATE: H1.
 6. **Phase 3b-full** — REG+, all three fixes. Only if H1 passed. H3.
 7. **Phase 3c** — coverage sweep. Only if H1 passed.

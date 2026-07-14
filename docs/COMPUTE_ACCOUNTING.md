@@ -92,3 +92,17 @@ a rerun.
   amendment records the platform change and the drift; it changes no reported
   Phase-0/1/2 figure (those remain historical results of the retired Kaggle
   stack, per [PHASE_M.md] §3 — never cross-compared).
+
+- **2026-07-13 — stack rebuild (HF + NF4 + T4 → vLLM + bf16 + L4), no unit change.**
+  Phase M migrated the generation stack: HF `generate()` + bitsandbytes NF4 on
+  Turing T4 → vLLM continuous batching + bf16 on Ada L4 ([PHASE_M.md], [DECISIONS.md]
+  D11). **The budgeted unit — one candidate generation — is unchanged**; only the
+  hardware and backend changed, at **~100× throughput** (M2: 28 → 2809 tok/s). Two
+  accounting-relevant consequences: (1) all Phase-0/1/2 figures remain **historical
+  results of the retired stack**, never cross-compared to a post-migration number
+  (M3 re-based B0/B1 with an explained bf16 lift — a *new* reference, not a
+  correction); (2) the **bit-for-bit reproducibility lock is retired** — vLLM is not
+  bit-deterministic run-to-run (M5: greedy 143/164 byte-identical), so the
+  reproducibility standard is now **statistical** (D14), which the CI-gated Phase-3
+  comparisons already assume. The `pre-phase-m-hf-nf4` tag preserves the old stack
+  exactly.

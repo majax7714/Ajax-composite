@@ -166,6 +166,93 @@ def m1(n: int = 20, max_new: int = 48):
 
 
 @app.function(image=IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=3600)
+def m5_gen(seed: int = 17, n_problems: int = 164, n_samples: int = 2, greedy: bool = False):
+    """M5 re-lock generation — one independent run on the vLLM/bf16 stack. Seeded
+    (engine + sampling) so two runs with the same seed should reproduce. Returns
+    per-problem candidate texts for byte comparison. greedy=True → temp 0 (the
+    deterministic-by-construction fallback lock)."""
+    import os
+
+    os.chdir("/root/rgr")
+    from transformers import AutoTokenizer
+
+    from rgr.config import load_config
+    from rgr.data.humaneval import load_humaneval
+    from rgr.generator.formatting import SYSTEM_PROMPT, build_prompt
+    from rgr.types import SplitRole
+    from vllm import LLM, SamplingParams
+
+    g = load_config("configs/phase0_harness.toml").generator
+    tok = AutoTokenizer.from_pretrained(MODEL)
+    problems = load_humaneval().checkout(SplitRole.HELDOUT_EVAL)[:n_problems]
+    prompts = [tok.apply_chat_template(
+        [{"role": "system", "content": SYSTEM_PROMPT},
+         {"role": "user", "content": build_prompt(p.prompt)}],
+        add_generation_prompt=True, tokenize=False) for p in problems]
+    llm = LLM(model=MODEL, dtype="bfloat16", gpu_memory_utilization=0.85,
+              max_model_len=2048, seed=seed)
+    if greedy:
+        sp = SamplingParams(n=1, temperature=0.0, max_tokens=g.max_new_tokens)
+    else:
+        sp = SamplingParams(n=n_samples, temperature=g.temperature, top_p=g.top_p,
+                            max_tokens=g.max_new_tokens, seed=seed)
+    outs = llm.generate(prompts, sp)
+    return {"problem_ids": [p.problem_id for p in problems],
+            "texts": [[o.text for o in req.outputs] for req in outs]}
+
+
+@app.local_entrypoint()
+def m5_main(n_problems: int = 164, n_samples: int = 2):
+    """M5 gate. Two independent seeded runs → byte compare (the new lock_a/lock_b).
+    Also a greedy pair as the deterministic-by-construction check. Writes the new
+    lock artifacts + the COMPUTE_ACCOUNTING second-amendment note."""
+    def cmp(a, b):
+        prob_ids = a["problem_ids"]
+        cand_tot = sum(len(t) for t in a["texts"])
+        cand_match = sum(x == y for ta, tb in zip(a["texts"], b["texts"])
+                         for x, y in zip(ta, tb))
+        prob_match = sum(ta == tb for ta, tb in zip(a["texts"], b["texts"]))
+        return prob_match, len(prob_ids), cand_match, cand_tot
+
+    a = m5_gen.remote(17, n_problems, n_samples, False)
+    b = m5_gen.remote(17, n_problems, n_samples, False)
+    pm, pt, cm, ct = cmp(a, b)
+
+    ga = m5_gen.remote(17, n_problems, 1, True)
+    gb = m5_gen.remote(17, n_problems, 1, True)
+    gpm, gpt, gcm, gct = cmp(ga, gb)
+
+    (REPO / "artifacts/lock_a_bf16.jsonl").write_text(
+        "\n".join(json.dumps({"problem_id": p, "texts": t})
+                  for p, t in zip(a["problem_ids"], a["texts"])))
+    (REPO / "artifacts/lock_b_bf16.jsonl").write_text(
+        "\n".join(json.dumps({"problem_id": p, "texts": t})
+                  for p, t in zip(b["problem_ids"], b["texts"])))
+
+    stoch_bit = cm == ct
+    greedy_bit = gcm == gct
+    result = {"_label": "M5 — re-lock on vLLM/bf16/L4 (new lock_a/lock_b)",
+              "seed": 17, "n_problems": pt,
+              "seeded_stochastic": {"candidate_match": cm, "candidate_total": ct,
+                                    "problem_match": pm, "byte_identical": stoch_bit},
+              "greedy": {"candidate_match": gcm, "candidate_total": gct,
+                         "byte_identical": greedy_bit},
+              "verdict": ("PASS — seeded stochastic byte-identical" if stoch_bit
+                          else "PASS (greedy-locked) — stochastic reproduces statistically, "
+                               "greedy byte-identical (vLLM kernel nondeterminism, cf. K1)"
+                          if greedy_bit else "FAIL — not reproducible")}
+    (REPO / "artifacts/m5_relock.json").write_text(json.dumps(result, indent=2))
+
+    print(f"\n=== M5 — re-lock (vLLM/bf16/L4, {pt} problems, seed 17) ===")
+    print(f"seeded stochastic: {cm}/{ct} candidates byte-identical "
+          f"({pm}/{pt} problems)  → {'BYTE-IDENTICAL' if stoch_bit else 'not bit-identical'}")
+    print(f"greedy (temp 0):   {gcm}/{gct} candidates byte-identical "
+          f"→ {'BYTE-IDENTICAL' if greedy_bit else 'not bit-identical'}")
+    print(f"\nM5 verdict: {result['verdict']}")
+    print("wrote artifacts/lock_a_bf16.jsonl, lock_b_bf16.jsonl, m5_relock.json")
+
+
+@app.function(image=IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=3600)
 def m2(n_vllm: int = 64, gen_tokens: int = 256):
     """M2 throughput gate. Same L4, same workload (plain HumanEval prompts — the
     3a/3b-lite generation mode, no register): HF bf16 batch-1 `generate` vs vLLM

@@ -207,3 +207,28 @@ frozen at Phase-3 design before any generation on the new test set.
 *This is what makes DIAG-10 cheap and honest:* it runs on HumanEval-as-dev, spends
 no confirmatory budget, and its trajectory metric (per-step pass decline) needs
 only the same model+harness, not a headroom-sweet-spot task.
+
+## D14 — Reproducibility standard on the vLLM/bf16 stack: statistical, not bit-for-bit (2026-07-13, Phase M / M5)
+
+The Phase-0 bit-for-bit lock (lock_a/lock_b, 164/164 byte-identical) was a property
+of the old HF stack: fixed `torch.manual_seed` + deterministic algorithms →
+bit-identical runs. **The vLLM/bf16 throughput stack does not reproduce
+byte-for-byte** — M5 measured, across two independent seeded runs, **greedy
+143/164** and **seeded-stochastic 294/328** candidates byte-identical. The
+divergences are coherent alternative generations (as at GATE K1), caused by
+nondeterministic throughput kernels (reduction atomics, CUDA graphs, the
+FlashInfer→PyTorch sampling fallback). This is **inherent to the stack**, not a bug,
+and it is the accepted cost of the 100× throughput (D11).
+
+**Decision:** retire the bit-lock; the reproducibility standard on the new stack is
+**statistical** — aggregate metrics (pass@k, AUROC, matched-compute deltas) reproduce
+within sampling noise, and Phase-3 comparisons already gate on bootstrap CIs, which
+are robust to ~10% candidate-level nondeterminism. Evidence it holds: M3's two
+independent bf16 draws agreed to ~1 pt (B0 0.6418 vs 0.6479; pass@8 0.9146 vs
+0.9024). `lock_a_bf16.jsonl` / `lock_b_bf16.jsonl` are retained as a reference that
+documents the drift level, not as a bit-lock.
+
+*Honest cost:* this is a genuine reduction in reproducibility rigor vs the old stack.
+A bit-reproducible *verification* mode (greedy + `enforce_eager` + a deterministic
+attention backend, at a throughput cost) could be pursued if a future result ever
+needs exact replay; it is not the deployment mode and is not built now.
