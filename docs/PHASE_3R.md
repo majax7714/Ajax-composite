@@ -297,6 +297,21 @@ record is from *what we aimed it at*, not anchoring per se. (c) **TAX monotone
 increasing in T, → 0 at greedy** — reconciles Self-Debug (greedy → pool size 1 → they
 collect the pull without paying the tax). Output: `artifacts/dmeasure_conditioning.json`.
 
+**RESULTS (2026-07-14, N=60 HumanEval, task `bmeetye9d`).** *Predictions above stand as written; outcomes appended.* PULL = `1 − SequenceMatcher.ratio(gen, artifact)` (**low = near-reproduction, high = divergence**); coverage = pass@ns any-pass (greedy ns=1, T>0 ns=8 — a confound flagged below). E1/E2 share the *same* failed artifact so their PULL is directly comparable; E5's PULL is to a *different* (correct) artifact.
+
+| cond@T | PULL | coverage | TAX vs E0 |
+|---|---|---|---|
+| E1  0.0 / 0.8 / 1.2 | 0.075 / 0.176 / 0.309 | 0.20 / 0.52 / 0.62 | +0.45 / +0.40 / +0.28 |
+| E2  0.0 / 0.8 / 1.2 | 0.043 / 0.068 / 0.157 | 0.10 / 0.22 / 0.40 | +0.55 / +0.70 / +0.50 |
+| E5  0.0 / 0.8 / 1.2 | 0.020 / 0.066 / 0.168 | **1.00 / 1.00 / 1.00** | **−0.35 / −0.08 / −0.10** |
+(E0 coverage 0.65 / 0.92 / 0.90.)
+
+- **(a) E1 ≈ E2 — FALSIFIED.** Framing produces a large, consistent split in *both* axes at every T. But the split runs **opposite to Tsui**: the pre-registered trigger was "E2 *pulls markedly less* (anchors less) → Tsui on code." Instead E2 **anchors *more*** (lower edit distance to the failed artifact: 0.043/0.068/0.157 vs E1 0.075/0.176/0.309) while **repairing *less*** (coverage 0.10/0.22/0.40 vs E1 0.20/0.52/0.62). So provenance/framing matters, but "your previous attempt — improve it" is a *better* repair scaffold than "someone else's submission — write a correct solution," which is the reverse of a self-anchoring blind spot. **Caveat (honest):** E1↔E2 differ in provenance label *and* instruction verb ("improve" vs "write correct") — a bundled contrast, so the repair-rate gap is not cleanly attributable to provenance alone. Not clean Tsui, not clean provenance-irrelevance.
+- **(b) E5 neutral attractor — SIGN CONFIRMED (emphatically), magnitude reframed.** Aim the attractor at a *correct* artifact and coverage → **1.00 at every temperature** (TAX negative — conditioning *adds* pass-coverage vs i.i.d.). At greedy it near-reproduces the correct code (PULL 0.020 → sim 0.98). The attractor amplifies **whatever it is aimed at**: aimed at failure, coverage collapses to 0.10–0.62; aimed at success, 1.00. The "pulls as hard as E1" clause is not directly testable (different target artifact), but reproduction-strength is symmetric across sign. This is the empirical charter for **BEST-SO-FAR**.
+- **(c) TAX monotone↑ in T, →0 at greedy — FALSIFIED as measured.** E1 TAX is *largest* at greedy and *decreases* in T (0.45 → 0.40 → 0.28). Two reasons: (i) the metric is pass-coverage tax, not the diversity tax the prediction imagined; (ii) greedy ns=1 vs T>0 ns=8 confounds the greedy row. The clean unconfounded facts (matched ns at T>0): conditioning on a **failure** costs 0.28–0.70 pass-coverage; conditioning on a **success** gains it. **Self-Debug reconciliation survives, but via a different mechanism than predicted:** Self-Debug helps not because greedy dodges a diversity tax, but because execution-guided repair aims the attractor at a *corrected* target (E5-like, negative tax) rather than a raw failed one (E1/E2-like, positive tax).
+
+**Headline.** Anchoring is a **neutral distributional attractor** whose sign is set entirely by its target: every harm in the RGR record traces to conditioning on failures, and E5 shows the same mechanism yields total success when aimed at a correct artifact. Directly motivates BEST-SO-FAR (aim it at the best candidate seen). Provenance is *not* irrelevant, but the effect is a framing/instruction bundle opposite to Tsui's self-anchoring direction, not a "self" blind spot.
+
 ## BEST-SO-FAR — point the attractor at a success *(pre-registered; rides R2's enriched pools)*
 
 If E5 confirms the attractor is neutral, the fix isn't *remove* the candidate — it's
