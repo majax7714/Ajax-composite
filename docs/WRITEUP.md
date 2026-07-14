@@ -172,7 +172,15 @@ The gap that frames everything: a correct candidate exists in the 8-sample
 pool 84.15% of the time, but self-fluency selection recovers only 62.80% —
 ~21 points of selection headroom.
 
-### 4.2 H1: execution-grounded confidence beats self-fluency — PASS
+### 4.2 H1: execution-grounded confidence beats self-fluency — PASS *(under audit — R1b)*
+
+> **⚠ Under audit ([PHASE_3R.md] R1).** R1a cleared H1 of the vLLM logprob bug (it was
+> port-introduced, never touched the HF Phase-1 likelihood arm; the Phase-0 lock has
+> 0/1312 null `mean_logprob`). But R1b is open: Phase-M/M4 showed V-v2b's within-problem
+> edge over likelihood collapsing +0.15 → +0.016 on the *non-quantized* bf16 candidate
+> distribution, raising the possibility that H1 partly measured "V beats
+> *quantization-corrupted* likelihood." **No H1 claim is final until R1b closes.** The
+> numbers below stand as originally computed on the retired 4-bit stack.
 
 Evaluation set: the frozen Phase-0 candidates (1,312 held-out HumanEval
 candidates with execution labels and stored mean token log-probabilities).
