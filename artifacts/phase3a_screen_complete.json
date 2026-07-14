@@ -1,0 +1,21 @@
+{
+  "benchmark": "BigCodeBench-instruct",
+  "n_problems": 40,
+  "k": 50,
+  "pass@1": 0.3635,
+  "pass@8": 0.5793322617690235,
+  "pass@50": 0.65,
+  "pass50_minus_pass8": 0.0706677382309765,
+  "import_failure_rate": 0.0,
+  "error_breakdown": {
+    "": 727,
+    "wrong_answer": 1234,
+    "runtime": 29,
+    "syntax": 7,
+    "timeout": 3
+  },
+  "criterion1_coverage_band[0.30,0.60]": true,
+  "criterion1_headroom>=0.15": false,
+  "criterion2_feedback_rich": true,
+  "gate": "does-not-qualify"
+}

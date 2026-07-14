@@ -179,8 +179,21 @@ feedback-rich, tractable (function-call/unittest) candidate; screened for covera
 
 **Part B — coverage (criterion 1) on BigCodeBench-instruct, vLLM bf16.** Pipeline
 validated (`bcb_generate` k samples → `bcb_exec` unittest in a broad scientific/web
-image; import-failure rate reported to keep the estimate honest). [Result pending the
-full n=100/k=50 run.]
+image; **import-failure rate 0.000** — the env covers the sampled problems).
+
+- **BigCodeBench-Complete (n=40, k=50):** pass@1 0.363, **pass@8 0.579**, pass@50
+  0.650. **Coverage band [0.30,0.60]: PASS** (0.579), but **headroom pass@50−pass@8 =
+  +0.071 < 0.15: FAIL.** The pool **saturates fast** — problems Qwen2.5-Coder-1.5B
+  can solve it solves within ~8 samples; the rest stay unreachable even at 50. Little
+  "reachable-but-improbable" middle → **does not qualify** on criterion 1's headroom
+  sub-condition. `artifacts/phase3a_screen_complete.json`.
+- **BigCodeBench-Hard (n=60, k=50):** the pre-registered fallback (lower coverage,
+  potentially deeper headroom). *[running — heavy execution; result to follow.]*
+
+*Screen caveat:* first-n problems (not random) and n=40–60 subsets (per-metric SE
+~0.06–0.08); the headroom gap on Complete (0.071 vs 0.15) is well outside noise, but
+the coverage point estimates are subset-sensitive — the *full-benchmark* run comes
+after selection (§4).
 
 ---
 

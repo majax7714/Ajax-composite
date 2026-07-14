@@ -137,7 +137,7 @@ EXEC_IMAGE = modal.Image.debian_slim(python_version="3.12").pip_install(
     "flask", "statsmodels", "openpyxl", "python-dateutil", "pytz", "regex",
     "faker", "cryptography", "networkx", "sqlalchemy", "pyyaml", "wordcloud",
     "textblob", "gensim", "folium", "geopy", "django", "psutil",
-).env({"HF_HOME": "/cache/hf"})
+).env({"HF_HOME": "/cache/hf", "MPLBACKEND": "Agg"})
 
 _FENCE = None
 
@@ -155,13 +155,14 @@ def _extract_code(text):
 
 
 @app.function(image=GEN_IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=7200)
-def bcb_generate(n_problems: int = 60, k: int = 50, seed: int = 17):
+def bcb_generate(n_problems: int = 60, k: int = 50, seed: int = 17,
+                 dataset: str = "bigcode/bigcodebench"):
     """Generate k i.i.d. samples per BigCodeBench-instruct problem (vLLM bf16)."""
     from datasets import load_dataset
     from transformers import AutoTokenizer
     from vllm import LLM, SamplingParams
 
-    ds = load_dataset("bigcode/bigcodebench", split="v0.1.4")
+    ds = load_dataset(dataset, split="v0.1.4")
     idx = list(range(min(n_problems, len(ds))))
     tok = AutoTokenizer.from_pretrained(MODEL)
     SYS = ("You are a Python programming assistant. Answer with a single fenced "
@@ -187,8 +188,8 @@ def bcb_generate(n_problems: int = 60, k: int = 50, seed: int = 17):
     return {"problems": problems, "k": k}
 
 
-@app.function(image=EXEC_IMAGE, timeout=7200, cpu=8.0)
-def bcb_exec(problems: list, timeout_s: int = 20) -> list:  # cpu=16
+@app.function(image=EXEC_IMAGE, timeout=7200, cpu=16.0)
+def bcb_exec(problems: list, timeout_s: int = 12) -> list:
     """Execute each candidate's code+unittest; return per-candidate pass + frac +
     error class (import failures counted separately to gauge env coverage)."""
     import subprocess
@@ -226,7 +227,7 @@ def bcb_exec(problems: list, timeout_s: int = 20) -> list:  # cpu=16
         return {"passed": False, "frac": 0.0, "err": err}
 
     results = []
-    with ThreadPoolExecutor(max_workers=8) as tp:
+    with ThreadPoolExecutor(max_workers=16) as tp:
         for prob in problems:
             res = list(tp.map(run_one, [(c, prob["test"]) for c in prob["codes"]]))
             results.append(res)
@@ -234,7 +235,7 @@ def bcb_exec(problems: list, timeout_s: int = 20) -> list:  # cpu=16
 
 
 @app.local_entrypoint()
-def screen_main(n_problems: int = 60, k: int = 50):
+def screen_main(n_problems: int = 60, k: int = 50, dataset: str = "bigcode/bigcodebench"):
     from collections import Counter
     from math import comb
     from pathlib import Path
@@ -242,7 +243,7 @@ def screen_main(n_problems: int = 60, k: int = 50):
     def pass_at_k(n, c, kk):
         return 1.0 if n - c < kk else 1.0 - comb(n - c, kk) / comb(n, kk)
 
-    gen = bcb_generate.remote(n_problems, k)
+    gen = bcb_generate.remote(n_problems, k, 17, dataset)
     problems = gen["problems"]
     results = bcb_exec.remote(problems)
 
@@ -259,7 +260,7 @@ def screen_main(n_problems: int = 60, k: int = 50):
     p8, p50 = mean_pak(8), mean_pak(min(k, 50))
     in_band = 0.30 <= p8 <= 0.60
     headroom = (p50 - p8) >= 0.15
-    result = {"benchmark": "BigCodeBench-instruct", "n_problems": len(counts), "k": k,
+    result = {"benchmark": dataset, "n_problems": len(counts), "k": k,
               "pass@1": mean_pak(1), "pass@8": p8, "pass@50": p50,
               "pass50_minus_pass8": p50 - p8, "import_failure_rate": import_rate,
               "error_breakdown": dict(errs),
@@ -268,7 +269,7 @@ def screen_main(n_problems: int = 60, k: int = 50):
               "criterion2_feedback_rich": True,  # ~5 unittest methods (Part A)
               "gate": "PASS" if (in_band and headroom) else "does-not-qualify"}
     Path("artifacts/phase3a_screen.json").write_text(json.dumps(result, indent=2))
-    print(f"\n=== Phase 3a — BigCodeBench coverage screen ({len(counts)} problems, k={k}) ===")
+    print(f"\n=== Phase 3a — coverage screen: {dataset} ({len(counts)} problems, k={k}) ===")
     print(f"pass@1 {result['pass@1']:.3f}  pass@8 {p8:.3f}  pass@50 {p50:.3f}  "
           f"(pass@50−pass@8 = {p50-p8:+.3f})")
     print(f"coverage band [0.30,0.60]: {in_band}   headroom ≥0.15: {headroom}")
