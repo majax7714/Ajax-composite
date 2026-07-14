@@ -1,0 +1,53 @@
+{
+  "BigCodeBench": {
+    "note": "function-call / unittest",
+    "columns": [
+      "task_id",
+      "complete_prompt",
+      "instruct_prompt",
+      "canonical_solution",
+      "code_prompt",
+      "test",
+      "entry_point",
+      "doc_struct",
+      "libs"
+    ],
+    "n": 1140,
+    "test_methods_median": 5.0,
+    "test_methods_mean": 5.4,
+    "distinct_libs_sampled": 0
+  },
+  "EvalPlus MBPP+": {
+    "note": "function-call / assert (augmented tests)",
+    "columns": [
+      "task_id",
+      "code",
+      "prompt",
+      "source_file",
+      "test_imports",
+      "test_list",
+      "test"
+    ],
+    "n": 378,
+    "assert_field": "test",
+    "asserts_median": 4.0,
+    "asserts_mean": 4.0
+  },
+  "EvalPlus HumanEval+": {
+    "note": "function-call / assert (augmented tests)",
+    "columns": [
+      "task_id",
+      "prompt",
+      "canonical_solution",
+      "entry_point",
+      "test"
+    ],
+    "n": 164,
+    "assert_field": "test",
+    "asserts_median": 4.0,
+    "asserts_mean": 4.0
+  },
+  "APPS": {
+    "note": "LOAD FAILED: RuntimeError('Dataset scripts are no longer supported, but found apps.py')"
+  }
+}

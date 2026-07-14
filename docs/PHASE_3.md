@@ -167,6 +167,21 @@ feedback-rich candidates first; expand only if none qualifies.
 
 Output: `artifacts/phase3a_screen.json`, `scripts/modal_phase3a.py`.
 
+### 4.2 Screen results
+
+**Part A — feedback richness (criterion 2), done 2026-07-13.** Loaded candidate
+benchmarks (`characterize`): **BigCodeBench** n=1140, **~5 unittest methods/problem →
+PASS ≫3**; EvalPlus MBPP+ (n=378) / HumanEval+ (n=164) ~4 asserts (PASS, marginal by
+the crude proxy); plain MBPP (3) / HumanEval (binary) **FAIL** (baseline). APPS
+load-failed on `datasets` 5.0 (script-based dataset). → BigCodeBench is the clean
+feedback-rich, tractable (function-call/unittest) candidate; screened for coverage.
+`artifacts/phase3a_characterization.json`.
+
+**Part B — coverage (criterion 1) on BigCodeBench-instruct, vLLM bf16.** Pipeline
+validated (`bcb_generate` k samples → `bcb_exec` unittest in a broad scientific/web
+image; import-failure rate reported to keep the estimate honest). [Result pending the
+full n=100/k=50 run.]
+
 ---
 
 ## 5. Phase 3b — the refinement channel study
