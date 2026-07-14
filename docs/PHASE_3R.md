@@ -363,7 +363,18 @@ Temperature rescues **only** the anchored conditions (unanchored E0 is already s
 
 **Escape requires direction; direction requires rich feedback.** This is R3's thesis with a mechanism. It predicts a **feedback-richness × temperature interaction** (substitutes at the margin — both buy escape; complements in the limit — T supplies escape *energy*, feedback supplies *direction*; undirected escape at high T is just resampling). Folded into R3 (§ below). *If they are pure substitutes, feedback does nothing temperature couldn't do more cheaply — a deflationary result about self-refinement we'd be first to state.*
 
-**Follow-ups (all parallel to R2; none gates it):** D2b (metric fix, free CPU — *running*) · D2a (verb×provenance 2×2, cheap GPU on committed pools — *running*, **blocks any Tsui/provenance claim**) · D2c/E6 (partial-credit conditioning — the real BEST-SO-FAR premise test, rides R2's enriched pools). Outputs: `dmeasure_conditioning.json` (per_sample_D2b), `dmeasure_d2a_verb_provenance.json`, `dmeasure_d2c_partial_credit.json`.
+**D2a RESULTS (2026-07-14 — the Tsui gate; pre-registered prediction CONFIRMED).** 2×2, all cells conditioned on the *same* failed artifact, so the two contrasts are clean:
+
+| contrast | held fixed | ΔPULL (T=0/0.8/1.2) | Δmean_pass |
+|---|---|---|---|
+| **provenance** (E1 self − E2′ other) | verb = "improve" | −0.012 / −0.019 / −0.028 | +0.050 / +0.025 / **+0.006** |
+| **verb** (E1 "improve" − E1′ "write-correct") | attribution = "your" | +0.042 / +0.096 / **+0.115** | +0.067 / +0.096 / +0.040 |
+
+- **Provenance is near-irrelevant: E1 ≈ E2′.** Telling the model the failed code is "someone else's" vs "your previous attempt" barely moves PULL (≤0.028) or pass (→+0.006), and the gap *shrinks* with temperature. The verb ("improve it" vs "write a correct solution") drives the split, at **3–4× the magnitude**, and it does so *through escape distance* — "improve" diverges more (higher PULL) and repairs more, consistent with §2.
+- **Resolves the `[SUPERSEDED]` Tsui flag on the (a) bullet.** The mechanism is **provenance-independent distributional conditioning — distinct from Tsui's self-anchoring blind spot** (it is not about "self"; the "Wait"/attribution family of fixes would not touch it). This is *our* result, and the related-work claim is now unblocked. It is also **not** "opposite to Tsui" (that read is retired) — it is orthogonal: Tsui's axis (whose output) is inert here; the live axis is escape distance.
+- **Replicates the escape-distance law** across all 12 cells (coverage roughly monotone in PULL), on a fresh 4-condition run, with mean_pass again flat (~0.10–0.23) — corroborating D2b's "coverage via diversity, not per-sample quality."
+
+**Follow-ups (all parallel to R2; none gates it):** D2b (metric fix, free CPU — *done, §D2b above*) · D2a (verb×provenance 2×2 — *done, Tsui gate CONFIRMED*) · D2c/E6 (partial-credit conditioning — the real BEST-SO-FAR premise test, rides R2's enriched pools). Outputs: `dmeasure_conditioning.json` (per_sample_D2b), `dmeasure_d2a_verb_provenance.json`, `dmeasure_d2c_partial_credit.json`.
 
 ## BEST-SO-FAR — point the attractor at a success *(pre-registered; rides R2's enriched pools)*
 
