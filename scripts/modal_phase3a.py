@@ -319,7 +319,12 @@ def bcb_exec(problems: list, timeout_s: int = 10, max_workers: int = 16) -> list
                     proc.wait(timeout=5)
                 except Exception:
                     pass
-            out = outf.read_text(errors="replace")
+            # a candidate can delete/clobber its own cwd (base-model garbage does);
+            # a missing/unreadable output file is a failure, never a batch-abort
+            try:
+                out = outf.read_text(errors="replace")
+            except OSError:
+                out = ""
         if timed_out:
             return {"passed": False, "frac": 0.0, "n_tests": 0, "n_passed": 0,
                     "failing": [], "exc": "", "err": "timeout"}
