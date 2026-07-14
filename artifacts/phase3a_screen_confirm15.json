@@ -1,0 +1,24 @@
+{
+  "benchmark": "bigcode/bigcodebench",
+  "generator": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+  "n_problems": 400,
+  "k": 50,
+  "pass@1": 0.1463,
+  "pass@8": 0.30151883880556624,
+  "pass@50": 0.41,
+  "pass50_minus_pass8": 0.10848116119443374,
+  "import_failure_rate": 0.05115,
+  "error_breakdown": {
+    "wrong_answer": 10175,
+    "runtime": 5588,
+    "": 2926,
+    "syntax": 115,
+    "import": 1023,
+    "timeout": 161,
+    "no_code": 12
+  },
+  "criterion1_coverage_band[0.30,0.60]": true,
+  "criterion1_headroom>=0.15": false,
+  "criterion2_feedback_rich": true,
+  "gate": "does-not-qualify"
+}
