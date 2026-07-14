@@ -187,13 +187,27 @@ image; **import-failure rate 0.000** — the env covers the sampled problems).
   can solve it solves within ~8 samples; the rest stay unreachable even at 50. Little
   "reachable-but-improbable" middle → **does not qualify** on criterion 1's headroom
   sub-condition. `artifacts/phase3a_screen_complete.json`.
-- **BigCodeBench-Hard (n=60, k=50):** the pre-registered fallback (lower coverage,
-  potentially deeper headroom). *[running — heavy execution; result to follow.]*
+- **BigCodeBench-Hard** and **0.5B-generator-on-Complete** (both pre-registered
+  fallbacks): **blocked by an execution-harness limit.** BigCodeBench's library-heavy
+  unittests hang (network, plotting, infinite loops in weak-model code) to the
+  per-candidate timeout; at k=50 × 40–60 problems the subprocess+ThreadPool harness
+  can't finish in reasonable wall-clock (two runs killed after >45 min in the exec
+  stage). A hardened harness is needed — process-group kill so a timed-out test can't
+  leave orphans, a tighter bound (≤6 s), and/or the official `bigcodebench` sandboxed
+  evaluator — before Hard/0.5B/other candidates can be screened at k=50.
 
-*Screen caveat:* first-n problems (not random) and n=40–60 subsets (per-metric SE
-~0.06–0.08); the headroom gap on Complete (0.071 vs 0.15) is well outside noise, but
-the coverage point estimates are subset-sensitive — the *full-benchmark* run comes
-after selection (§4).
+**3a status: UNDECIDED.** Criterion 2 satisfied (BigCodeBench feedback-rich).
+Criterion 1: BigCodeBench-Complete@1.5B has in-band coverage but **shallow headroom**
+(the "solve-fast-or-not-at-all" shape); the fallbacks that might find deeper headroom
+are gated on the harness fix. *Screen caveat:* first-n (not random), n=40–60 subsets
+(SE ~0.06–0.08) — the headroom gap (0.071 vs 0.15) is outside noise, but coverage
+points are subset-sensitive; the full-benchmark run comes after selection.
+
+**Next options (user's call):** (a) harden the BigCodeBench execution harness and
+re-screen Hard + 0.5B (most direct); (b) treat "1.5B on this benchmark family has too
+little reachable-but-improbable headroom" as the gate's *negative* finding pending
+(b) more evidence; (c) build an I/O-comparison harness for a stdin/stdout benchmark
+(LiveCodeBench; APPS failed to load on `datasets` 5.0).
 
 ---
 
