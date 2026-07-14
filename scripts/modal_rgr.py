@@ -998,3 +998,155 @@ def r1b_h2h():
     print(f"\nretired 4-bit H1: V within 0.7189 vs lik 0.5680 (edge +0.151); "
           f"bo8 V 0.6707 vs lik 0.6280")
     print("wrote artifacts/r1b_h2h_stale_v.json")
+
+
+@app.function(image=IMAGE, gpu="T4", volumes={"/cache": VOL}, timeout=10800)
+def r1b2d_train_eval(train_rows: list, val_rows: list, m3_pool: dict, lock_pool: dict):
+    """R1b.2d — retrain V-v2b on the BF16 MBPP candidate distribution with the
+    identical D9 recipe (4-bit QLoRA cross-encoder, r16/α32, q/k/v/o, BCE, 3 epochs,
+    batch 4, val-AUROC epoch selection), then score the BF16 HumanEval pool (m3) and
+    the 4-bit pool (lock, off-diagonal). Only the candidate distribution changes vs
+    Phase 1. [PHASE_3R.md] R1b.2d."""
+    import os
+
+    os.chdir("/root/rgr")
+    import torch
+    from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
+    from transformers import (AutoModelForSequenceClassification, AutoTokenizer,
+                              BitsAndBytesConfig)
+
+    from rgr.data.humaneval import load_humaneval
+    from rgr.evals.calibration import auroc
+    from rgr.types import SplitRole
+    from rgr.verifier.qlora import pair_text
+
+    BASE = "Qwen/Qwen2.5-Coder-1.5B-Instruct"
+    max_length, batch_size, lr, epochs = 768, 4, 1e-4, 3
+    tok = AutoTokenizer.from_pretrained(BASE)
+    if tok.pad_token is None:
+        tok.pad_token = tok.eos_token
+    model = AutoModelForSequenceClassification.from_pretrained(
+        BASE, num_labels=1, torch_dtype=torch.bfloat16,
+        quantization_config=BitsAndBytesConfig(
+            load_in_4bit=True, bnb_4bit_quant_type="nf4",
+            bnb_4bit_compute_dtype=torch.bfloat16, bnb_4bit_use_double_quant=True))
+    model.config.pad_token_id = tok.pad_token_id
+    model = prepare_model_for_kbit_training(model)
+    model = get_peft_model(model, LoraConfig(
+        r=16, lora_alpha=32, lora_dropout=0.05, bias="none",
+        task_type="SEQ_CLS", target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+        modules_to_save=["score"]))
+    model.print_trainable_parameters()
+    device = next(model.parameters()).device
+
+    def encode(rows):
+        texts = [pair_text(r["prompt"], r["code"]) for r in rows]
+        return tok(texts, truncation=True, max_length=max_length, padding=True,
+                   return_tensors="pt")
+
+    @torch.no_grad()
+    def score(rows, chunk=16):
+        model.eval()
+        out = []
+        for s in range(0, len(rows), chunk):
+            enc = encode(rows[s:s + chunk]).to(device)
+            out.extend(torch.sigmoid(model(**enc).logits.squeeze(-1).float()).tolist())
+        return out
+
+    opt = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad], lr=lr)
+    best_auroc, best = -1.0, None
+    val_y = [bool(r["passed"]) for r in val_rows]
+    for epoch in range(epochs):
+        model.train()
+        order = torch.randperm(len(train_rows))
+        for step, start in enumerate(range(0, len(order), batch_size)):
+            rows = [train_rows[i] for i in order[start:start + batch_size]]
+            enc = encode(rows).to(device)
+            y = torch.tensor([float(r["passed"]) for r in rows], device=device)
+            logits = model(**enc).logits.squeeze(-1).float()
+            loss = torch.nn.functional.binary_cross_entropy_with_logits(logits, y)
+            loss.backward()
+            opt.step()
+            opt.zero_grad()
+            if (step + 1) % 150 == 0:
+                print(f"epoch {epoch+1} step {step+1} loss {float(loss):.4f}", flush=True)
+        va = auroc(score(val_rows), val_y)
+        print(f"epoch {epoch+1}: val AUROC {va:.4f}", flush=True)
+        if va > best_auroc:
+            best_auroc = va
+            best = epoch + 1
+            he = {p.problem_id: p.prompt for p in load_humaneval().checkout(SplitRole.HELDOUT_EVAL)}
+
+            def score_pool(pool):
+                out = []
+                for pid, row in zip(pool["problem_ids"], pool["codes"]):
+                    rows = [{"prompt": he[pid], "code": cd} for cd in row]
+                    out.append(score(rows))
+                return out
+            best_m3 = score_pool(m3_pool)
+            best_lock = score_pool(lock_pool)
+
+    return {"best_val_auroc": best_auroc, "best_epoch": best,
+            "m3_v_scores": best_m3, "lock_v_scores": best_lock}
+
+
+@app.local_entrypoint()
+def r1b2d_train_main():
+    import json as _json
+    import os
+
+    os.chdir(str(REPO))
+    from rgr.evals.calibration import auroc
+
+    lab = _json.loads((REPO / "runs/modal/r1b2d_mbpp_labeled.json").read_text())
+    rows = [r for r in lab["rows"] if r.get("passed") is not None]
+    train_rows = [{"problem_id": r["problem_id"], "prompt": r["prompt"],
+                   "code": r["code"], "passed": r["passed"]} for r in rows if r["split"] == "train"]
+    val_rows = [{"problem_id": r["problem_id"], "prompt": r["prompt"],
+                 "code": r["code"], "passed": r["passed"]} for r in rows if r["split"] == "validation"]
+
+    m3 = _json.loads((REPO / "runs/modal/m3_candidates.json").read_text())
+    m3_labels = _json.loads((REPO / "runs/modal/m3_labels.json").read_text())["labels"]
+    m3_pool = {"problem_ids": m3["problem_ids"],
+               "codes": [[c["code"] for c in row] for row in m3["candidates"]]}
+    # 4-bit lock pool (off-diagonal): lock_a HumanEval
+    lock = [_json.loads(l) for l in open(REPO / "artifacts/lock_a.jsonl")]
+    lock_pool = {"problem_ids": [r["problem_id"] for r in lock],
+                 "codes": [[s["code"] for s in r["steps"]] for r in lock]}
+    lock_labels = [[s["execution"]["passed"] for s in r["steps"]] for r in lock]
+
+    r = r1b2d_train_eval.remote(train_rows, val_rows, m3_pool, lock_pool)
+    vs_m3, vs_lock = r["m3_v_scores"], r["lock_v_scores"]
+
+    def within(scores, labels):
+        per = [auroc([s if s is not None else -1e9 for s in sv], [bool(x) for x in lb])
+               for sv, lb in zip(scores, labels) if len({bool(x) for x in lb}) == 2]
+        return sum(per) / len(per)
+
+    def bestof_se(scores, labels, B0, ORACLE, kk=8):
+        hit = 0
+        for sv, lb in zip(scores, labels):
+            idx = max(range(min(kk, len(sv))), key=lambda i: (sv[i] if sv[i] is not None else -1e9))
+            hit += bool(lb[idx])
+        return ((hit / len(labels)) - B0) / (ORACLE - B0)
+
+    v_within_bf16 = within(vs_m3, m3_labels)
+    se_v_bf16 = bestof_se(vs_m3, m3_labels, 0.6479, 0.9024)
+    se_v_lock = bestof_se(vs_lock, lock_labels, 0.5922, 0.8415)  # off-diagonal: bf16-V on 4-bit pool
+    out = {"_label": "R1b.2d — retrained-on-bf16 V; SE vs bf16 likelihood 0.305",
+           "best_val_auroc": r["best_val_auroc"], "best_epoch": r["best_epoch"],
+           "retrained_V_within_bf16": v_within_bf16,
+           "retrained_V_SE_bf16": se_v_bf16, "bf16_likelihood_SE": 0.305,
+           "offdiag_retrained_V_SE_on_4bit_pool": se_v_lock,
+           "kill_H1_if_SE_le_0.305": se_v_bf16 <= 0.305}
+    (REPO / "artifacts/r1b2d_verifier_retrain.json").write_text(_json.dumps(out, indent=2))
+    print("\n=== R1b.2d — retrained V (on bf16 MBPP) ===")
+    print(f"best val AUROC {r['best_val_auroc']:.4f} (epoch {r['best_epoch']})")
+    print(f"retrained-V within-problem AUROC (bf16 pool): {v_within_bf16:.4f}")
+    print(f"retrained-V SE (bf16 pool): {se_v_bf16:.3f}  vs bf16 likelihood 0.305  "
+          f"(stale V was 0.067)")
+    print(f"off-diagonal — bf16-trained V on the 4-bit pool SE: {se_v_lock:.3f}")
+    verdict = ("H1 SURVIVES (staleness)" if se_v_bf16 >= 0.31 else
+               "H1 ARTIFACT (edge gone)" if se_v_bf16 <= 0.10 else "PARTIAL")
+    print(f"\nR1b.2d verdict: {verdict}  (kill if SE ≤ 0.305)")
+    print("wrote artifacts/r1b2d_verifier_retrain.json")

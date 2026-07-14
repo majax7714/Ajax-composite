@@ -479,3 +479,88 @@ def m1_main(n: int = 20, max_new: int = 48):
                else "INSPECT" if len(early) <= 0.1 * r["n"] else "FAIL (systematic — chat template?)")
     print(f"\nM1 verdict: {verdict}")
     print("wrote runs/modal/m1_correctness.json")
+
+
+@app.function(image=IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=7200)
+def r1b2d_gen_mbpp(k: int = 8):
+    """R1b.2d — regenerate Phase-1 V training candidates from the BF16 generator on
+    MBPP (seed-17 385/42 split). Returns per-candidate {problem_id, split, prompt,
+    code, mean_logprob}; execution/labels done by the local entrypoint. [PHASE_3R.md] R1b.2d."""
+    import os
+    import random as _rnd
+
+    os.chdir("/root/rgr")
+    from transformers import AutoTokenizer
+
+    from rgr.config import load_config
+    from rgr.data.mbpp import load_mbpp
+    from rgr.generator.formatting import SYSTEM_PROMPT, build_prompt, extract_code
+    from vllm import LLM, SamplingParams
+
+    g = load_config("configs/phase2_register.toml").generator
+    probs = load_mbpp().problems
+    ids = sorted(p.problem_id for p in probs)
+    _rnd.Random(17).shuffle(ids)
+    split = {pid: ("train" if i < 385 else "validation") for i, pid in enumerate(ids)}
+    tok = AutoTokenizer.from_pretrained(MODEL)
+
+    def chat(p):
+        return tok.apply_chat_template(
+            [{"role": "system", "content": SYSTEM_PROMPT},
+             {"role": "user", "content": build_prompt(p.prompt)}],
+            add_generation_prompt=True, tokenize=False)
+
+    prompts = [chat(p) for p in probs]
+    llm = LLM(model=MODEL, dtype="bfloat16", gpu_memory_utilization=0.90,
+              max_model_len=2048, seed=17)
+    sp = SamplingParams(n=k, temperature=g.temperature, top_p=g.top_p,
+                        max_tokens=g.max_new_tokens, seed=17, logprobs=1)
+    outs = llm.generate(prompts, sp)
+    rows = []
+    for p, req in zip(probs, outs):
+        for o in req.outputs:
+            nt = len(o.token_ids)
+            rows.append({"problem_id": p.problem_id, "split": split[p.problem_id],
+                         "prompt": p.prompt, "code": extract_code(o.text),
+                         "mean_logprob": (o.cumulative_logprob / nt) if nt else None})
+    return {"rows": rows, "k": k}
+
+
+@app.local_entrypoint()
+def r1b2d_gen_main(k: int = 8):
+    """Generate BF16 MBPP candidates (L4) → execute locally via Daytona for labels →
+    save runs/modal/r1b2d_mbpp_labeled.json. Then run modal_rgr.py::r1b2d_train_main."""
+    import os
+
+    os.chdir(str(REPO))
+    from rgr.config import load_config
+    from rgr.data.mbpp import load_mbpp
+    from rgr.execution.sandbox import DaytonaBackend
+    from rgr.training.labels import ExecutionPool
+    from rgr.types import Candidate
+
+    gen = r1b2d_gen_mbpp.remote(k)
+    rows = gen["rows"]
+    probs = {p.problem_id: p for p in load_mbpp().problems}
+    cfg = load_config("configs/phase0_harness.toml")
+    pool = ExecutionPool(lambda: DaytonaBackend(cfg.execution.timeout_seconds), size=8)
+    # group by problem for execute_all
+    from collections import defaultdict
+    idx_by_pid = defaultdict(list)
+    for i, r in enumerate(rows):
+        idx_by_pid[r["problem_id"]].append(i)
+    try:
+        for pid, idxs in idx_by_pid.items():
+            cands = [Candidate(text="", code=rows[i]["code"]) for i in idxs]
+            for i, e in zip(idxs, pool.execute_all(probs[pid], cands)):
+                rows[i]["passed"] = bool(e.passed)
+    finally:
+        pool.close()
+    import json as _json
+    (REPO / "runs/modal").mkdir(parents=True, exist_ok=True)
+    (REPO / "runs/modal/r1b2d_mbpp_labeled.json").write_text(_json.dumps({"rows": rows, "k": k}))
+    tr = sum(1 for r in rows if r["split"] == "train")
+    va = len(rows) - tr
+    pas = sum(1 for r in rows if r.get("passed"))
+    print(f"R1b.2d gen: {len(rows)} MBPP candidates (train {tr}, val {va}), "
+          f"passed {pas} ({pas/len(rows):.3f}). wrote runs/modal/r1b2d_mbpp_labeled.json")
