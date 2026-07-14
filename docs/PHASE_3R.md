@@ -255,3 +255,57 @@ coverage +0.14, headroom +0.02).
    recover anything? The new evidence and the central claim.*
 
 Predictions committed above before each run; left standing whether they hold or not.
+
+---
+
+## Addendum II (2026-07-14) — judge fix, D-measure, BEST-SO-FAR
+
+**§1 judge fix — DONE (`d6cbf37`).** The Phase-3a judges destroyed downstream signal:
+lcb_exec short-circuited on first failing case; bcb_exec recorded counts only. Both now
+emit per candidate `{passed, n_tests, n_passed, frac, failing[], err, exc}`. §1.1
+persistence check: candidate pools ARE persisted → re-execution is CPU-only (no GPU
+regen). Screen verdicts (pass@8/headroom) are unaffected. R1b.2d + R2-gen untouched.
+
+## D-measure — is anchoring about "self" at all? *(parallel, pre-registered before run)*
+
+Every anchoring measurement (DIAG-8 edit-dist, DIAG-9b error-echo, DIAG-7 coverage) is
+*distributional* — none requires the artifact to be the model's own. If anchoring is
+distributional, it is a fact about **conditional generation** (tokens in context pull
+the distribution toward themselves), and self-refinement is merely the special case.
+Single-step conditioning on committed HumanEval pools, no loop, no reachability.
+
+| # | context artifact | framing | isolates |
+|---|---|---|---|
+| E0 | nothing | — | i.i.d. baseline |
+| E1 | own failed candidate (this problem) | "your previous attempt" | standard self-refine (≡ B2) |
+| E2 | **byte-identical** failed candidate | "a submission from someone else" | **PROVENANCE** |
+| E5 | a **correct** candidate (this problem) | "a previous attempt" | **SIGN** of the attractor |
+| E3† | failed candidate from 0.5B | "someone else" | genuinely external source |
+| E4† | failed candidate from a different problem | "a previous attempt" | problem-relevant vs raw token gravity |
+
+Tier 1: E0/E1/E2/E5 (†E3/E4 if budget). **PULL** = normalized edit distance (1 −
+SequenceMatcher, == DIAG-3/8) of the new generation to the conditioned artifact
+(measurable at any T incl. greedy). **TAX** = pool coverage of 8 conditioned vs 8 i.i.d.
+(only meaningful at T>0). Temperature T ∈ {0.0, 0.8, 1.2}.
+
+**Pre-registered predictions:** (a) **E1 ≈ E2** (~60/40) — provenance irrelevant; the
+mechanism is distributional conditioning, distinct from Tsui's blind spot (would also
+predict "Wait" won't fix it). If E2 pulls markedly less → it *is* Tsui on code, our
+result a special case. (b) **E5 pulls as hard as E1 but with high pass rate** (~75%) —
+the attractor is **neutral**, it amplifies whatever it's aimed at; every harm in the
+record is from *what we aimed it at*, not anchoring per se. (c) **TAX monotone
+increasing in T, → 0 at greedy** — reconciles Self-Debug (greedy → pool size 1 → they
+collect the pull without paying the tax). Output: `artifacts/dmeasure_conditioning.json`.
+
+## BEST-SO-FAR — point the attractor at a success *(pre-registered; rides R2's enriched pools)*
+
+If E5 confirms the attractor is neutral, the fix isn't *remove* the candidate — it's
+*aim it at a success*. Conditions on R2's selected (feedback-rich) benchmark, matched
+compute: **B1** (i.i.d.), **LAST** (prev candidate ≡ B2/ANCHOR), **BEST** (highest-
+frac_tests seen so far), **ABSTRACT** (error abstraction only), **BEST+ABSTRACT**. Rank
+**ORACLE-first** (by execution frac_tests, not the verifier — sidesteps R1b.2: if
+oracle-BEST doesn't help, verifier-BEST can't). Primary: pass@1 matched compute.
+**Predictions:** BEST > LAST (~80%); BEST vs ABSTRACT genuinely open; BEST+ABSTRACT the
+favourite. Depends on §1 (per-test frac) + R2 (feedback-rich pool). Convergence to name:
+BEST-SO-FAR = "condition on the lowest-energy candidate seen" = the original relaxation
+dynamics, needing exactly the graded landscape the feedback-richness criterion hunted for.
