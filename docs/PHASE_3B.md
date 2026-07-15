@@ -107,3 +107,52 @@ null floor. Nonparametric sanity check alongside: the histogram mass at x ∈ {1
 without the point mass (a pure-Beta fit bounds the false-zero rate from above).
 Artifact: `artifacts/w0c_stratum_falsezero.json`. Writeup destination: new §9.6
 (stratum characterization), which W2 extends.
+
+---
+
+## W0 RESULTS (2026-07-15) — [artifacts/w0a_e0_anchor.json, w0b_copy_null.json, w0c_stratum_falsezero.json]
+
+**W0a — the anchor MOVED; the 70/30 prediction was WRONG.** E0-PULL against the same
+failed artifacts every conditioned cell used: **0.4085 ± 0.319 (T=0, n=59) / 0.4910 ±
+0.212 (T=0.8) / 0.5935 ± 0.178 (T=1.2)**. The T=1.2 anchor is **+0.198 from the
+assumed 0.396** — far outside the pre-registered ±0.05 band. The assumed value was
+within-set pairwise diversity; the measured value is distance-to-a-failed-candidate,
+and an i.i.d. sample sits substantially farther from a failed candidate than two
+i.i.d. samples sit from each other. **The secondary expectation holds** (E0-PULL ≥
+every conditioned PULL at matched T: 0.491 > 0.176/0.068; 0.594 > 0.309/0.157), so the
+figure's geometry does not invert — it **stretches**: the honest anchor puts E1@T1.2
+(PULL 0.309, cov 0.62) not near the anchor but **barely past half the escape distance**
+to i.i.d. (0.594, cov 0.90). Two consequences, recorded: (i) the "approach from below"
+gap is ~3× larger than the old figure implied — undirected escape at the hottest
+measured temperature has closed only ~52% of the distance; the "can only approach
+i.i.d." asymptote has far more unclaimed room than assumed, and nothing measured
+crosses it. (ii) A calibration fact: even greedy i.i.d. sits only ~0.41 from an
+arbitrary failed candidate (same problem, same model → ~59% natural token overlap), so
+conditioned PULLs of 0.04–0.31 are *deep* inside copy territory. The elimination
+argument survives W0a with its anchor now measured; §9.3.1 item 1's specific "0.396"
+sentence is superseded in place.
+
+**W0b — the copy-expectation null, computed.** Base T=0.8 LCB-easy enriched pool:
+**77/80 problems** hold partial-credit candidates — **1,602 total** (far richer than
+the 360 earlier quoted, which is exactly the 40–60% band: **360 in [0.4, 0.6]**).
+Partial frac mean/median 0.384/0.333, median 15 tests/problem. Per-artifact null lines
+persisted: copy-null = f_a, i.i.d.-null = problem pool mean frac. D2c/E6's "climbing"
+must clear **both** (beat copying and beat resampling); formal test frozen at W3.
+
+**W0c — the false-zero floor is large; the easy strata alone are unpowered.**
+Two-component fit (π₀ point mass + Beta, ML; pure-Beta fit as upper bound):
+
+| cell | stratum (0/50) | x=1 / x=2 | E[B1-50 lucky recoveries] (upper) |
+|---|---|---|---|
+| base T=0.8 | 19/80 | 10 / 5 | **3.59** (3.91) |
+| base T=1.0 | 26/80 | 5 / 4 | 2.30 (5.31) |
+| base T=1.2 | 35/80 | 10 / 5 | 5.01 (6.89) |
+| instruct T=1.2 | 32/80 | 10 / 3 | 4.55 (5.45) |
+
+The mixture split (π₀ vs Beta shape) is fit-unstable cell-to-cell — P(reachable|0)
+ranges 0.22–0.81 — but the expected-recovery floor is stable at **~2–5 per stratum**
+and bounded above by the pure-Beta fit. Read against R3's pre-registered 5–20% recovery
+prediction (1–7 recoveries on 19–35 problems): **the noise floor is the same size as
+the signal.** ABSTRACT > 0 was already banned; W0c shows even ABSTRACT > B1-50 paired
+is unpowered on the easy strata alone. W2 (LCB-medium stratum) is promoted from
+contingency to **prerequisite**, exactly as chartered.

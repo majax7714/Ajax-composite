@@ -975,7 +975,10 @@ things we currently believe, and they set R3's bar.
    then the *ceiling* of escape is the point where the generation has diverged so far that
    the conditioning is **vacuous** — i.e. full escape *is* i.i.d. E0's natural position on
    the escape axis is its own within-set diversity (DIAG-8 measured B1 i.i.d. pairwise edit
-   distance **0.396**); E1 at T=1.2 reaches only PULL 0.309 / coverage 0.62 against E0's
+   distance **0.396**) *[ANCHOR SUPERSEDED 2026-07-15 — that number was pairwise diversity,
+   a different metric than the conditioned cells' PULL; the measured commensurate anchor is
+   **0.594 at T=1.2 / 0.491 at T=0.8** — see "E0 anchor, measured" below]*; E1 at T=1.2
+   reaches only PULL 0.309 / coverage 0.62 against E0's
    ~0.90. So every undirected refinement scheme is **strictly dominated by resampling at
    matched compute** — a mechanism-level derivation of Olausson et al. (2024)'s empirical
    compute-matched conclusion, and consistent with our own DIAG-1/H2 record.
@@ -988,7 +991,8 @@ things we currently believe, and they set R3's bar.
    registered success bar is therefore **strict**: ABSTRACT with *rich* feedback must
    **exceed** B1's coverage, not merely match it (matching is free from resampling).
 3. **The paper's central figure is already computable.** Coverage vs PULL, every failure-
-   conditioned cell, with E0 anchored at (0.396, ~0.90). Every measured point sits strictly
+   conditioned cell, with E0 anchored at (0.396, ~0.90) *[superseded — measured anchor
+   (0.594, 0.90) at T=1.2; see "E0 anchor, measured" below]*. Every measured point sits strictly
    under the i.i.d. anchor. R3 then either places a point *above* that line (directed escape
    beats resampling) or the sample-based refinement paradigm is, at this scale, finished.
 
@@ -1031,6 +1035,27 @@ consistent with the answer-leakage retraction already in place. What remains is 
 (not random), ~8 pts harder than the full pool (M3 mean-pass 0.565 vs 0.648) — absolute
 magnitudes are scoped to mixed problems; every within-subset contrast, the
 escape-distance law, content-blindness, and the dose-response are unchanged.
+
+**E0 anchor, measured (2026-07-15 — [PHASE_3B.md] W0a; the pre-registered 70/30
+prediction was WRONG).** The figure's i.i.d. anchor had been *assumed* commensurate with
+the conditioned cells' PULL axis: 0.396 was DIAG-8's within-set pairwise diversity, a
+different metric. Measured directly — PULL of every committed E0 generation against the
+same failed artifact each conditioned cell used — the anchor is **0.409 ± 0.319 (T=0) /
+0.491 ± 0.212 (T=0.8) / 0.594 ± 0.178 (T=1.2)**, +0.198 from the assumed value at the
+figure's anchor row, far outside the pre-registered ±0.05 band (odds were 70/30 the
+other way; recorded). The secondary check holds — E0-PULL exceeds every conditioned
+PULL at matched T — so the geometry does not invert; it **stretches**: E1@T1.2
+(PULL 0.309) has closed only **~52% of the escape distance** to the honest i.i.d.
+position, not the ~78% the assumed anchor implied. Two consequences. (i) The
+"undirected escape can only approach i.i.d." asymptote has far more unclaimed room than
+the old figure suggested, and nothing measured comes near it — the elimination
+argument survives its first audit leg with a *larger* unexplained gap, not a smaller
+one. (ii) Calibration: an i.i.d. sample sits only ~0.41–0.59 from an arbitrary failed
+candidate on the same problem (natural same-problem token overlap), so conditioned
+PULLs of 0.04–0.31 are deep inside copy territory — "escape" as measured has never yet
+left the artifact's neighborhood. The central-figure spec now uses the measured anchor
+per temperature; the 0.396 mentions above carry supersede markers in place.
+[artifacts/w0a_e0_anchor.json].
 
 ### 9.4 R3 + BEST-SO-FAR *(pre-registered; ride R2's enriched pools)*
 
@@ -1103,6 +1128,31 @@ rate) → **W1** (E7 repelled-conditioning arm — the asymptote's unpopulated t
 pre-reg: R3 four-arm with ABSTRACT-trace ceiling, recovery validation protocol) →
 **W4** (execute D2c/E6 → R3 → BEST-SO-FAR). A reconciliation ledger (§11) now governs
 every external result used in design.
+
+### 9.6 Stratum characterization — the pass@50 = 0 label has a false-zero floor *(2026-07-15, W0c; W2 extends)*
+
+R3's target stratum ("problems i.i.d. provably fails in 50 tries") is not a clean
+label: a problem with true per-sample rate p = 0.01 survives 50 draws with probability
+~0.60. From the persisted k=50 pools of the four feasible cells, a two-component
+maximum-likelihood fit (point mass at p = 0 + Beta over reachable p; pure-Beta fit as
+upper bound) gives the **expected lucky-recovery count a fresh B1-50 control arm
+produces on the stratum by chance alone**:
+
+| cell | stratum (0/50) | x=1 / x=2 near-misses | E[B1-50 lucky recoveries] (upper) |
+|---|---|---|---|
+| base T=0.8 | 19/80 | 10 / 5 | **3.6** (3.9) |
+| base T=1.0 | 26/80 | 5 / 4 | 2.3 (5.3) |
+| base T=1.2 | 35/80 | 10 / 5 | 5.0 (6.9) |
+| instruct T=1.2 | 32/80 | 10 / 3 | 4.6 (5.4) |
+
+The mixture split is fit-unstable cell-to-cell (P(reachable | 0/50) ranges 0.22–0.81),
+but the floor is stable: **~2–5 lucky recoveries per stratum**, the same order as the
+pre-registered 5–20% recovery prediction (1–7 recoveries on 19–35 problems). Two design
+consequences, both binding on W3: (i) R3's primary contrast must be **ABSTRACT >
+B1-50, paired** — ABSTRACT > 0 is theater, and this floor goes into the stated null;
+(ii) **the easy strata alone are unpowered** — the signal and the noise floor are the
+same size — so the LCB-medium screen (W2) is a prerequisite, not a contingency.
+[artifacts/w0c_stratum_falsezero.json].
 
 ---
 

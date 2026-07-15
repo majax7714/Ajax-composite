@@ -1,0 +1,110 @@
+{
+  "_label": "W0c \u2014 per-problem p\u0302 + false-zero rate of the pass@50=0 stratum",
+  "model": "ML fit of pi0*delta(p=0) + (1-pi0)*Beta(a,b); posterior for an observed-zero problem: P(reachable|0/50) and fresh-50 recovery prob 1 \u2212 B(a,b+100)/B(a,b+50); pure-Beta fit (pi0=0) reported as the upper bound on the false-zero rate",
+  "cells": {
+    "base_T0.8": {
+      "n_problems": 80,
+      "stratum_size_pass50_eq_0": 19,
+      "n_at_1_of_50": 10,
+      "n_at_2_of_50": 5,
+      "fits": {
+        "mixture": {
+          "loglik": -267.8740923500095,
+          "alpha": 0.3872538307909223,
+          "beta": 1.0787724829764358,
+          "pi0": 0.045,
+          "P_reachable_given_zero": 0.8104958598444003,
+          "fresh50_recovery_prob_per_zero_problem": 0.18896646658135585,
+          "expected_B1_50_recoveries_in_stratum": 3.590362865045761
+        },
+        "pure_beta_upper_bound": {
+          "loglik": -267.88198471606967,
+          "alpha": 0.33615783636974383,
+          "beta": 1.0349201087394193,
+          "pi0": 0.0,
+          "P_reachable_given_zero": 1.0,
+          "fresh50_recovery_prob_per_zero_problem": 0.20599435897753404,
+          "expected_B1_50_recoveries_in_stratum": 3.913892820573147
+        }
+      }
+    },
+    "base_T1.0": {
+      "n_problems": 80,
+      "stratum_size_pass50_eq_0": 26,
+      "n_at_1_of_50": 5,
+      "n_at_2_of_50": 4,
+      "fits": {
+        "mixture": {
+          "loglik": -238.34141043861322,
+          "alpha": 0.7666876735040665,
+          "beta": 2.6086241752905814,
+          "pi0": 0.255,
+          "P_reachable_given_zero": 0.22056909317995493,
+          "fresh50_recovery_prob_per_zero_problem": 0.08851585100238075,
+          "expected_B1_50_recoveries_in_stratum": 2.3014121260618996
+        },
+        "pure_beta_upper_bound": {
+          "loglik": -241.05383730472798,
+          "alpha": 0.33615783636974383,
+          "beta": 1.6775315134835993,
+          "pi0": 0.0,
+          "P_reachable_given_zero": 1.0,
+          "fresh50_recovery_prob_per_zero_problem": 0.20432893134454888,
+          "expected_B1_50_recoveries_in_stratum": 5.312552214958271
+        }
+      }
+    },
+    "base_T1.2": {
+      "n_problems": 80,
+      "stratum_size_pass50_eq_0": 35,
+      "n_at_1_of_50": 10,
+      "n_at_2_of_50": 5,
+      "fits": {
+        "mixture": {
+          "loglik": -178.1315834396328,
+          "alpha": 0.5777148290300914,
+          "beta": 5.707733947103689,
+          "pi0": 0.235,
+          "P_reachable_given_zero": 0.461333581833579,
+          "fresh50_recovery_prob_per_zero_problem": 0.14302351394136367,
+          "expected_B1_50_recoveries_in_stratum": 5.005822987947728
+        },
+        "pure_beta_upper_bound": {
+          "loglik": -178.56007948669185,
+          "alpha": 0.33615783636974383,
+          "beta": 4.673097312880965,
+          "pi0": 0.0,
+          "P_reachable_given_zero": 1.0,
+          "fresh50_recovery_prob_per_zero_problem": 0.19691993921566642,
+          "expected_B1_50_recoveries_in_stratum": 6.892197872548325
+        }
+      }
+    },
+    "instruct_T1.2": {
+      "n_problems": 80,
+      "stratum_size_pass50_eq_0": 32,
+      "n_at_1_of_50": 10,
+      "n_at_2_of_50": 3,
+      "fits": {
+        "mixture": {
+          "loglik": -210.25432460773328,
+          "alpha": 0.3504017563773925,
+          "beta": 2.135760835533087,
+          "pi0": 0.13,
+          "P_reachable_given_zero": 0.6747017696207834,
+          "fresh50_recovery_prob_per_zero_problem": 0.14220741235819603,
+          "expected_B1_50_recoveries_in_stratum": 4.550637195462273
+        },
+        "pure_beta_upper_bound": {
+          "loglik": -210.38308099804345,
+          "alpha": 0.2752227585240653,
+          "beta": 1.932516319966082,
+          "pi0": 0.0,
+          "P_reachable_given_zero": 1.0,
+          "fresh50_recovery_prob_per_zero_problem": 0.17017871775575366,
+          "expected_B1_50_recoveries_in_stratum": 5.445718968184117
+        }
+      }
+    }
+  }
+}

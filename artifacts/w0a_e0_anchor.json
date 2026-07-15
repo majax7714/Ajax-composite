@@ -1,0 +1,35 @@
+{
+  "_label": "W0a \u2014 E0 anchor measured on the conditioned-cell PULL metric",
+  "prereg_prediction": "E0-PULL within \u00b10.05 of 0.396 (odds 70/30); secondary: E0-PULL \u2265 every conditioned PULL at matched T",
+  "diag8_pairwise_anchor_assumed": 0.396,
+  "E0_PULL_vs_E1_artifact": {
+    "E0_PULL@0.0": {
+      "n": 59,
+      "mean": 0.40847143185789997,
+      "sd": 0.3189570677104436
+    },
+    "E0_PULL@0.8": {
+      "n": 60,
+      "mean": 0.4909885202732277,
+      "sd": 0.21146075596602715
+    },
+    "E0_PULL@1.2": {
+      "n": 60,
+      "mean": 0.5934996548460191,
+      "sd": 0.17768505508700477
+    }
+  },
+  "conditioned_PULL_recomputed": {
+    "E1@0.0": 0.07511510419816916,
+    "E1@0.8": 0.17583480319225622,
+    "E1@1.2": 0.3094718039958377,
+    "E2@0.0": 0.0431160527790606,
+    "E2@0.8": 0.06781132873328596,
+    "E2@1.2": 0.15665568083591422
+  },
+  "anchor_row_T1.2": 0.5934996548460191,
+  "delta_vs_assumed": 0.19749965484601906,
+  "within_prereg_band": false,
+  "secondary_holds_T0.8": true,
+  "secondary_holds_T1.2": true
+}
