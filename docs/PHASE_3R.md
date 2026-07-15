@@ -399,3 +399,80 @@ dynamics, needing exactly the graded landscape the feedback-richness criterion h
 | BEST+ABSTRACT | "the favourite" | **the only condition with a mechanism** — best candidate = good start, abstraction = the escape *direction* |
 
 D2c/E6 (partial-credit conditioning) is the premise test: if a ~40–60% candidate reproduces at ~same frac_tests, BEST-alone is dead and BEST+ABSTRACT carries the phase; if frac_tests *climbs*, the attractor does more than copy and BEST-SO-FAR is a bigger result than scoped. ORACLE-first ranking unchanged.
+
+---
+
+## CRASH RECOVERY (2026-07-14, ~18:00 EDT) — power-grid failure mid-run
+
+A city-grid outage killed the local Modal client mid-sweep. All Modal apps were torn
+down (`modal app list` → `[]`, no ephemeral tasks survive a client death). **Nothing is
+recoverable *from the cloud*** — there is no running remote job to reattach to. Salvage
+is therefore exactly what already landed on local disk. Persist-before-exec design paid
+off: every candidate **pool** that finished generating was written to `runs/modal/` before
+its executor ran, so no generation compute is lost — only the (cheap) execution/scoring
+step and the (expensive) R1b.2d retrain need re-running. **No number below crosses a
+stack boundary; nothing here is a verdict.** Recovery is exec-only where a pool exists,
+full rerun where it does not. *Nothing was re-executed during this assessment (user
+directive: salvage-check only).*
+
+**SALVAGED — complete on disk, verdict already written (no action):**
+
+| item | file | status |
+|---|---|---|
+| R2 base T=1.0 screen | `artifacts/phase3a_screen_r2_base_T10.json` | pass@8 0.241 / pass@50 0.390 / headroom **+0.149** — band ✗, headroom ✗ (by 0.001), gate does-not-qualify |
+| R2 base T=1.2 screen | `artifacts/phase3a_screen_r2_base_T12.json` | pass@8 0.092 / pass@50 0.225 / headroom +0.133 — both ✗, does-not-qualify |
+
+These two confirm the **pre-registered trade-off curve** (base deepens the tail
++0.108→+0.149 as T rises, but pass@8 falls out of the [0.30,0.60] band). They stand.
+
+**SALVAGEABLE — pool complete (200 probs × 50 codes, all non-empty), screen NOT written; exec-only, no regen:**
+
+| item | pool on disk | recovery |
+|---|---|---|
+| R2 base **T=0.8** screen (the pivotal coolest-base point) | `runs/modal/bcb_cand_r2_base_T08.json` (18 MB) | `modal run scripts/modal_phase3a.py::exec_only --tag r2_base_T08` → writes `artifacts/phase3a_screen_r2_base_T08.json`. Pool predates the executor-guard fix (`eec132e`); re-exec now runs the hardened judge. |
+| R2 **instruct T=0.8** screen (comparison arm) | `runs/modal/bcb_cand_r2_instruct_T08.json` (8.3 MB) | `modal run scripts/modal_phase3a.py::exec_only --tag r2_instruct_T08` → writes `artifacts/phase3a_screen_r2_instruct_T08.json`. |
+
+**KILLED — needs full regeneration (pool never written):**
+
+| item | why lost | rerun |
+|---|---|---|
+| R2 **instruct T=1.0** (pool+screen) | outage hit before generation started | `modal run scripts/modal_phase3a.py::r2_screen --arch instruct --temperature 1.0` |
+| R2 **instruct T=1.2** (pool+screen) | never started | `modal run scripts/modal_phase3a.py::r2_screen --arch instruct --temperature 1.2` |
+| R2 **LiveCodeBench arm** (base+instruct × 3 T) | never started; needs LCB base-path build+smoke first | build LCB base path → `r2_smoke` → `r2_screen --dataset <lcb>` ×6 |
+| **R1b.2d retrain + H1 verdict** | died at **epoch 3/3, step ~450/750**; `r1b2d_train_eval` trains+evals in one remote call and returns scores to the local entrypoint — **no `volume.commit` of the adapter** (only volume is `rgr-hf-cache`, the HF download cache), so the trained weights died with the container and `artifacts/r1b2d_verifier_retrain.json` was never written | `modal run scripts/modal_rgr.py::r1b2d_train_main` (regenerates from `runs/modal/r1b2d_mbpp_labeled.json`, which survived — the k=8 MBPP gen at 15:01 is intact, so only the ~3-epoch T4 retrain repeats, not the generation). |
+
+Last-known R1b.2d training signal (bf16 stack; **informational, NOT the verdict, does
+not cross any gate**): epoch-1 val AUROC 0.7009, epoch-2 val AUROC 0.7410; epoch 3 was
+mid-run when the power died. The kill-line (retrained-V SE ≤ 0.305 → H1 doesn't survive
+de-quantization) is **still unresolved** — it never computed.
+
+**F2 gate status after recovery:** still open. Base cleared headroom (T=1.0 at +0.149)
+but never the pass@8 band; the two instruct arms that would complete the pre-registered
+base+instruct × 3-T grid (T=0.8 salvageable, T=1.0/1.2 to regen) are the missing cells.
+The decision rule cannot fire until instruct T=0.8/1.0/1.2 land.
+
+### RECOVERY UPDATE (2026-07-14, salvage exec-only, hardened judge)
+
+**Base T=0.8 salvage LANDED** (`artifacts/phase3a_screen_r2_base_T08.json`, exec-only on
+the intact pool, executor-guard `eec132e` active — no re-crash): pass@1 0.144, **pass@8
+0.328**, pass@50 0.425, **headroom +0.097**. Band [0.30,0.60] **✓ (first config to clear
+it)**, headroom ≥0.15 **✗**, gate does-not-qualify.
+
+This closes the base-temperature axis and **confirms the trade-off has no feasible base
+point** (the "clean trade-off, no feasible point" branch of the R2 pre-registration — the
+second-most-likely and most-informative outcome):
+
+| base config | pass@8 | headroom | band | headroom≥0.15 |
+|---|---|---|---|---|
+| T=0.8 | **0.328** | +0.097 | ✓ | ✗ |
+| T=1.0 | 0.241 | **+0.149** | ✗ | ✗ (by 0.001) |
+| T=1.2 | 0.092 | +0.133 | ✗ | ✗ |
+
+The two criteria move oppositely and **never co-occur** on base: pass@8 needs T ≤ 0.8,
+headroom needs T ≥ 1.0. No base point clears both. The instruct comparison arm (T=0.8
+salvage exec running; T=1.0/1.2 need regen) is the remaining input before F2's decision
+rule fires; on current evidence F2 trends toward **strengthened-as-structural** unless
+instruct opens a feasible cell.
+
+Instruct T=0.8 salvage (exec-only on `bcb_cand_r2_instruct_T08.json`) executing at time of
+writing — result to be appended here on landing.

@@ -6,14 +6,18 @@ this architecture work" to "on what task can iterative refinement pay at all" �
 that reframing drives a stack rebuild (Phase M) and a pre-registered benchmark search
 (Phase 3) whose first hard result is itself a negative worth publishing.*
 
-*Living record — last updated 2026-07-14. All numbers trace to committed artifacts
-and run records; sources cited inline as `[file]`. This is the canonical results
-document for the whole experiment; §§1–5 are the register experiment (Phases 0–2 +
-its diagnostic teardown, complete and frozen); §6 is the throughput/stack rebuild
-(Phase M, complete); §7 is Phase 3 (reframe + benchmark screen, complete: gate
-NEGATIVE/F2); §9 is the **current phase (Phase 3R** — auditing the two live claims
-H1 and F2, plus pinning the anchoring *mechanism*; in progress). Read §9.5 for live
-status. Every §4.2/§7.4 claim now carries a Phase-3R audit banner pointing into §9.*
+*Living record — last updated 2026-07-14 (post power-outage bookkeeping; carry-over
+source of truth for a fresh conversation). All numbers trace to committed artifacts and
+run records; sources cited inline as `[file]`. This is the canonical results document for
+the whole experiment. **New conversation: start with §10 (working method) and §9.5 (live
+status + restart ordering).** §§1–5 are the register experiment (Phases 0–2 + diagnostic
+teardown, complete and frozen); §6 is the throughput/stack rebuild (Phase M, complete);
+§7 is Phase 3 (reframe + benchmark screen: gate NEGATIVE/F2, under R2 audit); §9 is the
+**current phase (Phase 3R** — auditing the two live claims H1 and F2, pinning the
+anchoring→escape mechanism; in progress, §9.3.1 is the current frontier of thought). §10
+is the durable **working method**; §11 is external **references** (Tsui, Olausson,
+Self-Debug, "How Many Tries", Kamoi). Every §4.2/§7.4 claim carries a Phase-3R audit
+banner pointing into §9.*
 
 ---
 
@@ -76,10 +80,12 @@ training was built on it.
 against the Phase-0 choices they inherit. **R1** asks whether H1 is a *quantization
 artifact*: on bf16 the stack-invariant Selection-Efficiency metric shows likelihood
 alone (SE 0.305) nearly reproduces the 4-bit verifier benefit (SE 0.315) — the decider
-is a bf16 verifier retrain, running. **R2** asks whether F2's shallow tail is
+is a bf16 verifier retrain (interrupted by a 2026-07-14 power outage before its verdict
+computed — rerun pending; see §9.5). **R2** asks whether F2's shallow tail is
 *decoding-induced* (top-p 0.95 + T 0.8 + Instruct all suppress the improbable tail);
 it re-screens with a base completion model, top-p 1.0, and a temperature sweep — base
-path validated, sweep running. Spun off from the DIAG-8 anchoring finding, **D-measure**
+path validated, base T=0.8/1.0/1.2 screened, instruct arm partial (same outage). Spun
+off from the DIAG-8 anchoring finding, **D-measure**
 converts "conditioning on a failure is harmful" into a law: repair is governed by
 **escape distance** (how far a generation diverges from the failed artifact), the
 benefit is a **coverage/diversity** effect not a per-sample-quality one (D2b), the
@@ -87,6 +93,14 @@ attractor is **content-blind** and **provenance-independent** — distinct from 
 self-anchoring blind spot (D2a) — and the reconciliation with the self-refinement
 literature is that **escape requires direction, and direction requires rich feedback**.
 That last statement is the hypothesis R3 (conditional reachability) now tests directly.
+The law's sharpest consequence (§9.3.1) is an **elimination argument**: undirected
+failure-conditioning asymptotes toward i.i.d. sampling (full escape = the artifact
+discarded = resampling), so it is *strictly dominated by resampling at matched compute*;
+the only mechanism that can beat i.i.d. is **directed** escape, which makes R3 the sole
+surviving refinement hypothesis rather than one option among several. This converges,
+from a mechanism, on the compute-matched conclusion of Olausson et al. (2024). One
+confound of our own (E5's subset overlap; §9.3.1) is flagged for a free matched-control
+recompute before the content-blindness/neutral-attractor claim is called final.
 
 ---
 
@@ -200,9 +214,12 @@ pool 84.15% of the time, but self-fluency selection recovers only 62.80% —
 > (SE 0.315) — so H1's edge may have been "V beats *quantization-corrupted* likelihood."
 > Free checks closed the mundane escapes (R1b.2b: V does discriminate subtle
 > wrong_answer-only failures, within-AUROC 0.751; R1b.2c: not a length artifact). **The
-> decider is R1b.2d — a bf16 verifier retrain, running now; kill line: retrained-V bf16
+> decider is R1b.2d — a bf16 verifier retrain; kill line: retrained-V bf16
 > SE ≤ 0.305 → H1 does not survive de-quantization.** No H1 claim is final until it
-> lands. Numbers below stand as originally computed on the retired 4-bit stack.
+> lands — and it has **not** landed: the retrain was killed by a 2026-07-14 power
+> outage at epoch 3/3 (~step 450) with no checkpoint persisted, so the verdict never
+> computed and a full rerun is required (§9.5). Numbers below stand as originally
+> computed on the retired 4-bit stack.
 
 Evaluation set: the frozen Phase-0 candidates (1,312 held-out HumanEval
 candidates with execution labels and stored mean token log-probabilities).
@@ -586,10 +603,16 @@ entire reason a confirmation step exists.
 > improbable tail), temperature 0.8 (never swept), and Instruct tuning (entropy-collapsed
 > vs a base model's deeper pass@k tail). Its honest current scope is "*instruct* Qwen at
 > T=0.8/top-p=0.95 has a shallow tail." R2 re-screens with the tail un-suppressed
-> (base completion model, top-p 1.0, T∈{0.8,1.0,1.2}); **base path validated, sweep
-> running.** If any config clears pass@8∈[0.30,0.60] ∧ headroom≥0.15, F2 narrows to the
-> frozen config and the gate flips to PASS; if none does across base+instruct × 3 temps
-> un-truncated, F2 is *strengthened* (structural, decoding confound ruled out).
+> (base completion model, top-p 1.0, T∈{0.8,1.0,1.2}); **base sweep complete: T=0.8
+> (pass@8 0.328, headroom +0.097), T=1.0 (0.241, +0.149), T=1.2 (0.092, +0.133). The
+> pre-registered trade-off is confirmed and has NO feasible base point — pass@8 needs
+> T≤0.8 (only T=0.8 clears the band), headroom needs T≥1.0; they never co-occur.** If any
+> config clears pass@8∈[0.30,0.60] ∧ headroom≥0.15, F2 narrows to the frozen config and
+> the gate flips to PASS; if none does across base+instruct × 3 temps un-truncated, F2 is
+> *strengthened* (structural, decoding confound ruled out). **Gate still open** — base is
+> exhausted with no feasible point; only the instruct arm (T=0.8 recovered exec-only;
+> T=1.0/1.2 need regen after the 2026-07-14 outage, §9.5) remains before F2 resolves, and
+> on current evidence trends toward *strengthened*.
 
 F1's implication was pursued to **LiveCodeBench** (contamination-controlled; 400
 problems, ~27 test cases each; easy/medium/hard) via a new hardened stdin/stdout judge
@@ -703,9 +726,14 @@ SE = (selected pass@1 − random pass@1) / (oracle pass@8 − random pass@1):
   **R1b.2b** — V is not just a brokenness detector (it discriminates *subtle*,
   wrong_answer-only failures at within-AUROC **0.751**); **R1b.2c** — the bf16 likelihood
   advantage is not a length artifact (sum-logprob / shortest-candidate do not rescue it).
-- **R1b.2d (running — the decider).** Retrain V on the bf16 MBPP distribution and re-score.
-  **Pre-committed kill line: retrained-V bf16 SE ≤ 0.305 → H1 does not survive
-  de-quantization.** Predicted SE ~0.33–0.38 (partial survival). Verdict pending.
+- **R1b.2d (the decider — RERUN PENDING).** Retrain V on the bf16 MBPP distribution and
+  re-score. **Pre-committed kill line: retrained-V bf16 SE ≤ 0.305 → H1 does not survive
+  de-quantization.** Predicted SE ~0.33–0.38 (partial survival). **Verdict not yet
+  computed:** the retrain was killed by a 2026-07-14 power outage at epoch 3/3 (~step
+  450); `r1b2d_train_eval` never commits the adapter to a volume, so the weights died with
+  the container and no verdict was written. Labeled input (`r1b2d_mbpp_labeled.json`)
+  survived, so the rerun repeats only the ~3-epoch T4 retrain. Last-known training signal
+  (bf16, informational, *not* the verdict): epoch-1 val AUROC 0.7009, epoch-2 0.7410.
   [artifacts/r1b2b_stratified_auroc.json, r1b2c_length_bias.json].
 
 ### 9.2 R2 — is F2's shallow tail structural or decoding-induced? *(the F2 audit)*
@@ -721,9 +749,20 @@ judge. **Decision rule:** any config with pass@8 ∈ [0.30,0.60] **and** pass@50
 no config clears across base+instruct × 3 temps un-truncated → **F2 strengthened**
 (structural, decoding confound ruled out). **Base completion path validated** (smoke:
 64/64 well-formed modules, 0 degenerate, mean `frac_tests` 0.269, 44% pass ≥1 test —
-graded feedback present). Base BigCodeBench sweep (n=200, k=50) running; verdict pending.
-**Prediction:** a trade-off curve (base + hotter T deepens the tail but drops pass@8);
-most-likely one base point clears → F2 retracted-as-structural, with real uncertainty.
+graded feedback present). Base BigCodeBench sweep (n=200, k=50) **complete**: **T=0.8**
+pass@8 **0.328** / pass@50 0.425 / headroom +0.097 (band ✓ — the only config to clear it);
+**T=1.0** pass@8 0.241 / pass@50 0.390 / headroom **+0.149**; **T=1.2** pass@8 0.092 /
+0.225 / +0.133. The **pre-registered trade-off curve is confirmed and has no feasible base
+point**: pass@8 clears the [0.30,0.60] band only at T=0.8, headroom clears ≥0.15 only at
+T≥1.0, and the two never co-occur (they move oppositely along temperature). This is the
+"clean trade-off, no feasible point" branch — the pre-registered second-most-likely and
+most-informative outcome. The **instruct comparison arm** (T=0.8 recovered exec-only after
+the 2026-07-14 outage; T=1.0/1.2 need regen — §9.5) is the last input before F2 resolves.
+**Gate still open**, trending **F2-strengthened-as-structural**. **Prediction (recorded
+before running):** a trade-off curve (base + hotter T deepens the tail but drops pass@8);
+most-likely one base point clears → F2 retracted-as-structural, with real uncertainty —
+**outcome: partially falsified** (the curve is confirmed, but *no* base point clears both,
+the more-informative branch).
 
 ### 9.3 The anchoring mechanism — D-measure *(the DIAG-8 spin-off, closed)*
 
@@ -765,6 +804,58 @@ append-only ([PHASE_3R.md] Addenda II/III):
   mechanism, and it explains the split B2 (no feedback, copies) vs B2+fb (2 bits, still
   declines) vs Self-Debug (traces, works).
 
+### 9.3.1 What the escape-distance law forces — the elimination argument *(the current frontier of thought)*
+
+Three consequences follow from D2b's refinement that the law is a **coverage/diversity**
+effect (mean-per-sample-pass is flat, ~0.20 at every T for E1). They are the sharpest
+things we currently believe, and they set R3's bar.
+
+1. **Undirected failure-conditioning cannot exceed i.i.d. sampling; it can only approach
+   it.** If escape buys coverage by spreading samples (not by lifting per-sample quality),
+   then the *ceiling* of escape is the point where the generation has diverged so far that
+   the conditioning is **vacuous** — i.e. full escape *is* i.i.d. E0's natural position on
+   the escape axis is its own within-set diversity (DIAG-8 measured B1 i.i.d. pairwise edit
+   distance **0.396**); E1 at T=1.2 reaches only PULL 0.309 / coverage 0.62 against E0's
+   ~0.90. So every undirected refinement scheme is **strictly dominated by resampling at
+   matched compute** — a mechanism-level derivation of Olausson et al. (2024)'s empirical
+   compute-matched conclusion, and consistent with our own DIAG-1/H2 record.
+2. **Therefore the only escape hatch is *directed* escape.** The lone way to beat i.i.d. is
+   feedback that tells the model *where* to go, not merely how far. This is not one option
+   among several for R3 — it is, by elimination, the **sole surviving refinement
+   hypothesis.** It also **retro-reframes DIAG-10**: ABSTRACT ≈ B1 (0.787 vs 0.762) was
+   never an uninformative null — it was *complete escape with near-zero direction* (~2-bit
+   error_class), landing exactly where the law says undirected escape must. R3's pre-
+   registered success bar is therefore **strict**: ABSTRACT with *rich* feedback must
+   **exceed** B1's coverage, not merely match it (matching is free from resampling).
+3. **The paper's central figure is already computable.** Coverage vs PULL, every failure-
+   conditioned cell, with E0 anchored at (0.396, ~0.90). Every measured point sits strictly
+   under the i.i.d. anchor. R3 then either places a point *above* that line (directed escape
+   beats resampling) or the sample-based refinement paradigm is, at this scale, finished.
+
+**Tsui orthogonality, stated at the mechanism level (for related work).** Tsui's blind spot
+is a **detection** failure (can the model *notice* an error is present); ours is an
+**escape** failure (can the model *leave* an error it already knows about). In our setup
+detection is never required — the failure is announced — so the blind spot has nothing to
+bite on. The two axes coexist rather than compete; the "opposite-to-Tsui" read from the
+first D-measure pass is retired (§9.3), superseded by "orthogonal, because we removed the
+variable Tsui measures."
+
+**A confound of our own, flagged before the claim is final.** The content-blindness /
+neutral-attractor result (E5) and the "conditioning drops mean_pass" magnitude both depend
+on **which problems each condition ran on.** E1/E2 require a *failed* artifact to condition
+on; E5 requires a *correct* one. If those were populated by filtering the pool, then E1/E2
+ran on a hard-biased subset and E5 on an easy-biased subset, and E0's own baseline on those
+same subsets is the only fair comparison. **The escape-distance law itself is safe** (it
+lives entirely within failure-conditioned cells and D2a replicated it on a fixed-artifact
+2×2), and the temperature dose-response is safe (within-condition). **At risk and pending a
+free matched-control recompute:** (i) the absolute size of the "conditioning drops per-
+sample pass" drop — E1's subset excludes always-solved problems, which alone depresses
+mean_pass; (ii) E5's coverage-1.00 / negative-TAX, which could be near-tautological if E5's
+subset is "problems that have a correct candidate." **Action (committed, §9.5):** recompute
+E0's mean_pass and coverage on E1's subset and on E5's subset before publishing the neutral-
+attractor claim. This is the append-only method applied to *our own* new finding, not just
+inherited ones.
+
 ### 9.4 R3 + BEST-SO-FAR *(pre-registered; ride R2's enriched pools)*
 
 - **R3 — conditional reachability (the central claim).** On the **pass@50 = 0** stratum
@@ -788,14 +879,130 @@ append-only ([PHASE_3R.md] Addenda II/III):
 
 **Closed:** judge fix; R1a; R1b.2a/b/c; D-measure incl. Addendum II (judge/D-measure
 pre-reg) and Addendum III (escape-distance law, temperature dose-response,
-content-blindness, D2a provenance/Tsui, D2b metric fix). **Running:** R1b.2d (H1
-de-quantization verdict), R2 base BigCodeBench sweep (F2 gate). **Pending:** R2
-instruct + LiveCodeBench arms, R3, BEST-SO-FAR, D2c/E6 (ride R2's enriched pools). No
-claim has been reversed; every prediction stands with its recorded outcome, including
-two D-measure predictions falsified (one backwards) and corrected in place by appended
-notes.
+content-blindness, D2a provenance/Tsui, D2b metric fix); **R2 base BigCodeBench sweep
+COMPLETE** — T=0.8 (pass@8 0.328, band ✓, headroom +0.097 ✗), T=1.0 (0.241, +0.149, band
+✗), T=1.2 (0.092, +0.133, band ✗): trade-off confirmed with **no feasible base point**
+(pass@8 clears only at T≤0.8, headroom only at T≥1.0 — never together). **Interrupted
+2026-07-14 ~18:00 by a power-grid outage** (see PHASE_3R.md "CRASH RECOVERY") — all Modal
+apps torn down, nothing recoverable from cloud; **base T=0.8 screen since recovered
+exec-only under the hardened judge.** **Salvageable (pools intact on disk, exec-only):**
+instruct T=0.8 screen (exec-only in progress). **Killed, needs rerun:** R1b.2d (H1
+de-quantization verdict — died epoch 3/3 step ~450, no checkpoint persisted, verdict never
+computed), R2 instruct T=1.0/1.2, LiveCodeBench arm. **Pending (unstarted):** R3, BEST-SO-FAR, D2c/E6
+(ride R2's enriched pools); **the E5/E1 subset matched-control recompute** (§9.3.1 —
+free, CPU, committed data; gates the neutral-attractor/content-blindness claim). The F2
+gate remains **open** — no config has cleared both criteria and the instruct arms are
+incomplete. No claim has been reversed; every prediction stands with its recorded
+outcome, including two D-measure predictions falsified (one backwards) and corrected in
+place by appended notes.
+
+**Restart ordering for the fresh conversation (highest-leverage first, cheapest tie-broken up):**
+1. **E5/E1 subset recompute** — free, CPU, no dependencies; closes the one open confound in our newest finding (§9.3.1).
+2. **R1b.2d rerun** — the H1 de-quantization verdict; GPU, self-contained (MBPP/HumanEval pools, not Phase-3a). Persist a checkpoint this time. Kill line unchanged: retrained-V bf16 SE ≤ 0.305 → H1 does not survive.
+3. **R2 salvage** — base T=0.8 recovered (pass@8 0.328, band ✓); instruct T=0.8 exec-only in progress; then instruct T=1.0/1.2 + LCB regen. Base axis has no feasible point, so F2 now hinges on the instruct arm.
+4. **Judge-fixed re-execution of R2's pools → enriched (per-test) pools**, then **D2c/E6**, **R3**, **BEST-SO-FAR** in that order (each needs the graded landscape the prior step produces).
+
+None of 1–4 blocks the others except where a pool dependency is stated; 1 and 2 can run concurrently.
 
 ---
+
+## 10. Working method — how this project reasons *(read first in any new conversation)*
+
+This section is not results. It is the **operating method** that produced them, written
+down so a fresh conversation continues in the same key rather than reverting to default
+LLM habits (agreeing, refuting, declaring). The method is the reason a mostly-negative
+record is worth publishing.
+
+**The core loop: a failure is a pointer, not a verdict.** Every dead result in this
+project spawned the next question rather than closing the book. H2's null → "what would
+have to be true for *any* refinement to pay?" → the coverage/headroom frame. F2's negative
+→ "is the tail structural or decoding-induced?" → R2. DIAG-8's anchoring → "is this about
+*self* or about *conditioning*?" → D-measure → the escape-distance law → the elimination
+argument. A refutation is treated as *information about our specifics*, not as a general
+truth to adopt or a decision that settles the matter.
+
+**Four rules that operationalize it:**
+
+1. **Question what a refutation means *for our specifics*, don't import it as truth.** When
+   a paper (or our own diagnostic) contradicts us, the first move is mechanistic: *why*
+   does their setup produce that result, and does the mechanism even apply to ours? This is
+   how Self-Debug (improves without execution feedback) and "How Many Tries" (universally
+   effective repair) were reconciled rather than fought — different baselines (greedy vs
+   compute-matched), different regimes (near-correct candidate vs structural failure),
+   different scale. Neither is wrong; both are measuring where our effect is invisible.
+2. **A decision is not a claim; a claim is not a finding.** Our own past suggestions,
+   drafts, and pre-registrations are *hypotheses*, not results, until a committed artifact
+   says otherwise. Prior-session enthusiasm ("BEST-SO-FAR is the charter") gets deflated by
+   the next measurement (E5 = answer leakage) without ceremony. Provenance is tracked per
+   claim: what is measured, what is inferred, what is still a bet.
+3. **Pre-register, then append — never revise.** Predictions and kill criteria are written
+   *before* the run, with odds where possible, and left standing whether they hold or not.
+   Two D-measure predictions were falsified (one *backwards*); both stay on the page next to
+   the corrected mechanism, because the correction is only trustworthy if the error is
+   visible. Retractions are marked `[SUPERSEDED]`/`[retracted]` in place, not deleted.
+4. **Turn the method on ourselves.** The same scrutiny applied to the field applies to our
+   own new findings — hence the E5 subset-confound flag (§9.3.1) raised against our *own*
+   freshest result before it is claimed, and the DIAG-2 problem-grouped-CV catch that killed
+   a false 0.87 that our own pipeline produced. The failure mode we actively guard against is
+   "treading into our own water": deriving a law post-hoc from a handful of cells and then
+   fitting everything to it. The defense is out-of-sample replication (D2a's fresh 12 cells)
+   and a standing generalization test (R2's benchmark family) with the law's predictions
+   pre-committed.
+
+**What this means for a new conversation.** Do not open by agreeing, and do not open by
+declaring a result final. Open by asking what the newest number *means for our specific
+system* and what question it opens. Peer-level pushback is expected and wanted; hedging and
+diplomatic softening are noise. When new evidence could alter a fundamental, question the
+fundamental — but remember the system under question need not be the one we started on
+(the register died; the live system is now anchoring/escape, and that migration is the
+point, not a detour).
+
+## 11. References *(external work this record engages; formal citations to be fitted at paper stage)*
+
+- **Tsui et al. (2025), "Self-Correction Bench" (NeurIPS 2025).** The **Self-Correction
+  Blind Spot**: LLMs fail to correct errors in their own output while fixing identical
+  errors from external sources (~64.5% failure across 14 models); a minimal "Wait" prompt
+  reduces it ~89%. *Our relation:* orthogonal, mechanism-level (§9.3.1) — Tsui's axis is
+  *detection*/provenance, ours is *escape*/distributional-conditioning; D2a shows provenance
+  near-inert in our setup (ΔPULL ≤ 0.028), so the blind spot does not bite where the failure
+  is announced.
+- **Olausson et al. (2024), "Is Self-Repair a Silver Bullet for Code Generation?" (ICLR
+  2024).** Compute-matched, self-repair is often ≤ i.i.d. sampling, especially at small
+  budgets; the bottleneck is the model's inability to produce accurate feedback about *why*
+  code is wrong. *Our relation:* the **methodological anchor** and the closest ally — our
+  escape-distance elimination argument (§9.3.1) is a mechanism-level derivation of their
+  empirical result, and their "feedback is the bottleneck" is our "direction requires rich
+  feedback."
+- **Chen et al., "Teaching Large Language Models to Self-Debug" (Self-Debug).** GPT-4
+  improves MBPP ~+3.6% and TransCoder/Spider substantially *without* unit-test execution —
+  the strongest published support for "the candidate itself helps." *Our relation:* the
+  reconciliation is baseline + regime — Self-Debug measures against **greedy** (not compute-
+  matched best-of-n), and its largest gains are on **near-correct-by-construction** tasks
+  (code translation, text-to-SQL) where the candidate is scaffolding and errors are *local*
+  — our "point the attractor at a near-success" regime. Not a contradiction; a different
+  point on the coverage/locality surface.
+- **"How Many Tries Does It Take?" (2026).** Self-repair reported universally effective
+  across 7 models on HumanEval + MBPP-Sanitized — *our exact benchmarks*; also reports name
+  errors repair easily while **assertion errors are hardest**, and gains grow with scale
+  (≤ +5.5pp at 70B). *Our relation:* the **direct challenge** to address head-on, and the
+  reconciliation is inside it — our failure mix is ~50% assertion-class (structural), 2%
+  syntax, and we run 1.5B; they average over easy (local) error types at large scale. The
+  local-vs-structural error axis is the reconciling variable and a Phase-3 stratification
+  target.
+- **Kamoi et al. (2024), TACL — survey of LLM self-correction.** Concludes no prior work
+  demonstrates successful *intrinsic* self-correction (from the model's own feedback alone)
+  on reasoning. *Our relation:* consistent with our B2 result (intrinsic self-refinement
+  buys nothing); we extend it to code with execution ground truth and give the *mechanism*
+  (undirected escape → resampling).
+- **Cross-Context Review line (2026)** and an **information-theoretic self-correction
+  preprint (2026):** fresh-context / external-channel framings escape the correlated-error-
+  mode problem. *Our relation:* corroborating context for "directed external signal" over
+  "self-review"; cite as convergent, not foundational.
+
+*Note on independence (to state honestly at paper stage):* the anchoring/escape line was
+reached from our own DIAG-8 spin-off before we surveyed Tsui/Olausson; we position as
+**convergent corroboration from an independent experimental path**, not priority, and cite
+prominently.
 
 *Appendix pointers. Architecture [ARCHITECTURE.md]; decision log **D1–D16**
 [DECISIONS.md] (D11 precision, D14 statistical reproducibility, D15 retracted, D16 =
@@ -809,8 +1016,11 @@ diagnostics [artifacts/diag{1..11}_*.json]; Phase M
 Phase 3a [artifacts/phase3a_screen_{complete,c05b,confirm,confirm15,confirmhard,
 lcb_easy,lcb_med}.json, phase3a_characterization.json]; Phase 3R
 [artifacts/r1b2b_stratified_auroc.json, r1b2c_length_bias.json,
-dmeasure_conditioning.json (incl. per_sample_D2b), dmeasure_d2a_verb_provenance.json;
-pending: r1b2d retrain, r2 sweep screens, dmeasure_d2c_partial_credit.json].
+dmeasure_conditioning.json (incl. per_sample_D2b), dmeasure_d2a_verb_provenance.json,
+phase3a_screen_r2_base_T10.json, phase3a_screen_r2_base_T12.json; intact pools awaiting
+exec-only: runs/modal/bcb_cand_r2_{base,instruct}_T08.json; crash-recovery record in
+PHASE_3R.md "CRASH RECOVERY (2026-07-14)"; pending rerun: r1b2d retrain, r2 instruct
+T=1.0/1.2 + LCB arm, dmeasure_d2c_partial_credit.json].
 Scripts: [scripts/modal_rgr.py] (T4 verifier/retrain), [scripts/modal_phasem.py]
 (L4 gates + D-measure/D2a), [scripts/modal_phase3a.py] (BigCodeBench screen + R2),
 [scripts/modal_lcb.py] (LiveCodeBench), [scripts/dmeasure_analysis.py] (D2b),

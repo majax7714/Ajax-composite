@@ -34,7 +34,7 @@ between those, and they point to completely different next experiments (§5).
 
 ## 1. Post-mortem — the null was probably over-determined
 
-The writeup ([WRITEUP.md] Abstract, §4.3) currently frames the result as *"every
+The writeup ([WRITEUP-rgr.md] Abstract, §4.3) currently frames the result as *"every
 link in the chain worked except the last one."* That framing is probably wrong.
 Three links were likely broken before the last one, and two were baked into the
 original build brief. **This section is a hypothesis, not a finding** — DIAG-1
@@ -92,7 +92,7 @@ wrong for H2. It optimized the control (verification) and starved the treatment
 The sharpest point, and the evidence is inside our own writeup. V-v1 (MLP over
 mean-pooled frozen-G `[φ(problem); φ(candidate)]`) failed H1 with within-problem
 macro AUROC 0.579 (near chance); an in-domain probe on those features reaches
-only 0.642, losing to raw likelihood ([WRITEUP.md] §4.2, [PHASES.md] Phase-1).
+only 0.642, losing to raw likelihood ([WRITEUP-rgr.md] §4.2, [PHASES.md] Phase-1).
 
 Now look at the update rule: `r_{t+1} = U(r_t, φ(candidate_t), v_t)`. The input
 `φ(candidate_t)` is *the exact representation we proved carries almost no
@@ -497,7 +497,7 @@ worth doing depends entirely on whether B2 lands in **Branch A** or **Branch B**
 **Deliverables (produced as the runs complete):**
 
 1. `artifacts/h2_b2_result.json` — B2, run to the frozen spec, ledger-verified.
-   The [WRITEUP.md] §4.3 table row filled in, and §5.3 replaced with the Branch
+   The [WRITEUP-rgr.md] §4.3 table row filled in, and §5.3 replaced with the Branch
    A/B verdict from §3 (prediction left standing).
 2. `artifacts/diag1..diag4_*.json` + [DIAGNOSTICS.md] — one paragraph per
    diagnostic: procedure, number, and whether the committed prediction held.
@@ -530,4 +530,4 @@ edits per §6 deliverable 1.
 
 *Appendix pointers: kill criteria [build-brief.md] §1; frozen accounting
 [COMPUTE_ACCOUNTING.md]; decisions D1–D10 [DECISIONS.md]; the H2 verdict
-[WRITEUP.md] §4.3 + [artifacts/h2_result.json]; gate log [PHASES.md].*
+[WRITEUP-rgr.md] §4.3 + [artifacts/h2_result.json]; gate log [PHASES.md].*
