@@ -1,0 +1,20 @@
+{
+  "benchmark": "LiveCodeBench/code_generation[easy,stdin] [instruct, T=1.2, top_p=1.0]",
+  "generator": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+  "n_problems": 80,
+  "k": 50,
+  "pass@1": 0.12975,
+  "pass@8": 0.3908714857165581,
+  "pass@50": 0.6,
+  "headroom": 0.20912851428344187,
+  "error_breakdown": {
+    "wrong_answer": 1051,
+    "runtime": 1813,
+    "no_code": 601,
+    "": 519,
+    "timeout": 16
+  },
+  "band": true,
+  "headroom_ok": true,
+  "gate": "PASS"
+}
