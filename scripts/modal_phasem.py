@@ -858,3 +858,169 @@ def dmeasure_d2a_main(n_problems: int = 60):
         cmp("E1", "E1p", T)
     print("\nprediction: verb explains most; provenance little. E1≈E2' → provenance "
           "near-irrelevant, distinct from Tsui. wrote artifacts/dmeasure_d2a_verb_provenance.json")
+
+
+# ---- E7: repelled conditioning [PHASE_3B.md W1] ----
+# The elimination argument excludes repulsive conditioning a priori; populate the
+# region. Same protocol as dmeasure_gen (instruct, top_p 0.95, seed 17, ns=8, the
+# committed 60-problem subset). Cells: E7@{0.8,1.2} explicit avoidance; E1@1.5 +
+# E0@1.5 extend the attraction curve and the measured anchor. PULL for EVERY cell
+# is distance to the same failed artifact (so E0@1.5's PULL extends W0a's anchor row).
+_E7_INSTR = ("Do not repeat this approach. Take a substantially different approach "
+             "and write a correct complete solution as a single fenced Python code block.")
+
+
+@app.function(image=IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=7200)
+def dmeasure_e7_gen(artifacts: list, n: int = 8):
+    import difflib
+    import os
+
+    os.chdir("/root/rgr")
+    from transformers import AutoTokenizer
+
+    from rgr.generator.formatting import SYSTEM_PROMPT, build_prompt, extract_code
+    from vllm import LLM, SamplingParams
+
+    tok = AutoTokenizer.from_pretrained(MODEL)
+    llm = LLM(model=MODEL, dtype="bfloat16", gpu_memory_utilization=0.90,
+              max_model_len=4096, seed=17)
+
+    def chat(user):
+        return tok.apply_chat_template(
+            [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": user}],
+            add_generation_prompt=True, tokenize=False)
+
+    def user_prompt(a, cond):
+        base = build_prompt(a["prompt"])
+        if cond == "E0":
+            return base
+        if cond == "E1":
+            return (base + f"\n\nYour previous attempt:\n```python\n{a['fail']}\n```\n"
+                    "Write an improved complete solution as a single fenced Python code block.")
+        if cond == "E7":
+            return (base + f"\n\nA previous attempt that FAILED:\n```python\n{a['fail']}\n```\n"
+                    + _E7_INSTR)
+
+    cells = [("E7", 0.8), ("E7", 1.2), ("E1", 1.5), ("E0", 1.5)]
+    out = []
+    for cond, T in cells:
+        prompts = [chat(user_prompt(a, cond)) for a in artifacts]
+        sp = SamplingParams(n=n, temperature=T, top_p=0.95, max_tokens=512,
+                            seed=17, logprobs=None)
+        outs = llm.generate(prompts, sp)
+        for a, req in zip(artifacts, outs):
+            codes = [extract_code(o.text) for o in req.outputs]
+            pulls = [1.0 - difflib.SequenceMatcher(None, cd, a["fail"]).ratio()
+                     for cd in codes if cd]
+            out.append({"pid": a["pid"], "cond": cond, "temp": T, "codes": codes,
+                        "pull": (sum(pulls) / len(pulls)) if pulls else None})
+    return {"results": out}
+
+
+@app.local_entrypoint()
+def dmeasure_e7_main(n_problems: int = 60):
+    """W1 — repelled-conditioning arm. Generate E7@{0.8,1.2} + E1/E0@1.5 on the
+    committed subset, execute locally (Daytona), apply the pre-registered branch
+    rule vs the committed E0 cells. [PHASE_3B.md W1]."""
+    import json as _json
+    import math as _math
+    import os
+    from collections import defaultdict
+
+    os.chdir(str(REPO))
+    from rgr.config import load_config
+    from rgr.data.humaneval import load_humaneval
+    from rgr.execution.sandbox import DaytonaBackend
+    from rgr.training.labels import ExecutionPool
+    from rgr.types import Candidate, SplitRole
+
+    m3 = _json.loads((REPO / "runs/modal/m3_candidates.json").read_text())
+    labels = _json.loads((REPO / "runs/modal/m3_labels.json").read_text())["labels"]
+    he = {p.problem_id: p for p in load_humaneval().checkout(SplitRole.HELDOUT_EVAL)}
+    arts = []
+    for pid, row, lab in zip(m3["problem_ids"], m3["candidates"], labels):
+        fail = next((c["code"] for c, p in zip(row, lab) if not p and c["code"]), None)
+        good = next((c["code"] for c, p in zip(row, lab) if p and c["code"]), None)
+        if fail and good:
+            arts.append({"pid": pid, "prompt": he[pid].prompt, "fail": fail, "correct": good})
+        if len(arts) >= n_problems:
+            break
+
+    gen = dmeasure_e7_gen.remote(arts)
+    (REPO / "runs/modal/dmeasure_e7_gen.json").write_text(_json.dumps(gen))
+
+    cfg = load_config("configs/phase0_harness.toml")
+    pool = ExecutionPool(lambda: DaytonaBackend(cfg.execution.timeout_seconds), size=8)
+    passed = {}
+    try:
+        for r in gen["results"]:
+            prob = he[r["pid"]]
+            cands = [Candidate(text="", code=cd) for cd in r["codes"]]
+            passed[(r["pid"], r["cond"], r["temp"])] = [bool(e.passed) for e in pool.execute_all(prob, cands)]
+    finally:
+        pool.close()
+
+    # committed E0 per-problem coverage at matched T (dmeasure_exec.json)
+    ex = _json.loads((REPO / "runs/modal/dmeasure_exec.json").read_text())
+    e0_cov = {}  # (pid, "0.8"/"1.2") -> 0/1
+    for key, v in ex.items():
+        pid, cond, temp = key.rsplit("|", 2)
+        if cond == "E0" and temp in ("0.8", "1.2") and v:
+            e0_cov[(pid, temp)] = 1 if any(v) else 0
+
+    pull, cover, meanp = defaultdict(list), defaultdict(list), defaultdict(list)
+    e7_cov = {}
+    for r in gen["results"]:
+        k = (r["cond"], r["temp"])
+        if r["pull"] is not None:
+            pull[k].append(r["pull"])
+        ps = passed[(r["pid"], r["cond"], r["temp"])]
+        if ps:
+            cover[k].append(1.0 if any(ps) else 0.0)
+            meanp[k].append(sum(ps) / len(ps))
+            if r["cond"] == "E7":
+                e7_cov[(r["pid"], str(r["temp"]))] = 1 if any(ps) else 0
+
+    def avg(d, k):
+        return (sum(d[k]) / len(d[k])) if d[k] else None
+
+    cells = {}
+    for cond, T in (("E7", 0.8), ("E7", 1.2), ("E1", 1.5), ("E0", 1.5)):
+        k = (cond, T)
+        cells[f"{cond}@{T}"] = {"pull": avg(pull, k), "coverage": avg(cover, k),
+                                "mean_pass": avg(meanp, k)}
+
+    # pre-registered branch rule: paired E7 vs committed E0, per temp
+    def paired(temp):
+        pids = [p for (p, t) in e7_cov if t == temp and (p, temp) in e0_cov]
+        b = sum(1 for p in pids if e7_cov[(p, temp)] and not e0_cov[(p, temp)])
+        c = sum(1 for p in pids if e0_cov[(p, temp)] and not e7_cov[(p, temp)])
+        n, delta = len(pids), (sum(e7_cov[(p, temp)] for p in pids)
+                               - sum(e0_cov[(p, temp)] for p in pids)) / max(len(pids), 1)
+        ptail = sum(_math.comb(b + c, k) for k in range(b, b + c + 1)) / (2 ** (b + c)) if b + c else 1.0
+        return {"n": n, "delta_cov": delta, "wins_E7": b, "wins_E0": c,
+                "one_sided_p_E7_gt_E0": ptail}
+
+    contrasts = {t: paired(t) for t in ("0.8", "1.2")}
+    fires_c = any(v["delta_cov"] >= 0.05 and v["one_sided_p_E7_gt_E0"] < 0.10
+                  for v in contrasts.values())
+    all_a = all(v["delta_cov"] <= -0.05 for v in contrasts.values())
+    branch = "c_retract_overclaim" if fires_c else ("a_strengthened" if all_a else "b_restate_leq_iid")
+
+    result = {"_label": "W1/E7 — repelled conditioning; branch rule pre-registered PHASE_3B.md",
+              "aggregation_rule": "(c) if any temp fires; (a) if all temps <= -0.05; else (b)",
+              "n_problems": len(arts), "cells": cells,
+              "paired_vs_committed_E0": contrasts, "branch": branch}
+    (REPO / "artifacts/dmeasure_e7.json").write_text(_json.dumps(result, indent=2))
+
+    print(f"\n=== W1/E7 — repelled conditioning ({len(arts)} problems) ===")
+    print(f"{'cell':<10}{'PULL':>8}{'mean_pass':>11}{'cov':>7}")
+    for name, s in cells.items():
+        pl = f"{s['pull']:.3f}" if s['pull'] is not None else "  -  "
+        mp = f"{s['mean_pass']:.3f}" if s['mean_pass'] is not None else "  -  "
+        print(f"{name:<10}{pl:>8}{mp:>11}{s['coverage']:>7.2f}")
+    for t, v in contrasts.items():
+        print(f"E7@{t} vs committed E0@{t}: dcov {v['delta_cov']:+.3f} "
+              f"(E7-only {v['wins_E7']}, E0-only {v['wins_E0']}, one-sided p {v['one_sided_p_E7_gt_E0']:.3f})")
+    print(f"BRANCH: {branch}")
+    print("wrote artifacts/dmeasure_e7.json")
