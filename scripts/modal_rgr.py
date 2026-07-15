@@ -1000,8 +1000,12 @@ def r1b_h2h():
     print("wrote artifacts/r1b_h2h_stale_v.json")
 
 
-@app.function(image=IMAGE, gpu="T4", volumes={"/cache": VOL}, timeout=10800)
+@app.function(image=IMAGE, gpu="T4", volumes={"/cache": VOL}, timeout=21600)
 def r1b2d_train_eval(train_rows: list, val_rows: list, m3_pool: dict, lock_pool: dict):
+    # timeout raised 10800→21600 (2026-07-15): 3 epochs + per-improved-epoch scoring
+    # of two 1312-candidate pools needs ~4.5h on T4; the 3h cap killed the first
+    # rerun mid-epoch-3 (the volume checkpoint captured epoch 2, validating the
+    # insurance). Plumbing only — recipe unchanged.
     """R1b.2d — retrain V-v2b on the BF16 MBPP candidate distribution with the
     identical D9 recipe (4-bit QLoRA cross-encoder, r16/α32, q/k/v/o, BCE, 3 epochs,
     batch 4, val-AUROC epoch selection), then score the BF16 HumanEval pool (m3) and
