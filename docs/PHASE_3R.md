@@ -489,6 +489,24 @@ requires instruct T=1.0/1.2 to run, but the standing evidence points to **F2 str
 as structural** (decoding confound ruled out across the temperature axis for both
 architectures). Gate remains open pending those two regen cells.
 
+### REGEN UPDATE (2026-07-14, post-outage session) — the BCB grid is complete
+
+The two outage-killed instruct cells regenerated (n=200, k=50, top_p=1.0, random
+samples, hardened judge; per-candidate detail persisted as `bcb_res_*` enriched pools):
+
+| BCB cell | pass@8 | pass@50 | headroom | band | headroom≥0.15 |
+|---|---|---|---|---|---|
+| instruct T=1.0 | 0.256 | 0.360 | +0.104 | ✗ | ✗ |
+| instruct T=1.2 | 0.167 | 0.270 | +0.103 | ✗ | ✗ |
+
+As the standing evidence required: instruct pass@8 keeps falling with T (0.269 →
+0.256 → 0.167, never re-entering the band), and instruct headroom caps at +0.104 —
+**below base headroom at every matched temperature** (0.086/0.104/0.103 vs
+0.097/0.149/0.133), confirming the deeper-base-tail direction once more. **The full
+pre-registered BigCodeBench grid (base+instruct × 3 temps, un-truncated) contains no
+feasible cell.** The F2 decision rule now waits only on the LiveCodeBench-easy arm
+(6 cells, running).
+
 ---
 
 ## Addendum IV (2026-07-14) — E5/E1 subset matched-control (§9.3.1's committed action) — CLOSED
