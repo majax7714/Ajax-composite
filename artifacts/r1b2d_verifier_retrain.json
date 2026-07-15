@@ -1,0 +1,10 @@
+{
+  "_label": "R1b.2d \u2014 retrained-on-bf16 V; SE vs bf16 likelihood 0.305",
+  "best_val_auroc": 0.7069099929128277,
+  "best_epoch": 2,
+  "retrained_V_within_bf16": 0.6377329192546584,
+  "retrained_V_SE_bf16": 0.08971201303368638,
+  "bf16_likelihood_SE": 0.305,
+  "offdiag_retrained_V_SE_on_4bit_pool": 0.36392631074325216,
+  "kill_H1_if_SE_le_0.305": true
+}

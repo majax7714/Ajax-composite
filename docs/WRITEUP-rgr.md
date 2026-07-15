@@ -6,9 +6,9 @@ this architecture work" to "on what task can iterative refinement pay at all" �
 that reframing drives a stack rebuild (Phase M) and a pre-registered benchmark search
 (Phase 3) whose first hard result is itself a negative worth publishing.*
 
-*Living record — last updated 2026-07-15 (Phase-3R audits resolving: **F2
-retracted-as-structural** by the completed R2 grid, E5/E1 subset confound closed clean,
-R1b.2d retrain in flight). All numbers trace to committed artifacts and
+*Living record — last updated 2026-07-15 (Phase-3R audits **RESOLVED**: **H1
+killed-as-artifact** by the landed R1b.2d retrain, **F2 retracted-as-structural** by the
+completed R2 grid, E5/E1 subset confound closed clean). All numbers trace to committed artifacts and
 run records; sources cited inline as `[file]`. This is the canonical results document for
 the whole experiment. **New conversation: start with §10 (working method) and §9.5 (live
 status + restart ordering).** §§1–5 are the register experiment (Phases 0–2 + diagnostic
@@ -16,7 +16,8 @@ teardown, complete and frozen); §6 is the throughput/stack rebuild (Phase M, co
 §7 is Phase 3 (reframe + benchmark screen: gate NEGATIVE/F2 as originally scoped — **the
 R2 audit retracted F2's structural reading 2026-07-15; see §9.2**); §9 is the
 **current phase (Phase 3R** — auditing the two live claims H1 and F2, pinning the
-anchoring→escape mechanism; R2 resolved, R1b pending, §9.3.1 is the current frontier of
+anchoring→escape mechanism; **R1 and R2 both resolved 2026-07-15 — both audited claims
+fell** (H1 artifact §9.1, F2 retracted §9.2); §9.3.1 is the current frontier of
 thought). §10
 is the durable **working method**; §11 is external **references** (Tsui, Olausson,
 Self-Debug, "How Many Tries", Kamoi). Every §4.2/§7.4 claim carries a Phase-3R audit
@@ -111,6 +112,15 @@ at in-band coverage) while BigCodeBench stays infeasible at every cell — the s
 tail was a property of benchmark-family × decoding, not of code at this scale, and
 Phase 3b now has a qualifying task (§9.2). The E5/E1 recompute closed clean (all
 conditions shared one identical subset; claims stand with a scope note — §9.3.1).
+**Resolved 2026-07-15, completing the audit:** the R1b.2d retrain landed and the
+**kill line fired — H1 is a quantization artifact** (retrained-V bf16 SE **0.090** vs
+likelihood 0.305, inside the registered artifact band). The SE matrix *inverts* across
+pools: the same retrained verifier scores **0.364** on the old 4-bit pool — better than
+the original — so the selection edge belonged to the quantization-corrupted candidate
+pool (corrupted likelihood + easy-to-discriminate failures), never to the verifier.
+**Both audited claims have now fallen** — H1 killed-as-artifact (§9.1), F2
+retracted-as-structural (§9.2); what survives Phase 3R is the register null, the
+escape-distance law, and the LCB-easy feasible region.
 
 ---
 
@@ -214,7 +224,7 @@ The gap that frames everything: a correct candidate exists in the 8-sample
 pool 84.15% of the time, but self-fluency selection recovers only 62.80% —
 ~21 points of selection headroom.
 
-### 4.2 H1: execution-grounded confidence beats self-fluency — PASS *(under audit — R1b)*
+### 4.2 H1: execution-grounded confidence beats self-fluency — PASS on the retired 4-bit stack; **KILLED by audit 2026-07-15 (R1b.2d: quantization artifact — §9.1)**
 
 > **⚠ Under audit ([PHASE_3R.md] R1; full detail §9.1).** R1a cleared H1 of the vLLM
 > logprob bug (port-introduced, never touched the HF Phase-1 likelihood arm; Phase-0
@@ -230,6 +240,22 @@ pool 84.15% of the time, but self-fluency selection recovers only 62.80% —
 > outage at epoch 3/3 (~step 450) with no checkpoint persisted, so the verdict never
 > computed and a full rerun is required (§9.5). Numbers below stand as originally
 > computed on the retired 4-bit stack.
+
+> **AUDIT RESOLVED (2026-07-15): H1 KILLED — quantization artifact.** The R1b.2d
+> retrain landed (fifth attempt; run-loss ledger §8) and the pre-committed kill line
+> **fired**: retrained-on-bf16 V reaches SE **0.090** on the bf16 pool vs likelihood's
+> **0.305** — inside the registered artifact band (0.05–0.10), against a registered
+> prediction of 0.33–0.38 (wrong, and recorded as such). The decomposition is an
+> **inversion** that localizes the artifact in the *pool*, not the verifier: the same
+> bf16-retrained V scores SE **0.364** on the old 4-bit pool (better than the original
+> Phase-1 V's 0.315), while likelihood there manages only 0.144. The 4-bit pool was
+> doubly special — corrupted likelihood (weak opponent) and easy-to-discriminate
+> failures (within-AUROC 0.7189 there vs 0.6377 on bf16). The table below therefore
+> stands as a correct measurement of the retired stack, but its transferable content is
+> a negative: **at 1.5B on a clean generator, an execution-trained cross-encoder does
+> not beat the generator's own token likelihood as a selection signal.** No
+> verifier-selection stage carries into any bf16-stack design
+> ([artifacts/r1b2d_verifier_retrain.json]; [PHASE_3R.md] R1b.2d RESOLUTION; §9.1).
 
 Evaluation set: the frozen Phase-0 candidates (1,312 held-out HumanEval
 candidates with execution labels and stored mean token log-probabilities).
@@ -805,6 +831,30 @@ SE = (selected pass@1 − random pass@1) / (oracle pass@8 − random pass@1):
   (bf16, informational, *not* the verdict): epoch-1 val AUROC 0.7009, epoch-2 0.7410.
   [artifacts/r1b2b_stratified_auroc.json, r1b2c_length_bias.json].
 
+**RESOLUTION (2026-07-15) — the kill line FIRED: H1 is a quantization artifact.** The
+retrain landed on the fifth attempt (the four losses were infrastructure — the §8
+operational ledger); val AUROC 0.6872 / **0.7069** / 0.6999, epoch 2 selected. The full
+SE matrix, both pools × three rankers:
+
+| SE | 4-bit pool | bf16 pool |
+|---|---|---|
+| likelihood (free) | 0.144 | **0.305** |
+| V trained on 4-bit distribution | **0.315** | 0.067 |
+| V retrained on bf16 distribution | **0.364** | **0.090** |
+
+Retrained-V bf16 SE **0.090** ≤ 0.305 — the kill line fires inside the registered
+artifact band (0.05–0.10); the registered prediction (0.33–0.38, partial survival) was
+**wrong**. The matrix reads as an **inversion**: on the 4-bit pool any execution-trained
+V beats likelihood (the bf16-retrained V, which never saw a 4-bit candidate, ranks it
+*better than the original*); on the bf16 pool no V comes close, and on-distribution
+retraining moved SE just +0.023. The edge was a property of the quantization-corrupted
+candidate pool — corrupted likelihood (SE 0.144) plus easier-to-discriminate failures
+(within-AUROC 0.7189 vs 0.6377) — not of the verifier. **H1 is retired**; likelihood is
+the strong free selection baseline on the clean stack, and no verifier-selection stage
+carries into 3b / R3 / BEST-SO-FAR (all execution-conditioned designs are unaffected).
+Full decomposition and consequences: [PHASE_3R.md] R1b.2d RESOLUTION;
+[artifacts/r1b2d_verifier_retrain.json].
+
 ### 9.2 R2 — is F2's shallow tail structural or decoding-induced? *(the F2 audit)*
 
 F2 was measured under three independent **tail-suppressors**: `top_p=0.95` (nucleus
@@ -1001,41 +1051,48 @@ escape-distance law, content-blindness, and the dose-response are unchanged.
   premise test: condition on a ~40–60%-tests artifact, measure the generated candidate's
   `frac_tests` — flat → BEST-alone dead; climbing → a bigger result than scoped.
 
-### 9.5 Live status (2026-07-15)
+### 9.5 Live status (2026-07-15, post-R1b.2d — **the Phase-3R audits are complete**)
 
 **Closed:** judge fix; R1a; R1b.2a/b/c; D-measure incl. Addendum II (judge/D-measure
 pre-reg) and Addendum III (escape-distance law, temperature dose-response,
 content-blindness, D2a provenance/Tsui, D2b metric fix); the 2026-07-14 outage record
-(PHASE_3R.md "CRASH RECOVERY" — all pools salvaged or regenerated, nothing lost but the
-R1b.2d retrain compute); **the E5/E1 subset matched-control recompute** (§9.3.1 —
-confound structurally absent, claims stand with a scope note;
-[artifacts/dmeasure_subset_control.json], [PHASE_3R.md] Addendum IV); **R2 COMPLETE
-2026-07-15 — the F2 gate FIRED on its retraction branch** (§9.2): full
-base+instruct × 3-temp grid on both benchmarks; BigCodeBench has zero feasible cells,
-LiveCodeBench-easy has **four** (base T=0.8/1.0/1.2, instruct T=1.2; best in-band
-headroom +0.250); **F2 retracted-as-structural, Phase-3a gate PASS, scope narrowed**;
-enriched per-test pools persisted for all 12 cells (`bcb_res_*`, `lcb_res_*`).
+(PHASE_3R.md "CRASH RECOVERY") and the full run-loss/hardening ledger (§8 operational
+reproducibility — five R1b.2d attempts, four distinct infrastructure failure modes,
+closed by detach + checkpoint/resume, commit `7e4ea2f`); **the E5/E1 subset
+matched-control recompute** (§9.3.1 — confound structurally absent, claims stand with a
+scope note; [artifacts/dmeasure_subset_control.json], [PHASE_3R.md] Addendum IV);
+**R2 COMPLETE — the F2 gate FIRED on its retraction branch** (§9.2): BigCodeBench zero
+feasible cells, LiveCodeBench-easy **four** (base T=0.8/1.0/1.2, instruct T=1.2; best
+in-band headroom +0.250); **F2 retracted-as-structural, Phase-3a gate PASS, scope
+narrowed**; enriched per-test pools persisted for all 12 cells (`bcb_res_*`,
+`lcb_res_*`); **R1 COMPLETE — the H1 kill line FIRED** (§9.1, [PHASE_3R.md] R1b.2d
+RESOLUTION): retrained-V bf16 SE 0.090 vs likelihood 0.305, registered artifact band;
+the SE matrix inverts across pools (retrained V scores 0.364 on the 4-bit pool) — **H1
+killed-as-artifact; the edge lived in the corrupted candidate pool, not the verifier.**
 
-**Running:** R1b.2d rerun (H1 de-quantization verdict; T4, checkpoint-persisted this
-time — epoch 1 val AUROC 0.7119 at last check). Kill line unchanged: retrained-V bf16
-SE ≤ 0.305 → H1 does not survive de-quantization. **Blocking any H1 claim.**
+**Running:** nothing. No GPU job is required by any closed item.
 
-**Pending (unstarted):** 3b pre-registration on the qualifying LCB-easy config
-(recommend base T=0.8; a design decision, not run work); **D2c/E6** (partial-credit
-conditioning — premise test for BEST-SO-FAR; enriched pools now exist); **R3**
-(conditional reachability on the pass@50 = 0 stratum of the chosen config);
-**BEST-SO-FAR**. No claim has been reversed silently; every prediction stands with its
-recorded outcome — including R2's named-point miss (base BCB ~T=1.0 did not clear;
-LCB-easy did) and the two interim "trending strengthened" reads superseded by the
-completed grid.
+**Phase-3R outcome, one line: both audited claims fell** — H1 killed-as-artifact, F2
+retracted-as-structural — and what survives is the register null (H2), the
+escape-distance law + elimination argument, and the LCB-easy feasible region. No claim
+was reversed silently; every prediction stands with its recorded outcome, including the
+two audit-prediction misses (R1b.2d predicted partial-survival 0.33–0.38, landed 0.090
+artifact; R2 named base BCB ~T=1.0, the feasible region landed on LCB-easy).
+
+**Pending (unstarted — design decisions, not run work):** 3b pre-registration on the
+qualifying LCB-easy config (recommend **base T=0.8**: pass@8 0.566 / headroom +0.197;
+note the H1 consequence — selection/ranking stages in any 3b design use likelihood or
+execution feedback, never a learned verifier); **D2c/E6** (partial-credit conditioning —
+premise test for BEST-SO-FAR; enriched pools ready, 360 partial-credit candidates);
+**R3** (conditional reachability on the pass@50 = 0 stratum of the chosen config;
+stratum sizes 19/26/35/32 across the four feasible cells — small, consider LCB-medium
+extension if the 5–20% recovery prediction needs resolution); **BEST-SO-FAR**.
 
 **Restart ordering for a fresh conversation:**
-1. **R1b.2d verdict** — if the run is dead, recover from `/cache/r1b2d/partial.json`
-   (per-epoch checkpoint now persisted) or rerun `modal_rgr.py::r1b2d_train_main`.
-2. **3b pre-registration** — pick + freeze the qualifying config (§9.2 recommendation:
+1. **3b pre-registration** — pick + freeze the qualifying config (§9.2 recommendation:
    base T=0.8), write predictions/kill criteria for R3, D2c/E6, BEST-SO-FAR before any
-   run.
-3. **D2c/E6 → R3 → BEST-SO-FAR** in that order on the frozen config's enriched pools.
+   run. Inherit the H1 verdict: no verifier-selection stage on the bf16 stack.
+2. **D2c/E6 → R3 → BEST-SO-FAR** in that order on the frozen config's enriched pools.
 
 ---
 

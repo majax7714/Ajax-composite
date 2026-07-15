@@ -632,3 +632,71 @@ temperature dose-response survive the matched-control check unchanged; magnitude
 claims gain a scope note (mixed-outcome, first-60, ~8 pts harder than the full
 pool). The pre-registered fear (differential subsets) did not materialize — closed
 with no claim change.**
+
+---
+
+## R1b.2d RESOLUTION (2026-07-15) — the kill line FIRES: H1 is a quantization artifact
+
+**Run record.** The retrain landed on the fifth attempt in ~30 h; the four losses were
+infrastructure, each a different mode (2× power outage killing the client-tied app, 1×
+remote timeout below the true workload, 2× worker preemption restarting the function
+from scratch mid-scoring). The hardened design (detach + epoch-boundary
+checkpoint/resume + volume-first result persistence, commit `7e4ea2f`) is recorded as
+the operational-reproducibility ledger in [WRITEUP-rgr.md §8]. Recipe fidelity:
+identical D9 recipe throughout; the landed run trained uninterrupted (no resume
+needed). Incidental D14 evidence: six epoch-1 val AUROCs across attempts —
+0.7009 / 0.7119 / 0.7112 / 0.7260 / 0.6735 / 0.6872 — the unseeded-shuffle
+run-to-run band is ±0.03.
+
+**The landed numbers** ([artifacts/r1b2d_verifier_retrain.json]): val AUROC by epoch
+0.6872 / **0.7069** / 0.6999 → epoch 2 selected (D9 rule), pools scored with epoch-2
+weights:
+
+| SE (selection efficiency) | 4-bit pool (B0 0.5922, oracle 0.8415) | bf16 pool (B0 0.6479, oracle 0.9024) |
+|---|---|---|
+| likelihood (free) | 0.144 | **0.305** |
+| V trained on 4-bit distribution (Phase 1) | **0.315** | 0.067 (stale) |
+| V retrained on bf16 distribution (R1b.2d) | **0.364** | **0.090** |
+
+Within-problem AUROC of the retrained V on the bf16 pool: **0.6377** (the Phase-1 V
+scored 0.7189 on the 4-bit pool).
+
+**The pre-committed kill line fires.** Retrained-V bf16 SE **0.090** ≤ 0.305, squarely
+in the registered **artifact band (0.05–0.10)**: "even on-distribution V can't beat
+free likelihood on a clean generator." **H1 does not survive de-quantization.**
+**Prediction accounting:** the registered prediction (partial survival, SE ≈
+0.33–0.38) was **wrong**; the artifact branch — explicitly kept live in the
+pre-registration — is the outcome.
+
+**The decomposition is an inversion, and it localizes the artifact in the pool, not
+the verifier.** Read the matrix column-wise. On the 4-bit pool, *any*
+execution-trained verifier beats likelihood (0.315 and 0.364 vs 0.144) — the
+bf16-retrained V, which never saw a 4-bit candidate, ranks that pool *better than the
+original 4-bit-trained V*. On the bf16 pool, *no* verifier comes close to likelihood
+(0.067 and 0.090 vs 0.305) — retraining on-distribution moved SE by only +0.023,
+nowhere near the 0.305 line. So "execution-trained verification beats self-fluency"
+was never a property of the verifier or its training distribution; it was a property
+of the **quantization-corrupted candidate pool**, which is doubly special: its
+likelihood signal is corrupted (a weak opponent — SE 0.144) and its failures are
+easier to discriminate (within-AUROC 0.7189 there vs 0.6377 on bf16). A clean
+generator closes both doors at once: fluency becomes a strong free ranker, and the
+remaining failures become subtle.
+
+**Consequences.**
+- **H1 is retired as a live claim.** §4.2's numbers stand as correct measurements of
+  the retired 4-bit stack (audit banner marked in place); the transferable statement
+  is the negative: *at 1.5B on a clean bf16 generator, an execution-trained
+  cross-encoder does not beat the generator's own token likelihood as a selection
+  signal* — free likelihood is the baseline to beat, and it is strong (SE 0.305).
+- **Phase 3R's audit is complete and maximally consequential: both audited claims
+  fell.** H1 killed-as-artifact (R1); F2 retracted-as-structural (R2). What survives
+  Phase 3R: the register null (H2, never under audit), the escape-distance law with
+  its matched-control closure, and the LCB-easy feasible region.
+- **Stack consequences for 3b / R3 / BEST-SO-FAR:** no verifier-selection stage is
+  carried into any downstream design on the bf16 stack — the selection baselines are
+  likelihood (free) and execution feedback. D2c/E6 and BEST-SO-FAR are
+  execution-conditioned, not V-conditioned, and are unaffected. R3 (conditional
+  reachability) never depended on H1's edge and proceeds as pre-registered.
+- The off-diagonal cell (0.364) is a small independent observation worth keeping:
+  verifier transfer *into* a corrupted distribution works fine; a corrupted pool is
+  "easy mode" for any execution-trained ranker.
