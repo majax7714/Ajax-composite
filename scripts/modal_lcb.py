@@ -270,6 +270,141 @@ def lcb_exec(question_ids: list, codes: list, cap_private: int = 12,
     return results
 
 
+BASE_MODEL = "Qwen/Qwen2.5-Coder-1.5B"  # completion model — deeper pass@k tail (R2)
+
+
+@app.function(image=GEN_IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=7200)
+def lcb_r2_generate(n_problems: int = 100, k: int = 50, difficulty: str = "easy",
+                    seed: int = 17, arch: str = "base", temperature: float = 1.0,
+                    top_p: float = 1.0):
+    """R2 tail-un-suppression sweep, LiveCodeBench arm [PHASE_3R.md R2]. arch='base'
+    → completion model on a fenced-markdown prompt (the model completes a ```python
+    block; stop on the closing fence — clean extraction without chat collapse);
+    arch='instruct' → the existing chat path. temperature/top_p swept."""
+    import random as _rnd
+
+    from datasets import load_dataset
+    from transformers import AutoTokenizer
+    from vllm import LLM, SamplingParams
+
+    ds = load_dataset(DATASET, split="test")
+    idx = _stdin_problems(ds, difficulty)
+    _rnd.Random(seed).shuffle(idx)
+    idx = idx[:n_problems]
+    model = BASE_MODEL if arch == "base" else MODEL
+    SYS = ("You are an expert competitive programmer. Write a complete Python 3 "
+           "program that reads from standard input and writes the answer to standard "
+           "output. Respond with a single fenced Python code block and nothing else.")
+
+    if arch == "base":
+        prompts = [
+            ("Problem:\n" + ds[i]["question_content"].strip() +
+             "\n\nA complete Python 3 program that reads from standard input and "
+             "writes the answer to standard output:\n\n```python\n") for i in idx]
+        stop = ["```", "\nProblem:"]
+    else:
+        tok = AutoTokenizer.from_pretrained(model)
+        prompts = [tok.apply_chat_template(
+            [{"role": "system", "content": SYS},
+             {"role": "user", "content": ds[i]["question_content"]}],
+            add_generation_prompt=True, tokenize=False) for i in idx]
+        stop = None
+
+    llm = LLM(model=model, dtype="bfloat16", gpu_memory_utilization=0.90,
+              max_model_len=8192, seed=seed)
+    sp = SamplingParams(n=k, temperature=temperature, top_p=top_p, max_tokens=1536,
+                        seed=seed, stop=stop)
+    outs = llm.generate(prompts, sp)
+
+    def base_code(text):
+        s = text.strip()
+        return s or None
+
+    codes = [[(base_code(o.text) if arch == "base" else _extract_code(o.text))
+              for o in outs[j].outputs] for j in range(len(idx))]
+    return {"question_ids": [ds[i]["question_id"] for i in idx], "codes": codes,
+            "k": k, "difficulty": difficulty, "model": model, "arch": arch,
+            "temperature": temperature, "top_p": top_p}
+
+
+@app.local_entrypoint()
+def lcb_r2_smoke(n_problems: int = 8, k: int = 8, difficulty: str = "easy",
+                 arch: str = "base", temperature: float = 1.0):
+    """Validate the base completion prompt/extraction path on LCB before the full R2
+    sweep (pre-registered caveat: 'validate the prompt/extraction path before trusting
+    any number'). Prints a sample program, degenerate rate, and pass stats."""
+    from collections import Counter
+    from pathlib import Path
+    gen = lcb_r2_generate.remote(n_problems, k, difficulty, 17, arch, temperature, 1.0)
+    Path("runs/modal").mkdir(parents=True, exist_ok=True)
+    Path(f"runs/modal/lcb_r2_smoke_{arch}.json").write_text(json.dumps(gen))
+    results = lcb_exec.remote(gen["question_ids"], gen["codes"])
+    ncodes = sum(len(row) for row in gen["codes"])
+    nnull = sum(1 for row in gen["codes"] for c in row if not c or len(c.strip()) < 5)
+    passed = sum(r["passed"] for res in results for r in res)
+    fracs = [r["frac"] for res in results for r in res if "frac" in r]
+    print(f"\n=== LCB R2 smoke: {arch} @ T={temperature}, top_p=1.0 "
+          f"({n_problems} problems × k={k}, {difficulty}) ===")
+    print(f"candidates {ncodes} | empty/degenerate {nnull} ({nnull/max(1,ncodes):.2f}) | "
+          f"passed {passed} ({passed/max(1,ncodes):.2f})")
+    if fracs:
+        print(f"frac_tests: mean {sum(fracs)/len(fracs):.3f}  "
+              f">0 {sum(f>0 for f in fracs)/len(fracs):.2f}  ==1 {sum(f>=1 for f in fracs)/len(fracs):.2f}")
+    print("--- sample program (problem 0, candidate 0) ---")
+    print((gen["codes"][0][0] or "<none>")[:600])
+    print("--- errors ---")
+    print(dict(Counter(r["err"] for res in results for r in res)))
+
+
+@app.local_entrypoint()
+def lcb_r2_screen(n_problems: int = 100, k: int = 50, difficulty: str = "easy",
+                  arch: str = "base", temperature: float = 1.0):
+    """One R2 LCB sweep cell: generate (random stdin problems) → persist pool →
+    exec (hardened all-case judge) → score against the gate + persist per-candidate
+    detail (enriched pool for D2c/R3). tag = lcb_r2_<arch>_T<temp>."""
+    from collections import Counter
+    from math import comb
+    from pathlib import Path
+
+    def pak(n, c, kk):
+        return 1.0 if n - c < kk else 1.0 - comb(n - c, kk) / comb(n, kk)
+
+    tag = f"lcb_r2_{arch}_T{str(temperature).replace('.', '')}"
+    gen = lcb_r2_generate.remote(n_problems, k, difficulty, 17, arch, temperature, 1.0)
+    Path("runs/modal").mkdir(parents=True, exist_ok=True)
+    Path(f"runs/modal/lcb_cand_{tag}.json").write_text(json.dumps(gen))
+    results = lcb_exec.remote(gen["question_ids"], gen["codes"])
+    Path(f"runs/modal/lcb_res_{tag}.json").write_text(json.dumps(
+        {"tag": tag, "question_ids": gen["question_ids"], "results": results}))
+
+    counts, errs = [], Counter()
+    for res in results:
+        counts.append((len(res), sum(r["passed"] for r in res)))
+        errs.update(r["err"] for r in res)
+
+    def mpak(kk):
+        return sum(pak(n, c, kk) for n, c in counts) / len(counts)
+
+    p8, p50 = mpak(8), mpak(min(k, 50))
+    in_band, hd = 0.30 <= p8 <= 0.60, (p50 - p8) >= 0.15
+    result = {"benchmark": f"LiveCodeBench/code_generation[{difficulty},stdin]"
+                           f" [{arch}, T={temperature}, top_p=1.0]",
+              "generator": gen["model"], "n_problems": len(counts), "k": k,
+              "pass@1": mpak(1), "pass@8": p8, "pass@50": p50, "headroom": p50 - p8,
+              "error_breakdown": dict(errs), "band": in_band, "headroom_ok": hd,
+              "gate": "PASS" if (in_band and hd) else "does-not-qualify"}
+    Path("artifacts").mkdir(exist_ok=True)
+    Path(f"artifacts/phase3a_screen_{tag}.json").write_text(json.dumps(result, indent=2))
+    print(f"\n=== LCB R2 screen [{difficulty}, stdin] {arch} @ T={temperature}, top_p=1.0 "
+          f"({len(counts)} problems, k={k}) ===")
+    print(f"pass@1 {result['pass@1']:.3f}  pass@8 {p8:.3f}  pass@50 {p50:.3f}  "
+          f"(headroom {p50-p8:+.3f})")
+    print(f"coverage band [0.30,0.60]: {in_band}   headroom ≥0.15: {hd}")
+    print(f"errors: {dict(errs)}")
+    print(f"\nR2 gate ({tag}): {result['gate']}")
+    print(f"wrote artifacts/phase3a_screen_{tag}.json")
+
+
 @app.local_entrypoint()
 def lcb_screen(n_problems: int = 100, k: int = 50, difficulty: str = "medium",
                model: str = MODEL, tag: str = "lcb_med"):

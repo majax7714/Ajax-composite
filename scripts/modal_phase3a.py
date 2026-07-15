@@ -420,6 +420,25 @@ def exec_only(tag: str = "screen"):
 
 
 @app.local_entrypoint()
+def exec_enrich(tag: str = "screen"):
+    """Re-execute a persisted pool ONLY to persist per-candidate detail
+    (runs/modal/bcb_res_<tag>.json) for D2c/E6 + R3. Deliberately does NOT rewrite
+    the landed screen artifact: a re-exec can shift aggregates within judge noise,
+    and a landed verdict is never re-scored (append, never revise)."""
+    from pathlib import Path
+    c = json.loads(Path(f"runs/modal/bcb_cand_{tag}.json").read_text())
+    results = bcb_exec.remote(c["problems"])
+    Path(f"runs/modal/bcb_res_{tag}.json").write_text(json.dumps(
+        {"tag": tag, "task_ids": [p["task_id"] for p in c["problems"]],
+         "results": results}))
+    npass = sum(r["passed"] for res in results for r in res)
+    ntot = sum(len(res) for res in results)
+    print(f"enriched {tag}: {ntot} candidates, {npass} passed "
+          f"({npass/max(1,ntot):.3f}); wrote runs/modal/bcb_res_{tag}.json "
+          f"(screen artifact untouched)")
+
+
+@app.local_entrypoint()
 def r2_smoke(n_problems: int = 8, k: int = 8, arch: str = "base",
              temperature: float = 1.0, dataset: str = "bigcode/bigcodebench"):
     """Validate the base completion prompt/extraction path before the full R2 sweep
