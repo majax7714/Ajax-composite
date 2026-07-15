@@ -573,6 +573,16 @@ rich). base T=1.2 has the deepest tail (+0.250) but sits at the band edge with 7
 runtime-error candidates — escape energy without per-sample quality. R3's
 pass@50 = 0 stratum is now computable from the enriched pools.
 
+**Readiness numbers (computed 2026-07-15 from the enriched pools).** R3 stratum
+(pass@50 = 0, of 80): base T=0.8 → **19** problems; T=1.0 → 26; T=1.2 → 35; instruct
+T=1.2 → 32. Caveat for the R3 pre-registration: at stratum ≈ 19–35 the pre-committed
+"ABSTRACT recovers 5–20% of the stratum" resolves to only ~1–7 recoveries — the
+binary kill (ABSTRACT ≈ 0 vs > 0) is testable, the rate is coarse; consider extending
+the stratum with LCB-medium (pass@8 0.067 at the old config → mostly pass@50 = 0) if
+finer resolution is wanted. D2c/E6 is well-fed: e.g. base T=0.8 has 360 candidates
+with frac_tests ∈ [0.4, 0.6] across 44/80 problems (median 15 test cases/problem) to
+condition on.
+
 ---
 
 ## Addendum IV (2026-07-14) — E5/E1 subset matched-control (§9.3.1's committed action) — CLOSED
