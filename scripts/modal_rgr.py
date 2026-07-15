@@ -1001,7 +1001,8 @@ def r1b_h2h():
 
 
 @app.function(image=IMAGE, gpu="T4", volumes={"/cache": VOL}, timeout=21600)
-def r1b2d_train_eval(train_rows: list, val_rows: list, m3_pool: dict, lock_pool: dict):
+def r1b2d_train_eval(train_rows: list, val_rows: list, m3_pool: dict, lock_pool: dict,
+                     run_id: str = "r1b2d-a4"):
     # timeout raised 10800→21600 (2026-07-15): 3 epochs + per-improved-epoch scoring
     # of two 1312-candidate pools needs ~4.5h on T4; the 3h cap killed the first
     # rerun mid-epoch-3 (the volume checkpoint captured epoch 2, validating the
@@ -1058,9 +1059,50 @@ def r1b2d_train_eval(train_rows: list, val_rows: list, m3_pool: dict, lock_pool:
         return out
 
     opt = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad], lr=lr)
-    best_auroc, best = -1.0, None
     val_y = [bool(r["passed"]) for r in val_rows]
-    for epoch in range(epochs):
+
+    # Preemption/outage insurance v2 (2026-07-15): two Modal T4 preemptions in a row
+    # killed attempts ~70 min in — both during the ~15-min post-epoch pool scoring,
+    # i.e. before the old end-of-epoch checkpoint could land — and Modal restarts a
+    # preempted function from scratch, so a 4.5h run facing ~hourly preemptions never
+    # finishes. Fix: (a) checkpoint trainable params + optimizer state seconds after
+    # each epoch's val AUROC; (b) defer pool scoring to one post-training pass over
+    # the best epoch's reloaded weights; (c) resume from the volume checkpoint when
+    # run_id matches, so a restart loses at most one epoch or one scoring pass.
+    # Resume restores the exact AdamW state dict; only the unseeded shuffle order
+    # differs from an uninterrupted run, which D14 already leaves uncontrolled
+    # run-to-run. Plumbing only — the D9 recipe (3 epochs, batch 4, lr 1e-4,
+    # val-AUROC epoch selection) is untouched.
+    ck = Path("/cache/r1b2d")
+    ck.mkdir(parents=True, exist_ok=True)
+    pj = ck / "partial.json"
+
+    def trainable_sd():
+        return {k: v.detach().cpu() for k, v in model.state_dict().items()
+                if "lora_" in k or "score" in k}
+
+    start_epoch, val_hist, best_auroc, best = 0, [], -1.0, None
+    st = {}
+    if pj.exists():
+        try:
+            st = json.loads(pj.read_text())
+        except Exception:
+            st = {}
+    if st.get("run_id") == run_id and st.get("completed_epoch", 0) > 0:
+        if st.get("scored"):
+            print(f"[resume] run {run_id} already trained+scored; returning stored result",
+                  flush=True)
+            return {"best_val_auroc": st["best_val_auroc"], "best_epoch": st["best_epoch"],
+                    "m3_v_scores": st["m3_v_scores"], "lock_v_scores": st["lock_v_scores"]}
+        payload = torch.load(ck / "last.pt", map_location="cpu")
+        model.load_state_dict(payload["sd"], strict=False)
+        opt.load_state_dict(payload["opt"])
+        start_epoch, val_hist = st["completed_epoch"], st["val_history"]
+        best_auroc, best = st["best_val_auroc"], st["best_epoch"]
+        print(f"[resume] run {run_id}: restored epoch-{start_epoch} state "
+              f"(best val AUROC {best_auroc:.4f} @ epoch {best})", flush=True)
+
+    for epoch in range(start_epoch, epochs):
         model.train()
         order = torch.randperm(len(train_rows))
         for step, start in enumerate(range(0, len(order), batch_size)):
@@ -1076,28 +1118,36 @@ def r1b2d_train_eval(train_rows: list, val_rows: list, m3_pool: dict, lock_pool:
                 print(f"epoch {epoch+1} step {step+1} loss {float(loss):.4f}", flush=True)
         va = auroc(score(val_rows), val_y)
         print(f"epoch {epoch+1}: val AUROC {va:.4f}", flush=True)
+        val_hist.append(va)
         if va > best_auroc:
-            best_auroc = va
-            best = epoch + 1
-            he = {p.problem_id: p.prompt for p in load_humaneval().checkout(SplitRole.HELDOUT_EVAL)}
-
-            def score_pool(pool):
-                out = []
-                for pid, row in zip(pool["problem_ids"], pool["codes"]):
-                    rows = [{"prompt": he[pid], "code": cd} for cd in row]
-                    out.append(score(rows))
-                return out
-            best_m3 = score_pool(m3_pool)
-            best_lock = score_pool(lock_pool)
-            model.save_pretrained("/cache/r1b2d/adapter_best")
-        # Outage insurance (2026-07-14 grid failure killed epoch 3/3 with nothing
-        # persisted): commit the best adapter + best-so-far scores to the volume
-        # after EVERY epoch. Plumbing only — the D9 training recipe is untouched.
-        Path("/cache/r1b2d").mkdir(parents=True, exist_ok=True)
-        Path("/cache/r1b2d/partial.json").write_text(json.dumps(
-            {"completed_epoch": epoch + 1, "best_val_auroc": best_auroc,
-             "best_epoch": best, "m3_v_scores": best_m3, "lock_v_scores": best_lock}))
+            best_auroc, best = va, epoch + 1
+            torch.save(trainable_sd(), ck / "best.pt")
+        torch.save({"sd": trainable_sd(), "opt": opt.state_dict()}, ck / "last.pt")
+        pj.write_text(json.dumps(
+            {"run_id": run_id, "completed_epoch": epoch + 1, "val_history": val_hist,
+             "best_val_auroc": best_auroc, "best_epoch": best, "scored": False}))
         VOL.commit()
+
+    print(f"scoring pools with best-epoch-{best} weights (val AUROC {best_auroc:.4f})",
+          flush=True)
+    model.load_state_dict(torch.load(ck / "best.pt", map_location="cpu"), strict=False)
+    he = {p.problem_id: p.prompt for p in load_humaneval().checkout(SplitRole.HELDOUT_EVAL)}
+
+    def score_pool(pool):
+        out = []
+        for pid, row in zip(pool["problem_ids"], pool["codes"]):
+            rows = [{"prompt": he[pid], "code": cd} for cd in row]
+            out.append(score(rows))
+        return out
+
+    best_m3 = score_pool(m3_pool)
+    best_lock = score_pool(lock_pool)
+    model.save_pretrained("/cache/r1b2d/adapter_best")
+    pj.write_text(json.dumps(
+        {"run_id": run_id, "completed_epoch": epochs, "val_history": val_hist,
+         "best_val_auroc": best_auroc, "best_epoch": best, "scored": True,
+         "m3_v_scores": best_m3, "lock_v_scores": best_lock}))
+    VOL.commit()
 
     return {"best_val_auroc": best_auroc, "best_epoch": best,
             "m3_v_scores": best_m3, "lock_v_scores": best_lock}
@@ -1128,7 +1178,8 @@ def r1b2d_train_main():
                  "codes": [[s["code"] for s in r["steps"]] for r in lock]}
     lock_labels = [[s["execution"]["passed"] for s in r["steps"]] for r in lock]
 
-    r = r1b2d_train_eval.remote(train_rows, val_rows, m3_pool, lock_pool)
+    r = r1b2d_train_eval.remote(train_rows, val_rows, m3_pool, lock_pool,
+                                os.environ.get("R1B2D_RUN_ID", "r1b2d-a4"))
     vs_m3, vs_lock = r["m3_v_scores"], r["lock_v_scores"]
 
     def within(scores, labels):
