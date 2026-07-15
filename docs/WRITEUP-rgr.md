@@ -6,15 +6,18 @@ this architecture work" to "on what task can iterative refinement pay at all" �
 that reframing drives a stack rebuild (Phase M) and a pre-registered benchmark search
 (Phase 3) whose first hard result is itself a negative worth publishing.*
 
-*Living record — last updated 2026-07-14 (post power-outage bookkeeping; carry-over
-source of truth for a fresh conversation). All numbers trace to committed artifacts and
+*Living record — last updated 2026-07-15 (Phase-3R audits resolving: **F2
+retracted-as-structural** by the completed R2 grid, E5/E1 subset confound closed clean,
+R1b.2d retrain in flight). All numbers trace to committed artifacts and
 run records; sources cited inline as `[file]`. This is the canonical results document for
 the whole experiment. **New conversation: start with §10 (working method) and §9.5 (live
 status + restart ordering).** §§1–5 are the register experiment (Phases 0–2 + diagnostic
 teardown, complete and frozen); §6 is the throughput/stack rebuild (Phase M, complete);
-§7 is Phase 3 (reframe + benchmark screen: gate NEGATIVE/F2, under R2 audit); §9 is the
+§7 is Phase 3 (reframe + benchmark screen: gate NEGATIVE/F2 as originally scoped — **the
+R2 audit retracted F2's structural reading 2026-07-15; see §9.2**); §9 is the
 **current phase (Phase 3R** — auditing the two live claims H1 and F2, pinning the
-anchoring→escape mechanism; in progress, §9.3.1 is the current frontier of thought). §10
+anchoring→escape mechanism; R2 resolved, R1b pending, §9.3.1 is the current frontier of
+thought). §10
 is the durable **working method**; §11 is external **references** (Tsui, Olausson,
 Self-Debug, "How Many Tries", Kamoi). Every §4.2/§7.4 claim carries a Phase-3R audit
 banner pointing into §9.*
@@ -101,6 +104,13 @@ surviving refinement hypothesis rather than one option among several. This conve
 from a mechanism, on the compute-matched conclusion of Olausson et al. (2024). One
 confound of our own (E5's subset overlap; §9.3.1) is flagged for a free matched-control
 recompute before the content-blindness/neutral-attractor claim is called final.
+**Resolved 2026-07-15:** the R2 grid completed and the gate **fired on its retraction
+branch — F2 is retracted-as-structural**: with the tail un-suppressed, LiveCodeBench-easy
+has a feasible *region* (the whole base arm plus instruct T=1.2; headroom up to +0.25
+at in-band coverage) while BigCodeBench stays infeasible at every cell — the shallow
+tail was a property of benchmark-family × decoding, not of code at this scale, and
+Phase 3b now has a qualifying task (§9.2). The E5/E1 recompute closed clean (all
+conditions shared one identical subset; claims stand with a scope note — §9.3.1).
 
 ---
 
@@ -616,6 +626,16 @@ entire reason a confirmation step exists.
 > remain (need regen after the 2026-07-14 outage, §9.5), and since instruct pass@8 already
 > sits below the band at its coolest temp and falls with T, they cannot open a feasible
 > cell. Evidence strongly trends **F2 strengthened-as-structural**.
+>
+> **AUDIT RESOLVED (2026-07-15, full grid landed — §9.2): F2 RETRACTED-AS-STRUCTURAL.**
+> The trend statement above was written inside the BCB-only evidence window and did not
+> survive the LiveCodeBench arm: **four LCB-easy cells clear both criteria** (base
+> T=0.8/1.0/1.2 and instruct T=1.2; best headroom +0.250 in-band), so the pre-registered
+> decision rule fires on its retraction branch and the Phase-3a gate flips to **PASS,
+> scope narrowed to the qualifying configs**. What survives is F1 rescoped: the
+> *function-call family* (BigCodeBench) stays infeasible at every un-suppressed cell.
+> F2's tables and reasoning below stand as the historical record of the *suppressed*
+> regime (instruct, T=0.8, top-p 0.95).
 
 F1's implication was pursued to **LiveCodeBench** (contamination-controlled; 400
 problems, ~27 test cases each; easy/medium/hard) via a new hardened stdin/stdout judge
@@ -772,6 +792,42 @@ T=1.0/1.2 (killed by the outage, need regen) cannot open a feasible cell — ins
 already sits below the band at its coolest temp and falls with T. **Gate formally open
 pending those two cells; evidence strongly trends F2-strengthened-as-structural.**
 
+**RESOLUTION (2026-07-15) — the completed grid retracts F2.** The regenerated BCB
+instruct cells landed as the trend required (T=1.0: pass@8 0.256 / +0.104; T=1.2:
+0.167 / +0.103 — no BCB cell feasible anywhere in the 2×3 grid). But the
+**LiveCodeBench-easy arm** — run on a newly built, smoke-validated base completion path
+(fenced-completion prompt; 64/64 well-formed) over the full 80-problem stdin-easy
+population, k=50, top_p=1.0 — **contains a feasible region**:
+
+| LCB-easy cell | pass@8 | pass@50 | headroom | gate |
+|---|---|---|---|---|
+| base T=0.8 | **0.566** | **0.762** | +0.197 | **PASS** |
+| base T=1.0 | 0.505 | 0.675 | +0.170 | **PASS** |
+| base T=1.2 | 0.312 | 0.562 | **+0.250** | **PASS** |
+| instruct T=0.8 | 0.525 | 0.637 | +0.112 | ✗ |
+| instruct T=1.0 | 0.509 | 0.637 | +0.128 | ✗ |
+| instruct T=1.2 | 0.391 | 0.600 | +0.209 | **PASS** |
+
+The pre-registered rule fires on its first branch: **F2 retracted-as-structural; the
+Phase-3a gate flips to PASS.** Suppressor decomposition at matched cells: architecture
+is the biggest lever (base +0.197 vs instruct +0.112 at T=0.8, base dominating both
+axes), temperature second (instruct +0.112→+0.209 across T), top-p alone nearly nil
+(instruct T=0.8: 0.525/+0.112 at top-p 1.0 vs 0.541/+0.122 at 0.95). **What survives,
+rescoped:** F1 — the function-call family's shallow tail — is now *decoding-controlled*
+(BigCodeBench infeasible even fully un-suppressed); the honest replacement statement is
+*"reachable headroom at 0.5–1.5B exists on competitive stdin/stdout benchmarks under
+un-suppressed sampling, and does not exist for function-call benchmarks at any tested
+decoding."* Prediction accounting: the pre-registered phase-level call ("at least one
+point clears → F2 retracted") was **correct**; the named clearing point (base BCB
+~T=1.0) was **wrong** — BCB's trade-off has no feasible point, and the clearing came on
+LCB-easy, whose higher coverage floor lets temperature buy tail depth without leaving
+the band. The interim "trending strengthened" reads (recorded in the BCB-only window)
+are superseded and stand with this outcome note. **Consequence:** Phase 3b has a
+qualifying task; the config choice (recommend base T=0.8 — coverage-dominant, +0.197
+headroom, cleanest error profile) is a 3b pre-registration decision, and R3's
+pass@50 = 0 stratum is computable from the persisted enriched pools
+[artifacts/phase3a_screen_lcb_r2_*.json; runs/modal/lcb_res_lcb_r2_*.json].
+
 ### 9.3 The anchoring mechanism — D-measure *(the DIAG-8 spin-off, closed)*
 
 DIAG-8 showed conditioning on a failed candidate halves diversity. D-measure asks *what
@@ -899,38 +955,41 @@ escape-distance law, content-blindness, and the dose-response are unchanged.
   premise test: condition on a ~40–60%-tests artifact, measure the generated candidate's
   `frac_tests` — flat → BEST-alone dead; climbing → a bigger result than scoped.
 
-### 9.5 Live status (2026-07-14)
+### 9.5 Live status (2026-07-15)
 
 **Closed:** judge fix; R1a; R1b.2a/b/c; D-measure incl. Addendum II (judge/D-measure
 pre-reg) and Addendum III (escape-distance law, temperature dose-response,
-content-blindness, D2a provenance/Tsui, D2b metric fix); **R2 base BigCodeBench sweep
-COMPLETE** — T=0.8 (pass@8 0.328, band ✓, headroom +0.097 ✗), T=1.0 (0.241, +0.149, band
-✗), T=1.2 (0.092, +0.133, band ✗): trade-off confirmed with **no feasible base point**
-(pass@8 clears only at T≤0.8, headroom only at T≥1.0 — never together). **Interrupted
-2026-07-14 ~18:00 by a power-grid outage** (see PHASE_3R.md "CRASH RECOVERY") — all Modal
-apps torn down, nothing recoverable from cloud; **both T=0.8 screens (base + instruct)
-since recovered exec-only under the hardened judge** — base 0.328/+0.097 (band ✓),
-instruct 0.269/+0.086 (band ✗ from below; base beats instruct at matched T). **Killed,
-needs rerun:** R1b.2d (H1 de-quantization verdict — died epoch 3/3 step ~450, no
-checkpoint persisted, verdict never computed), R2 instruct T=1.0/1.2, LiveCodeBench arm.
-**Closed 2026-07-14 (post-outage session): the E5/E1 subset matched-control recompute**
-(§9.3.1) — feared differential-subset confound structurally absent (all conditions share
-one identical 60-problem subset); claims survive with a scope note
-([artifacts/dmeasure_subset_control.json], [PHASE_3R.md] Addendum IV).
-**Pending (unstarted):** R3, BEST-SO-FAR, D2c/E6 (ride R2's enriched pools). The F2
-gate remains **open** — no config has cleared both criteria; base is exhausted with no
-feasible point and instruct T=0.8 fails from below, so only the un-run instruct T=1.0/1.2
-(which cannot help pass@8) remain. Evidence trends **F2-strengthened-as-structural**. No claim has been reversed; every prediction stands with its recorded
-outcome, including two D-measure predictions falsified (one backwards) and corrected in
-place by appended notes.
+content-blindness, D2a provenance/Tsui, D2b metric fix); the 2026-07-14 outage record
+(PHASE_3R.md "CRASH RECOVERY" — all pools salvaged or regenerated, nothing lost but the
+R1b.2d retrain compute); **the E5/E1 subset matched-control recompute** (§9.3.1 —
+confound structurally absent, claims stand with a scope note;
+[artifacts/dmeasure_subset_control.json], [PHASE_3R.md] Addendum IV); **R2 COMPLETE
+2026-07-15 — the F2 gate FIRED on its retraction branch** (§9.2): full
+base+instruct × 3-temp grid on both benchmarks; BigCodeBench has zero feasible cells,
+LiveCodeBench-easy has **four** (base T=0.8/1.0/1.2, instruct T=1.2; best in-band
+headroom +0.250); **F2 retracted-as-structural, Phase-3a gate PASS, scope narrowed**;
+enriched per-test pools persisted for all 12 cells (`bcb_res_*`, `lcb_res_*`).
 
-**Restart ordering for the fresh conversation (highest-leverage first, cheapest tie-broken up):**
-1. **E5/E1 subset recompute** — free, CPU, no dependencies; closes the one open confound in our newest finding (§9.3.1).
-2. **R1b.2d rerun** — the H1 de-quantization verdict; GPU, self-contained (MBPP/HumanEval pools, not Phase-3a). Persist a checkpoint this time. Kill line unchanged: retrained-V bf16 SE ≤ 0.305 → H1 does not survive.
-3. **R2 salvage — DONE** (both T=0.8 screens recovered exec-only: base 0.328/+0.097, instruct 0.269/+0.086, both gate-failing). Remaining R2 work is **instruct T=1.0/1.2 + LCB regen** (full rerun); on current evidence these strengthen F2 rather than open a feasible cell.
-4. **Judge-fixed re-execution of R2's pools → enriched (per-test) pools**, then **D2c/E6**, **R3**, **BEST-SO-FAR** in that order (each needs the graded landscape the prior step produces).
+**Running:** R1b.2d rerun (H1 de-quantization verdict; T4, checkpoint-persisted this
+time — epoch 1 val AUROC 0.7119 at last check). Kill line unchanged: retrained-V bf16
+SE ≤ 0.305 → H1 does not survive de-quantization. **Blocking any H1 claim.**
 
-None of 1–4 blocks the others except where a pool dependency is stated; 1 and 2 can run concurrently.
+**Pending (unstarted):** 3b pre-registration on the qualifying LCB-easy config
+(recommend base T=0.8; a design decision, not run work); **D2c/E6** (partial-credit
+conditioning — premise test for BEST-SO-FAR; enriched pools now exist); **R3**
+(conditional reachability on the pass@50 = 0 stratum of the chosen config);
+**BEST-SO-FAR**. No claim has been reversed silently; every prediction stands with its
+recorded outcome — including R2's named-point miss (base BCB ~T=1.0 did not clear;
+LCB-easy did) and the two interim "trending strengthened" reads superseded by the
+completed grid.
+
+**Restart ordering for a fresh conversation:**
+1. **R1b.2d verdict** — if the run is dead, recover from `/cache/r1b2d/partial.json`
+   (per-epoch checkpoint now persisted) or rerun `modal_rgr.py::r1b2d_train_main`.
+2. **3b pre-registration** — pick + freeze the qualifying config (§9.2 recommendation:
+   base T=0.8), write predictions/kill criteria for R3, D2c/E6, BEST-SO-FAR before any
+   run.
+3. **D2c/E6 → R3 → BEST-SO-FAR** in that order on the frozen config's enriched pools.
 
 ---
 

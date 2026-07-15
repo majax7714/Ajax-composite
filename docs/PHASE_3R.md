@@ -509,6 +509,72 @@ feasible cell.** The F2 decision rule now waits only on the LiveCodeBench-easy a
 
 ---
 
+## R2 RESOLUTION (2026-07-15) — the gate FIRES: F2 retracted-as-structural
+
+The LiveCodeBench-easy arm landed (new base completion path, fenced-completion
+prompt, smoke-validated: 64/64 well-formed, 0 degenerate; n=80 = the full stdin-easy
+population, k=50, top_p=1.0, hardened all-case judge, per-candidate detail persisted
+as `lcb_res_*` enriched pools). The complete pre-registered grid:
+
+| LiveCodeBench-easy | pass@1 | pass@8 | pass@50 | headroom | band | ≥0.15 | gate |
+|---|---|---|---|---|---|---|---|
+| **base T=0.8** | 0.270 | **0.566** | **0.762** | **+0.197** | ✓ | ✓ | **PASS** |
+| **base T=1.0** | 0.176 | 0.505 | 0.675 | +0.170 | ✓ | ✓ | **PASS** |
+| **base T=1.2** | 0.071 | 0.312 | 0.562 | **+0.250** | ✓ | ✓ | **PASS** |
+| instruct T=0.8 | 0.281 | 0.525 | 0.637 | +0.112 | ✓ | ✗ | ✗ |
+| instruct T=1.0 | 0.223 | 0.509 | 0.637 | +0.128 | ✓ | ✗ | ✗ |
+| **instruct T=1.2** | 0.130 | 0.391 | 0.600 | +0.209 | ✓ | ✓ | **PASS** |
+
+(BigCodeBench, for contrast: **zero** feasible cells across the same grid; instruct
+headroom caps at +0.104, base at +0.149-by-0.001.)
+
+**The pre-registered decision rule fires on its first branch: F2 is RETRACTED as
+"structural." The Phase-3a gate outcome flips to PASS, scope narrowed to the
+qualifying configs.** Four cells clear both criteria — a feasible *region*, not a
+point: the entire LCB-easy base arm plus instruct T=1.2.
+
+**What was actually wrong with F2, precisely.** F2 generalized "no reachable tail"
+from a sweep that never un-suppressed the tail. Decomposing the three suppressors on
+LCB-easy at matched cells:
+
+- **Architecture is the biggest lever:** at T=0.8, base +0.197 vs instruct +0.112 —
+  and base dominates on *both* axes (0.566 > 0.525 pass@8), the Codex/AlphaCode
+  effect exactly.
+- **Temperature is second:** instruct +0.112 → +0.128 → +0.209 across T; it alone
+  rescues instruct at T=1.2.
+- **top-p alone did almost nothing:** instruct T=0.8 top-p 1.0 (0.525/+0.112) ≈ the
+  original top-p 0.95 screen (0.541/+0.122).
+
+**What survives, rescoped.** F1 — the *function-call family* has a structurally
+shallow tail — **survives and is now decoding-controlled**: BigCodeBench stays
+infeasible even fully un-suppressed. The honest replacement for F2: *reachable
+headroom at 0.5–1.5B exists on competitive (stdin/stdout) benchmarks when sampling
+is un-suppressed (base arch, top-p 1.0, T≥0.8), and does not exist for function-call
+benchmarks at any tested decoding.* The "solve-within-8-or-not" shape was a property
+of the family × decoding, not of code at this scale.
+
+**Prediction accounting (recorded before the runs, left standing).**
+- The R2 pre-registration predicted a trade-off curve with "at least one point
+  clearing both → F2 retracted-as-structural," naming base BCB ~T=1.0 as the likely
+  clearing point. **Phase-level call: CORRECT** (F2 retracted). Named point: WRONG —
+  BCB never cleared (its trade-off has no feasible point); the clearing came from
+  LCB-easy, where coverage starts high enough that heating buys tail depth without
+  leaving the band.
+- The two interim trend statements ("evidence strongly trends F2-strengthened") were
+  recorded during the BCB-only evidence window and are superseded by the LCB grid;
+  they stand as written with this outcome note, per the append rule. The gate was
+  formally held open — correctly, it turns out.
+
+**Hand-off to 3b/R3.** The qualifying-config choice (among 4 feasible cells) is a 3b
+pre-registration decision. Recommendation: **base T=0.8** — dominates coverage
+(pass@8 0.566, pass@50 0.762), headroom +0.197 comfortably past the gate, cleanest
+error profile (no no_code; failures are graded wrong_answer/runtime, i.e. feedback-
+rich). base T=1.2 has the deepest tail (+0.250) but sits at the band edge with 72%
+runtime-error candidates — escape energy without per-sample quality. R3's
+pass@50 = 0 stratum is now computable from the enriched pools.
+
+---
+
 ## Addendum IV (2026-07-14) — E5/E1 subset matched-control (§9.3.1's committed action) — CLOSED
 
 **Question.** Were the D-measure cross-condition contrasts corrupted by per-condition
