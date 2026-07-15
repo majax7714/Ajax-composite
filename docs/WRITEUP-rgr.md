@@ -721,6 +721,52 @@ execution (12,100 runs; sandbox-fault rates 0.2% / 0.0% / 0.3%, faults scored as
 failures), and hardened subprocess judges (process-group kill + rlimits) for the
 Phase-3 benchmark screens ([scripts/modal_phase3a.py], [scripts/modal_lcb.py]).
 
+**Operational reproducibility — designing runs against the platform's failure
+semantics *(appended 2026-07-15)*.** "Question the underlying system" applies to the
+compute platform, not just the science: pre-registration protects claims from us;
+this ledger protects runs from the infrastructure. The R1b.2d retrain (a ~4.5 h
+single-function T4 job) was lost four times in two days, each to a *different*
+failure mode, before one hardened design closed all of them. The ledger, kept for
+consistency of practice on any managed-compute service:
+
+1. **Client-tied ephemeral apps.** Modal tears down a non-detached `modal run` app
+   ~3 minutes after the local client disconnects. Two local power outages
+   (2026-07-14, 2026-07-15 ~04:09 EDT) each killed ~2 h of remote GPU work this
+   way. *Practice:* long runs launch with `modal run --detach`, which keeps the
+   remote alive through client death (caveat: detach preserves only the
+   last-triggered function — sufficient for single-`.remote()` entrypoints, not
+   for chained remote calls).
+2. **Function timeout below true workload.** The remote cap (3 h) sat under the
+   measured ~4.5 h workload and killed a run mid-epoch-3. *Practice:* measure the
+   workload before capping, set headroom (now 6 h), and checkpoint so a timeout is
+   a resume, not a loss.
+3. **Worker preemption restarts from scratch.** Modal reclaims workers and re-runs
+   the function on the same input with no memory of prior progress. Two
+   consecutive preemptions landed ~70 min in — both inside the ~15-minute
+   post-epoch pool-scoring window that preceded the old end-of-epoch checkpoint —
+   so each cycle billed a full epoch and persisted nothing; at that hazard rate a
+   4.5 h monolith never completes while still spending. *Practice:* checkpoint
+   within seconds of each epoch boundary (trainable params + full optimizer state
+   + progress JSON keyed by a `run_id` nonce to reject stale state from earlier
+   attempts), defer long scoring to a single resumable post-training pass, and
+   resume on `run_id` match so a restart forfeits at most one epoch or one scoring
+   pass.
+4. **Result loss at the finish line.** The final artifact was computed by the
+   *local* entrypoint from the remote's return value — a dead client would lose a
+   completed run's payload. *Practice:* the remote persists the complete scored
+   payload to the volume before returning; the verdict is recomputable from the
+   volume plus `modal app logs` alone, with no live client required.
+
+Two footnotes for honesty. *Recipe fidelity under resume:* restarts restore the
+exact AdamW state dict, so a stitched trajectory differs from an uninterrupted one
+only in the unseeded shuffle order — which D14 already leaves uncontrolled between
+runs; resume is therefore a draw from the same run distribution, not a recipe
+deviation. *Cost:* every one of these failure modes bills before it loses the work —
+the un-hardened design converted an overnight outage plus a preemption cycle into
+roughly half the project's remaining compute budget with zero scientific output.
+Run-loss modes are spend-loss modes; hardening is cheaper than any single recurrence
+([scripts/modal_rgr.py] `r1b2d_train_eval`, commit `7e4ea2f`).
+
 ## 9. Phase 3R — auditing the two live claims, and the anchoring mechanism
 
 Phase 3 published two load-bearing results on *inherited* Phase-0 choices: **H1** (an
