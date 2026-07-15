@@ -1085,6 +1085,15 @@ def r1b2d_train_eval(train_rows: list, val_rows: list, m3_pool: dict, lock_pool:
                 return out
             best_m3 = score_pool(m3_pool)
             best_lock = score_pool(lock_pool)
+            model.save_pretrained("/cache/r1b2d/adapter_best")
+        # Outage insurance (2026-07-14 grid failure killed epoch 3/3 with nothing
+        # persisted): commit the best adapter + best-so-far scores to the volume
+        # after EVERY epoch. Plumbing only — the D9 training recipe is untouched.
+        Path("/cache/r1b2d").mkdir(parents=True, exist_ok=True)
+        Path("/cache/r1b2d/partial.json").write_text(json.dumps(
+            {"completed_epoch": epoch + 1, "best_val_auroc": best_auroc,
+             "best_epoch": best, "m3_v_scores": best_m3, "lock_v_scores": best_lock}))
+        VOL.commit()
 
     return {"best_val_auroc": best_auroc, "best_epoch": best,
             "m3_v_scores": best_m3, "lock_v_scores": best_lock}

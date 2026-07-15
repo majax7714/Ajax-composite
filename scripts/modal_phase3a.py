@@ -377,6 +377,12 @@ def _finalize(problems: list, results: list, dataset: str, model: str, k: int, t
               "gate": "PASS" if (in_band and headroom) else "does-not-qualify"}
     Path("artifacts").mkdir(exist_ok=True)
     Path(f"artifacts/phase3a_screen_{tag}.json").write_text(json.dumps(result, indent=2))
+    # Enriched-pool persistence (Phase 3R restart item 4): keep the per-candidate
+    # execution detail (frac/n_passed/failing/exc) so D2c/E6 + R3 can consume the
+    # graded landscape without re-executing. Screen verdicts unaffected.
+    Path("runs/modal").mkdir(parents=True, exist_ok=True)
+    Path(f"runs/modal/bcb_res_{tag}.json").write_text(json.dumps(
+        {"tag": tag, "task_ids": [p["task_id"] for p in problems], "results": results}))
     print(f"\n=== Phase 3a screen: {dataset} @ {model.split('/')[-1]} "
           f"({len(counts)} problems, k={k}) ===")
     print(f"pass@1 {result['pass@1']:.3f}  pass@8 {p8:.3f}  pass@50 {p50:.3f}  "

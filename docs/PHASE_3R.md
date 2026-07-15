@@ -488,3 +488,53 @@ fails, and the one open direction cannot help pass@8.** F2's decision rule forma
 requires instruct T=1.0/1.2 to run, but the standing evidence points to **F2 strengthened
 as structural** (decoding confound ruled out across the temperature axis for both
 architectures). Gate remains open pending those two regen cells.
+
+---
+
+## Addendum IV (2026-07-14) — E5/E1 subset matched-control (§9.3.1's committed action) — CLOSED
+
+**Question.** Were the D-measure cross-condition contrasts corrupted by per-condition
+problem filtering — E1/E2 (which need a *failed* artifact) on a hard-biased subset, E5
+(which needs a *correct* one) on an easy-biased subset?
+
+**Method (free, CPU, committed data only).** `scripts/dmeasure_subset_control.py` over
+`dmeasure_gen/exec.json`, `dmeasure_d2a_gen.json`, `m3_candidates/m3_labels.json`:
+recover each condition's actual pid set, reconstruct the selection rule, recompute E0
+restricted to E1's subset and to E5's subset. Output:
+`artifacts/dmeasure_subset_control.json`.
+
+**Result — the feared confound is structurally absent.**
+
+- All four D-measure conditions ran on **one identical 60-problem subset**; so did all
+  four D2a cells; and both runs used the **same** 60 (pid-set equality verified all
+  three ways).
+- Selection reconstruction: the subset is exactly the **first 60 M3-pool problems with
+  both a failed and a correct non-empty candidate** ("mixed-outcome"), in pool order.
+- Therefore E0-on-E1's-subset == E0-on-E5's-subset == the published E0 (mean_pass
+  0.650 / 0.5875 / 0.4062, coverage 0.650 / 0.917 / 0.900 at T=0/0.8/1.2). The
+  committed recompute returns the published numbers identically; **no cross-condition
+  contrast ever crossed a subset boundary.**
+
+**What remains is scope, not confound.**
+
+- The shared subset is mixed-outcome-only (91/164 qualify: 56 always-solved, 16
+  never-solved, 1 degenerate excluded) and **first-60 of those, not random**. M3
+  mean-pass: subset 0.565 vs full pool 0.648 — the subset is ~8 pts *harder* than full
+  HumanEval. Absolute magnitudes are scoped to mixed problems; within-subset contrasts
+  are unaffected.
+- At-risk claim (i) — "conditioning drops per-sample pass": **stands as measured**,
+  E0 0.5875 → E1 0.2375 at T=0.8 (−0.350) and 0.4062 → 0.200 at T=1.2 (−0.206), on
+  identical problems.
+- At-risk claim (ii) — E5's coverage-1.00 / negative TAX: the tautology worry is
+  **real but bounded** — every subset problem is solvable-within-8 by construction,
+  and the matched-subset E0 is already near-saturated (0.917 / 0.900 at T=0.8/1.2;
+  0.650 greedy), so E5's informative margin over its fair baseline is small
+  (+0.08–0.10 at T>0). Consistent with the Addendum III §1 answer-leakage retraction
+  already in place. Content-blindness (E5 PULL ≈ E2 PULL) is untouched — PULL is
+  measured within the same subset.
+
+**Verdict: the escape-distance law, the content-blindness residue, and the
+temperature dose-response survive the matched-control check unchanged; magnitude
+claims gain a scope note (mixed-outcome, first-60, ~8 pts harder than the full
+pool). The pre-registered fear (differential subsets) did not materialize — closed
+with no claim change.**

@@ -864,6 +864,22 @@ E0's mean_pass and coverage on E1's subset and on E5's subset before publishing 
 attractor claim. This is the append-only method applied to *our own* new finding, not just
 inherited ones.
 
+**Resolution (2026-07-14, [artifacts/dmeasure_subset_control.json]; [PHASE_3R.md]
+Addendum IV) — the feared confound is structurally absent.** All four D-measure
+conditions, and all four D2a cells, ran on **one identical 60-problem subset** (the
+first 60 M3-pool problems with both a failed and a correct candidate — verified by
+pid-set equality and selection reconstruction), so E0-on-E1's-subset = E0-on-E5's-subset
+= the published E0, and no cross-condition contrast ever crossed a subset boundary.
+Claim (i) stands as measured (E0 0.5875 → E1 0.2375 at T=0.8, on identical problems);
+claim (ii)'s tautology worry is real but bounded — every subset problem is
+solvable-within-8 by construction, and the matched E0 is already near-saturated
+(coverage 0.92/0.90 at T=0.8/1.2), so E5's margin over its fair baseline is small,
+consistent with the answer-leakage retraction already in place. What remains is a
+**scope note**, not a confound: the shared subset is mixed-outcome-only and first-60
+(not random), ~8 pts harder than the full pool (M3 mean-pass 0.565 vs 0.648) — absolute
+magnitudes are scoped to mixed problems; every within-subset contrast, the
+escape-distance law, content-blindness, and the dose-response are unchanged.
+
 ### 9.4 R3 + BEST-SO-FAR *(pre-registered; ride R2's enriched pools)*
 
 - **R3 — conditional reachability (the central claim).** On the **pass@50 = 0** stratum
@@ -897,9 +913,11 @@ since recovered exec-only under the hardened judge** — base 0.328/+0.097 (band
 instruct 0.269/+0.086 (band ✗ from below; base beats instruct at matched T). **Killed,
 needs rerun:** R1b.2d (H1 de-quantization verdict — died epoch 3/3 step ~450, no
 checkpoint persisted, verdict never computed), R2 instruct T=1.0/1.2, LiveCodeBench arm.
-**Pending (unstarted):** R3, BEST-SO-FAR, D2c/E6
-(ride R2's enriched pools); **the E5/E1 subset matched-control recompute** (§9.3.1 —
-free, CPU, committed data; gates the neutral-attractor/content-blindness claim). The F2
+**Closed 2026-07-14 (post-outage session): the E5/E1 subset matched-control recompute**
+(§9.3.1) — feared differential-subset confound structurally absent (all conditions share
+one identical 60-problem subset); claims survive with a scope note
+([artifacts/dmeasure_subset_control.json], [PHASE_3R.md] Addendum IV).
+**Pending (unstarted):** R3, BEST-SO-FAR, D2c/E6 (ride R2's enriched pools). The F2
 gate remains **open** — no config has cleared both criteria; base is exhausted with no
 feasible point and instruct T=0.8 fails from below, so only the un-run instruct T=1.0/1.2
 (which cannot help pass@8) remain. Evidence trends **F2-strengthened-as-structural**. No claim has been reversed; every prediction stands with its recorded
