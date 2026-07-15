@@ -211,3 +211,44 @@ coverage-vs-PULL curve (PULL ~0.35–0.45, coverage between E1@1.2's 0.62 and E0
 **Writeup destination:** §9.3.1 append with the branch outcome; central-figure spec
 gains the E7 and T=1.5 points. Artifacts: `runs/modal/dmeasure_e7_gen.json`,
 `artifacts/dmeasure_e7.json`.
+
+---
+
+## W2 pre-registration — LCB-medium base screen *(committed before running)*
+
+**Purpose.** Size R3 before pre-registering it. W0c showed the easy strata alone are
+unpowered (false-zero floor ~2–5 lucky recoveries ≈ the predicted signal). The medium
+stratum is the candidate fix.
+
+**Design.** Base completion path (the smoke-validated fenced-completion prompt from
+R2), LiveCodeBench code_generation **medium** stdin population (78 problems — the full
+population, no sampling), **top_p 1.0, T ∈ {0.8, 1.2}, k=50, seed 17**, fixed hardened
+judge; enriched per-test pools persisted under distinct tags
+(`lcb_r2_base_medium_T08/T12` — the tag now carries difficulty so landed easy pools
+cannot be overwritten). The W0c false-zero fit is recomputed on the medium pools with
+the same method — that floor enters R3's medium-arm null.
+
+**Decision rule (pre-committed).**
+- Medium pass@50 = 0 stratum **≥ ~60 problems with feedback richness intact** (per-test
+  signal present: a majority of stratum problems show ≥1 partial-credit candidate in
+  the k=50 pool) → R3 runs on **easy-stratum + medium-stratum, analyzed separately**,
+  pooled only if pre-registered at W3.
+- If medium coverage is so low the problems are plausibly **unreachable-at-any-k**
+  rather than improbable (pass@50 near zero AND stratum partial-credit signal near
+  zero), record the regime difference: recovery there tests something *stronger*, and
+  a null there does not kill the easy-stratum question.
+- **Power check before the W3 freeze:** with final stratum sizes and the recomputed
+  false-zero floor, compute the minimum detectable recovery delta (exact
+  binomial/McNemar, α=0.05 one-sided, power 0.8). If the design cannot resolve the
+  pre-registered 5–20% recovery prediction, the pre-reg says so explicitly and adjusts
+  n — no kill criterion that is theater.
+
+**Predictions (recorded before running).** Base > instruct on the tail at matched T
+(the R2 suppressor ordering carries over): base T=0.8 medium pass@8 ∈ [0.08, 0.20]
+(~60%), pass@50 ∈ [0.20, 0.35] (~55%; instruct T=0.8 was 0.067/0.154). Stratum size at
+T=0.8: ≥60 (~40%), 45–59 (~40%), <45 (~20%). T=1.2: pass@8 lower (~0.05–0.12), stratum
+larger. Feedback richness intact on the stratum: ~70%.
+
+**Writeup destination:** §9.6 extension. Artifacts:
+`artifacts/phase3a_screen_lcb_r2_base_medium_T{08,12}.json`, enriched pools
+`runs/modal/lcb_{cand,res}_lcb_r2_base_medium_T{08,12}.json`.

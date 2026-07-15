@@ -369,7 +369,10 @@ def lcb_r2_screen(n_problems: int = 100, k: int = 50, difficulty: str = "easy",
     def pak(n, c, kk):
         return 1.0 if n - c < kk else 1.0 - comb(n - c, kk) / comb(n, kk)
 
-    tag = f"lcb_r2_{arch}_T{str(temperature).replace('.', '')}"
+    # Difficulty enters the tag for non-easy runs so W2's medium pools can never
+    # overwrite the landed easy artifacts (which predate this suffix).
+    dsuf = "" if difficulty == "easy" else f"_{difficulty}"
+    tag = f"lcb_r2_{arch}{dsuf}_T{str(temperature).replace('.', '')}"
     gen = lcb_r2_generate.remote(n_problems, k, difficulty, 17, arch, temperature, 1.0)
     Path("runs/modal").mkdir(parents=True, exist_ok=True)
     Path(f"runs/modal/lcb_cand_{tag}.json").write_text(json.dumps(gen))
