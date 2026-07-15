@@ -609,10 +609,13 @@ entire reason a confirmation step exists.
 > T≤0.8 (only T=0.8 clears the band), headroom needs T≥1.0; they never co-occur.** If any
 > config clears pass@8∈[0.30,0.60] ∧ headroom≥0.15, F2 narrows to the frozen config and
 > the gate flips to PASS; if none does across base+instruct × 3 temps un-truncated, F2 is
-> *strengthened* (structural, decoding confound ruled out). **Gate still open** — base is
-> exhausted with no feasible point; only the instruct arm (T=0.8 recovered exec-only;
-> T=1.0/1.2 need regen after the 2026-07-14 outage, §9.5) remains before F2 resolves, and
-> on current evidence trends toward *strengthened*.
+> *strengthened* (structural, decoding confound ruled out). **Gate still open**, but every
+> landed cell fails: base is exhausted with no feasible point, and instruct T=0.8 (pass@8
+> 0.269, headroom +0.086) fails the band *from below* — base beats instruct at matched
+> T=0.8 on both axes, the deeper-base-tail direction R2 predicted. Only instruct T=1.0/1.2
+> remain (need regen after the 2026-07-14 outage, §9.5), and since instruct pass@8 already
+> sits below the band at its coolest temp and falls with T, they cannot open a feasible
+> cell. Evidence strongly trends **F2 strengthened-as-structural**.
 
 F1's implication was pursued to **LiveCodeBench** (contamination-controlled; 400
 problems, ~27 test cases each; easy/medium/hard) via a new hardened stdin/stdout judge
@@ -762,7 +765,12 @@ the 2026-07-14 outage; T=1.0/1.2 need regen — §9.5) is the last input before 
 before running):** a trade-off curve (base + hotter T deepens the tail but drops pass@8);
 most-likely one base point clears → F2 retracted-as-structural, with real uncertainty —
 **outcome: partially falsified** (the curve is confirmed, but *no* base point clears both,
-the more-informative branch).
+the more-informative branch). **Instruct comparison** T=0.8: pass@8 0.269 / pass@50 0.355
+/ headroom +0.086 — fails the band *from below*; base beats instruct at matched T=0.8 on
+both axes (0.328/+0.097 vs 0.269/+0.086), confirming the deeper base tail. Instruct
+T=1.0/1.2 (killed by the outage, need regen) cannot open a feasible cell — instruct pass@8
+already sits below the band at its coolest temp and falls with T. **Gate formally open
+pending those two cells; evidence strongly trends F2-strengthened-as-structural.**
 
 ### 9.3 The anchoring mechanism — D-measure *(the DIAG-8 spin-off, closed)*
 
@@ -884,22 +892,24 @@ COMPLETE** — T=0.8 (pass@8 0.328, band ✓, headroom +0.097 ✗), T=1.0 (0.241
 ✗), T=1.2 (0.092, +0.133, band ✗): trade-off confirmed with **no feasible base point**
 (pass@8 clears only at T≤0.8, headroom only at T≥1.0 — never together). **Interrupted
 2026-07-14 ~18:00 by a power-grid outage** (see PHASE_3R.md "CRASH RECOVERY") — all Modal
-apps torn down, nothing recoverable from cloud; **base T=0.8 screen since recovered
-exec-only under the hardened judge.** **Salvageable (pools intact on disk, exec-only):**
-instruct T=0.8 screen (exec-only in progress). **Killed, needs rerun:** R1b.2d (H1
-de-quantization verdict — died epoch 3/3 step ~450, no checkpoint persisted, verdict never
-computed), R2 instruct T=1.0/1.2, LiveCodeBench arm. **Pending (unstarted):** R3, BEST-SO-FAR, D2c/E6
+apps torn down, nothing recoverable from cloud; **both T=0.8 screens (base + instruct)
+since recovered exec-only under the hardened judge** — base 0.328/+0.097 (band ✓),
+instruct 0.269/+0.086 (band ✗ from below; base beats instruct at matched T). **Killed,
+needs rerun:** R1b.2d (H1 de-quantization verdict — died epoch 3/3 step ~450, no
+checkpoint persisted, verdict never computed), R2 instruct T=1.0/1.2, LiveCodeBench arm.
+**Pending (unstarted):** R3, BEST-SO-FAR, D2c/E6
 (ride R2's enriched pools); **the E5/E1 subset matched-control recompute** (§9.3.1 —
 free, CPU, committed data; gates the neutral-attractor/content-blindness claim). The F2
-gate remains **open** — no config has cleared both criteria and the instruct arms are
-incomplete. No claim has been reversed; every prediction stands with its recorded
+gate remains **open** — no config has cleared both criteria; base is exhausted with no
+feasible point and instruct T=0.8 fails from below, so only the un-run instruct T=1.0/1.2
+(which cannot help pass@8) remain. Evidence trends **F2-strengthened-as-structural**. No claim has been reversed; every prediction stands with its recorded
 outcome, including two D-measure predictions falsified (one backwards) and corrected in
 place by appended notes.
 
 **Restart ordering for the fresh conversation (highest-leverage first, cheapest tie-broken up):**
 1. **E5/E1 subset recompute** — free, CPU, no dependencies; closes the one open confound in our newest finding (§9.3.1).
 2. **R1b.2d rerun** — the H1 de-quantization verdict; GPU, self-contained (MBPP/HumanEval pools, not Phase-3a). Persist a checkpoint this time. Kill line unchanged: retrained-V bf16 SE ≤ 0.305 → H1 does not survive.
-3. **R2 salvage** — base T=0.8 recovered (pass@8 0.328, band ✓); instruct T=0.8 exec-only in progress; then instruct T=1.0/1.2 + LCB regen. Base axis has no feasible point, so F2 now hinges on the instruct arm.
+3. **R2 salvage — DONE** (both T=0.8 screens recovered exec-only: base 0.328/+0.097, instruct 0.269/+0.086, both gate-failing). Remaining R2 work is **instruct T=1.0/1.2 + LCB regen** (full rerun); on current evidence these strengthen F2 rather than open a feasible cell.
 4. **Judge-fixed re-execution of R2's pools → enriched (per-test) pools**, then **D2c/E6**, **R3**, **BEST-SO-FAR** in that order (each needs the graded landscape the prior step produces).
 
 None of 1–4 blocks the others except where a pool dependency is stated; 1 and 2 can run concurrently.

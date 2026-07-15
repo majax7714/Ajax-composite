@@ -474,5 +474,17 @@ salvage exec running; T=1.0/1.2 need regen) is the remaining input before F2's d
 rule fires; on current evidence F2 trends toward **strengthened-as-structural** unless
 instruct opens a feasible cell.
 
-Instruct T=0.8 salvage (exec-only on `bcb_cand_r2_instruct_T08.json`) executing at time of
-writing — result to be appended here on landing.
+**Instruct T=0.8 salvage LANDED** (`artifacts/phase3a_screen_r2_instruct_T08.json`,
+exec-only): pass@1 0.137, **pass@8 0.269**, pass@50 0.355, **headroom +0.086**. Band ✗
+(0.269 < 0.30 — fails *from below*), headroom ✗, gate does-not-qualify.
+
+**Base beats instruct at matched T=0.8 on both axes** (base 0.328 / +0.097 vs instruct
+0.269 / +0.086) — the un-suppressed base completion tail is genuinely deeper, exactly the
+R2 pre-registered direction. The remaining un-run cells are instruct T=1.0/1.2 (killed,
+need regen); but instruct already fails the band *from below* at its coolest temperature,
+and pass@8 falls monotonically with T (base: 0.328→0.241→0.092), so hotter instruct only
+moves further from the band. **No config has cleared both criteria; every landed cell
+fails, and the one open direction cannot help pass@8.** F2's decision rule formally
+requires instruct T=1.0/1.2 to run, but the standing evidence points to **F2 strengthened
+as structural** (decoding confound ruled out across the temperature axis for both
+architectures). Gate remains open pending those two regen cells.
