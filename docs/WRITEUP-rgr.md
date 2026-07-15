@@ -1094,6 +1094,16 @@ extension if the 5–20% recovery prediction needs resolution); **BEST-SO-FAR**.
    run. Inherit the H1 verdict: no verifier-selection stage on the bf16 stack.
 2. **D2c/E6 → R3 → BEST-SO-FAR** in that order on the frozen config's enriched pools.
 
+**Ordering superseded (2026-07-15, same day):** the Phase-3b design-cycle charter
+([PHASE_3B.md]) inserts a hardening pass **before** the 3b freeze — the elimination
+argument (§9.3.1), now the central claim, gets the same audit treatment H1 and F2 got.
+New order: **W0** (free CPU: measured E0 anchor, D2c copy-null, stratum false-zero
+rate) → **W1** (E7 repelled-conditioning arm — the asymptote's unpopulated third limit)
+→ **W2** (LCB-medium base screen — size R3, power check) → **W3** (freeze the 3b
+pre-reg: R3 four-arm with ABSTRACT-trace ceiling, recovery validation protocol) →
+**W4** (execute D2c/E6 → R3 → BEST-SO-FAR). A reconciliation ledger (§11) now governs
+every external result used in design.
+
 ---
 
 ## 10. Working method — how this project reasons *(read first in any new conversation)*
@@ -1193,6 +1203,52 @@ point, not a detour).
 reached from our own DIAG-8 spin-off before we surveyed Tsui/Olausson; we position as
 **convergent corroboration from an independent experimental path**, not priority, and cite
 prominently.
+
+### Reconciliation ledger *(appended 2026-07-15; one entry per reference per design decision it influenced)*
+
+Rule ([PHASE_3B.md] charter): no external conclusion is imported as a general truth or a
+design constant. Each entry states (a) their setup specifics, (b) the delta to ours,
+(c) what their result does and does not license here.
+
+- **Olausson et al. (2024) → R3's four-arm decomposition (W3).** (a) Their feedback
+  decomposition uses **human/oracle feedback arms vs self-generated feedback** on
+  GPT-3.5/GPT-4, compute-matched, on APPS-class problems; the bottleneck localization
+  ("the model cannot produce accurate feedback") comes from the oracle arm beating the
+  self arm. (b) Ours is a 1.5B base model, execution-trace feedback (templated, no
+  model in the loop) vs model-generated abstraction, on a pass@50 = 0 stratum.
+  (c) **Licenses:** the *decomposition logic* — without a feedback-ceiling arm, a
+  repair null is ambiguous between "direction doesn't help" and "this model can't
+  produce direction"; hence R3's ABSTRACT-trace arm exists. **Does not license:** any
+  magnitude expectation — their gap sizes were measured at 100–1000× our scale with
+  human-quality feedback; nothing transfers numerically.
+- **Self-Debug (Chen et al.) → ABSTRACT-trace arm framing (W3).** (a) Gains measured
+  against **greedy** (not compute-matched best-of-n), largest on
+  near-correct-by-construction tasks (TransCoder, Spider) where errors are local; the
+  "explanation" channel is model-generated. (b) Our control is compute-matched i.i.d.
+  (B1-50), our stratum is structural failure (0/50), our trace channel is verbatim
+  execution output. (c) **Licenses:** trace-style feedback as the *strongest known
+  candidate* for the direction channel — worth a dedicated arm. **Does not license:**
+  any expectation that repair beats resampling here — their baseline never asked that
+  question, and their regime (near-correct) is the one D2c/E6 tests separately.
+- **"How Many Tries" (2026) → R3 recovery stratification (W3/W4).** (a) Self-repair
+  universally effective across 7 models on HumanEval/MBPP-Sanitized — our exact
+  benchmarks — with gains growing with scale (≤ +5.5pp at 70B); **name errors repair
+  easily, assertion errors are hardest**. (b) Our failure mix is ~50% assertion-class
+  at 1.5B, and R3's stratum is by construction the hardest tail. (c) **Licenses:** a
+  pre-committed *check*: their error-type axis predicts which stratum problems are
+  recoverable — R3 recoveries (if any) should skew toward non-assertion error classes;
+  we stratify recoveries by error type and test that prediction. **Does not license:**
+  the "universally effective" headline — averaged over easy error types at scales
+  where the mechanism has capacity we don't have.
+- **Tsui et al. (2025) → E7 prompt design (W1) — formalizing the existing
+  reconciliation.** (a) Detection-axis result: models fail to notice their own errors;
+  "Wait"-style prompts recover ~89% of the gap; instruct models, natural-language
+  reasoning tasks. (b) Our failures are announced (detection removed); D2a measured
+  provenance ΔPULL ≤ 0.028 — inert. (c) **Licenses:** treating E7's avoidance framing
+  as a *verb/instruction* intervention (the live 3–4× lever per D2a), not an
+  attribution one; predicts "someone else's failed attempt" framing adds nothing to
+  E7. **Does not license:** any expectation about escape magnitude — Tsui never
+  measures distance-to-artifact.
 
 *Appendix pointers. Architecture [ARCHITECTURE.md]; decision log **D1–D16**
 [DECISIONS.md] (D11 precision, D14 statistical reproducibility, D15 retracted, D16 =
