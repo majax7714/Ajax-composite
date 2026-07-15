@@ -252,3 +252,49 @@ larger. Feedback richness intact on the stratum: ~70%.
 **Writeup destination:** §9.6 extension. Artifacts:
 `artifacts/phase3a_screen_lcb_r2_base_medium_T{08,12}.json`, enriched pools
 `runs/modal/lcb_{cand,res}_lcb_r2_base_medium_T{08,12}.json`.
+
+---
+
+## W1 RESULTS (2026-07-15) — BRANCH (a): the elimination argument is STRENGTHENED — [artifacts/dmeasure_e7.json]
+
+| cell | PULL | mean_pass | coverage | vs committed E0 |
+|---|---|---|---|---|
+| E7 @ T=0.8 | 0.196 | 0.285 | 0.65 | **−0.267** (E7-only 1, E0-only 17, p≈1.0) |
+| E7 @ T=1.2 | 0.357 | 0.244 | 0.75 | **−0.150** (E7-only 4, E0-only 13, p=0.99) |
+| E1 @ T=1.5 | 0.560 | 0.035 | 0.18 | (E0@1.5: 0.37) |
+| E0 @ T=1.5 | 0.740 | 0.067 | 0.37 | — |
+
+**Branch (a) fires exactly as pre-registered (the 55% favourite):** both E7 temps land
+≤ E0 − 0.05. Explicit repulsive conditioning loses to i.i.d. by 15–27 coverage points
+at matched compute; **"strictly dominated" stands as written.**
+
+**The sharper finding: repulsion is unachievable by prompting at this scale.** The
+avoidance instruction ("do not repeat this approach; take a substantially different
+approach") moved PULL only **+0.020/+0.048** over E1's plain "improve it" (0.196 vs
+0.176; 0.357 vs 0.309) — both still far below the measured anchor (0.491/0.594). The
+decisive region (PULL ≥ anchor) stays unpopulated **because the model cannot reach
+it**: told explicitly to leave the failed basin, a 1.5B generates *inside copy
+territory anyway*. The elimination argument's exclusion of repulsive conditioning is
+no longer a priori — it is measured: there is no prompt-level anti-correlated sampler
+to build the "sample the complement" scheme out of. (E7 does sit on the escape-coverage
+ordering — its extra escape bought coverage 0.65/0.75 vs E1's 0.52/0.62, the best
+failure-conditioned cells yet — but the ceiling claim is untouched: the best repelled
+cell is still 15 points under resampling.)
+
+**Prediction accounting.** Primary: (a) at 55% — **CORRECT**. Secondary: E7-PULL >
+E1-PULL at matched T (~85%) — held, marginally; E7-PULL between E1 and the anchor
+(~60%) — held; **E1@T1.5 continues the monotone curve (~70%) — WRONG, informatively.**
+
+**The wrong prediction is a regime boundary: the escape-distance law has a bounded
+domain.** At T=1.5, escape distance jumps (E1 PULL 0.560 — past the T=1.2 anchor
+neighborhood) but coverage **collapses** (0.18, far below E1@1.2's 0.62), because
+per-sample competence collapses (mean_pass 0.035; E0@1.5 likewise degrades to 0.37
+coverage / 0.067 mean_pass). The law — coverage monotone in PULL — holds **within the
+competence regime (T ≲ 1.2)** and inverts past it: escape bought with temperature
+beyond the boundary produces broken code, and spreading broken samples lands nothing.
+Consequences: (i) temperature is not an unbounded escape knob — the undirected-escape
+route to i.i.d. is closed not only asymptotically (W0a: never gets there) but
+*practically* (pushing T hard enough to escape destroys the samples first);
+(ii) the central figure's points must carry temperature labels and the law's stated
+domain; (iii) the E0 anchor row extends to T=1.5: PULL 0.409/0.491/0.594/**0.740**,
+coverage 0.65/0.92/0.90/**0.37** — i.i.d. itself falls off the same cliff.

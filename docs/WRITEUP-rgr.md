@@ -1057,6 +1057,29 @@ left the artifact's neighborhood. The central-figure spec now uses the measured 
 per temperature; the 0.396 mentions above carry supersede markers in place.
 [artifacts/w0a_e0_anchor.json].
 
+**The repulsion escape-hatch, closed (2026-07-15 — [PHASE_3B.md] W1/E7; branch (a),
+the pre-registered 55% favourite).** The elimination argument had excluded a third
+limit *a priori*: **repulsive conditioning** (a model anti-correlated with the failed
+artifact would sample i.i.d.-restricted-to-the-complement and could beat resampling by
+not re-wasting draws on the failed basin). E7 populated the region: same protocol,
+explicit-avoidance framing, T ∈ {0.8, 1.2}. Outcome — **repulsion loses to i.i.d. by
+15–27 coverage points at matched compute** (E7 0.65/0.75 vs committed E0 0.92/0.90;
+paired: E7-only 1 and 4 problems vs E0-only 17 and 13), and the sharper mechanism
+finding is that **prompt-level repulsion is unachievable at this scale**: the
+avoidance instruction moved PULL just +0.02/+0.05 over plain "improve it" (0.196/0.357
+vs anchor 0.491/0.594) — told explicitly to leave the failed basin, the model
+generates inside copy territory anyway. The exclusion is now measured, not assumed;
+"strictly dominated by resampling" stands as written. One secondary prediction was
+**wrong, informatively**: E1@T=1.5 did not continue the coverage-vs-PULL curve — it
+fell off a **competence cliff** (PULL 0.560 but coverage 0.18, mean_pass 0.035; E0@1.5
+itself degrades to 0.37/0.067). **The escape-distance law's domain is
+temperature-bounded (T ≲ 1.2):** past the boundary, escape is bought with broken
+samples and coverage inverts. So the undirected route to i.i.d. is doubly closed —
+asymptotically (the anchor is never reached) and practically (the temperature needed
+to force the distance destroys the samples first). Figure spec: points carry
+temperature labels; anchor row extends to T=1.5 (PULL 0.409/0.491/0.594/0.740,
+coverage 0.65/0.92/0.90/0.37). [artifacts/dmeasure_e7.json].
+
 ### 9.4 R3 + BEST-SO-FAR *(pre-registered; ride R2's enriched pools)*
 
 - **R3 — conditional reachability (the central claim).** On the **pass@50 = 0** stratum

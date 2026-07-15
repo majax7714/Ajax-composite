@@ -1,0 +1,44 @@
+{
+  "_label": "W1/E7 \u2014 repelled conditioning; branch rule pre-registered PHASE_3B.md",
+  "aggregation_rule": "(c) if any temp fires; (a) if all temps <= -0.05; else (b)",
+  "n_problems": 60,
+  "cells": {
+    "E7@0.8": {
+      "pull": 0.19609625630661803,
+      "coverage": 0.65,
+      "mean_pass": 0.28541666666666665
+    },
+    "E7@1.2": {
+      "pull": 0.35657808512126515,
+      "coverage": 0.75,
+      "mean_pass": 0.24375
+    },
+    "E1@1.5": {
+      "pull": 0.56009445329286,
+      "coverage": 0.18333333333333332,
+      "mean_pass": 0.035416666666666666
+    },
+    "E0@1.5": {
+      "pull": 0.7399451993932812,
+      "coverage": 0.36666666666666664,
+      "mean_pass": 0.06666666666666667
+    }
+  },
+  "paired_vs_committed_E0": {
+    "0.8": {
+      "n": 60,
+      "delta_cov": -0.26666666666666666,
+      "wins_E7": 1,
+      "wins_E0": 17,
+      "one_sided_p_E7_gt_E0": 0.9999961853027344
+    },
+    "1.2": {
+      "n": 60,
+      "delta_cov": -0.15,
+      "wins_E7": 4,
+      "wins_E0": 13,
+      "one_sided_p_E7_gt_E0": 0.9936370849609375
+    }
+  },
+  "branch": "a_strengthened"
+}
