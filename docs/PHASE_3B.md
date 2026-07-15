@@ -156,3 +156,58 @@ prediction (1–7 recoveries on 19–35 problems): **the noise floor is the same
 the signal.** ABSTRACT > 0 was already banned; W0c shows even ABSTRACT > B1-50 paired
 is unpowered on the easy strata alone. W2 (LCB-medium stratum) is promoted from
 contingency to **prerequisite**, exactly as chartered.
+
+---
+
+## W1 pre-registration — E7, the repelled-conditioning arm *(committed before running)*
+
+**The hole.** The elimination argument's asymptote ("undirected failure-conditioning can
+only approach i.i.d.") excludes a third limit a priori: **repulsive conditioning**. A
+model anti-correlated with the artifact samples from i.i.d.-restricted-to-the-complement
+of the failed basin — on a peaked distribution where the failed mode holds mass and zero
+solutions, that beats i.i.d. at matched compute by not re-wasting draws. Our data show
+attraction dominates in-range (max PULL 0.309 vs measured anchor 0.594), but the
+decisive region (PULL ≳ anchor) is unpopulated.
+
+**Design.** Identical D-measure protocol (instruct generator, vLLM bf16 L4, top_p 0.95,
+seed 17, max_tokens 512, ns=8, the same 60-problem first-60-mixed subset, the same
+per-problem failed artifacts, Daytona execution). New cells:
+
+- **E7 @ T ∈ {0.8, 1.2}** — explicit-avoidance framing: *"A previous attempt that
+  FAILED: [artifact]. Do not repeat this approach. Take a substantially different
+  approach and write a correct complete solution as a single fenced Python code
+  block."* One framing, strong avoidance verb — the verb is the live lever (D2a: 3–4×
+  provenance), and the Tsui ledger entry licenses treating this as a verb intervention
+  (no attribution variant needed).
+- **E1 @ T=1.5 and E0 @ T=1.5** — extends the attraction curve toward the anchor, with
+  its matched i.i.d. baseline; E0@1.5's PULL extends the measured anchor row.
+
+PULL is measured for **every** cell (E0/E7 included) against the same failed artifact.
+
+**Decision rule (paired vs committed E0 at matched T, n=60; band pre-committed):**
+- **(a)** E7 coverage ≤ E0 − 0.05 → **elimination argument strengthened**: the
+  asymptote holds even under explicit repulsion; "strictly dominated" stands as
+  written.
+- **(b)** |Δcoverage| < 0.05 → argument **stands, restated**: "≤ i.i.d." — drop
+  "strictly".
+- **(c)** E7 coverage ≥ E0 + 0.05 **and** McNemar p < 0.10 → **a bigger result than
+  the one being defended**: cheap mode-exclusion beats resampling; the elimination
+  argument is **retracted-as-overclaim in place**.
+
+**Odds (recorded before running): (a) 55% / (b) 40% / (c) 5%.**
+
+**Power caveat (recorded).** E0 is near-saturated on this subset (coverage 0.92/0.90 at
+T=0.8/1.2), so branch (c)'s detectable region is compressed to +0.08–0.10 max headroom.
+A branch-(b) landing with E7-PULL ≥ the anchor is still decisive for the design
+question: repulsion that reaches vacuous-conditioning distance and buys nothing over
+i.i.d. is the asymptote observed from the far side.
+
+**Secondary predictions:** E7-PULL > E1-PULL at matched T (~85%); E7-PULL lands between
+E1 and the measured anchor (~60%) vs above the anchor (~15%; above-anchor + coverage
+≈ E0 reads "over-repulsion is still just resampling"); E1@T1.5 continues the monotone
+coverage-vs-PULL curve (PULL ~0.35–0.45, coverage between E1@1.2's 0.62 and E0@1.5's)
+(~70%).
+
+**Writeup destination:** §9.3.1 append with the branch outcome; central-figure spec
+gains the E7 and T=1.5 points. Artifacts: `runs/modal/dmeasure_e7_gen.json`,
+`artifacts/dmeasure_e7.json`.
