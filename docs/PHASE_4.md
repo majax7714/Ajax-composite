@@ -247,3 +247,83 @@ Combined with H1 this de-confounds scale from family within one design.
 **Writeup:** §9.7 addendum (condensed) landed with H0c.
 
 ---
+
+## H1 — cross-family battery (the catastrophic-loss test)
+
+**PRE-REGISTRATION (2026-07-16, frozen before any generation).**
+
+**Question:** which of the record's structural findings are properties of models at
+0.5–3B, and which are properties of Qwen2.5-Coder?
+
+**Models:** `deepseek-ai/deepseek-coder-1.3b-base` and `bigcode/starcoder2-3b` —
+bracketing 1.5B, both trained on substantially organic code corpora (StarCoder2 on
+The Stack v2) against Qwen2.5-Coder's synthetic-heavy pipeline. **Confounds recorded
+honestly:** StarCoder2-3B is 2× parameters; neither is a Qwen-minus-synthetic-data
+counterfactual; training cutoffs differ from Qwen2.5's, so LCB contest-date exposure
+differs (families with earlier cutoffs may be *disadvantaged* on 2024 problems —
+noted, not corrected). This battery **scopes findings; it does not isolate the
+synthetic-data variable.** DeepSeek-Coder-1.3B-**instruct** is *not* run: the
+suppressor ordering already inverted on medium (W2) and is not one of the four
+headline findings — suppressor transfer stays untested in H1 (recorded limitation).
+
+**Smoke gate (per family, before any screening cell counts):** 8 LCB-easy problems ×
+8 samples, T=0.8, top_p 1.0, seed 17, the frozen R2 fenced-completion scaffold.
+Gate: well-formed ≥ 0.85, degenerate ≤ 0.10 (R3-smoke thresholds), judged mean frac
+and pass stats printed. A failing family gets **one** recorded template fix and one
+re-smoke; still failing → excluded, failure recorded, battery proceeds one-family.
+
+**Cells (per family; seed 17, top_p 1.0, T=0.8, frozen judges):**
+
+| cell | design | Qwen reference |
+|---|---|---|
+| (i) BCB-Complete | n=200 (the committed seed-17 shuffle subset), k=50, base completion on `complete_prompt`, `_BASE_STOP`; frozen bcb_exec semantics (container right-sized per §8-5, recorded) | pass@8 0.328 / pass@50 0.425 / headroom +0.097 |
+| (ii) LCB-easy | full 80, k=50, frozen fenced scaffold; lcb_exec **short-circuit variant** (pass/fail identical, frac unused — §8-5 cost rule; the committed all-cases judge is reserved for frac cells) | pass@8 0.566 / pass@50 0.763 / headroom +0.197 |
+| (iii)+(iv) merged | the frozen 44 D2c artifacts (W3 §2 rule) × {E0 no-context, E1 = frozen D2C context}, k=8; **all-cases** judge (frac is the analysis); PULL vs artifact both arms | E1 PULL 0.430 / E0 anchor 0.774 (recomputed from committed pools, this pre-reg); frac: conditioned 0.374 vs copy-null 0.494 / Qwen-iid 0.468 |
+
+*(Merge rationale, recorded: the committed D2c cell was k=8, and the family's honest
+i.i.d. null must be the family's own E0 frac on the same 44 problems — cell (iv)'s E0
+arm supplies it; a separate k=50 conditioning cell would duplicate generation without
+adding a pre-registered contrast. Deviation from the charter table's "(iii) 44
+problems [k=50]": k matched to the committed cell instead.)*
+
+*(Artifact provenance, recorded: both families condition on the same Qwen-generated
+artifacts — everything held fixed except the model. Provenance-inertness was measured
+on Qwen only (D2a); if a family reacts to foreign-provenance artifacts differently,
+that shows up as a SINK-form anomaly and is reported, not silently absorbed.)*
+
+**Pre-registered branches and odds:**
+
+- **F1-rescoped (BCB shallow tail).** Informativeness gate, pre-declared: pass@8 <
+  0.15 → the family's BCB cell is competence-limited, F1 transfer **UNRESOLVED** for
+  that family (evidence for neither branch). Informative cells: headroom ≥ 0.15 at
+  in-band coverage (pass@8 ∈ [0.30, 0.60]) → **F1 is Qwen-scoped** (retract the
+  "task-family property" language in place); cap ≈ 0.09–0.12 reproduced → hardens.
+  Odds: both informative families reproduce the cap **60%**; exactly one shows
+  headroom ≥ 0.15 **30%**; both **10%**.
+- **Feasible region (LCB-easy runway).** Informativeness gate: pass@8 < 0.05 →
+  UNRESOLVED for that family. Branches: headroom ≥ 0.15 off-Qwen → the runway
+  finding generalizes; else Qwen-scoped (and the Phase-3b platform inherits the
+  scope). Odds: at least one family ≥ 0.15 **55%**; both **25%**.
+- **SINK.** The one cell where the literature makes the call (Codex precedent):
+  conditioned mean frac < family's own E0 mean frac (paired, one-sided MC Wilcoxon
+  as committed). Odds: directional in both families **85%**; significant (p < 0.05)
+  per family **70%**. A non-replication is the surprise worth chasing.
+- **Law form (constants expected to vary — pre-declared; no numeric transfer
+  claimed).** Form under test: E1 PULL < 0.8 × family E0 anchor (conditioning pulls
+  generations toward the artifact) — odds both families **75%**. Form breaking on
+  another family is a major rescope of the law.
+
+**Decision rule for the record (binding):** each finding gets an explicit post-H1
+scope line in the writeup — **GENERALIZES** (both new families reproduce) /
+**QWEN-SCOPED** (neither, cells informative) / **MIXED** (split or ≥1 uninformative,
+stated per family). No finding keeps an unscoped "at this scale."
+
+**Ops:** new `scripts/modal_h1.py` (self-contained app; judge code duplicated from
+the frozen implementations, marked); model download via a hub-online function
+(images stay hub-offline); per-cell volume persistence + resume; `--detach`; est.
+$8–15 total. Cost note per §8-5: LCB pass@k judging short-circuits; all-cases
+judging only on the 44 × 16 cell.
+
+*(H1 RESULT lands below this line after the run.)*
+
+---
