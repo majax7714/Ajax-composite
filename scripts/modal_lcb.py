@@ -99,10 +99,15 @@ GEN_IMAGE = (
     modal.Image.debian_slim(python_version="3.12")
     .pip_install("vllm==0.11.0", "transformers==4.57.0", "datasets==5.0.0")
     .env({"HF_HOME": "/cache/hf", "TOKENIZERS_PARALLELISM": "false",
-          "VLLM_LOGGING_LEVEL": "WARNING"})
+          "VLLM_LOGGING_LEVEL": "WARNING",
+          # 2026-07-16 HF Hub outage (504s) killed a W4 arm mid-chain; every model
+          # and dataset this file uses is already in the volume cache, so run
+          # hub-offline. Remove if a NEW model/dataset must be fetched.
+          "HF_HUB_OFFLINE": "1", "HF_DATASETS_OFFLINE": "1"})
 )
 EXEC_IMAGE = modal.Image.debian_slim(python_version="3.12").pip_install(
-    "datasets==5.0.0", "numpy").env({"HF_HOME": "/cache/hf"})
+    "datasets==5.0.0", "numpy").env({"HF_HOME": "/cache/hf",
+                                     "HF_HUB_OFFLINE": "1", "HF_DATASETS_OFFLINE": "1"})
 
 DATASET = "livecodebench/code_generation"
 
