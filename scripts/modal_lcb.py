@@ -1012,3 +1012,77 @@ def p3b_bsf():
         extra = f"  vs B1 {s['vs_B1']}" if s["vs_B1"] else ""
         print(f"  {c:<9} coverage {s['coverage']:.3f}  mean_frac {s['mean_frac']:.3f}{extra}")
     print("wrote artifacts/bestsofar.json")
+
+
+@app.function(image=EXEC_IMAGE, volumes={"/cache": VOL}, timeout=1800,
+              env={"HF_HOME": "/cache/hf"})
+def lcb_contest_dates(question_ids: list) -> dict:
+    from datasets import load_dataset
+    ds = load_dataset(DATASET, split="test")
+    want = set(question_ids)
+    return {ds[i]["question_id"]: str(ds[i].get("contest_date", ""))
+            for i in range(len(ds)) if ds[i]["question_id"] in want}
+
+
+@app.local_entrypoint()
+def p3b_validate(stratum: str = "medium"):
+    """W3 recovery validation protocol: (a) judge rerun, (b) contamination audit
+    (contest date + AST dissimilarity vs the committed failure pool), (c) error-type
+    stratification. Runs over artifacts/r3_conditional_reachability.json."""
+    import ast
+    import difflib
+    from pathlib import Path
+
+    art = json.loads(Path("artifacts/r3_conditional_reachability.json").read_text())
+    detail = art[stratum]["recovery_detail"]
+    if not detail:
+        print(f"[{stratum}] no recoveries to validate")
+        return
+    cand_f, _ = _p3b_pool_files(stratum)
+    pool = json.loads(cand_f.read_text())
+    pool_by_qid = dict(zip(pool["question_ids"], pool["codes"]))
+
+    recs = []
+    for d in detail:
+        gen = json.loads(Path(f"runs/modal/r3_cand_{stratum}_{d['arm']}.json").read_text())
+        code = next(g for g in gen if g["qid"] == d["qid"])["codes"][d["cand_idx"]]
+        recs.append({**d, "code": code})
+
+    rerun = lcb_exec.remote([r["qid"] for r in recs], [[r["code"]] for r in recs])
+    dates = lcb_contest_dates.remote([r["qid"] for r in recs])
+
+    def ast_dump(code):
+        try:
+            return ast.dump(ast.parse(code))
+        except Exception:
+            return None
+
+    out = []
+    for r, row in zip(recs, rerun):
+        stable = bool(row[0]["passed"])
+        rd = ast_dump(r["code"])
+        sims = []
+        if rd:
+            for c in pool_by_qid[r["qid"]]:
+                if not c:
+                    continue
+                cd = ast_dump(c)
+                if cd:
+                    sims.append(difflib.SequenceMatcher(None, rd, cd).ratio())
+        max_sim = max(sims) if sims else None
+        date = dates.get(r["qid"], "")
+        out.append({"arm": r["arm"], "qid": r["qid"],
+                    "rerun_stable": stable,
+                    "contest_date": date,
+                    "contamination_possible": bool(date and date < "2025-01"),
+                    "max_ast_similarity_vs_failure_pool": max_sim,
+                    "in_distribution_shape": (max_sim is not None and max_sim >= 0.85),
+                    "artifact_err_class": r["err_class_of_artifact"]})
+    art[stratum]["recovery_validation"] = out
+    Path("artifacts/r3_conditional_reachability.json").write_text(json.dumps(art, indent=2))
+    print(f"=== recovery validation [{stratum}] ({len(out)} events) ===")
+    for v in out:
+        print(f"  {v['arm']:<9} {v['qid']:<12} stable {v['rerun_stable']}  "
+              f"date {v['contest_date'][:10]}  contam-possible {v['contamination_possible']}  "
+              f"max AST-sim vs pool {v['max_ast_similarity_vs_failure_pool']}")
+    print("updated artifacts/r3_conditional_reachability.json")
