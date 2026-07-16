@@ -327,3 +327,83 @@ judging only on the 44 × 16 cell.
 *(H1 RESULT lands below this line after the run.)*
 
 ---
+
+## H2 — completing the direction decomposition: hint arm + near-miss band
+
+**DRAFTED 2026-07-16 pre-H1-verdicts; FROZEN only after the H1 scope line is
+inserted (charter: H2's interpretation inherits H1's scope from the start).**
+
+### H2a — the hint arm (the missing Olausson rung)
+
+**Channel:** HINT = an approach-level description in natural language. **Deviation
+recorded:** LCB carries no reference solutions (dataset metadata empty), so the
+charter's "oracle-derived from the reference solution" adapts to: frontier-model
+worked approach derived from the problem statement alone, hand-audited. Hint set
+**frozen pre-H1-results** at commit `48987b8` ([artifacts/h2_hints_frozen.json]):
+125 hints (68 medium-stratum, 39 near-miss, 20 manipulation-check + 2 overlap),
+leakage protocol binding (words only; no identifiers; no numerals/code tokens —
+automated screen 125/125 clean; ~2 sentences; idea, never implementation). One
+drafting error caught by the hand audit and corrected before freeze (abc341_a,
+written from memory, did not match the statement — the audit protocol exists for
+exactly this).
+
+**Manipulation check (gate; runs before any stratum arm):** the frozen 20-problem
+mid-p̂ set (easy base T=0.8, x nearest 25/50), arms **HINT-25 vs E0-25**, both
+fresh, frozen config (base, T=0.8, top_p 1.0, seed 17). Gate: per-problem
+mean-pass uplift (HINT − E0), one-sided MC Wilcoxon p < 0.05 **and** mean delta >
+0. If hints do not lift solvable problems, the channel is broken and the stratum
+run is **postponed, not interpreted**. Harm guard: mean delta < −0.05 → hints
+actively sink (reported as its own finding). Odds: **gate passes 70%**.
+
+**Stratum run (fires only on gate pass):** HINT-50 on the medium 0/50 stratum
+(n=68), against a **fresh B1-50 control** (same batch, same config; the committed
+R3 B1-50 and its floor-2 result stand as the calibration reference). Paired exact
+McNemar, α=0.05 one-sided; the W2 power envelope carries over: a null forecloses
+r ≳ 0.15; r ∈ [0.05, 0.13) pre-declared unresolvable. PULL and AST-PULL recorded
+per generation; full recovery-validation protocol (judge rerun + contamination
+audit + error-type stratification).
+
+**Pre-registered branches (odds):**
+- **(a) HINT recovery significantly above floor** → "capacity to use direction"
+  is retracted-as-overclaim in place; the constraint was feedback *content*; a
+  richness gradient exists above traces; the paper's headline changes — **20%**.
+- **(b) HINT ≈ floor** → the competence-boundary thesis hardens dramatically: a
+  stated correct approach does not cross the boundary — the darker, stronger
+  claim, now licensed — **55%**.
+- **(c) positive-unresolvable** (above floor, p ≥ 0.05, inside the declared
+  unresolvable band) — reported as such, not spun — **25%**.
+
+### H2b — the near-miss band (where the refinement question is live)
+
+**Set:** the frozen 39-problem near-miss enumeration (x ∈ {1,2} of 50 in any of
+the four easy cells + medium T=0.8; [artifacts/h2_hints_frozen.json]
+near_miss_cells; per-tier reporting by min-x). Run config: the frozen base T=0.8
+(easy problems on the easy scaffold, medium on medium). **Caveat recorded:**
+problems enumerated at other temperatures may have lower p at T=0.8; all arms are
+equally affected and the contrast is unbiased. **All three arms fresh** (B1-25 /
+TRACE-25 / HINT-25, same batch, seed 17) — a committed-pool subsample for B1 would
+inherit the selection's luck (regression-to-the-mean asymmetry); fresh arms keep
+the contrast clean.
+
+**Artifact rule for TRACE:** per problem, highest-frac *failing* candidate from
+the committed run-config pool (the R3 rule restricted to failures); trace = the
+frozen first-failing-case capture (stdin/expected/actual, 512-char cap).
+
+**Power envelope (computed from the pooled p̂ enumeration, MC over exact paired
+one-sided McNemar, α=0.05; k=25 chosen):** a doubling of per-sample rate is
+resolvable at power **0.64**, a tripling at **0.97**; a 1.5× effect is
+**pre-declared unresolvable** (0.29); false-alarm rate at null 0.034.
+
+**Pre-registered prediction (the competence-boundary thesis's own falsifiable
+consequence):** direction works *inside* the boundary. Odds: **HINT > B1
+significant 55%**; TRACE > B1 significant 30%; **neither 35%** — if direction
+fails even on near-misses, "cannot use direction" hardens beyond R3, and the
+Self-Debug reconciliation sharpens (their regime is near-correct; ours shows even
+near-reachable does not respond at 1.5B). Either branch is a paper-grade sentence.
+
+**Writeup:** H2a + H2b land as §9.8 ("completing the decomposition"), with the
+§9.7 headline amended in place per the branch taken.
+
+*(H1 scope-inheritance line inserted at freeze; H2 RESULTS land below after the runs.)*
+
+---
