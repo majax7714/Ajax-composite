@@ -165,4 +165,55 @@ underweighted it both times.
 
 ---
 
-*(J3–J5 pre-registrations and results append below as they land.)*
+## J3 — the self-hint arm on Qwen (measure the production gap; stop inferring it)
+
+**PRE-REGISTRATION (2026-07-16, frozen before any generation).**
+
+**Question:** Index row 12 ("the model cannot produce hint-grade direction") is
+LIVE-BUT-INFERRED, resting on MODELABS (trace *compression*, not approach
+generation) and BSF nulls. Measure it directly.
+
+**Channel (frozen):** SELFHINT — Qwen2.5-Coder-1.5B-**Instruct** (matching
+MODELABS generator practice) writes its own approach hint from the problem
+statement alone (no trace, no artifact, no oracle), T = 0, ≤ 120 tokens, code
+fences stripped. Frozen prompt: *"Problem:\n{statement[:2500]}\n\nIn at most two
+sentences, state the algorithmic approach a correct solution must take. Describe
+the idea only — no code, no variable names."* The base model then generates
+conditioned via the **identical** frozen hint-context block; the only variable vs
+§9.8's HINT arm is who wrote the hint. Self-hints are persisted verbatim; the
+leakage screen is run post-hoc for characterization only (the channel is whatever
+the model produces under the frozen prompt).
+
+**Run:** SELFHINT-50 on the same 68-problem medium stratum, frozen config.
+Controls: the same-day fresh **B1-50 = 2** (the twice-calibrated floor) and
+**HINT-50 = 13** (§9.8), both same config, same session — stated, not rerun.
+
+**Grading (the decisive cross-tabulation, frozen):** every self-hint graded by a
+fresh blind instance under the J2 **anchored** instrument, extended with a second
+registered dimension — approach judgment: CORRECT / DOUBTFUL / WRONG.
+"Production-adequate" := COMPLETE **and** CORRECT. Grading completes before any
+join with recovery outcomes.
+
+**Branches (odds):**
+- **(a) production failure measured** — SELFHINT ≤ 4 recoveries (p ≥ 0.05 vs B1)
+  AND production-adequate share < 30% → Olausson completed at both rungs; the
+  cascade is the only deployable shape at this scale — **45%**.
+- **(b) use failure reappears** — SELFHINT ≈ floor despite production-adequate
+  share ≥ 30% → the Qwen pathology may act on self-generated context; its own
+  follow-up — **10%**.
+- **(c) self-refinement partially exists** — SELFHINT > B1, McNemar p < 0.05 →
+  §9.8's closing and Index row 12 amended; tension with both our nulls and
+  PlanSearch-scale intuitions — **20%**.
+- **(d) positive-unresolvable** (above floor, p ≥ 0.05) — reported as such —
+  **25%**.
+
+**Analysis:** paired exact McNemar vs B1-50 (primary); vs HINT-50 (secondary —
+the production gap in recoveries); cross-tab recovery × production-adequacy.
+**Artifacts:** h5_selfhint_qwen.json, h5_selfhint_grades.json. **Writeup:** §9.8
+extension + Index rows 10/12.
+
+*(J3 RESULT lands below.)*
+
+---
+
+*(J4–J5 pre-registrations and results append below as they land.)*
