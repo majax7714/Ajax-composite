@@ -471,6 +471,41 @@ inversion sharpens what H2a tests: other families *use* a code anchor profitably
 whether Qwen can use **direction without code** (the hint channel) is precisely
 the still-open decomposition rung. No H2 branch licenses removal of the Qwen scope.
 
-*(H2 RESULTS land below after the runs.)*
+### H2a RESULT, part 1 (2026-07-16) — **manipulation gate: HARM; stratum run POSTPONED per pre-reg**
+
+E0-25 mean pass 0.540 → HINT-25 **0.444** on the 20-problem mid-p̂ set: mean uplift
+**−0.096**, one-sided p for uplift 0.993 (harm significant at p ≈ 0.007); the
+frozen harm guard (mean delta < −0.05) fired. **The 70% "gate passes" prediction
+was WRONG.** Per the pre-registration, the stratum run does not fire and no
+stratum null will be interpreted. [artifacts/h2_manip_check.json].
+
+**The harm is its own finding.** A correct, leakage-audited, approach-level
+natural-language hint *depresses* Qwen-base's per-sample pass rate on problems it
+half-solves. Convergence with H1: on Qwen, every conditioning content tested —
+partial-credit code (D2c SINK), code + trace (BEST+ABSTRACT zero), and now
+code-free natural-language guidance — lands *below* i.i.d., while the same
+code-anchor conditioning **lifts** DeepSeek and StarCoder2 (H1 inversion). Two
+candidate readings: (i) Qwen-specific conditioning degradation extends to the
+language channel; (ii) the hint block disrupts the base-model completion scaffold
+(format artifact of our prompt, not a Qwen property).
+
+### Exploratory follow-up E-H2 (pre-registered before running, 2026-07-16) —
+### the same hint arm on DeepSeek discriminates (i) from (ii)
+
+Same 20 problems, same frozen hints, same scaffold and config, model =
+DeepSeek-Coder-1.3B-base: HINT-25 vs E0-25. **Branches:** (a) hints LIFT DeepSeek
+(mean Δ > 0) → the harm is Qwen-scoped conditioning degradation — the SINK
+inversion extends to the language channel — **60%**; (b) hints HARM DeepSeek too
+(Δ < −0.05) → format/channel artifact; the hint-arm design is questioned, not
+Qwen — **25%**; (c) flat — **15%**. Exploratory: no writeup claim rests on it
+beyond reading (i)-vs-(ii).
+
+**H2b proceeds as frozen** (B1/TRACE/HINT on the near-miss band): the TRACE-vs-B1
+contrast is untouched by the gate; the HINT arm's interpretation inherits the
+manipulation-check failure (pre-stated: a HINT null in the band says nothing about
+direction-use; a HINT *win* against a channel that harms on solvable problems
+would be anomalous and would be chased).
+
+*(E-H2 and H2b results land below.)*
 
 ---

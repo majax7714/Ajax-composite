@@ -1,0 +1,111 @@
+{
+  "_label": "H2a manipulation check [PHASE_4.md H2a]",
+  "n_problems": 20,
+  "e0_mean_pass": 0.54,
+  "hint_mean_pass": 0.444,
+  "mean_uplift": -0.096,
+  "p_one_sided": 0.9930003499825009,
+  "gate": "HARM",
+  "per_problem": [
+    {
+      "qid": "abc302_a",
+      "e0": 0.6,
+      "hint": 0.24
+    },
+    {
+      "qid": "abc306_b",
+      "e0": 0.4,
+      "hint": 0.08
+    },
+    {
+      "qid": "abc307_a",
+      "e0": 0.44,
+      "hint": 0.44
+    },
+    {
+      "qid": "abc308_a",
+      "e0": 0.48,
+      "hint": 0.32
+    },
+    {
+      "qid": "abc312_a",
+      "e0": 0.6,
+      "hint": 0.48
+    },
+    {
+      "qid": "abc320_a",
+      "e0": 0.8,
+      "hint": 0.56
+    },
+    {
+      "qid": "abc320_b",
+      "e0": 0.36,
+      "hint": 0.4
+    },
+    {
+      "qid": "abc325_a",
+      "e0": 0.56,
+      "hint": 0.56
+    },
+    {
+      "qid": "abc327_a",
+      "e0": 0.56,
+      "hint": 0.48
+    },
+    {
+      "qid": "abc332_a",
+      "e0": 0.44,
+      "hint": 0.28
+    },
+    {
+      "qid": "abc333_a",
+      "e0": 0.56,
+      "hint": 0.48
+    },
+    {
+      "qid": "abc335_a",
+      "e0": 0.68,
+      "hint": 0.6
+    },
+    {
+      "qid": "abc336_a",
+      "e0": 0.48,
+      "hint": 0.52
+    },
+    {
+      "qid": "abc336_b",
+      "e0": 0.6,
+      "hint": 0.52
+    },
+    {
+      "qid": "abc337_a",
+      "e0": 0.72,
+      "hint": 0.4
+    },
+    {
+      "qid": "abc338_a",
+      "e0": 0.36,
+      "hint": 0.28
+    },
+    {
+      "qid": "abc338_b",
+      "e0": 0.28,
+      "hint": 0.48
+    },
+    {
+      "qid": "abc339_a",
+      "e0": 0.52,
+      "hint": 0.72
+    },
+    {
+      "qid": "abc340_b",
+      "e0": 0.72,
+      "hint": 0.36
+    },
+    {
+      "qid": "abc343_b",
+      "e0": 0.64,
+      "hint": 0.68
+    }
+  ]
+}

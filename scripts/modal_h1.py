@@ -559,22 +559,26 @@ def h1_prefetch():
 
 
 @app.local_entrypoint()
-def h2_manip():
-    """H2a manipulation-check gate: 20 mid-p̂ problems x {E0-25, HINT-25}, fresh,
-    frozen Qwen base config. Gate: mean uplift > 0 AND one-sided p < 0.05."""
+def h2_manip(family: str = "qwen"):
+    """H2a manipulation-check gate: 20 mid-p̂ problems x {E0-25, HINT-25}, fresh.
+    family='qwen' is the gate (frozen config); other families run the E-H2
+    exploratory discrimination cell ([PHASE_4.md] E-H2)."""
     import statistics as st
 
+    model = QWEN_BASE if family == "qwen" else FAMILIES[family]
+    suf = "" if family == "qwen" else f"_{family}"
     fz = _h2_frozen()
     qids = fz["groups"]["manip_check"]
     hints = fz["hints"]
     items = ([{"qid": q, "context": None} for q in qids]
              + [{"qid": q, "context": _hint_context(hints[q])} for q in qids])
-    gen = _load("h2_manip_cand") or _persist(
-        "h2_manip_cand", h1_gen_lcb.remote(QWEN_BASE, items, 25, tag="h2_manip_cand"))
-    res = _load("h2_manip_res") or _persist(
-        "h2_manip_res",
+    gen = _load(f"h2_manip_cand{suf}") or _persist(
+        f"h2_manip_cand{suf}",
+        h1_gen_lcb.remote(model, items, 25, tag=f"h2_manip_cand{suf}"))
+    res = _load(f"h2_manip_res{suf}") or _persist(
+        f"h2_manip_res{suf}",
         h1_lcb_exec.remote([g["qid"] for g in gen], [g["codes"] for g in gen],
-                           tag="h2_manip_res", short_circuit=True))
+                           tag=f"h2_manip_res{suf}", short_circuit=True))
     n = len(qids)
     e0 = [sum(r["passed"] for r in row) / len(row) for row in res[:n]]
     hi = [sum(r["passed"] for r in row) / len(row) for row in res[n:]]
@@ -583,14 +587,15 @@ def h2_manip():
     mean_d = st.mean(diffs)
     gate = "PASS" if (mean_d > 0 and p < 0.05) else (
         "HARM" if mean_d < -0.05 else "FAIL")
-    out = {"_label": "H2a manipulation check [PHASE_4.md H2a]", "n_problems": n,
+    out = {"_label": f"H2a manipulation check [{family}]", "model": model,
+           "n_problems": n,
            "e0_mean_pass": st.mean(e0), "hint_mean_pass": st.mean(hi),
            "mean_uplift": mean_d, "p_one_sided": p, "gate": gate,
            "per_problem": [{"qid": q, "e0": a, "hint": b}
                            for q, a, b in zip(qids, e0, hi)]}
-    (REPO / "artifacts/h2_manip_check.json").write_text(json.dumps(out, indent=2))
-    print(f"=== H2a manipulation check: E0 {st.mean(e0):.3f} → HINT {st.mean(hi):.3f} "
-          f"(Δ {mean_d:+.3f}, p {p:.4f}) → {gate} ===")
+    (REPO / f"artifacts/h2_manip_check{suf}.json").write_text(json.dumps(out, indent=2))
+    print(f"=== H2a manipulation check [{family}]: E0 {st.mean(e0):.3f} → HINT "
+          f"{st.mean(hi):.3f} (Δ {mean_d:+.3f}, p {p:.4f}) → {gate} ===")
 
 
 @app.local_entrypoint()
