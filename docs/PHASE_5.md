@@ -110,7 +110,28 @@ concentration** → nudges suffice; the production bar drops substantially —
 **Outputs:** [artifacts/h5_hint_grades.json]; §9.8 addendum; Index row 10 gains
 the dose-response line; the grade joins the J3/J4 cross-tabulations.
 
-*(J2 RESULT lands below.)*
+### J2 RESULT, first instrument (2026-07-16) — **branch (c): ceiling-limited, as pre-declared (the 25% branch)**
+
+The blind grader (fresh model instance, shuffled label-free input) returned
+**COMPLETE for 125/125 hints** — zero variance; the > 80% ceiling guard fires and
+the concentration test is UNINFORMATIVE as registered. Two readings are
+indistinguishable in this grade: a true ceiling (the drafter deliberately wrote
+full strategies) and grader leniency (no calibration anchors in the rubric).
+[runs/h2/grades_raw.json — grader agent a33b46e0d34374b2b.]
+
+### J2 amended instrument (registered 2026-07-16 BEFORE any regrade ran)
+
+A zero-variance grade contains no outcome information (there is nothing to
+join), so amending the instrument now cannot be outcome-tuning. Amendment: same
+three levels, plus (i) two calibration anchors per level written into the
+grader prompt, (ii) the marginal-doubt rule — *when in doubt between two grades,
+choose the lower*, (iii) an explicit calibration expectation stated to the
+grader ("hints are two-sentence summaries; full mechanical sufficiency should be
+uncommon"), (iv) a different fresh grader instance. Same frozen analysis and
+ceiling guard. **Amended odds: concentration 30% / no concentration 40% /
+ceiling again 30%.**
+
+*(J2 amended RESULT lands below.)*
 
 ---
 
