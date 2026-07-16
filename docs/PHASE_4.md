@@ -570,6 +570,85 @@ overclaim; the R3 null becomes "trace-channel null," not "direction null" —
 **direction helps exactly up to the competence boundary and not beyond** (H2b
 inside, null outside) — **45%**. **(c)** positive-unresolvable — **25%**.
 
-*(H2a part 2 RESULT lands below.)*
+### H2a part 2 RESULT (2026-07-16) — **branch (a), the 30% branch: approach-level direction crosses the boundary**
+
+On the 68-problem medium pass@50 = 0 stratum, frozen config: **B1-50 recovered 2**
+(the W0c floor prediction of 2.01, hit exactly for the **second** independent
+time) — **HINT-50 recovered 13** (11 hint-only, 0 b1-only; paired exact McNemar
+**p = 4.9 × 10⁻⁴**; r ≈ 0.19, above the 0.15 power line, outside the unresolvable
+band). The 45% favourite (on-floor null) was **WRONG**; branch (a) fired.
+[artifacts/h2a_hint_arm.json].
+
+**Recovery validation (pre-registered protocol, all passed):**
+- **Judge rerun:** 13/13 recoveries reproduce. [artifacts/h2a_rerun_stability.json]
+- **Mechanism — off the curve, as the frozen R3 spec required:** HINT-50 generated
+  at AST-PULL 0.427 / lex 0.897 — *beyond* B1's i.i.d. position (0.375 / 0.843) —
+  with coverage 13/68 where the undirected curve at that distance pays the ~2/68
+  floor. **Relocated mass, not spread** — the only success mechanism a 0/50
+  stratum admits, observed.
+- **Structural novelty:** 11/13 recovered solutions sit ≥ 0.17 normalized-AST from
+  *every* candidate in the problem's 50-failure pool (range 0.171–0.404); 2 are
+  structurally near one pool failure (0.118, 0.134 — hint-guided repairs of an
+  existing wrong attempt). [artifacts/h2a_validation_struct.json]
+- **Error-type stratification:** recoveries skew toward timeout-class artifacts
+  (4/13 = 31% vs 13% stratum base; wrong_answer 69% vs 76% base) — approach
+  hints preferentially fix efficiency-class failures, consistent with the "How
+  Many Tries" error-type axis (§11 ledger).
+- **Contamination:** the global LCB-contest-date-vs-Qwen2.5 caveat is unchanged
+  and arm-uniform (both arms, same problems, same dates); the hint channel is
+  oracle-*derived* by design — the treatment is direction, and direction is what
+  recovered.
+
+**Consequence (pre-registered):** "capacity to use direction that 1.5B does not
+have" is **retracted-as-overclaim** in §9.3.1/§9.7 (markers landed). The R3 null
+was a **trace-channel null**: at 1.5B on Qwen, verbatim traces and compressed
+traces carry unusable direction, but a two-sentence stated approach recovers a
+fifth of the provably-unreachable stratum. The bottleneck is **feedback
+content**, exactly as Olausson's oracle rung suggested — their localization now
+*confirmed one rung deeper* at 1/70th their model scale. Combined with H2b:
+approach-level direction works both inside the boundary (24→34, p = 0.015) and
+across it (2→13, p = 4.9e-4); the trace channel works nowhere (p = 0.77 inside,
+floor outside).
+
+**H2 prediction accounting:** manipulation gate 70%-PASS prediction WRONG (HARM
+fired); E-H2 60% branch ✓; H2b HINT 55% ✓, TRACE 30% miss; stratum 45%-null
+favourite WRONG, 30% branch (a) fired. Four of seven registered odds were
+against the outcomes that materialized — all stand on the page.
+
+---
+
+## PHASE GATE — CLOSED (2026-07-16)
+
+**Gate condition:** every headline claim in the abstract carries a cross-family
+scope line (H1) or a completed-decomposition basis (H2); SINK/elimination
+positioning corrected (H0). **Audit:**
+
+| abstract headline | disposition |
+|---|---|
+| register null (H2-orig) | Qwen-scoped inline (§5.2/5.3) + abstract banner |
+| F1 shallow tail / "no configuration" | RETRACTED-as-Qwen-scoped, measured (§7.3 banner) |
+| F2-retraction / feasible region | GENERALIZES, measured (§9.2 marker) |
+| escape law + elimination argument | metric-robust (H0a), form GENERALIZES (H1), in-context channel scope (H0c), decomposition completed (§9.8) |
+| D2c SINK | repositioned (H0c) + INVERTED off-Qwen, amended (§9.7) |
+| "constraint is the ability to use it" | RETRACTED-as-overclaim, measured (§9.8; markers §9.3.1/§9.7) |
+| Phase-3b powered null | re-read as trace-channel null, Qwen-scoped (§9.7/§9.8) |
+
+**Phase verdict, one paragraph.** Phase 4 spent ~$10–15 of compute to make every
+headline sentence either measurably wider or measurably narrower, and both
+happened: the *mechanism* (anchoring/escape, conditioning-pull) generalized
+across metric and family, while the *platform negatives* (shallow tails, no
+headroom, conditioning-sinks) collapsed to Qwen2.5-Coder — the exact
+Spurious-Rewards failure mode, caught by the audit rather than by a reviewer.
+The decomposition then produced the phase's positive surprise: direction, when
+it exists as stated approach content, crosses the competence boundary at 1.5B
+(13 vs floor 2), so the sample-refinement story ends at feedback *production*,
+not use — Olausson's localization, confirmed from below. Remaining open, all
+sign-off-gated: the H3 cross-scale fork (+7B spot check), TTT-on-the-stratum,
+self-generated-hint experiments, the r ∈ [0.05, 0.13) band. Nothing is running;
+nothing is silently drifted.
+
+**Spend note (§8 practice):** all Phase-4 runs used detach + volume-first
+persistence + short-circuit judging where frac was not the analysis; no failure
+modes, no reruns lost, one gate misfire handled by amendment-with-registration.
 
 ---

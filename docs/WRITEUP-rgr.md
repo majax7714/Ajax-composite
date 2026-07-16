@@ -6,8 +6,15 @@ this architecture work" to "on what task can iterative refinement pay at all" �
 that reframing drives a stack rebuild (Phase M) and a pre-registered benchmark search
 (Phase 3) whose first hard result is itself a negative worth publishing.*
 
-*Living record — last updated 2026-07-16 (Phase 3b W0–W4 complete: elimination
-argument hardened, **R3 NULL at declared power**, D2c SINK, BEST+ABSTRACT zero —
+*Living record — last updated 2026-07-16 (**Phase 4 complete — claim hardening,
+[PHASE_4.md]**: the cross-family battery retracted F1 and the SINK as
+Qwen2.5-Coder-scoped — the SINK *inverts* off-Qwen — while the feasible region and
+the anchoring law generalize (and the law survives structural-AST recomputation);
+the completed decomposition **reversed the use-capacity claim**: oracle-grade
+approach hints recover 13/68 on the pass@50 = 0 stratum vs the calibrated floor of
+2, p = 4.9 × 10⁻⁴ — §9.8, §7.3 banner, abstract scope banner. Earlier same day:
+Phase 3b W0–W4 complete: elimination argument hardened, **R3 NULL at declared
+power** [now read as a trace-channel null — §9.8], D2c SINK, BEST+ABSTRACT zero —
 §9.7, [PHASE_3B.md]; Phase-3R audits resolved 2026-07-15: H1 killed-as-artifact, F2
 retracted-as-structural, E5/E1 closed clean). All numbers trace to committed artifacts and
 run records; sources cited inline as `[file]`. This is the canonical results document for
@@ -174,6 +181,24 @@ trace channel; "capacity to use direction" is decided by the hint arm (H2a,
 [PHASE_4.md]). (ii) "Closed" holds for in-context conditioning channels on
 Qwen2.5-Coder at 0.5–1.5B; weight-space (test-time training) and search-space
 channels were never enumerated, and family transfer is under audit (H1).]*
+**Phase 4 executed (2026-07-16, [PHASE_4.md]) — the two exposures closed in
+opposite directions.** The cross-family battery fired the retraction branches:
+F1's shallow tail and D2c's SINK are **Qwen2.5-Coder properties** — the SINK
+*inverts* on DeepSeek-Coder-1.3B and StarCoder2-3B, which benefit from the very
+conditioning that degrades Qwen on both the code and the natural-language
+channels (a measured double dissociation) — while the feasible region and the
+anchoring law's form generalize (the law is also metric-robust: it survives
+recomputation under structural AST distance). And the completed decomposition
+**reversed the capacity claim**: given approach-level hints (the missing Olausson
+rung; frozen and leakage-audited before any run), the same 1.5B model recovers
+**13 of 68** provably-unreachable problems against a calibrated floor of 2
+(p = 4.9 × 10⁻⁴, all recoveries validated), generating *off* the
+coverage-vs-distance curve — **the constraint was feedback content, not
+use-capacity**: traces carry no usable direction; stated approaches do.
+Deployability caveat, stated plainly: the hint is oracle-derived, and R3/BSF
+showed the model cannot produce hint-grade direction for itself — the bottleneck
+moves from "use" back to "production," which is Olausson's original localization,
+confirmed at 1/70th their scale.
 
 ---
 
@@ -1245,7 +1270,11 @@ failure, and MODELABS compresses the trace, so the arms bound the null at the
 **trace channel**, not at "use." The honest closing: direction *as any tested arm
 could carry it* went unused; whether stated approach-level direction (the Olausson
 oracle rung) crosses the boundary is H2a's hint arm ([PHASE_4.md]), the missing rung
-of this decomposition.]*
+of this decomposition.]* *[RESOLVED 2026-07-16 — it crosses: HINT-50 recovered
+13/68 against the calibrated floor of 2 (p = 4.9 × 10⁻⁴), generating off the
+coverage-vs-distance curve (§9.8). The elimination arc's true ending: direction
+works when it carries approach content; traces do not carry it; and the model
+cannot yet produce that content for itself.]*
 
 **The elimination argument's channel scope, stated (2026-07-16, Phase 4 H0c).**
 Undirected escape (E0/E1/E2), repulsive escape (E7), and directed escape (R3's
@@ -1319,6 +1348,16 @@ the named successor experiment, explicitly outside this record.
 > feasible region GENERALIZES (§9.2); SINK QWEN-SCOPED and inverted (§9.7); law
 > form GENERALIZES. Full table + prediction accounting [PHASE_4.md] H1 RESULT.
 > H2 (hint arm + near-miss band) frozen and running behind its manipulation gate.
+>
+> **H2 executed; PHASE 4 CLOSED (same day).** Gate HARM (hints depress Qwen
+> per-sample — Qwen-scoped per E-H2's DeepSeek dissociation); H2b: HINT > B1
+> inside the boundary (24→34, p = 0.015), TRACE null; amended stratum run:
+> **HINT crosses the boundary — 13 vs floor 2, p = 4.9 × 10⁻⁴, validated** —
+> "cannot use direction" retracted-as-overclaim (§9.8). Nothing is running.
+> Open decisions (the user's): paper stage; the H3 cross-scale fork + 7B spot
+> check (pre-registered, sign-off gated); TTT-on-the-stratum (named successor,
+> outside this record); self-generated-hint experiments (the production
+> bottleneck, §9.8); the r ∈ [0.05, 0.13) band.
 
 *(historical, 2026-07-15)*
 
@@ -1475,8 +1514,11 @@ beyond its competence, at either end of the deployability spectrum. *[AMENDED
 2026-07-16, H0b: "cannot use direction" over-reads — the arms bound the null at the
 trace channel (near-zero approach-level direction for structural failures); the
 use-capacity question is decided by H2a's hint arm ([PHASE_4.md]), the missing
-Olausson rung.]* r ≥ 0.15 is foreclosed; r ∈ [0.05, 0.13) stands unresolvable as
-pre-declared. All 19 recovery events rerun-stable; contamination date-flag uniform
+Olausson rung.]* *[DECIDED same day, §9.8: the hint arm crossed the boundary
+(B1 2 → HINT 13, p = 4.9 × 10⁻⁴, validated) — the null was the trace channel's;
+"cannot use direction" is retracted-as-overclaim.]* r ≥ 0.15 is foreclosed *[for
+the trace arms; the hint arm resolved it at r ≈ 0.19 — §9.8]*; r ∈ [0.05, 0.13)
+stands unresolvable as pre-declared. All 19 recovery events rerun-stable; contamination date-flag uniform
 (global LCB-vs-Qwen2.5 scope caveat, no arm-specific unlock pattern); the
 repeated-qid recoveries (abc314_a by all four easy arms) are the false-zero mechanism
 in the raw. **BEST-SO-FAR: the attractor cannot be aimed on this stack** — BEST
@@ -1505,6 +1547,65 @@ the anchor); **distribution-matching** predicts they degrade. Optional spot chec
 (not authorized by this pre-registration; costed separately): Qwen2.5-Coder-7B bf16
 on L4, one D2c cell + one TRACE cell — combined with H1 this de-confounds scale from
 family within one design. [PHASE_4.md] H3.
+
+
+### 9.8 Completing the decomposition — the hint arm and the near-miss band *(Phase 4 H2, 2026-07-16; [PHASE_4.md] H2)*
+
+The R3 null left an ambiguity the Olausson amendment (§11) named: no tested arm
+ever carried *approach-level* direction — traces are near-zero-direction for
+structural failures. H2 filled the missing rung with a **hint channel**: 125
+two-sentence approach hints, frontier-model-derived from problem statements alone
+(LCB has no reference solutions — deviation recorded), leakage-audited (no
+identifiers, no numerals, no code tokens; one drafting error caught by the hand
+audit), **frozen before the H1 battery reported** (commit `48987b8`).
+
+**The five results, in run order:**
+
+1. **Manipulation gate: HARM (the 70% pass-prediction was wrong).** On 20
+   mid-p̂ solvable problems, hints *depress* Qwen's per-sample pass 0.540 → 0.444
+   (p ≈ 0.007). Per pre-registration the stratum run was postponed, not
+   interpreted.
+2. **E-H2 (exploratory, pre-registered): the harm is Qwen's, not the channel's.**
+   The same hints, same scaffold, lift DeepSeek-Coder-1.3B 0.306 → 0.394
+   (p = 0.019). With H1's D2c inversion this completes a **double dissociation**:
+   Qwen degrades under conditioning of either kind (code −0.095, language −0.096)
+   on the same problems where DeepSeek benefits from both (+0.107, +0.088).
+   **Qwen2.5-Coder-specific conditioning degradation, now shown on two channels.**
+3. **Near-miss band (H2b): direction works inside the boundary — the 55%
+   favourite hit.** On 39 problems at x ∈ {1,2}/50, HINT-25 recovers **34 vs
+   B1's 24** (p = 0.015); TRACE-25 nulls (23, p = 0.77). The apparent
+   gate-contradiction resolved by a free decomposition: the manipulation set is
+   coverage-saturated (20/20 both arms) — the gate metric (per-sample quality)
+   was mis-specified against our own D2b law; on Qwen, hint-conditioning trades
+   per-sample quality for **directed coverage**.
+4. **Amended stratum run (new pre-registration, gate misfire documented):
+   branch (a), against the 45% on-floor favourite — approach-level direction
+   CROSSES the boundary.** On the 68-problem pass@50 = 0 stratum: **B1-50
+   recovered 2 (the W0c floor prediction, 2.01, hit exactly a second time);
+   HINT-50 recovered 13** (11 hint-only / 0 b1-only, p = 4.9 × 10⁻⁴; r ≈ 0.19,
+   above the declared 0.15 power line). Validation: 13/13 rerun-stable; 11/13
+   structurally novel vs the entire failure pool (≥ 0.17 normalized-AST);
+   recoveries skew to timeout-class failures (31% vs 13% base — hints fix
+   efficiency errors); and the mechanism is the one the frozen R3 spec demanded —
+   **HINT generated off the coverage-vs-PULL curve** (AST-PULL 0.427, beyond
+   B1's 0.375, at 6.5× floor coverage): relocated mass, not spread.
+5. **The trace channel works nowhere:** floor on the stratum (R3), null inside
+   the boundary (H2b) — while the hint channel works both sides. The direction
+   variable is **feedback content**, not use-capacity.
+
+**What this reverses, and what it doesn't.** The Phase-3b closing line — "the
+constraint is not the feedback channel but the model's ability to use it" — is
+**retracted-as-overclaim** (markers in §9.3.1/§9.7): at 1.5B, Qwen *uses*
+approach-level direction to reach a fifth of a stratum it provably cannot
+i.i.d.-sample. Olausson's bottleneck localization ("the model cannot produce
+accurate feedback") is confirmed one rung deeper and 70× smaller: what a 1.5B
+model cannot do is *produce* hint-grade direction from traces; given the
+direction, it executes. What does **not** reverse: the elimination argument's
+structure (undirected ≤ i.i.d.; repulsion inexpressible; direction the sole
+surviving channel — now with its existence proof), the register null, and every
+Qwen scope line from H1. The hint channel is oracle-fed by construction —
+deployable self-refinement still requires something that *generates* the hint,
+and R3/BSF showed this model cannot generate it for itself.
 
 ---
 
@@ -1654,7 +1755,11 @@ design constant. Each entry states (a) their setup specifics, (b) the delta to o
   ambiguous between "1.5B cannot use direction" and "no arm ever contained
   direction" until an approach-level hint arm (H2a, [PHASE_4.md]) fills the missing
   rung. The "cannot use direction" sentences in §9.3.1/§9.7 are scoped accordingly
-  (H0c).
+  (H0c). *Second outcome (2026-07-16, §9.8): the rung ran — hint-grade direction
+  recovers 13/68 against the calibrated floor of 2 (p = 4.9 × 10⁻⁴). Their
+  localization is confirmed one rung deeper and ~70× smaller: feedback*
+  production*, not use, is the bottleneck; the amendment above was the correct
+  call, made before the data.*
 - **Self-Debug (Chen et al.) → ABSTRACT-trace arm framing (W3).** (a) Gains measured
   against **greedy** (not compute-matched best-of-n), largest on
   near-correct-by-construction tasks (TransCoder, Spider) where errors are local; the
@@ -1681,6 +1786,10 @@ design constant. Each entry states (a) their setup specifics, (b) the delta to o
   wrong_answer artifacts (50% vs 76% stratum base) and over-represent runtime/timeout
   (50% vs 24%); their scale trend (≤ +5.5pp at 70B) is now the main reason the R3
   null is scoped to ≤ 1.5B rather than read as universal ([PHASE_3B.md] W4).*
+  *Second outcome (2026-07-16, §9.8): their error-type axis held with real n —
+  the hint arm's 13 stratum recoveries over-represent timeout-class failures
+  (31% vs 13% base): approach-level hints preferentially fix efficiency errors,
+  the class their taxonomy predicts responds to algorithmic guidance.*
 - **Tsui et al. (2025) → E7 prompt design (W1) — formalizing the existing
   reconciliation.** (a) Detection-axis result: models fail to notice their own errors;
   "Wait"-style prompts recover ~89% of the gap; instruct models, natural-language
@@ -1792,10 +1901,18 @@ W0–W3 pre-registrations, W4 verdicts) [artifacts/w0a_e0_anchor.json,
 w0b_copy_null.json, w0c_stratum_falsezero.json, dmeasure_e7.json (W1 branch (a)),
 phase3a_screen_lcb_r2_base_medium_T{08,12}.json (W2), r3_smoke.json,
 dmeasure_d2c_partial_credit.json (SINK), r3_conditional_reachability.json (NULL +
-recovery validation), bestsofar.json].
+recovery validation), bestsofar.json]; **Phase 4** ([PHASE_4.md] — charter,
+H0a/H1/H2 pre-registrations + results, E-H2, the amended H2a part 2, H3 frozen
+fork) [artifacts/h0a_ast_distance.json, h0a_d2a_ast_followup.json,
+h1_smoke_{deepseek,starcoder2}.json, h1_cross_family.json, h2_hints_frozen.json,
+h2_manip_check.json, h2_manip_check_deepseek.json, h2b_near_miss.json,
+h2a_hint_arm.json, h2a_rerun_stability.json, h2a_validation_struct.json].
 Scripts: [scripts/modal_rgr.py] (T4 verifier/retrain), [scripts/modal_phasem.py]
 (L4 gates + D-measure/D2a/E7), [scripts/modal_phase3a.py] (BigCodeBench screen + R2),
 [scripts/modal_lcb.py] (LiveCodeBench + Phase-3b W4: p3b_* entrypoints),
 [scripts/dmeasure_analysis.py] (D2b), [scripts/r1b2_analysis.py] (R1b.2a/b/c),
 [scripts/w0_recomputes.py] (W0a/b/c), [scripts/dmeasure_subset_control.py] (Addendum
-IV). Difficulty proxies [artifacts/phase0_difficulty_proxy.csv].*
+IV), [scripts/h0a_ast_distance.py] + [scripts/h0a_d2a_followup.py] (H0a),
+[scripts/modal_h1.py] (Phase 4 runner: H1 battery + H2 arms),
+[scripts/h2a_struct_validation.py] (H2a validation). Difficulty proxies
+[artifacts/phase0_difficulty_proxy.csv].*

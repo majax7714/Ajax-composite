@@ -1,0 +1,112 @@
+{
+  "_label": "H2a manipulation check [deepseek]",
+  "model": "deepseek-ai/deepseek-coder-1.3b-base",
+  "n_problems": 20,
+  "e0_mean_pass": 0.306,
+  "hint_mean_pass": 0.394,
+  "mean_uplift": 0.088,
+  "p_one_sided": 0.01929903504824759,
+  "gate": "PASS",
+  "per_problem": [
+    {
+      "qid": "abc302_a",
+      "e0": 0.04,
+      "hint": 0.48
+    },
+    {
+      "qid": "abc306_b",
+      "e0": 0.36,
+      "hint": 0.12
+    },
+    {
+      "qid": "abc307_a",
+      "e0": 0.12,
+      "hint": 0.32
+    },
+    {
+      "qid": "abc308_a",
+      "e0": 0.16,
+      "hint": 0.12
+    },
+    {
+      "qid": "abc312_a",
+      "e0": 0.6,
+      "hint": 0.68
+    },
+    {
+      "qid": "abc320_a",
+      "e0": 0.76,
+      "hint": 0.72
+    },
+    {
+      "qid": "abc320_b",
+      "e0": 0.24,
+      "hint": 0.6
+    },
+    {
+      "qid": "abc325_a",
+      "e0": 0.64,
+      "hint": 0.52
+    },
+    {
+      "qid": "abc327_a",
+      "e0": 0.08,
+      "hint": 0.04
+    },
+    {
+      "qid": "abc332_a",
+      "e0": 0.08,
+      "hint": 0.24
+    },
+    {
+      "qid": "abc333_a",
+      "e0": 0.36,
+      "hint": 0.48
+    },
+    {
+      "qid": "abc335_a",
+      "e0": 0.24,
+      "hint": 0.64
+    },
+    {
+      "qid": "abc336_a",
+      "e0": 0.04,
+      "hint": 0.0
+    },
+    {
+      "qid": "abc336_b",
+      "e0": 0.24,
+      "hint": 0.2
+    },
+    {
+      "qid": "abc337_a",
+      "e0": 0.4,
+      "hint": 0.52
+    },
+    {
+      "qid": "abc338_a",
+      "e0": 0.32,
+      "hint": 0.28
+    },
+    {
+      "qid": "abc338_b",
+      "e0": 0.4,
+      "hint": 0.48
+    },
+    {
+      "qid": "abc339_a",
+      "e0": 0.32,
+      "hint": 0.48
+    },
+    {
+      "qid": "abc340_b",
+      "e0": 0.6,
+      "hint": 0.72
+    },
+    {
+      "qid": "abc343_b",
+      "e0": 0.12,
+      "hint": 0.24
+    }
+  ]
+}

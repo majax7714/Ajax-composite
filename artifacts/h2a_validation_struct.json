@@ -1,0 +1,38 @@
+{
+ "arm_pull": {
+  "B1": {
+   "ast": 0.3745384803713945,
+   "lex": 0.8432796708104074
+  },
+  "HINT": {
+   "ast": 0.4267365761295388,
+   "lex": 0.8971988671259655
+  }
+ },
+ "novelty_min_ast_vs_failpool": {
+  "abc304_c": 0.404,
+  "abc305_c": 0.403,
+  "abc306_c": 0.233,
+  "abc309_d": 0.279,
+  "abc312_c": 0.118,
+  "abc325_c": 0.283,
+  "abc327_d": 0.281,
+  "abc328_c": 0.171,
+  "abc330_c": 0.221,
+  "abc330_d": 0.134,
+  "abc334_d": 0.234,
+  "abc340_c": 0.295,
+  "abc342_c": 0.291
+ },
+ "error_type": {
+  "stratum_base": {
+   "runtime": 7,
+   "wrong_answer": 52,
+   "timeout": 9
+  },
+  "recovered": {
+   "wrong_answer": 9,
+   "timeout": 4
+  }
+ }
+}

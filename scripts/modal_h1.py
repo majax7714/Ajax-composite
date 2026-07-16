@@ -638,6 +638,32 @@ def h2a_stratum(amended: bool = False):
 
 
 @app.local_entrypoint()
+def h2a_validate():
+    """Recovery validation for the amended stratum run: judge rerun on the
+    recovered problems' HINT rows (fresh tag), stability per recovery."""
+    res = json.loads((REPO / "runs/modal/h2a_res.json").read_text())
+    gen = json.loads((REPO / "runs/modal/h2a_cand.json").read_text())
+    n = 68
+    rec = json.loads((REPO / "artifacts/h2a_hint_arm.json").read_text())["recovered_qids"]["hint"]
+    sub = [(g["qid"], g["codes"]) for g in gen[n:] if g["qid"] in rec]
+    rr = _load("h2a_res_rerun") or _persist(
+        "h2a_res_rerun",
+        h1_lcb_exec.remote([q for q, _ in sub], [c for _, c in sub],
+                           tag="h2a_res_rerun", short_circuit=True))
+    first = {g["qid"]: row for g, row in zip(gen[n:], res[n:])}
+    stable = {}
+    for (qid, _), row2 in zip(sub, rr):
+        p1 = {i for i, r in enumerate(first[qid]) if r["passed"]}
+        p2 = {i for i, r in enumerate(row2) if r["passed"]}
+        stable[qid] = {"first_pass_idx": sorted(p1), "rerun_pass_idx": sorted(p2),
+                       "stable": bool(p1 & p2)}
+    ok = sum(1 for v in stable.values() if v["stable"])
+    print(f"rerun stability: {ok}/{len(stable)} recoveries reproduce")
+    (REPO / "artifacts/h2a_rerun_stability.json").write_text(
+        json.dumps(stable, indent=1))
+
+
+@app.local_entrypoint()
 def h2b_band():
     """H2b near-miss band: 39 problems x {B1-25, TRACE-25, HINT-25}, all fresh."""
     fz = _h2_frozen()

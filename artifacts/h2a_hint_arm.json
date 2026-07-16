@@ -1,0 +1,31 @@
+{
+  "_label": "H2a stratum arm \u2014 HINT-50 vs fresh B1-50, medium 0/50 [PHASE_4.md H2a]",
+  "n": 68,
+  "b1_recoveries": 2,
+  "hint_recoveries": 13,
+  "hint_only": 11,
+  "b1_only": 0,
+  "p_one_sided_mcnemar": 0.00048828125,
+  "recovered_qids": {
+    "b1": [
+      "abc312_c",
+      "abc328_c"
+    ],
+    "hint": [
+      "abc304_c",
+      "abc305_c",
+      "abc306_c",
+      "abc309_d",
+      "abc312_c",
+      "abc325_c",
+      "abc327_d",
+      "abc328_c",
+      "abc330_c",
+      "abc330_d",
+      "abc334_d",
+      "abc340_c",
+      "abc342_c"
+    ]
+  },
+  "floor_reference_W0c": 2.0
+}
