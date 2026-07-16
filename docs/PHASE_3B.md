@@ -348,3 +348,153 @@ collapse — a mechanism note feeding the "what does instruct-tuning suppress"
 want-to-see. Stratum ≥ 60 (~40% odds) **CORRECT** (68); richness intact (~70%)
 **CORRECT** (97%); T=1.2 direction **CORRECT**, magnitude far beyond expectation
 (competence cliff).
+
+---
+
+## W3 — THE FROZEN 3b PRE-REGISTRATION (2026-07-15; committed before any W4 run)
+
+*Everything below is fixed. W4 runs it without new design decisions; deviations require
+an appended amendment with its own date and rationale, never an edit.*
+
+### 0. Config freeze
+
+**Generator:** Qwen/Qwen2.5-Coder-1.5B (base, fenced-completion path, smoke-validated
+in R2), **T = 0.8, top_p = 1.0, seed 17, max_tokens 1536**. **Judge:** the hardened
+all-case subprocess judge (unchanged from R2/W2). **No learned verifier anywhere**
+(H1-kill propagation): every selection is likelihood-free — execution frac_tests
+(oracle-first where stated) or nothing. **Benchmarks:** LCB-easy base T=0.8 pool
+(coverage-dominant cell: pass@8 0.566 / headroom +0.197 — D2c/E6, BEST-SO-FAR, R3
+exploratory arm) + LCB-medium base T=0.8 (R3 primary stratum, n=68). **The flagged
+config tension is resolved by W2's power check:** no easy stratum is viable as a
+primary instrument at any temperature (power ≤ 0.25 at r = 0.40), so the smallest-easy-
+stratum objection to base T=0.8 is moot; the medium stratum from the *same* frozen
+config is the primary instrument.
+
+### 1. R3 — conditional reachability, four arms (the Olausson decomposition)
+
+**Strata.** Primary: medium-stratum, **n = 68** (pass@50 = 0 in the committed base
+T=0.8 medium pool). Exploratory (unpowered, reported as such): easy-stratum, **n = 19**.
+Analyzed separately; **no pooling** (pooling was not pre-registered and stays out).
+
+**Per-problem artifact** (fixed rule): the committed pool candidate with the highest
+frac_tests (ties → lowest candidate index). Problems whose candidates are all
+frac = 0 use candidate index 0. **Trace capture** (one re-execution of the 87
+artifacts, remote): first failing test case → (case index, stdin, expected output,
+actual output/error), each field truncated to 512 chars.
+
+**Arms** (each: 50 fresh draws/problem at the frozen sampling config; context inserted
+before the final ` ```python ` fence of the base prompt):
+
+- **B1-50** — no context (fresh i.i.d. control; the W0c/W2 floor: E ≈ 2.0 lucky
+  recoveries on the medium stratum, ≈ 3.6 on easy).
+- **ANCHOR** — "A previous attempt:" + artifact code + "This attempt failed {n_failed}
+  of {n_tests} tests. Write a corrected complete program."
+- **ABSTRACT-trace** — *no code.* "A previous attempt failed {n_failed} of {n_tests}
+  tests. First failing test: input / expected output / actual output" (verbatim
+  templated trace) + "Write a correct complete program." The feedback **ceiling**: no
+  model in the loop.
+- **ABSTRACT-model** — *no code.* The same trace given to
+  Qwen2.5-Coder-1.5B-**Instruct** (same family — deployable, no oracle) with: "In 2–4
+  sentences, state what is wrong with the approach and what a correct approach must do
+  differently. Do not write code." (T=0, ≤160 tokens, code fences stripped); its output
+  replaces the raw trace in the prompt. The **deployable channel**: measures whether
+  1.5B-generated direction retains the trace's value (Olausson ledger entry).
+
+**Smoke gate (pre-registered, before the full run):** 8 medium-stratum problems × 4
+arms × 8 draws — well-formed code ≥ 85%, degenerate ≤ 10%; formatting fixes are
+plumbing and re-smoke; any semantic change is an amendment.
+
+**Recovery** = ≥ 1 of the 50 draws passes all tests. **PULL is recorded for every R3
+generation** (edit-similarity vs the artifact code, all four arms including B1-50 —
+B1-50's PULL is the stratum's i.i.d. anchor), so the off-the-curve prediction is
+placeable either way.
+
+**Decision rules (frozen):**
+- **Primary:** ABSTRACT-trace > B1-50, **paired one-sided exact McNemar on the
+  medium stratum, α = 0.05**. Null floor stated: ≈ 2.0 lucky B1-50 recoveries (3%/
+  problem). **Power envelope declared: 80% power only at r ≳ 0.17 (73% at r = 0.15,
+  92% at r = 0.20). A null forecloses r ≳ 0.15 at this scale/config; r ∈ [0.05, 0.13)
+  is unresolvable by this design — pre-declared, not spun.**
+- **Secondary:** ABSTRACT-model vs ABSTRACT-trace (paired; the "can the model make its
+  own direction" gap); ABSTRACT-* vs ANCHOR (the law's prediction: direction beats
+  proximity); all four arms' PULL/coverage points placed on the central figure.
+- **Off-the-curve mechanism prediction:** on a pass@50 = 0 stratum, spread cannot land
+  where i.i.d. never lands — R3 success requires **relocating per-sample mass**
+  (breaking D2b flatness). A *successful* ABSTRACT-trace sits **off** the
+  coverage-vs-PULL curve: PULL comparable to E1/E2 cells, coverage above the law's
+  line.
+- **Recovery validation protocol** (every stratum recovery): (a) judge **rerun**
+  (flakiness exclusion); (b) **contamination audit** — LCB contest date vs the base
+  model's plausible training window (flag pre-2025 problems as contamination-possible;
+  LCB's own control is dated against instruct releases, not our exposure) + AST-level
+  dissimilarity of the recovery vs the problem's 50 failed pool draws (a recovery
+  shaped like the failures is in-distribution generation, not memorization); classify
+  "memorization-unlocked-by-feedback" separately — reportable, different claim;
+  (c) **error-type stratification** (How-Many-Tries ledger check): classify each
+  stratum artifact wrong_answer vs runtime; prediction below.
+
+**Predictions with odds (recorded at freeze):**
+- ABSTRACT-trace significant at α = 0.05 on medium (r ≳ 0.15): **15%**;
+  positive-but-unresolvable (net delta > 0, p ≥ 0.05): **45%**; ≈ 0 or negative:
+  **40%**. (The trace is oracle-grade, but the binding constraint is 1.5B competence
+  on medium — W2 measured pass@8 0.048.)
+- ANCHOR ≤ B1-50 on medium (the law: proximity without direction buys nothing on a
+  0/50 stratum): **75%**.
+- ABSTRACT-model ≤ ABSTRACT-trace: **80%** (1.5B interpretation degrades the raw
+  signal).
+- Conditional: *if* ABSTRACT-trace fires significant, its point sits off the curve:
+  **70%**.
+- Error-type check: recoveries (any arm) skew toward runtime-error artifacts over
+  wrong_answer artifacts: **60%**.
+
+### 2. D2c/E6 — partial-credit conditioning (the BEST-SO-FAR premise test; runs first)
+
+**Problem set (fixed):** the **44** easy-pool problems holding ≥ 1 candidate in the
+40–60% frac band ([artifacts/w0b_copy_null.json]). **Artifact:** the band candidate
+with frac closest to 0.5 (ties → lowest index). **Generation:** 8 draws/problem,
+frozen sampling config, framing: "A previous attempt:" + code + "This attempt passed
+{n_passed} of {n_tests} tests. Improve it so that all tests pass."
+
+**Metrics & nulls (from W0b):** paired per-problem mean frac(gen) vs (i) **copy-null**
+f_a and (ii) **i.i.d.-null** (that problem's pool mean frac). Copy-fidelity
+(PULL vs artifact) is recorded — the 83–98% fidelity regime was measured on
+HumanEval/instruct, not LCB/base; if fidelity here is materially lower, that is
+reported alongside (the nulls stand as frozen; the fidelity number contextualizes).
+
+**Verdict branches (frozen):** **CLIMB** — Wilcoxon one-sided p < 0.05 over copy-null
+AND over i.i.d.-null → the attractor does more than copy; BEST-alone is alive and
+BEST-SO-FAR is a bigger result than scoped (**~20%**). **FLAT** — neither cleared →
+BEST-alone dead (hold-at-best confirmed); BEST+ABSTRACT carries the phase (**~65%**).
+**SINK** — significantly below copy-null → conditioning on partials is actively
+harmful (**~15%**).
+
+### 3. BEST-SO-FAR — aim the attractor at a success (runs last)
+
+**Problem set (fixed):** the **30** easy-pool problems whose first-8 committed
+candidates contain no pass and ≥ 1 partial (the refinement regime, selection from the
+committed pool only). **Conditions** (single-step, 8 fresh draws each, matched
+compute; history = the problem's first-8 committed candidates): **B1** (no context) /
+**LAST** (candidate #8) / **BEST** (highest-frac of first 8, oracle-selected by
+frac_tests) / **ABSTRACT** (trace of BEST's first failing test, no code) /
+**BEST+ABSTRACT** (BEST's code + that trace). **Metrics:** primary any-pass coverage
+of the 8 draws, paired vs B1; secondary mean frac(gen). **Predictions** (Addendum III
+§5 revised table, stands): BEST > LAST **80%**; BEST ≈ B1 hold-at-best; ABSTRACT >
+BEST **60%**; BEST+ABSTRACT the top condition **55%**. D2c gates interpretation, not
+execution: if D2c lands FLAT/SINK, BEST-alone's null is *expected*, and BEST+ABSTRACT
+is the phase's live condition. Recoveries validated per the R3 protocol (rerun +
+contamination; these are 0-of-8 problems, not 0-of-50, so the false-zero caveat is
+stated with the result).
+
+### 4. W4 execution order, budget, and hygiene
+
+Smoke gate → **D2c/E6** (44 × 8 = 352 gens) → **R3** (4 arms × 87 problems × 50 =
+17,400 gens + 87 trace captures + 87 abstractions) → **BEST-SO-FAR** (5 × 30 × 8 =
+1,200 gens). Judging via the hardened judge; every stage persists its generation pool
+before judging (outage insurance); all launches `modal run --detach` per the §8
+operational ledger. Estimated GPU: ~2–4 L4-hours total. Artifacts:
+`artifacts/r3_smoke.json`, `artifacts/dmeasure_d2c_partial_credit.json`,
+`artifacts/r3_conditional_reachability.json`, `artifacts/bestsofar.json`; pools under
+`runs/modal/r3_*`, `runs/modal/d2c_*`, `runs/modal/bsf_*`.
+
+**Writeup destinations:** D2c → §9.3.1/§9.4 append; R3 → new §9.7 (the phase verdict);
+BEST-SO-FAR → §9.4 append; every outcome with its prediction accounting.

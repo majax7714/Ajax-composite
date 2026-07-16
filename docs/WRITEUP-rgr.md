@@ -1194,6 +1194,28 @@ richness 64%) — the competence cliff W1 met at T=1.5 on HumanEval arrives at T
 medium: **the escape-distance law's temperature boundary descends with difficulty.**
 [artifacts/phase3a_screen_lcb_r2_base_medium_T{08,12}.json].
 
+### 9.7 Phase 3b — the frozen pre-registration *(W3, 2026-07-15; verdicts land here as W4 executes)*
+
+The full frozen text is [PHASE_3B.md] W3; the load-bearing content: **Config** — base
+Qwen2.5-Coder-1.5B, fenced completion, T=0.8, top_p 1.0, seed 17, hardened judge, no
+learned verifier anywhere. **R3** — four arms on the medium stratum (n=68; easy n=19
+exploratory-only): B1-50 / ANCHOR / **ABSTRACT-trace** (templated execution feedback,
+no model in the loop — the ceiling arm without which a null is ambiguous, per the
+Olausson ledger entry) / **ABSTRACT-model** (1.5B-Instruct compresses the same trace —
+the deployable channel). Primary contrast: ABSTRACT-trace > B1-50, paired exact
+McNemar, α=0.05, null floor ≈2.0 lucky recoveries stated; **power envelope declared:
+a null forecloses r ≳ 0.15, r ∈ [0.05, 0.13) pre-declared unresolvable.** PULL
+recorded for every generation; a *successful* trace arm must sit **off** the
+coverage-vs-PULL curve (relocated mass, not spread — the only mechanism a 0/50 stratum
+admits). Every recovery: judge rerun + contamination audit (contest-date vs base-model
+exposure + AST dissimilarity vs the failure pool) + error-type stratification.
+**Key odds:** ABSTRACT-trace significant 15% / positive-unresolvable 45% / null 40%;
+ANCHOR ≤ B1-50 75%; ABSTRACT-model ≤ ABSTRACT-trace 80%. **D2c/E6** (runs first): 44
+problems, artifact = band candidate nearest frac 0.5, verdict = CLIMB ~20% / FLAT ~65%
+/ SINK ~15% against the W0b copy-null and i.i.d.-null. **BEST-SO-FAR** (runs last): 30
+refinement-regime problems, five conditions, oracle-first by frac_tests; Addendum III
+§5 predictions stand.
+
 ---
 
 ## 10. Working method — how this project reasons *(read first in any new conversation)*
