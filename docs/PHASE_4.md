@@ -506,6 +506,28 @@ manipulation-check failure (pre-stated: a HINT null in the band says nothing abo
 direction-use; a HINT *win* against a channel that harms on solvable problems
 would be anomalous and would be chased).
 
-*(E-H2 and H2b results land below.)*
+### E-H2 RESULT (2026-07-16) — **branch (a), the 60% favourite: the harm is Qwen's, not the channel's**
+
+Same 20 problems, same frozen hints, same scaffold: DeepSeek-Coder-1.3B-base goes
+**0.306 → 0.394** under the hint arm (mean Δ **+0.088**, one-sided p **0.019**;
+12 problems up / 8 down). The hint channel and prompt format are sound.
+[artifacts/h2_manip_check_deepseek.json].
+
+**The double dissociation, stated (all cells: same artifacts/hints, same scaffold,
+same judge, seed 17):**
+
+| conditioning content | Qwen2.5-Coder-1.5B | DeepSeek-Coder-1.3B |
+|---|---|---|
+| partial-credit code (D2c) | **−0.095** (SINK, p ≈ 5e-5) | **+0.107** (climb, p ≈ 0.003) |
+| approach hint, no code (manip set) | **−0.096** (HARM, p ≈ 0.007) | **+0.088** (lift, p ≈ 0.019) |
+
+**Qwen2.5-Coder degrades under prompt-space conditioning of either kind — code or
+correct natural language — on the same problems where a smaller organic-corpus
+model benefits from both.** The refinement-null platform (Phases 3–3b) was
+measured on the one family that responds to conditioning by degrading. Licensed
+reading only: the H2a harm is Qwen-scoped conditioning degradation (reading (i));
+n = 20 and one alternative family — no stronger generalization is claimed.
+
+*(H2b result lands below.)*
 
 ---
