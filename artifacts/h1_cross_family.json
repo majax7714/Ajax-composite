@@ -1,0 +1,74 @@
+{
+  "_label": "H1 \u2014 cross-family battery results [PHASE_4.md H1]",
+  "families": {
+    "deepseek": {
+      "model": "deepseek-ai/deepseek-coder-1.3b-base",
+      "lcb_easy": {
+        "pass@1": 0.158,
+        "pass@8": 0.401266764449471,
+        "pass@50": 0.6375,
+        "headroom": 0.23623323555052894
+      },
+      "bcb": {
+        "pass@1": 0.1293,
+        "pass@8": 0.35832288508771953,
+        "pass@50": 0.535,
+        "headroom": 0.1766771149122805
+      },
+      "d2c": {
+        "e0_mean_frac_iid_null": 0.3618037265764538,
+        "e1_mean_frac_conditioned": 0.4684288880311608,
+        "copy_null_artifact_frac": 0.49448897062533426,
+        "delta_conditioned_minus_iid": 0.10662516145470691,
+        "p_one_sided_sink": 0.9968501574921254,
+        "e0_anchor_pull": 0.8151167181338614,
+        "e1_conditioned_pull": 0.18068979822684755,
+        "form_holds_pull": true
+      }
+    },
+    "starcoder2": {
+      "model": "bigcode/starcoder2-3b",
+      "lcb_easy": {
+        "pass@1": 0.171,
+        "pass@8": 0.4679329951703239,
+        "pass@50": 0.7,
+        "headroom": 0.23206700482967607
+      },
+      "bcb": {
+        "pass@1": 0.0285,
+        "pass@8": 0.15768834512231023,
+        "pass@50": 0.41,
+        "headroom": 0.25231165487768975
+      },
+      "d2c": {
+        "e0_mean_frac_iid_null": 0.35849789415130323,
+        "e1_mean_frac_conditioned": 0.40469650299195753,
+        "copy_null_artifact_frac": 0.49448897062533426,
+        "delta_conditioned_minus_iid": 0.04619860884065429,
+        "p_one_sided_sink": 0.8548572571371431,
+        "e0_anchor_pull": 0.8253508135766787,
+        "e1_conditioned_pull": 0.31430193775733367,
+        "form_holds_pull": true
+      }
+    }
+  },
+  "qwen_reference": {
+    "lcb_easy": {
+      "pass@8": 0.5658,
+      "pass@50": 0.7625,
+      "headroom": 0.1967
+    },
+    "bcb": {
+      "pass@8": 0.328,
+      "pass@50": 0.425,
+      "headroom": 0.097
+    },
+    "d2c": {
+      "e1_conditioned_frac": 0.374,
+      "qwen_iid_null": 0.468,
+      "copy_null": 0.494,
+      "e0_anchor_pull": 0.774,
+      "e1_conditioned_pull": 0.43
+    }
+  }
+}

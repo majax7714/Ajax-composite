@@ -45,6 +45,21 @@ banner pointing into §9.*
 > conditioning channels* — weight-space (test-time training) and search-space
 > (feedback-guided search, multi-model sampling) channels were never in its
 > enumeration.
+>
+> **H1 verdicts (2026-07-16, same day — the battery ran; [PHASE_4.md] H1 RESULT).**
+> The audit **fired**. Per-finding scope lines, now measured: **F1 (BCB shallow
+> tail): QWEN-SCOPED, retracted** — DeepSeek-Coder-1.3B shows headroom +0.177 at
+> in-band coverage (the pre-committed retraction condition verbatim; it would have
+> *passed* the Phase-3a gate), StarCoder2-3B +0.252; the ~0.10 cap reproduces on
+> neither family (§7.3). **Feasible region: GENERALIZES** — both families exceed
+> Qwen's LCB-easy headroom (+0.236/+0.232 vs +0.197; §9.2). **SINK: QWEN-SCOPED
+> and INVERTED** — the same artifacts *lift* both families above their own i.i.d.
+> (+0.107 significant / +0.046 n.s.); what generalizes is the *blend toward the
+> artifact*; Qwen's below-both-nulls sink is a family-specific degradation that
+> distribution-matching does not explain (§9.7). **The anchoring law's form:
+> GENERALIZES** — conditioning pulls generations deep into the artifact's
+> neighborhood on all three families. One line: the negative *platform* claims
+> were a portrait of Qwen2.5-Coder; the *mechanism* is family-general.
 
 We test one claim in isolation: that an explicit internal state vector — a
 *register* — updated across refinement steps and gating generation improves
@@ -636,7 +651,19 @@ band** pass@8 ∈ [0.30, 0.60], **reachable headroom** pass@50 − pass@8 ≥ 0.
 three has correct-but-improbable solutions the model can be *steered* toward, and a
 rich enough error signal to steer with.
 
-### 7.3 Finding F1 — function-call benchmarks have a shallow reachable tail
+### 7.3 Finding F1 — function-call benchmarks have a shallow reachable tail **[RETRACTED-AS-QWEN-SCOPED 2026-07-16 — Phase 4 H1]**
+
+> **Retraction (2026-07-16, [PHASE_4.md] H1 RESULT).** The pre-registered
+> cross-family retraction branch fired **verbatim**: on the same 200-problem
+> BCB-Complete subset, same judge, seed 17, DeepSeek-Coder-1.3B-base shows
+> pass@8 0.358 → pass@50 0.535 (**headroom +0.177 at in-band coverage** — it
+> would have *passed* the Phase-3a gate this section says nothing can pass), and
+> StarCoder2-3B shows 0.158 → 0.410 (headroom +0.252, below-band coverage). The
+> ~0.09–0.12 cap reproduces on neither family. Everything measured below stands
+> **as a fact about Qwen2.5-Coder (0.5–1.5B)**: its function-call tail is
+> shallow; the task family's is not. The "property of the whole task family"
+> reading — and the AlphaCode tension it created — is resolved against F1's
+> general form (§11 ledger).
 
 BigCodeBench (1140 problems, ~5 unittest methods each — the richest feedback of the
 function-call benchmarks) was the lead candidate. It fails, and the failure is
@@ -738,7 +765,12 @@ register null: HumanEval had no headroom (pass@8 0.85) — and it turns out *no*
 code benchmark at 0.5–1.5B (Qwen2.5-Coder) has enough. The register experiment was
 starved of runway not by an unlucky benchmark choice but by a property of the whole
 task family *(as sampled by this family — the AlphaCode tension and the cross-family
-check are [PHASE_4.md] H1 cell (i))*.
+check are [PHASE_4.md] H1 cell (i))*. *[H1 RESOLVED 2026-07-16: the check fired —
+"property of the whole task family" is **retracted**; it is a property of
+Qwen2.5-Coder. Both audit families show headroom ≥ 0.15 on BCB and ≥ 0.23 on
+LCB-easy; the starved-runway account of the register null stands for the stack the
+register ran on, but the task family itself has runway off-Qwen (§7.3 banner,
+[PHASE_4.md] H1).]*
 
 **The fork (a decision for the next stage), and why F2 is the useful output.** Per the
 pre-registration, a benchmark clearing the gate does not exist at this scale, so 3b/3c
@@ -988,7 +1020,11 @@ rescoped:** F1 — the function-call family's shallow tail — is now *decoding-
 (BigCodeBench infeasible even fully un-suppressed); the honest replacement statement is
 *"reachable headroom at 0.5–1.5B (Qwen2.5-Coder — H0c scope, pending H1) exists on
 competitive stdin/stdout benchmarks under un-suppressed sampling, and does not exist
-for function-call benchmarks at any tested decoding."* Prediction accounting: the pre-registered phase-level call ("at least one
+for function-call benchmarks at any tested decoding."* *[H1 RESOLVED 2026-07-16: the
+first clause **GENERALIZES** — DeepSeek-Coder-1.3B and StarCoder2-3B both clear
+headroom ≥ 0.15 on LCB-easy (+0.236/+0.232), each wider than Qwen's +0.197; Qwen has
+the least runway of the three. The second clause is **QWEN-SCOPED** — both families
+show BCB headroom ≥ 0.177 (§7.3 retraction banner). [PHASE_4.md] H1.]* Prediction accounting: the pre-registered phase-level call ("at least one
 point clears → F2 retracted") was **correct**; the named clearing point (base BCB
 ~T=1.0) was **wrong** — BCB's trade-off has no feasible point, and the clearing came on
 LCB-easy, whose higher coverage floor lets temperature buy tail depth without leaving
@@ -1278,6 +1314,11 @@ the named successor experiment, explicitly outside this record.
 > repositioning, elimination-argument channel scope (abstract banner, §9.3.1, §9.7);
 > H3 cross-scale fork pre-registered (§9.7 addendum). Next in order: H1 cross-family
 > battery (DeepSeek-Coder-1.3B, StarCoder2-3B) → H2 hint arm + near-miss band.
+>
+> **H1 executed (same day).** Verdicts: F1 QWEN-SCOPED (retracted, §7.3 banner);
+> feasible region GENERALIZES (§9.2); SINK QWEN-SCOPED and inverted (§9.7); law
+> form GENERALIZES. Full table + prediction accounting [PHASE_4.md] H1 RESULT.
+> H2 (hint arm + near-miss band) frozen and running behind its manipulation gate.
 
 *(historical, 2026-07-15)*
 
@@ -1412,7 +1453,18 @@ ledger) — the extension is the compute-matched, execution-quantified below-bot
 result. Two causal stories fit it — SINK-as-capacity ("cannot use the anchor") and
 SINK-as-distribution-matching ("faithfully continues the quality register") — with
 opposite scale predictions; this record cannot distinguish them; the H3 addendum
-below pre-registers the discriminating fork.]* **R3: NULL at declared power** (medium, primary): B1-50 recovered exactly 2 —
+below pre-registers the discriminating fork.]* *[AMENDED same day — H1 measured it
+across families and the SINK **INVERTED**: on the same 44 artifacts, same judge,
+conditioning lifts DeepSeek-Coder-1.3B **above** its own i.i.d. (0.468 vs 0.362,
+a significant climb, p ≈ 0.003) and StarCoder2-3B likewise (+0.046 n.s.), both
+landing between own-iid and the artifact — the imitation/blend story, working as
+Codex predicts. Qwen alone lands **below both nulls**. So the "replication" framing
+over-credited the precedent: quality-matching explains the cross-family *blend*,
+not Qwen's sink — for Qwen, whose i.i.d. (0.468) ≈ artifact (0.494), imitation
+predicts *no change*, yet it degraded to 0.374. **SINK is a Qwen2.5-Coder-specific
+conditioning degradation**, and H3's fork is partially pre-empted: the
+distribution-matching account already fails to explain the one family that sinks.
+[PHASE_4.md] H1 RESULT.]* **R3: NULL at declared power** (medium, primary): B1-50 recovered exactly 2 —
 the W0c floor prediction to the decimal — and every arm sits on the floor (ANCHOR 2,
 TRACE 1, MODELABS 3; TRACE vs B1 p = 0.875 — and **MODELABS 3 vs TRACE 1 is floor
 noise, p = 0.875: it supports no compression-helps reading**). The PULL column
@@ -1657,7 +1709,11 @@ design constant. Each entry states (a) their setup specifics, (b) the delta to o
   *below both* the artifact's own frac and the i.i.d. baseline, quantified with a
   copy-null. **Does not license:** treating SINK as novel, or importing their
   "capable of better" interpretation — that is exactly the capacity-vs-
-  distribution-matching ambiguity H3 pre-registers (§9.7 addendum).
+  distribution-matching ambiguity H3 pre-registers (§9.7 addendum). *Outcome
+  (2026-07-16, H1): the precedent predicted the wrong thing for the wrong family —
+  quality-matching explains the cross-family **blend** (both audit families climb
+  toward the artifact's quality), but not Qwen's below-both-nulls sink; the SINK
+  repositioning is amended in §9.7 — Qwen-specific degradation, not replication.*
 - **The inverse-scaling reading of Codex's buggy-prompt result → H3's cross-scale
   pre-registration.** (a) The buggy-vs-clean completion-quality gap *grows with model
   size*; proposed mechanism is imitation — in pretraining data, buggy code is
@@ -1669,7 +1725,12 @@ design constant. Each entry states (a) their setup specifics, (b) the delta to o
   (per "How Many Tries"' scale trend); the two open-scale axes point in opposite
   directions, which is the discriminating test between SINK-as-capacity and
   SINK-as-distribution-matching. **Does not license:** any magnitude, or running the
-  test without a sign-off (H3 is pre-registration-only in Phase 4).
+  test without a sign-off (H3 is pre-registration-only in Phase 4). *Outcome note
+  (2026-07-16, H1): partially pre-empted — the cross-family D2c cell already shows
+  distribution-matching failing to explain Qwen's sink (it predicts no-change for
+  Qwen, which sank; it predicts the blend elsewhere, which held). The H3 fork
+  stands for the scale axis; its SINK-discrimination leg now tests a narrower
+  question: whether Qwen's anomalous sink deepens or dissolves with scale.*
 - **Spurious Rewards (arXiv 2506.10947) + contamination follow-up (2507.10532) →
   H1's existence.** (a) RLVR on Qwen2.5-Math with *random* rewards nearly matched
   ground-truth rewards — driven by Qwen-specific pretraining priors (code-reasoning
@@ -1684,7 +1745,11 @@ design constant. Each entry states (a) their setup specifics, (b) the delta to o
   **mandatory audit** (H1's cross-family battery), not a limitation paragraph; and
   H0c's interim rescoping of every "at this scale" to "on Qwen2.5-Coder at this
   scale" until H1 reports. **Does not license:** assuming our findings *fail* to
-  transfer — that is what H1 measures, with per-finding branches and odds.
+  transfer — that is what H1 measures, with per-finding branches and odds. *Outcome
+  (2026-07-16, H1): the precaution was warranted in full — two of four findings
+  (F1's shallow tail, D2c's SINK) were Qwen properties, one inverted outright; the
+  feasible region and the anchoring law's form generalize. The record avoided
+  exactly the Spurious-Rewards failure it feared, by measuring instead of assuming.*
 - **AlphaCode (Li et al., 2022) → tail-structure scoping (H1 cell (i)).** (a) Deep
   pass@k tails on competitive programming with large-scale sampling: solve rates
   climb steadily with k (to k = 10⁵–10⁶) and with scale, on organically-trained
@@ -1697,7 +1762,10 @@ design constant. Each entry states (a) their setup specifics, (b) the delta to o
   comparison points. **Does not license:** expecting AlphaCode-scale tails at 1.3–3B,
   or reading a Qwen-scoped F1 as a training-data *mechanism* claim — H1 scopes
   findings; it does not isolate the synthetic-data variable (confounds recorded in
-  the H1 pre-registration).
+  the H1 pre-registration). *Outcome (2026-07-16, H1): the tension resolved in
+  AlphaCode's favor — both organic-corpus families show deep reachable tails on
+  BCB (headroom +0.177/+0.252) and LCB-easy; F1 retracted-as-Qwen-scoped (§7.3).
+  The synthetic-data *mechanism* remains unisolated, as pre-declared.*
 
 *Appendix pointers. Architecture [ARCHITECTURE.md]; decision log **D1–D16**
 [DECISIONS.md] (D11 precision, D14 statistical reproducibility, D15 retracted, D16 =

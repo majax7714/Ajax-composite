@@ -324,7 +324,64 @@ the frozen implementations, marked); model download via a hub-online function
 $8–15 total. Cost note per §8-5: LCB pass@k judging short-circuits; all-cases
 judging only on the 44 × 16 cell.
 
-*(H1 RESULT lands below this line after the run.)*
+### H1 RESULT (2026-07-16) — **the catastrophic-loss test fired: the platform
+negatives were Qwen properties; the mechanism's form generalizes**
+
+Smoke gates: both families PASS on the frozen scaffold, zero template fixes
+(deepseek wf 1.00/dg 0.00/frac 0.334; starcoder2 1.00/0.00/0.331).
+[artifacts/h1_smoke_{deepseek,starcoder2}.json].
+
+| cell | Qwen2.5-Coder-1.5B | DeepSeek-Coder-1.3B | StarCoder2-3B |
+|---|---|---|---|
+| LCB-easy pass@8 → pass@50 (headroom) | 0.566 → 0.763 (+0.197) | 0.401 → 0.638 (**+0.236**) | 0.468 → 0.700 (**+0.232**) |
+| BCB pass@8 → pass@50 (headroom) | 0.328 → 0.425 (+0.097) | 0.358 → 0.535 (**+0.177**) | 0.158 → 0.410 (**+0.252**) |
+| D2c conditioned vs own-iid (Δ, p_sink) | 0.374 vs 0.468 (**−0.095**, p≈5e-5 SINK) | 0.468 vs 0.362 (**+0.107**, p_sink 0.997) | 0.405 vs 0.358 (+0.046, p_sink 0.855) |
+| E1 PULL vs E0 anchor | 0.430 / 0.774 | 0.181 / 0.815 | 0.314 / 0.825 |
+
+**Per-finding scope lines (binding; the writeup carries each):**
+
+1. **F1 (BCB shallow tail): QWEN-SCOPED — retraction branch fired exactly as
+   registered.** DeepSeek shows headroom 0.177 ≥ 0.15 *at in-band coverage*
+   (pass@8 0.358 ∈ [0.30, 0.60]) — the pre-committed retraction condition
+   verbatim; StarCoder2 adds headroom 0.252 (below band, pass@8 0.158, marginally
+   informative). The ~0.09–0.12 cap reproduces on **neither** family. Prediction
+   accounting: the 60% favourite (cap reproduces on both) was **wrong**; the 10%
+   both-families branch hit. F1's "task-family property" language is retracted in
+   place (§7.3); on DeepSeek-1.3B, BCB-Complete would have **passed** the
+   Phase-3a gate.
+2. **Feasible region: GENERALIZES** — both families clear headroom ≥ 0.15 on
+   LCB-easy, each *wider* than Qwen's. The 25% both-families branch hit. The
+   runway finding is real and family-general; Qwen has the *least* of it.
+3. **SINK: QWEN-SCOPED — and it INVERTS.** The one cell where the literature made
+   the call went the other way: conditioning on the same ~0.49-frac artifacts
+   *lifts* both families above their own i.i.d. (DeepSeek +0.107 — a significant
+   CLIMB, p ≈ 0.003; StarCoder2 +0.046 n.s.), landing between own-iid and the
+   artifact. The 85% directional-replication prediction was **wrong** — the
+   pre-named "surprise worth chasing." Mechanistic re-read, stated carefully:
+   what is universal is the **blend** — conditioned generation is pulled toward
+   the artifact (form line below) and lands near a mixture of own-ability and
+   artifact quality. For families whose i.i.d. sits *below* the artifact
+   (0.36 < 0.49), imitation is an upgrade — exactly the Codex quality-matching
+   story. For Qwen, whose i.i.d. (0.468) ≈ artifact (0.494), quality-matching
+   predicts *no change*; instead Qwen landed **below both nulls** (0.374). **The
+   sink is not explained by distribution-matching; it is a Qwen2.5-Coder-specific
+   degradation** — which partially pre-empts H3's fork: the imitation story
+   explains the cross-family blend, but Qwen's sink needs something else (an
+   interference/instability of conditioning specific to this family's training).
+4. **Law form: GENERALIZES** (75% ✓) — conditioning pulls generations deep into
+   the artifact's neighborhood on every family (E1 PULL ≤ 0.38 × anchor in all
+   three); constants vary as pre-declared (copy strength Qwen 0.43 > StarCoder2
+   0.31 > DeepSeek 0.18, anchors ~0.77–0.83).
+
+**Confounds, restated:** StarCoder2-3B is 2× parameters; training cutoffs differ
+(the new families' LCB numbers may be *understated* on 2024 problems); the
+battery scopes findings, it does not isolate the synthetic-data variable. The
+suppressor decomposition remains untested off-Qwen (recorded limitation).
+
+**One line: the record's negative platform claims (shallow tails, no headroom,
+conditioning-sinks) were a portrait of Qwen2.5-Coder; the anchoring mechanism's
+form (pull toward the artifact) is family-general.** The Spurious-Rewards
+precaution was warranted in full. [artifacts/h1_cross_family.json].
 
 ---
 

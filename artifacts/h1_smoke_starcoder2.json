@@ -1,0 +1,9 @@
+{
+  "_label": "H1 smoke gate \u2014 starcoder2 (bigcode/starcoder2-3b)",
+  "n": 64,
+  "well_formed": 1.0,
+  "degenerate": 0.0,
+  "mean_frac": 0.3308779761904762,
+  "n_passed_candidates": 13,
+  "gate": "PASS"
+}

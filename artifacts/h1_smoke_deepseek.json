@@ -1,0 +1,9 @@
+{
+  "_label": "H1 smoke gate \u2014 deepseek (deepseek-ai/deepseek-coder-1.3b-base)",
+  "n": 64,
+  "well_formed": 1.0,
+  "degenerate": 0.0,
+  "mean_frac": 0.33444940476190477,
+  "n_passed_candidates": 14,
+  "gate": "PASS"
+}
