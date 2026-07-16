@@ -1,0 +1,19 @@
+{
+  "benchmark": "LiveCodeBench/code_generation[medium,stdin] [base, T=0.8, top_p=1.0]",
+  "generator": "Qwen/Qwen2.5-Coder-1.5B",
+  "n_problems": 78,
+  "k": 50,
+  "pass@1": 0.012820512820512824,
+  "pass@8": 0.04836348199556255,
+  "pass@50": 0.1282051282051282,
+  "headroom": 0.07984164620956564,
+  "error_breakdown": {
+    "runtime": 1285,
+    "wrong_answer": 2319,
+    "timeout": 246,
+    "": 50
+  },
+  "band": false,
+  "headroom_ok": false,
+  "gate": "does-not-qualify"
+}

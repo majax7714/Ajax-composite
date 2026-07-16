@@ -298,3 +298,53 @@ route to i.i.d. is closed not only asymptotically (W0a: never gets there) but
 (ii) the central figure's points must carry temperature labels and the law's stated
 domain; (iii) the E0 anchor row extends to T=1.5: PULL 0.409/0.491/0.594/**0.740**,
 coverage 0.65/0.92/0.90/**0.37** — i.i.d. itself falls off the same cliff.
+
+---
+
+## W2 RESULTS (2026-07-15) — the medium stratum is the R3 instrument; the easy strata are formally retired from primary analysis
+
+**Screens** ([artifacts/phase3a_screen_lcb_r2_base_medium_T{08,12}.json]; enriched
+pools persisted): base medium **T=0.8**: pass@1 0.013 / pass@8 0.048 / pass@50 0.128
+(headroom +0.080); **T=1.2**: 0.001 / 0.006 / 0.026 (+0.020). Neither qualifies as a
+3b training cell — irrelevant; W2's job was stratum sizing.
+
+| cell | stratum (0/50) | x=1 / x=2 | richness (≥1 partial-credit) | E[B1-50 lucky] |
+|---|---|---|---|---|
+| medium T=0.8 | **68/78** | 5 / 2 | **66/68 (97%)**, 1,400 partial cands, median 15 tests | **2.01** (pure-Beta 2.13) |
+| medium T=1.2 | 76/78 | 1 / 1 | 49/76 (64%) | 0.82 (fit-unstable) |
+
+Stratum overlap T0.8 ∩ T1.2 = 67.
+
+**The pre-committed first branch fires on T=0.8 medium:** stratum 68 ≥ 60 **and**
+feedback richness intact (97%). R3 runs on easy + medium strata, analyzed separately.
+The T=1.2 medium cell is **not** an instrument (near-total failure + degraded
+richness) — and it independently corroborates W1's bounded-domain finding: the
+competence cliff that appears at T=1.5 on HumanEval-easy arrives at **T=1.2 on
+LCB-medium**; the boundary descends with difficulty.
+
+**Power check (pre-committed; Monte-Carlo exact paired McNemar, one-sided α=0.05,
+20k trials).** Minimum detectable ABSTRACT recovery rate r:
+
+| stratum | floor rate | r=0.05 | 0.08 | 0.10 | 0.13 | 0.15 | 0.20 |
+|---|---|---|---|---|---|---|---|
+| medium n=68 | 0.030 | 0.05 | 0.21 | 0.36 | 0.59 | **0.73** | **0.92** |
+| easy n=19 | 0.189 | — | — | 0.00 (r=.10) | — | 0.02 (r=.20) | 0.10 (r=.30) / 0.25 (r=.40) |
+
+Consequences, binding on W3: (i) **primary analysis = medium stratum only** — the easy
+stratum cannot resolve any effect in the plausible range (power 0.25 at r=0.40) and is
+demoted to exploratory, reported unpowered; (ii) the design resolves the **upper half**
+of the pre-registered 5–20% band — a null at α=0.05 forecloses r ≳ 0.15; **r ∈ [0.05,
+0.13) is pre-declared unresolvable by this design** (stated, not spun); (iii) the W3
+config tension dissolves — base T=0.8 keeps the coverage-dominant easy cell for
+D2c/BEST-SO-FAR *and* supplies the 68-problem medium stratum for R3 from the same
+frozen config.
+
+**Prediction accounting (all recorded in the W2 pre-reg above).** pass@8 band **WRONG**
+(0.048 < [0.08, 0.20]); pass@50 band **WRONG** (0.128 < [0.20, 0.35]); base > instruct
+at matched T on medium **WRONG — the suppressor ordering inverts on medium** (base
+0.048/0.128 vs instruct 0.067/0.154): the base-tail advantage is an easy-tier
+phenomenon, and on harder problems instruct's SFT structure outweighs its entropy
+collapse — a mechanism note feeding the "what does instruct-tuning suppress"
+want-to-see. Stratum ≥ 60 (~40% odds) **CORRECT** (68); richness intact (~70%)
+**CORRECT** (97%); T=1.2 direction **CORRECT**, magnitude far beyond expectation
+(competence cliff).

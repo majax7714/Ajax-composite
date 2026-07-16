@@ -1177,6 +1177,23 @@ B1-50, paired** — ABSTRACT > 0 is theater, and this floor goes into the stated
 same size — so the LCB-medium screen (W2) is a prerequisite, not a contingency.
 [artifacts/w0c_stratum_falsezero.json].
 
+**W2 extension (2026-07-15) — the medium stratum is the R3 instrument.** Base
+completion, top_p 1.0, full 78-problem medium-stdin population, k=50: **T=0.8** pass@8
+0.048 / pass@50 0.128 → **stratum 68/78 with feedback richness intact** (66/68 problems
+hold partial-credit candidates; 1,400 partial candidates; median 15 tests) and a
+false-zero floor of only **~2.0 expected lucky B1-50 recoveries** (floor *rate* 3% vs
+the easy stratum's 19%). The pre-committed rule fires: R3 runs on easy + medium,
+analyzed separately. Power (exact paired McNemar, α=0.05 one-sided): medium n=68
+reaches 73%/92% power at recovery rate 0.15/0.20; the easy stratum has power 0.25
+*even at r=0.40* and is demoted to exploratory. **A medium null forecloses r ≳ 0.15;
+r ∈ [0.05, 0.13) is pre-declared unresolvable.** Two prediction misses recorded in
+[PHASE_3B.md]: the base-beats-instruct suppressor ordering **inverts on medium** (base
+0.048/0.128 vs instruct 0.067/0.154 — the base-tail advantage is an easy-tier
+phenomenon), and T=1.2 medium collapses outright (pass@50 0.026, stratum 76/78,
+richness 64%) — the competence cliff W1 met at T=1.5 on HumanEval arrives at T=1.2 on
+medium: **the escape-distance law's temperature boundary descends with difficulty.**
+[artifacts/phase3a_screen_lcb_r2_base_medium_T{08,12}.json].
+
 ---
 
 ## 10. Working method — how this project reasons *(read first in any new conversation)*
