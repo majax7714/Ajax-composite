@@ -732,7 +732,11 @@ exist. Pre-registration of the 3b redesign around it is the next step; it is a d
 decision, not an extension of this record.
 
 *Phase 3a is complete: gate outcome NEGATIVE (F2). Phase 3b/3c are held pending the
-redesign the fork above describes.*
+redesign the fork above describes.* *[SUPERSEDED 2026-07-16 — the redesign happened
+and ran: F2 was retracted-as-structural by the R2 audit (§9.2), the 3b
+pre-registration was frozen and executed as the Phase-3b design cycle ([PHASE_3B.md]),
+and direction (ii) — feedback-driven recovery — returned a **powered NULL** at 1.5B:
+§9.7.]*
 
 ## 8. Reproducibility
 
@@ -826,6 +830,14 @@ Run-loss modes are spend-loss modes; hardening is cheaper than any single recurr
    stratum); (d) batch a candidate's cases into one interpreter where isolation
    allows; (e) right-size judge containers — cpu=32/64 GiB bills for the full wall
    time whether saturated or not.
+6. **External-hub dependency at runtime *(appended 2026-07-16)*.** A HuggingFace Hub
+   outage (504s on the model API) killed a W4 R3 arm mid-chain — vLLM's loader
+   file-list check failed after retries even though every byte it needed was already
+   in the volume cache. Per-stage persistence limited the loss to one arm's restart.
+   *Practice:* once a project's models/datasets are cached, run images
+   **hub-offline** (`HF_HUB_OFFLINE=1`, `HF_DATASETS_OFFLINE=1`) so loads are
+   cache-only and immune to upstream outages; remove the flag only when a genuinely
+   new asset must be fetched ([scripts/modal_lcb.py] image env, commit `cc716f5`).
 
 ## 9. Phase 3R — auditing the two live claims, and the anchoring mechanism
 
@@ -970,7 +982,10 @@ append-only ([PHASE_3R.md] Addenda II/III):
   predicts repair is **PULL** — how far the generation *escapes* the artifact. Coverage
   is monotone in PULL across conditions × temperatures (0.043→0.62). Provenance and
   framing are downstream of escape distance; the law absorbs DIAG-7/8/9b (all *low
-  escape*, measured three ways).
+  escape*, measured three ways). *[Domain bounded 2026-07-15/16: the law holds within
+  the competence regime (T ≲ 1.2 on HumanEval; the boundary descends with difficulty —
+  T = 1.2 already collapses on LCB-medium) and inverts past it, where escape is bought
+  with broken samples — §9.3.1 W1 append, [PHASE_3B.md] W1/W2.]*
 - **It is a coverage/diversity law, not per-sample quality (D2b).** On the confound-free
   **mean-per-sample-pass** metric (greedy pass@1 vs T>0 pass@8 had corrupted the earlier
   read), escape is **flat** — E1 sits ~0.20 at every T. Escape buys pass@8 by *spreading*
@@ -983,7 +998,10 @@ append-only ([PHASE_3R.md] Addenda II/III):
   the target is correct: E5 PULL (0.020/0.066/0.168) ≈ E2 PULL — the mechanism does not
   know what it points at. *(The earlier "E5 = empirical charter for BEST-SO-FAR" was
   **retracted**: E5-on-a-correct-artifact is answer-leakage, 98% copy; the partial-credit
-  premise test is D2c/E6, pending R2's pools.)*
+  premise test is D2c/E6, pending R2's pools.)* *[D2c/E6 resolved 2026-07-16: **SINK** —
+  conditioning on a partial-credit artifact lands significantly below both copying it
+  and resampling; copy fidelity on LCB/base is only 0.57, a degraded blend, not a
+  copy — §9.7.]*
 - **Provenance is near-irrelevant — distinct from Tsui (D2a).** A verb×provenance 2×2
   on the *same* failed artifact: "self vs other" moves PULL ≤0.028 (→+0.006 pass), while
   the instruction verb ("improve it" vs "write a correct solution") moves it **3–4×**.
@@ -1114,7 +1132,38 @@ to force the distance destroys the samples first). Figure spec: points carry
 temperature labels; anchor row extends to T=1.5 (PULL 0.409/0.491/0.594/0.740,
 coverage 0.65/0.92/0.90/0.37). [artifacts/dmeasure_e7.json].
 
-### 9.4 R3 + BEST-SO-FAR *(pre-registered; ride R2's enriched pools)*
+**The sole surviving hypothesis, tested (2026-07-16) — and it nulled.** Item 2 above
+made directed escape "the sole surviving refinement hypothesis by elimination"; the
+frozen four-arm R3 (§9.7, [PHASE_3B.md] W3/W4) tested it at both ends of the
+deployability spectrum — verbatim execution traces (no model in the loop) and
+model-generated abstraction — on a 68-problem pass@50 = 0 stratum with the false-zero
+floor stated in the null. **Every arm landed on the floor** (B1 2 — the W0c
+prediction was 2.01 — ANCHOR 2, TRACE 1, MODELABS 3); the trace arms generated at
+i.i.d. distance from the artifact (PULL 0.85), i.e. *full escape with direction
+supplied*, and recovered nothing. The elimination argument's arc closes at this
+scale: undirected escape approaches i.i.d. from below (item 1), repulsion cannot be
+expressed (W1), and **direction — the one surviving channel — requires a capacity to
+use it that 1.5B does not have.** r ≥ 0.15 is foreclosed; r ∈ [0.05, 0.13) and
+scales above 1.5B remain open, stated in §9.7.
+
+### 9.4 R3 + BEST-SO-FAR *(pre-registered; ride R2's enriched pools)* — **RESOLVED 2026-07-16 (§9.7)**
+
+> **RESOLVED (2026-07-16 — the sketches below were superseded by the frozen
+> [PHASE_3B.md] W3 design and executed as W4; full verdicts §9.7).** R3 ran as four
+> arms (the Olausson decomposition added ABSTRACT-trace as the feedback ceiling) on
+> the medium stratum this section did not yet know it needed (§9.6): **NULL at
+> declared power** — every arm on the false-zero floor, the kill branch ("ABSTRACT ≈
+> 0 forecloses the refinement direction") fired in its floor-aware form. The
+> feedback-richness × temperature add-on was overtaken by W1/W2's harder finding:
+> temperature is not an unbounded escape knob (competence cliff), so the "substitutes
+> at the margin" cell grid was not run — recorded as superseded, not skipped
+> silently. BEST-SO-FAR ran as five conditions: **the deflation below was right in
+> direction and too gentle in degree** — BEST is not hold-at-best but **SINK**
+> (generations land below the artifact conditioned on; fidelity 0.57), and
+> BEST+ABSTRACT, "the only condition with a mechanism," scored **zero coverage**: the
+> anchor does not complement the direction, it poisons it. D2c/E6, the premise test:
+> **SINK** — BEST-alone dead exactly as the escape-distance law predicted, one branch
+> darker.
 
 - **R3 — conditional reachability (the central claim).** On the **pass@50 = 0** stratum
   (problems i.i.d. sampling provably fails in 50 tries), does an
@@ -1240,6 +1289,11 @@ phenomenon), and T=1.2 medium collapses outright (pass@50 0.026, stratum 76/78,
 richness 64%) — the competence cliff W1 met at T=1.5 on HumanEval arrives at T=1.2 on
 medium: **the escape-distance law's temperature boundary descends with difficulty.**
 [artifacts/phase3a_screen_lcb_r2_base_medium_T{08,12}.json].
+
+**Floor model validated out-of-sample (2026-07-16).** R3's fresh B1-50 control arm
+recovered **exactly 2** problems on the 68-problem medium stratum — the two-component
+fit's prediction was **2.01**. The false-zero characterization is not just a caveat;
+it is a calibrated instrument, and R3's null rests on it (§9.7).
 
 ### 9.7 Phase 3b — the frozen pre-registration *(W3, 2026-07-15; verdicts land here as W4 executes)*
 
@@ -1405,7 +1459,10 @@ design constant. Each entry states (a) their setup specifics, (b) the delta to o
   repair null is ambiguous between "direction doesn't help" and "this model can't
   produce direction"; hence R3's ABSTRACT-trace arm exists. **Does not license:** any
   magnitude expectation — their gap sizes were measured at 100–1000× our scale with
-  human-quality feedback; nothing transfers numerically.
+  human-quality feedback; nothing transfers numerically. *Outcome (2026-07-16): the
+  decomposition paid — both channels nulled together (TRACE 1, MODELABS 3, floor 2),
+  which converts an ambiguous null into a specific one: the bottleneck at 1.5B is not
+  feedback production (their result) but feedback* use *(§9.7).*
 - **Self-Debug (Chen et al.) → ABSTRACT-trace arm framing (W3).** (a) Gains measured
   against **greedy** (not compute-matched best-of-n), largest on
   near-correct-by-construction tasks (TransCoder, Spider) where errors are local; the
@@ -1415,6 +1472,9 @@ design constant. Each entry states (a) their setup specifics, (b) the delta to o
   candidate* for the direction channel — worth a dedicated arm. **Does not license:**
   any expectation that repair beats resampling here — their baseline never asked that
   question, and their regime (near-correct) is the one D2c/E6 tests separately.
+  *Outcome (2026-07-16): trace feedback was the only channel to show any coverage
+  anywhere (BSF ABSTRACT 2/30 n.s.; R3-easy TRACE 3/19 ≈ floor) — the "strongest
+  known candidate" ranking held, and it still never beat resampling (§9.7).*
 - **"How Many Tries" (2026) → R3 recovery stratification (W3/W4).** (a) Self-repair
   universally effective across 7 models on HumanEval/MBPP-Sanitized — our exact
   benchmarks — with gains growing with scale (≤ +5.5pp at 70B); **name errors repair
@@ -1424,7 +1484,11 @@ design constant. Each entry states (a) their setup specifics, (b) the delta to o
   recoverable — R3 recoveries (if any) should skew toward non-assertion error classes;
   we stratify recoveries by error type and test that prediction. **Does not license:**
   the "universally effective" headline — averaged over easy error types at scales
-  where the mechanism has capacity we don't have.
+  where the mechanism has capacity we don't have. *Outcome (2026-07-16): held
+  directionally at uninterpretably small n — medium recovery events under-represent
+  wrong_answer artifacts (50% vs 76% stratum base) and over-represent runtime/timeout
+  (50% vs 24%); their scale trend (≤ +5.5pp at 70B) is now the main reason the R3
+  null is scoped to ≤ 1.5B rather than read as universal ([PHASE_3B.md] W4).*
 - **Tsui et al. (2025) → E7 prompt design (W1) — formalizing the existing
   reconciliation.** (a) Detection-axis result: models fail to notice their own errors;
   "Wait"-style prompts recover ~89% of the gap; instruct models, natural-language
@@ -1433,7 +1497,10 @@ design constant. Each entry states (a) their setup specifics, (b) the delta to o
   as a *verb/instruction* intervention (the live 3–4× lever per D2a), not an
   attribution one; predicts "someone else's failed attempt" framing adds nothing to
   E7. **Does not license:** any expectation about escape magnitude — Tsui never
-  measures distance-to-artifact.
+  measures distance-to-artifact. *Outcome (2026-07-16): the verb-lever framing was
+  the right call and still nearly inert — the strongest avoidance instruction moved
+  PULL only +0.02/+0.05 over "improve it" ([PHASE_3B.md] W1); token gravity dominates
+  instruction at this scale.*
 
 *Appendix pointers. Architecture [ARCHITECTURE.md]; decision log **D1–D16**
 [DECISIONS.md] (D11 precision, D14 statistical reproducibility, D15 retracted, D16 =
@@ -1451,9 +1518,19 @@ dmeasure_conditioning.json (incl. per_sample_D2b), dmeasure_d2a_verb_provenance.
 phase3a_screen_r2_base_T10.json, phase3a_screen_r2_base_T12.json; intact pools awaiting
 exec-only: runs/modal/bcb_cand_r2_{base,instruct}_T08.json; crash-recovery record in
 PHASE_3R.md "CRASH RECOVERY (2026-07-14)"; pending rerun: r1b2d retrain, r2 instruct
-T=1.0/1.2 + LCB arm, dmeasure_d2c_partial_credit.json].
+T=1.0/1.2 + LCB arm, dmeasure_d2c_partial_credit.json — *all listed reruns landed
+2026-07-15/16: [artifacts/r1b2d_verifier_retrain.json,
+phase3a_screen_r2_instruct_T{10,12}.json, phase3a_screen_lcb_r2_*.json]*];
+**Phase 3R resolutions** [artifacts/r1b2d_verifier_retrain.json (H1 kill),
+dmeasure_subset_control.json (E5/E1 closure)]; **Phase 3B** ([PHASE_3B.md] — charter,
+W0–W3 pre-registrations, W4 verdicts) [artifacts/w0a_e0_anchor.json,
+w0b_copy_null.json, w0c_stratum_falsezero.json, dmeasure_e7.json (W1 branch (a)),
+phase3a_screen_lcb_r2_base_medium_T{08,12}.json (W2), r3_smoke.json,
+dmeasure_d2c_partial_credit.json (SINK), r3_conditional_reachability.json (NULL +
+recovery validation), bestsofar.json].
 Scripts: [scripts/modal_rgr.py] (T4 verifier/retrain), [scripts/modal_phasem.py]
-(L4 gates + D-measure/D2a), [scripts/modal_phase3a.py] (BigCodeBench screen + R2),
-[scripts/modal_lcb.py] (LiveCodeBench), [scripts/dmeasure_analysis.py] (D2b),
-[scripts/r1b2_analysis.py] (R1b.2a/b/c). Difficulty proxies
-[artifacts/phase0_difficulty_proxy.csv].*
+(L4 gates + D-measure/D2a/E7), [scripts/modal_phase3a.py] (BigCodeBench screen + R2),
+[scripts/modal_lcb.py] (LiveCodeBench + Phase-3b W4: p3b_* entrypoints),
+[scripts/dmeasure_analysis.py] (D2b), [scripts/r1b2_analysis.py] (R1b.2a/b/c),
+[scripts/w0_recomputes.py] (W0a/b/c), [scripts/dmeasure_subset_control.py] (Addendum
+IV). Difficulty proxies [artifacts/phase0_difficulty_proxy.csv].*
