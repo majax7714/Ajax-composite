@@ -1,0 +1,23 @@
+{
+  "_label": "R3 smoke gate [PHASE_3B W3 \u00a71]",
+  "n_problems": 8,
+  "per_arm": {
+    "B1": {
+      "well_formed": 1.0,
+      "degenerate": 0.0
+    },
+    "ANCHOR": {
+      "well_formed": 1.0,
+      "degenerate": 0.0
+    },
+    "TRACE": {
+      "well_formed": 1.0,
+      "degenerate": 0.0
+    },
+    "MODELABS": {
+      "well_formed": 1.0,
+      "degenerate": 0.0
+    }
+  },
+  "gate": "PASS"
+}

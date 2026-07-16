@@ -498,3 +498,27 @@ operational ledger. Estimated GPU: ~2–4 L4-hours total. Artifacts:
 
 **Writeup destinations:** D2c → §9.3.1/§9.4 append; R3 → new §9.7 (the phase verdict);
 BEST-SO-FAR → §9.4 append; every outcome with its prediction accounting.
+
+---
+
+## W4 RESULTS (2026-07-15, appended as each stage lands)
+
+### D2c/E6 — VERDICT: SINK (the ~15% branch) — [artifacts/dmeasure_d2c_partial_credit.json]
+
+44/44 frozen artifacts ran. Mean frac(gen) **0.374** vs copy-null **0.494**
+(Δ **−0.121**, sink one-sided p ≈ 5×10⁻⁵) and vs i.i.d.-null **0.468** (Δ −0.095;
+climb p = 0.998). **Conditioning on a partial-credit artifact is actively harmful on
+this stack**: the generation is significantly worse than copying the artifact *and*
+worse than unconditioned resampling. The smoke-registered fidelity caveat fired too:
+**copy fidelity is 0.57 on LCB/base** — far below the 0.83–0.98 measured on
+HumanEval/instruct — so the "hold-at-best" deflation was itself too optimistic: the
+base completion path cannot even faithfully reproduce the artifact; it produces a
+degraded blend. Consistent with, and stronger than, D2b's "conditioning relocates
+without lifting per-sample quality" — here it relocates *downward*.
+
+**Consequences per the frozen rule:** BEST-alone is dead (harmful, not merely flat);
+BEST+ABSTRACT carries the phase's remaining hope; the R3 ANCHOR arm's "≤ B1-50"
+prediction (75%) now looks conservative. Prediction accounting: SINK was the 15%
+branch — the modal FLAT (65%) call was **wrong**; the direction of the miss is the
+same as every D-measure surprise to date (the attractor is worse for repair than
+assumed, never better).

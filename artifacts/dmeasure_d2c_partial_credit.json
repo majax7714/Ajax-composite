@@ -1,0 +1,14 @@
+{
+  "_label": "D2c/E6 \u2014 partial-credit conditioning [PHASE_3B W3 \u00a72]",
+  "n_artifacts": 44,
+  "mean_frac_generated": 0.37376428811087903,
+  "mean_copy_null": 0.4944889706253343,
+  "mean_iid_null": 0.46847140233503864,
+  "delta_vs_copy_null": -0.12072468251445524,
+  "p_one_sided_vs_copy_null": 1.0,
+  "delta_vs_iid_null": -0.09470711422415969,
+  "p_one_sided_vs_iid_null": 0.9982000899955003,
+  "p_one_sided_sink": 4.999750012499375e-05,
+  "copy_fidelity_mean_similarity": 0.5697705853393846,
+  "verdict": "SINK"
+}
