@@ -1,0 +1,406 @@
+{
+ "_label": "H2 hint set, FROZEN 2026-07-16 (pre-H1-results; formal pre-reg lands post-H1 per charter order)",
+ "provenance": "No reference solutions exist in the LCB dataset (metadata empty; recorded deviation from the charter's 'oracle-derived from the reference solution'). Each hint is a frontier-model worked approach derived from the problem statement alone (no pool/artifact/failure data consulted), hand-audited against the leakage protocol. Behavioral validity is tested by the pre-registered manipulation check before any stratum run.",
+ "leakage_protocol": "words only; no identifiers; no numerals or code tokens (automated screen: 125/125 clean); problem-intrinsic small quantities in word form allowed; ~2 sentences; states the idea, never the implementation. One drafting error caught by hand-audit and corrected before freeze (abc341_a: hint written from memory did not match the statement; rewritten from the statement).",
+ "groups": {
+  "stratum_medium": [
+   "1883_C",
+   "abc301_c",
+   "abc301_d",
+   "abc302_b",
+   "abc302_d",
+   "abc303_c",
+   "abc303_d",
+   "abc304_c",
+   "abc304_d",
+   "abc305_c",
+   "abc306_c",
+   "abc306_d",
+   "abc307_c",
+   "abc307_d",
+   "abc308_d",
+   "abc309_c",
+   "abc309_d",
+   "abc310_d",
+   "abc311_c",
+   "abc311_d",
+   "abc312_c",
+   "abc312_d",
+   "abc313_b",
+   "abc313_c",
+   "abc314_c",
+   "abc314_d",
+   "abc315_c",
+   "abc315_d",
+   "abc318_c",
+   "abc318_d",
+   "abc319_c",
+   "abc319_d",
+   "abc320_c",
+   "abc320_d",
+   "abc321_d",
+   "abc322_c",
+   "abc322_d",
+   "abc323_c",
+   "abc324_c",
+   "abc325_b",
+   "abc325_c",
+   "abc327_d",
+   "abc328_c",
+   "abc329_c",
+   "abc330_c",
+   "abc330_d",
+   "abc331_c",
+   "abc332_c",
+   "abc333_c",
+   "abc333_d",
+   "abc334_b",
+   "abc334_c",
+   "abc334_d",
+   "abc335_c",
+   "abc335_d",
+   "abc336_c",
+   "abc336_d",
+   "abc337_c",
+   "abc337_d",
+   "abc338_c",
+   "abc339_b",
+   "abc339_d",
+   "abc340_c",
+   "abc341_c",
+   "abc341_d",
+   "abc342_c",
+   "abc342_d",
+   "abc343_d"
+  ],
+  "near_miss": [
+   "1873_A",
+   "1873_B",
+   "1883_B",
+   "1899_A",
+   "abc302_c",
+   "abc303_a",
+   "abc304_a",
+   "abc304_b",
+   "abc305_a",
+   "abc305_b",
+   "abc306_a",
+   "abc307_a",
+   "abc307_b",
+   "abc308_c",
+   "abc309_a",
+   "abc310_a",
+   "abc310_b",
+   "abc310_c",
+   "abc311_a",
+   "abc311_b",
+   "abc315_b",
+   "abc318_b",
+   "abc319_b",
+   "abc320_b",
+   "abc321_a",
+   "abc321_c",
+   "abc323_a",
+   "abc323_b",
+   "abc324_b",
+   "abc326_a",
+   "abc326_c",
+   "abc327_b",
+   "abc328_b",
+   "abc329_d",
+   "abc331_a",
+   "abc332_b",
+   "abc337_b",
+   "abc341_a",
+   "abc342_a"
+  ],
+  "manip_check": [
+   "abc302_a",
+   "abc306_b",
+   "abc307_a",
+   "abc308_a",
+   "abc312_a",
+   "abc320_a",
+   "abc320_b",
+   "abc325_a",
+   "abc327_a",
+   "abc332_a",
+   "abc333_a",
+   "abc335_a",
+   "abc336_a",
+   "abc336_b",
+   "abc337_a",
+   "abc338_a",
+   "abc338_b",
+   "abc339_a",
+   "abc340_b",
+   "abc343_b"
+  ]
+ },
+ "near_miss_cells": {
+  "abc337_b": {
+   "easy_base_T08": 1
+  },
+  "abc311_b": {
+   "easy_base_T08": 1
+  },
+  "abc304_b": {
+   "easy_base_T08": 2,
+   "easy_base_T12": 1,
+   "easy_instr_T12": 1
+  },
+  "1873_A": {
+   "easy_base_T08": 1
+  },
+  "abc332_b": {
+   "easy_base_T08": 1
+  },
+  "abc309_a": {
+   "easy_base_T08": 1
+  },
+  "abc318_b": {
+   "easy_base_T08": 2,
+   "easy_base_T12": 1
+  },
+  "abc310_b": {
+   "easy_base_T08": 1
+  },
+  "abc319_b": {
+   "easy_base_T08": 1,
+   "easy_base_T10": 1
+  },
+  "abc305_a": {
+   "easy_base_T08": 1,
+   "easy_base_T10": 1
+  },
+  "abc306_a": {
+   "easy_base_T08": 2,
+   "easy_base_T10": 2,
+   "easy_base_T12": 1,
+   "easy_instr_T12": 1
+  },
+  "abc342_a": {
+   "easy_base_T08": 1,
+   "easy_base_T12": 1
+  },
+  "abc305_b": {
+   "easy_base_T08": 1
+  },
+  "1873_B": {
+   "easy_base_T08": 2,
+   "easy_base_T10": 1
+  },
+  "abc323_b": {
+   "easy_base_T08": 2,
+   "easy_base_T10": 1,
+   "easy_base_T12": 1,
+   "easy_instr_T12": 1
+  },
+  "abc310_a": {
+   "easy_base_T10": 2
+  },
+  "abc304_a": {
+   "easy_base_T10": 1,
+   "easy_instr_T12": 1
+  },
+  "abc326_a": {
+   "easy_base_T10": 2,
+   "easy_instr_T12": 2
+  },
+  "abc331_a": {
+   "easy_base_T10": 2,
+   "easy_instr_T12": 1
+  },
+  "1899_A": {
+   "easy_base_T12": 2,
+   "easy_instr_T12": 2
+  },
+  "abc307_a": {
+   "easy_base_T12": 2
+  },
+  "abc311_a": {
+   "easy_base_T12": 1,
+   "easy_instr_T12": 2
+  },
+  "abc303_a": {
+   "easy_base_T12": 1,
+   "easy_instr_T12": 1
+  },
+  "abc321_a": {
+   "easy_base_T12": 2
+  },
+  "abc327_b": {
+   "easy_base_T12": 1
+  },
+  "abc307_b": {
+   "easy_base_T12": 2
+  },
+  "abc324_b": {
+   "easy_base_T12": 2,
+   "easy_instr_T12": 1
+  },
+  "abc320_b": {
+   "easy_base_T12": 1
+  },
+  "abc323_a": {
+   "easy_base_T12": 1
+  },
+  "abc341_a": {
+   "easy_instr_T12": 1
+  },
+  "abc315_b": {
+   "easy_instr_T12": 1
+  },
+  "abc328_b": {
+   "easy_instr_T12": 1
+  },
+  "abc308_c": {
+   "med_base_T08": 1
+  },
+  "abc310_c": {
+   "med_base_T08": 2
+  },
+  "1883_B": {
+   "med_base_T08": 1
+  },
+  "abc326_c": {
+   "med_base_T08": 2
+  },
+  "abc321_c": {
+   "med_base_T08": 1
+  },
+  "abc302_c": {
+   "med_base_T08": 1
+  },
+  "abc329_d": {
+   "med_base_T08": 1
+  }
+ },
+ "hints": {
+  "abc302_a": "Compute how many whole attacks are needed by dividing the stamina by the damage and rounding any remainder upward. Use exact integer arithmetic throughout, since the values are far too large for floating point.",
+  "abc306_b": "Read the sequence of binary digits and accumulate a total while doubling a positional weight as you advance, treating the first digit as the least significant position.",
+  "abc307_a": "Group the daily values into consecutive blocks of seven and print the sum of each block in order.",
+  "abc308_a": "Check three things separately: the sequence never decreases, every value lies inside the stated range, and every value is divisible by the stated step; print yes only if all checks hold.",
+  "abc312_a": "Compare the input string against the small fixed list of accepted strings from the statement and answer yes exactly when it matches one of them.",
+  "abc320_a": "Evaluate both exponentiations directly with integer arithmetic and print their sum; the inputs are tiny, so no shortcuts are needed.",
+  "abc320_b": "Enumerate every contiguous substring, test whether it reads the same forwards and backwards, and report the longest length that does; the string is short enough for brute force.",
+  "abc325_a": "Read the two words, then print the first word followed by a space and the fixed honorific from the statement, discarding the second word.",
+  "abc327_a": "Scan adjacent pairs of characters and answer yes if any pair consists of the first two letters of the alphabet in either order.",
+  "abc332_a": "Sum price times quantity over all items, then add the flat fee only when that total falls below the stated threshold.",
+  "abc333_a": "Print the given digit repeated a number of times equal to its own value.",
+  "abc335_a": "Print the input string with its final character replaced by the digit one greater, leaving everything else untouched.",
+  "abc336_a": "Build the string as: one uppercase opening letter, the given number of copies of the repeated middle letter, then the two closing letters, exactly as the statement's pattern describes.",
+  "abc336_b": "Count how many times the number can be halved while remaining even; equivalently count consecutive zero bits from the least significant end.",
+  "abc337_a": "Total each team's points across all matches and compare the sums, printing the first team's name, the second team's name, or the draw word per the statement's exact wording.",
+  "abc338_a": "Answer yes exactly when the first character is uppercase and every remaining character is lowercase.",
+  "abc338_b": "Count occurrences of each letter, then take the maximum count and, among letters achieving it, the alphabetically earliest.",
+  "abc339_a": "Split the string on the separator character and print the final piece; equivalently take everything after the last separator.",
+  "abc340_b": "Keep the values in a growing list; for a query of the second type, index the list from its end by the requested offset and print that element.",
+  "abc343_b": "For each row of the adjacency matrix, print the one-based column positions holding a one, in increasing order, on that row's own output line \u2014 printing an empty line when a vertex has no neighbours.",
+  "1883_C": "For a prime modulus it suffices to make one element divisible, so take the cheapest single-element top-up, which is zero if some element already qualifies. For the one composite modulus, the product needs two factors of two: compare the cheapest way to make one element divisible by four against the cost of topping up elements until two are even, and take the cheaper.",
+  "abc301_c": "Count each letter separately in both rows: letters not appearing in the statement's special word must have exactly equal counts, while any shortfall of special-word letters on one side must be paid for by the other row's wildcard budget. Answer yes exactly when both budgets cover their shortfalls.",
+  "abc301_d": "Fill the forced digits first, then decide wildcard positions greedily from the most significant end: set a wildcard to one only when the value with all lower wildcards zeroed still stays within the bound. If even choosing zero everywhere exceeds the bound, report impossibility.",
+  "abc302_b": "Scan every cell and each of the eight compass directions, stepping the required number of times while staying inside the grid, and test whether the visited letters spell the target word in order. Print the coordinates of the unique matching cells one per line, one-indexed.",
+  "abc302_d": "Sort one of the two lists, and for each value in the other list binary search the largest partner not exceeding that value plus the allowed difference. Accept the pair when the gap is within the limit and keep the best sum seen.",
+  "abc303_c": "Simulate the walk step by step with item positions in a hash set: after each move first check for collapse, then consume an item only when health is strictly below the threshold, removing it from the set once used.",
+  "abc303_d": "Run a dynamic program along the string whose only state is whether the lock is on, keeping minimum elapsed time per state. For each character consider both ways of typing it, optionally paying the toggle cost first.",
+  "abc304_c": "Connect any two people whose squared distance is at most the squared radius, then breadth-first search from the initially infected person; the input is small enough to compare all pairs, and squared distances avoid floating point.",
+  "abc304_d": "Assign each strawberry to its piece by binary searching the sorted cut positions on both axes, counting occupancy in a dictionary. The maximum answer is the largest count; the minimum is zero unless the number of occupied pieces equals the total number of pieces, in which case use the smallest count.",
+  "abc305_c": "Take the bounding box of all remaining cookie cells; the eaten cookie is the unique empty square inside that box.",
+  "abc306_c": "Record, for every value, the position of its second occurrence while scanning once, then output the values sorted by that recorded position.",
+  "abc306_d": "Dynamic programming over courses with two states, healthy and upset, storing the best total so far; at each course take the maximum of skipping or eating with the state transition the statement defines, and never allow the fatal transition.",
+  "abc307_c": "Try every translation of the two small sheets relative to each other within the target's size margin, overlay their black cells, and test whether the union matches the target sheet exactly while covering every black cell of both; the sizes are tiny, so brute force over all offsets.",
+  "abc307_d": "Process characters with a stack: push everything, and when a closing parenthesis appears, pop back to the most recent unmatched opening parenthesis and discard that whole span; characters left on the stack at the end form the answer.",
+  "abc308_d": "Breadth-first search over states of cell plus position in the repeating five-letter cycle, starting at the top-left only if it carries the first letter, moving to side-adjacent cells carrying the next cycle letter, and answering yes if the bottom-right is reached at any cycle position.",
+  "abc309_c": "Only days just after some medicine expires can be the answer: start from the full total on the first day, sort medicines by duration, and sweep the distinct expiry boundaries subtracting each medicine's contribution as it ends, reporting the first boundary day whose running total is within the limit.",
+  "abc309_d": "Breadth-first search separately from the first vertex and from the last vertex; the answer is the largest distance reachable in the first component, plus the largest in the second, plus one for the added bridging edge.",
+  "abc310_d": "Backtrack over players in order: each player either joins an existing group containing no incompatible member or opens a new group, never exceeding the team count; count completed assignments that use exactly the required number of groups \u2014 this canonical insertion order counts unordered teams exactly once.",
+  "abc311_c": "Follow the unique outgoing edge from any vertex while recording the order of first visits until you reach an already-visited vertex; the walk from that vertex's first visit to the current position is the cycle to print.",
+  "abc311_d": "Breadth-first search over resting positions, where a move slides in a straight line until the square beyond is rock; while sliding, mark every traversed square as touched, and finally count all squares touched by any slide or rest.",
+  "abc312_c": "As the price grows, willing sellers only increase and willing buyers only decrease, so binary search the smallest price at which the seller count reaches the buyer count, computing both counts from sorted lists.",
+  "abc312_d": "Dynamic program over positions whose state is the unmatched-opening balance: an opener increments, a closer decrements only from positive balance, and a wildcard does both; sum the ways ending at balance zero under the stated modulus.",
+  "abc313_b": "Compute the transitive closure of the known relation, then find the people who dominate all others under it; print that person only when exactly one exists, otherwise report indeterminate.",
+  "abc313_c": "Finally every value equals the average rounded down, with remainder-many values one larger. Sort the array, pair larger targets with larger values, and sum how far values sit above their targets \u2014 that surplus is the operation count.",
+  "abc314_c": "Gather the positions of each color in left-to-right order, then rewrite each group's characters shifted cyclically by one within the group, building the output in a mutable buffer.",
+  "abc314_d": "Apply nothing eagerly: record when the last global case conversion happened and which kind it was, plus each position's last directly-assigned character and its time. A position keeps its assigned character if that assignment came after the final global conversion; otherwise it takes the converted case.",
+  "abc315_c": "Keep the two most delicious cups per flavor. The answer is the better of the best two cups of different flavors summed, and, within one flavor, the best plus half the second best.",
+  "abc315_d": "Simulate with bookkeeping rather than rescanning: for every row and column maintain per-letter counts and the remaining size, mark a line when at least two cookies remain and a single letter accounts for all of them, remove marked cells while updating counts, and repeat until no line qualifies.",
+  "abc318_c": "Passes should cover the most expensive days: sort fares in decreasing order with prefix sums, then try every count of batches, paying the batch price times the count plus the uncovered remaining fares, and take the minimum.",
+  "abc318_d": "Dynamic program over bitmasks of used vertices: take the lowest unused vertex and either leave it forever unmatched or pair it with each other unused vertex, adding that edge weight; memoize the best value per mask.",
+  "abc319_c": "Enumerate every order of revealing the nine cells; a line disappoints exactly when its two equal values appear before its differing one. Count reveal orders that avoid this on all lines and divide by the total number of orders.",
+  "abc319_d": "Binary search on the window width, checking a candidate by greedy packing: place words left to right, opening a new line when the next word would overflow, and verify the line count fits. Never allow a width below the longest single word.",
+  "abc320_c": "For each target digit and each ordering of the three reels, take for each reel the earliest press second showing that digit while keeping the three press seconds pairwise distinct; occurrences recur with the reel period so only a few periods need checking. Minimize the largest press second over all choices, reporting impossibility when no digit works.",
+  "abc320_d": "Each statement fixes an exact vector between two people, so traverse the constraint graph from the anchored person accumulating offsets (using edges in both directions with the sign flipped when reversed); everyone reachable gets unique coordinates and everyone else is undecidable.",
+  "abc321_d": "Sort one price list and precompute prefix sums; for each price in the other list binary search where the pair total crosses the cap, summing exact totals below that point and the cap times the count at or above it.",
+  "abc322_c": "Walk the days from last to first, carrying the position of the nearest firework day seen so far, and output its distance for each day; a firework day resets the carry to itself.",
+  "abc322_d": "Brute force everything: for each piece try all four rotations and every translation keeping it inside the grid, then test all combinations of the three placements for zero overlap and full coverage; the board is tiny so exhaustive search is fast. Represent placements as sixteen-cell masks to make the overlap and coverage checks cheap.",
+  "abc323_c": "Compute every player's current total including the index bonus. For each player, sort that player's unsolved problem scores in decreasing order and greedily add the largest ones until the total strictly exceeds every other player's current total, reporting how many were needed, possibly zero.",
+  "abc324_c": "For each candidate, first prune by length difference greater than one, then check the appropriate case: equal length allows at most one mismatched position, and lengths differing by one must allow walking both strings with a single skip on the longer side. Compare with two pointers so the total work stays linear.",
+  "abc325_b": "Try each possible whole-hour meeting start in universal time \u2014 there are only twenty-four \u2014 and for each, sum the employees whose local meeting hour falls entirely inside the working window; take the best total.",
+  "abc325_c": "Flood fill over sensor cells treating all eight surrounding squares as adjacent, counting connected components.",
+  "abc327_d": "This asks whether the constraint graph is two-colorable: build edges between the paired positions and attempt a bipartition by breadth-first search, failing on any self-loop or on an edge whose endpoints get the same color.",
+  "abc328_c": "Precompute a prefix count of positions where a character equals its successor; each query is then a difference of two prefix values over the half-open range.",
+  "abc329_c": "Only maximal runs matter: for each letter track the longest consecutive run of it anywhere in the string, and sum those maxima \u2014 a run of some length contributes exactly that many distinct one-character repetitions.",
+  "abc330_c": "Iterate one coordinate over all values whose square does not exceed the target; for each, take the remaining amount and probe the integer square root and its successor as the other coordinate, tracking the smallest absolute difference.",
+  "abc330_d": "Count per row and per column how many marked cells each contains. Each marked cell serves as the corner shared by a row and a column, contributing the product of its row count minus one and its column count minus one; sum this over all marked cells.",
+  "abc331_c": "Sort the values with a suffix-sum table (or bucket by value using cumulative sums from the top); for each element the answer is the total of all values strictly greater, retrieved by binary search or bucket lookup rather than recomputation.",
+  "abc332_c": "The days split into independent segments between wash days. Within each segment the event days each need their own special shirt while meal days can consume the plain stock first and special shirts after it runs out; the answer is the maximum, over segments, of special shirts required.",
+  "abc333_c": "Generate all sums of three repeated-one numbers with lengths up to a dozen digits each, put them in a set to deduplicate, sort, and index the requested entry \u2014 the target count is small enough for full enumeration.",
+  "abc333_d": "Deleting the root requires first deleting all but one of its subtrees entirely, and the root then falls as a leaf. Compute each root-subtree's size; the answer is the total number of root-subtree vertices minus the largest subtree, plus one for the root itself.",
+  "abc334_b": "Count multiples of the spacing inside a shifted interval: subtract the offset from both endpoints, then count integers in the range using floor division of each endpoint \u2014 careful that floor division must round toward negative infinity for negative values.",
+  "abc334_c": "The colors with both socks intact should pair with themselves at zero cost, so only the single socks matter, sorted. With an even count pair them consecutively; with an odd count one sock is dropped, and a dynamic program (or prefix-suffix sums over pairing parities) over which one to drop gives the minimum total of adjacent differences.",
+  "abc334_d": "Sort the requirements ascending and precompute prefix sums; each query binary searches the largest prefix whose sum fits within the available count.",
+  "abc335_c": "The body follows the head like a rope, so keep every historical head position in an append-only list: after some moves, part number p sits at the position the head occupied p minus one steps ago, seeded with the initial straight-line layout.",
+  "abc335_d": "Any spiral walk from a corner inward that skips the center works: march around the boundary layer by layer numbering cells consecutively, leave the exact center for the player marker, and print the grid.",
+  "abc336_c": "Good integers are exactly base-five numbers with digits remapped to the even digits: write the index minus one in base five and translate each digit to twice its value, treating the smallest good integer as index one.",
+  "abc336_d": "For each position compute how tall a rising staircase ending there can be (limited by both the value and the previous height plus one), and symmetrically a falling staircase starting there scanning from the right; the answer is the best over positions of the smaller of the two heights.",
+  "abc337_c": "Build a map from each person to the person standing directly behind them, find the person marked as front, and follow the chain to the back, printing as you go.",
+  "abc337_d": "Slide a window of the required length along every row and every column, keeping counts of blocked and empty cells in the window incrementally; windows containing any blocked cell are invalid, and among valid windows the answer is the fewest empties. Report impossibility when no window is valid.",
+  "abc338_c": "Try every feasible count of the first dish from zero up to its ingredient-limited maximum; for each count, the second dish's servings are fixed by the minimum over ingredients of remaining stock divided by its per-serving need. Keep the best total.",
+  "abc339_b": "Directly simulate the walk on the torus, tracking position and facing, flipping the current cell's color and turning clockwise on white or counterclockwise on black before stepping; wrap coordinates with remainders and print the final grid.",
+  "abc339_d": "Breadth-first search over the joint state of both players' positions: each of the four directions maps a state to a new state where each player independently moves or is blocked. The board is small enough for the four-dimensional state space, and the goal is any state with both players coincident.",
+  "abc340_c": "The total cost obeys a recursion: the cost for a value is the value itself plus the costs of its two halves, with values below two costing nothing. Compute it recursively with memoization \u2014 only logarithmically many distinct values ever appear.",
+  "abc341_c": "Reverse the reasoning: for every land cell, replay the whole instruction string from it and check the entire path stays on land; count starting cells whose full path is valid. The grid and path are small enough for this quadratic scan, and equivalently you may test end positions by replaying backwards.",
+  "abc341_d": "Count qualifying numbers up to a bound using floor divisions by each value minus twice the count of common multiples via the least common multiple; binary search the smallest bound whose count reaches the requested rank.",
+  "abc342_c": "Keep a table from each alphabet letter to what it currently prints: on each operation redirect every letter whose current image equals the source to the destination, and render the string once at the very end.",
+  "abc342_d": "Two positive numbers multiply to a square exactly when their square-free parts are equal, so strip squared prime factors from each value with a sieve and count pairs sharing the same reduced form; handle zeros separately because zero pairs with everything.",
+  "abc343_d": "Track every player's score together with a frequency table over score values: each update decrements the old value's count (deleting emptied entries) and increments the new value's; the number of distinct scores is just the table's current size.",
+  "1873_A": "The arrangement works if it is already sorted or one swap sorts it \u2014 that is, if at most two positions differ from the sorted order. Remember to handle multiple test cases.",
+  "1873_B": "With so few digits, try adding one to each digit in turn, compute the product each time, and keep the maximum. Remember to handle multiple test cases.",
+  "1883_B": "Rearranged remains form a palindrome when at most one letter has odd count, so count odd-frequency letters: removing a character can fix one odd at a time, and the answer is yes when the odd count minus one does not exceed the number of deletions. Remember the deletions are exact, but parity works out, and handle multiple test cases.",
+  "1899_A": "The first player wins exactly when the starting number is not a multiple of three: if it is not, one move reaches a multiple; if it is, the opponent can always dodge for the whole game. Remember to handle multiple test cases.",
+  "abc302_c": "With at most eight strings, try every permutation and check consecutive strings differ in exactly one position; answer yes if any ordering passes.",
+  "abc303_a": "Compare the strings position by position, accepting equal characters and the two stated interchangeable pairs (the digit one with the lowercase letter ell, and the digit zero with the lowercase letter oh).",
+  "abc304_a": "Find the youngest person's index, then print names walking around the circle from that index, wrapping with a remainder.",
+  "abc304_b": "Determine the number's digit count and zero out the appropriate number of low digits by integer division then multiplication, printing small numbers unchanged.",
+  "abc305_a": "Round the position to the nearest multiple of five, rounding half upward toward the next station.",
+  "abc305_b": "Store the cumulative positions of the labeled points from the fixed adjacent gaps in the statement, then print the absolute difference of the two queried positions.",
+  "abc306_a": "Emit each character of the string twice in order.",
+  "abc307_b": "Try every ordered pair of distinct strings, concatenate, and test for palindromicity directly; the sizes are tiny.",
+  "abc308_c": "Sort by success rate without floating point: compare two people by cross-multiplying their fractions, breaking ties by index; a clean way is sorting with a rational-number key or an exact fraction type.",
+  "abc309_a": "On the fixed three-by-three numbering the two values are horizontally adjacent exactly when they differ by one and the smaller is not at the end of its row \u2014 equivalently the smaller value is not a multiple of three.",
+  "abc310_a": "Answer the smaller of the plain price and the coupon price plus the cheapest dish.",
+  "abc310_b": "For every ordered pair of products, test the three conditions directly using set inclusion of their function lists; the input is small enough for the quadratic scan.",
+  "abc310_c": "Canonicalize each stick by taking the lexicographically smaller of the string and its reversal, insert the canonical forms into a set, and print its size.",
+  "abc311_a": "Scan from the left tracking which of the three letters have been seen, and print the position where the third distinct one first appears.",
+  "abc311_b": "Build the per-day availability by intersecting all schedules, then find the longest run of consecutive all-free days.",
+  "abc315_b": "Compute the middle day's ordinal as half the total plus one, then walk the months subtracting each length until the ordinal fits inside the current month.",
+  "abc318_b": "The coordinates are tiny: mark covered unit squares in a boolean grid for every sheet and count the marked squares.",
+  "abc319_b": "For each position, scan the single-digit divisors of the number in increasing order and print the first one whose quotient divides the position, or a dash when none does.",
+  "abc321_a": "Check that each digit is strictly greater than the digit after it.",
+  "abc321_c": "Every such number corresponds to a nonempty subset of the ten digits arranged in decreasing order, so enumerate all subsets, convert each to its number, sort, and index the requested rank.",
+  "abc323_a": "Check the characters at the even positions (one-indexed) and answer yes only if all are zero.",
+  "abc323_b": "Count each player's wins from their result row, then sort player numbers by wins descending with index ascending as tiebreak.",
+  "abc324_b": "Repeatedly divide out the factor two, then the factor three, and answer yes exactly when one remains.",
+  "abc326_a": "Compute the signed floor difference and answer yes when it is an ascent of at most two or a descent of at most three.",
+  "abc326_c": "Sort the coordinates and slide a window: for each left endpoint, binary search (or advance a second pointer to) the first coordinate at or beyond the left value plus the interval length; the best count is the largest window size.",
+  "abc327_b": "Only a handful of bases are possible since the self-power grows explosively: try successive small bases, computing each base raised to itself with exact integers, and print the base that matches or report failure.",
+  "abc328_b": "For every month-day pair check whether the two numbers written in decimal use a single repeated digit and that digit is common to both; the ranges are tiny, so test all pairs directly.",
+  "abc329_d": "Keep a vote-count array and the current leader; after each vote only the updated candidate can dethrone the leader, taking over on strictly more votes or on equal votes with a smaller number. Print the leader after every vote.",
+  "abc331_a": "Increment the date with rollover: advance the day, wrapping to day one and advancing the month when past the month count, and likewise wrapping the month advances the year.",
+  "abc332_b": "Simulate the loop directly: repeatedly fill the glass when the mug empties into it, following the statement's operation order, for the given number of steps.",
+  "abc337_b": "Answer yes when the string consists of some (possibly empty) run of the first letter, then a run of the second, then a run of the third \u2014 check that letters never move backwards in that fixed order.",
+  "abc341_a": "Print an alternating pattern of ones and zeros that both starts and ends with a one, containing exactly the given count of zeros.",
+  "abc342_a": "All but one character are the same; find the index (one-based) of the character that differs from the majority character."
+ }
+}
