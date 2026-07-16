@@ -1,10 +1,28 @@
-# Register-Gated Refinement, and When Cross-Step Conditioning Pays — a full experimental record
+# The RGR Journal — an experimental record of refinement, anchoring, and where direction comes from
 
-*An execution-grounded verifier carries load; a learned cross-step register does
-not; the register null, once fully localized, reframes the question — from "does
-this architecture work" to "on what task can iterative refinement pay at all" — and
-that reframing drives a stack rebuild (Phase M) and a pre-registered benchmark search
-(Phase 3) whose first hard result is itself a negative worth publishing.*
+*(Retitled 2026-07-16, Phase 5 J0. Original title, kept for the record:
+"Register-Gated Refinement, and When Cross-Step Conditioning Pays — a full
+experimental record.")*
+
+**This document is an experimental journal, and the journal is the primary
+artifact.** It is not scaffolding for a claim: the original claim (the register)
+nulled; both audited successor claims (H1, F2) fell; the central mechanism claim
+reversed under its own missing arm — and at every step the retraction was more
+informative than the claim it replaced. What the project produces is the
+composite recorded here: a working method (§10) applied repeatedly, generating
+pre-registered questions, scoped verdicts, calibrated instruments, and meaning
+extracted from failures — in chronological truth, appended and never revised.
+Papers, if written, are *extractions from journal state* (§0.2), re-derived from
+the record — not the thing the record exists to serve.
+
+*The arc so far, one breath: an execution-grounded verifier seemed to carry load
+(it didn't — quantization artifact); a learned cross-step register carried none;
+the null, fully localized, reframed the question to "where can refinement pay at
+all"; the search for that answer produced the anchoring/escape law, an
+elimination argument, a false-zero floor that predicts to the decimal, a
+cross-family audit that retracted our platform negatives as one family's
+pathology — and finally an existence proof that approach-level direction crosses
+the competence boundary, moving the open question to where direction comes from.*
 
 *Living record — last updated 2026-07-16 (**Phase 4 complete — claim hardening,
 [PHASE_4.md]**: the cross-family battery retracted F1 and the SINK as
@@ -17,23 +35,28 @@ Phase 3b W0–W4 complete: elimination argument hardened, **R3 NULL at declared
 power** [now read as a trace-channel null — §9.8], D2c SINK, BEST+ABSTRACT zero —
 §9.7, [PHASE_3B.md]; Phase-3R audits resolved 2026-07-15: H1 killed-as-artifact, F2
 retracted-as-structural, E5/E1 closed clean). All numbers trace to committed artifacts and
-run records; sources cited inline as `[file]`. This is the canonical results document for
-the whole experiment. **New conversation: start with §10 (working method) and §9.5 (live
-status + restart ordering).** §§1–5 are the register experiment (Phases 0–2 + diagnostic
-teardown, complete and frozen); §6 is the throughput/stack rebuild (Phase M, complete);
-§7 is Phase 3 (reframe + benchmark screen: gate NEGATIVE/F2 as originally scoped — **the
-R2 audit retracted F2's structural reading 2026-07-15; see §9.2**); §9 is the
-**current phase (Phase 3R** — auditing the two live claims H1 and F2, pinning the
-anchoring→escape mechanism; **R1 and R2 both resolved 2026-07-15 — both audited claims
-fell** (H1 artifact §9.1, F2 retracted §9.2); §9.3.1 is the current frontier of
-thought). §10
-is the durable **working method**; §11 is external **references** (Tsui, Olausson,
-Self-Debug, "How Many Tries", Kamoi). Every §4.2/§7.4 claim carries a Phase-3R audit
-banner pointing into §9.*
+run records; sources cited inline as `[file]`. This is the canonical document for the
+whole project. **New conversation: read §10 (working method — the document's thesis,
+now directly after the abstract), then §0 (Claims & Scope Index — what the project
+currently believes), then §9.5 (live status).** §§1–5 are the register experiment
+(Phases 0–2 + diagnostic teardown, complete and frozen); §6 is the stack rebuild
+(Phase M); §7 is Phase 3 (reframe + benchmark screen; F1/F2 both since retracted —
+banners in place); §8 is reproducibility + the operational ledger; §9 is the
+mechanism arc (Phase 3R audits → D-measure → the escape-distance law → the
+elimination argument → Phase 3b's trace null → Phase 4's reversal, §9.8); §11 is
+references + the reconciliation ledger. Historical section numbering is preserved
+(reading order 10 → 0 → 1 is by design, J0); every retracted claim keeps its
+original text under a dated banner.*
 
 ---
 
 ## Abstract
+
+*(Framing, 2026-07-16 J0: what follows is a **composite** — a sequence of
+pre-registered questions, verdicts, retractions, and instruments, kept in
+chronological truth. The abstract accretes dated paragraphs as phases close;
+banners carry corrections backward. For the current belief state in one table,
+see §0.)*
 
 > **Scope correction (2026-07-16, Phase 4 H0c — [PHASE_4.md]).** Every finding in
 > this record was measured on **one model family** (Qwen2.5-Coder, 0.5–1.5B, base +
@@ -201,6 +224,135 @@ moves from "use" back to "production," which is Olausson's original localization
 confirmed at 1/70th their scale.
 
 ---
+
+## 10. Working method — how this project reasons *(read first in any new conversation)*
+
+*(Promoted to directly after the abstract, 2026-07-16 — Phase 5 J0: this section
+is the document's actual thesis. The section number is retained so every existing
+"§10" cross-reference in the record stays valid; the numbering below therefore
+runs 10 → 0 → 1 by design.)*
+
+This section is not results. It is the **operating method** that produced them, written
+down so a fresh conversation continues in the same key rather than reverting to default
+LLM habits (agreeing, refuting, declaring). The method is the reason a mostly-negative
+record is worth publishing.
+
+**The core loop: a failure is a pointer, not a verdict.** Every dead result in this
+project spawned the next question rather than closing the book. H2's null → "what would
+have to be true for *any* refinement to pay?" → the coverage/headroom frame. F2's negative
+→ "is the tail structural or decoding-induced?" → R2. DIAG-8's anchoring → "is this about
+*self* or about *conditioning*?" → D-measure → the escape-distance law → the elimination
+argument. A refutation is treated as *information about our specifics*, not as a general
+truth to adopt or a decision that settles the matter.
+
+**Four rules that operationalize it:**
+
+1. **Question what a refutation means *for our specifics*, don't import it as truth.** When
+   a paper (or our own diagnostic) contradicts us, the first move is mechanistic: *why*
+   does their setup produce that result, and does the mechanism even apply to ours? This is
+   how Self-Debug (improves without execution feedback) and "How Many Tries" (universally
+   effective repair) were reconciled rather than fought — different baselines (greedy vs
+   compute-matched), different regimes (near-correct candidate vs structural failure),
+   different scale. Neither is wrong; both are measuring where our effect is invisible.
+2. **A decision is not a claim; a claim is not a finding.** Our own past suggestions,
+   drafts, and pre-registrations are *hypotheses*, not results, until a committed artifact
+   says otherwise. Prior-session enthusiasm ("BEST-SO-FAR is the charter") gets deflated by
+   the next measurement (E5 = answer leakage) without ceremony. Provenance is tracked per
+   claim: what is measured, what is inferred, what is still a bet.
+3. **Pre-register, then append — never revise.** Predictions and kill criteria are written
+   *before* the run, with odds where possible, and left standing whether they hold or not.
+   Two D-measure predictions were falsified (one *backwards*); both stay on the page next to
+   the corrected mechanism, because the correction is only trustworthy if the error is
+   visible. Retractions are marked `[SUPERSEDED]`/`[retracted]` in place, not deleted.
+4. **Turn the method on ourselves.** The same scrutiny applied to the field applies to our
+   own new findings — hence the E5 subset-confound flag (§9.3.1) raised against our *own*
+   freshest result before it is claimed, and the DIAG-2 problem-grouped-CV catch that killed
+   a false 0.87 that our own pipeline produced. The failure mode we actively guard against is
+   "treading into our own water": deriving a law post-hoc from a handful of cells and then
+   fitting everything to it. The defense is out-of-sample replication (D2a's fresh 12 cells)
+   and a standing generalization test (R2's benchmark family) with the law's predictions
+   pre-committed.
+
+**What this means for a new conversation.** Do not open by agreeing, and do not open by
+declaring a result final. Open by asking what the newest number *means for our specific
+system* and what question it opens. Peer-level pushback is expected and wanted; hedging and
+diplomatic softening are noise. When new evidence could alter a fundamental, question the
+fundamental — but remember the system under question need not be the one we started on
+(the register died; the live system is now anchoring/escape, and that migration is the
+point, not a detour).
+
+**Addendum (2026-07-16, Phase 5 J0 — the journal turn relaxes nothing).** This
+record is now organized as an experimental journal rather than as scaffolding for
+a single claim (see the header and §0). The reframe's failure mode is named here
+so it can be caught: without a claim as organizing pressure, the drift risk is
+**wandering** — running whatever is fun and narrating it afterward. The
+counter-pressure stays exactly what it has been: every run is pre-registered
+against a *named question* with predictions, odds, and decision rules; every
+phase has a charter; every verdict lands appended and dated. The unit of progress
+changes from "claim defended" to **"question closed with scope"** — the
+discipline that closes questions is unchanged. Chasing meaning in failures only
+works if the failures are failures of something specific. One rule is added:
+**every phase's writeup work includes updating the Claims & Scope Index (§0); a
+phase is not closed with the index stale.**
+
+## 0. Claims & Scope Index *(the journal's map — seeded 2026-07-16, Phase 5 J0; maintained at every phase close)*
+
+Every claim this record has ever made, its current status, and the scope the
+evidence actually supports. **This is the single place to check what the project
+currently believes.** Statuses: LIVE / KILLED / RETRACTED / REVERSED / SCOPED.
+
+| # | claim | status | current scope | where |
+|---|---|---|---|---|
+| 1 | Register-gated refinement beats verifier best-of-n | **KILLED** (exact tie, pre-committed kill) | Qwen2.5-Coder-1.5B, HumanEval, imitation regime | §4.3, §5 |
+| 2 | Execution-trained verifier beats likelihood (H1) | **KILLED-AS-ARTIFACT** (quantization; SE matrix inverts across pools) | edge belonged to the corrupted 4-bit pool | §4.2, §9.1 |
+| 3 | Register-null causal localization (injection = transfer failure; update = input starvation) | LIVE (frozen) | that stack, that regime | §5.3 |
+| 4 | F1: function-call benchmarks have a shallow reachable tail | **RETRACTED-AS-QWEN-SCOPED** | true of Qwen2.5-Coder 0.5–1.5B; false of DeepSeek-1.3B (+0.177 in-band) and StarCoder2-3B (+0.252) | §7.3 banner |
+| 5 | F2: no code benchmark offers refinement runway at this scale | **RETRACTED twice** (structural reading → R2; family reading → H1) | LCB-easy feasible on Qwen; runway wider off-Qwen (both families > Qwen) | §7.4, §9.2 |
+| 6 | Escape-distance law (coverage monotone in escape distance; conditioning is a coverage effect, D2b) | **LIVE** | form: 3 families + lexical + structural-AST metrics; constants: family parameters; domain T ≲ 1.2, boundary descends with difficulty; in-context channels | §9.3, §9.3.1 |
+| 7 | Elimination argument (undirected ≤ i.i.d.; repulsion inexpressible; direction the sole surviving channel) | **LIVE, completed** — direction now has an existence proof | measured on Qwen-1.5B; in-context channels only; weight-/search-space never enumerated | §9.3.1, §9.8 |
+| 8 | D2c SINK (conditioning on partial-credit code degrades below both nulls) | **SCOPED + INVERTED** | Qwen-specific pathology; DeepSeek/StarCoder2 *climb* under the same artifacts | §9.7 markers, [PHASE_4.md] H1 |
+| 9 | R3 null — "1.5B cannot use direction" | **REVERSED-AS-REFINED** | a *trace-channel* null: traces carry no usable direction (Qwen); content, not capacity, was the variable | §9.7, §9.8 |
+| 10 | Hint result — approach-level direction crosses the competence boundary (13/68 vs floor 2, p = 4.9e-4) | **LIVE** | Qwen-1.5B, medium stratum, oracle-derived hints; cross-family test = Phase 5 J4 | §9.8 |
+| 11 | Qwen conditioning pathology (double dissociation: code and language channels degrade Qwen, lift DeepSeek) | **LIVE** | Qwen2.5-Coder-1.5B vs DeepSeek-1.3B (44-problem code cell; 20-problem language cell); StarCoder2 code-cell consistent | §9.8, [PHASE_4.md] |
+| 12 | Production bottleneck — "the model cannot produce hint-grade direction for itself" | **LIVE-BUT-INFERRED** (from MODELABS + BSF nulls, not a direct arm) | Qwen-1.5B; direct measurement = Phase 5 J3/J4 | §9.8 |
+| 13 | Temperature is a dose-responsive anti-anchoring intervention | LIVE | Qwen, HumanEval cells, within the law's domain | §9.3 |
+| 14 | Provenance near-irrelevance (instruction verb ≫ provenance) | LIVE | Qwen; holds under lexical and AST metrics | §9.3, H0a follow-up |
+| 15 | False-zero floor model (two-component mixture over k=50 pools) | LIVE — **2 exact hits** (predicted 2.01; B1 observed 2, twice independently) | LCB strata; third out-of-sample test pre-registered (J4, DeepSeek) | §9.6 |
+
+### 0.1 Instruments *(journal products independent of any claim)*
+
+- **The false-zero floor model** (§9.6) — calibrated to the decimal, twice; turns
+  "pass@50 = 0" from a label into an instrument with a stated noise floor.
+- **The reconciliation ledger** (§11) — no external result imported as truth;
+  setup/delta/licenses per entry; it has caught *our own* overclaims twice
+  (Olausson rung; Codex "replication" framing).
+- **The hint leakage-audit protocol** ([artifacts/h2_hints_frozen.json]) — words
+  only, no identifiers/numerals/code tokens, automated screen + hand audit; caught
+  a real drafting error before freeze.
+- **The AST-distance stack** ([scripts/h0a_ast_distance.py]) — canonicalized
+  Zhang–Shasha with a validated C kernel; makes every lexical distance claim
+  re-checkable structurally.
+- **The per-family smoke gate** (H1 practice) — no family is screened broken;
+  template validated before any cell counts.
+- **The first-n bias lesson** (§7.2) — subset screens on *random* samples only;
+  first-n was ~2× optimistic, caught by the confirmation step.
+- **Hardened judges + ops ledger** (§8) — short-circuit vs all-cases matched to
+  the analysis; detach/checkpoint/volume-first persistence; six recorded failure
+  modes with fixes.
+
+### 0.2 Extraction candidates *(papers are extractions from journal state, not the frame)*
+
+No commitment implied; the journal decides when an extraction is ripe.
+
+1. **The mechanism paper** — escape-distance law + elimination argument + the
+   hint existence proof (§9.3–9.8). Still needs: the J2 dose-response grade, J4's
+   cross-family trace/hint scope lines.
+2. **The Qwen pathology note** — the double dissociation + SINK inversion
+   ([PHASE_4.md]); fastest to publishable, audience primed post-Spurious-Rewards.
+   Still needs: J4's four-arm table; strengthened by J5's 7B persistence cell if
+   authorized.
+3. **The methods record** — §10 + §0.1 + the prediction-accounting trail; needs
+   no new data, only extraction.
 
 ## 1. The claim and its kill criteria
 
@@ -1608,57 +1760,6 @@ deployable self-refinement still requires something that *generates* the hint,
 and R3/BSF showed this model cannot generate it for itself.
 
 ---
-
-## 10. Working method — how this project reasons *(read first in any new conversation)*
-
-This section is not results. It is the **operating method** that produced them, written
-down so a fresh conversation continues in the same key rather than reverting to default
-LLM habits (agreeing, refuting, declaring). The method is the reason a mostly-negative
-record is worth publishing.
-
-**The core loop: a failure is a pointer, not a verdict.** Every dead result in this
-project spawned the next question rather than closing the book. H2's null → "what would
-have to be true for *any* refinement to pay?" → the coverage/headroom frame. F2's negative
-→ "is the tail structural or decoding-induced?" → R2. DIAG-8's anchoring → "is this about
-*self* or about *conditioning*?" → D-measure → the escape-distance law → the elimination
-argument. A refutation is treated as *information about our specifics*, not as a general
-truth to adopt or a decision that settles the matter.
-
-**Four rules that operationalize it:**
-
-1. **Question what a refutation means *for our specifics*, don't import it as truth.** When
-   a paper (or our own diagnostic) contradicts us, the first move is mechanistic: *why*
-   does their setup produce that result, and does the mechanism even apply to ours? This is
-   how Self-Debug (improves without execution feedback) and "How Many Tries" (universally
-   effective repair) were reconciled rather than fought — different baselines (greedy vs
-   compute-matched), different regimes (near-correct candidate vs structural failure),
-   different scale. Neither is wrong; both are measuring where our effect is invisible.
-2. **A decision is not a claim; a claim is not a finding.** Our own past suggestions,
-   drafts, and pre-registrations are *hypotheses*, not results, until a committed artifact
-   says otherwise. Prior-session enthusiasm ("BEST-SO-FAR is the charter") gets deflated by
-   the next measurement (E5 = answer leakage) without ceremony. Provenance is tracked per
-   claim: what is measured, what is inferred, what is still a bet.
-3. **Pre-register, then append — never revise.** Predictions and kill criteria are written
-   *before* the run, with odds where possible, and left standing whether they hold or not.
-   Two D-measure predictions were falsified (one *backwards*); both stay on the page next to
-   the corrected mechanism, because the correction is only trustworthy if the error is
-   visible. Retractions are marked `[SUPERSEDED]`/`[retracted]` in place, not deleted.
-4. **Turn the method on ourselves.** The same scrutiny applied to the field applies to our
-   own new findings — hence the E5 subset-confound flag (§9.3.1) raised against our *own*
-   freshest result before it is claimed, and the DIAG-2 problem-grouped-CV catch that killed
-   a false 0.87 that our own pipeline produced. The failure mode we actively guard against is
-   "treading into our own water": deriving a law post-hoc from a handful of cells and then
-   fitting everything to it. The defense is out-of-sample replication (D2a's fresh 12 cells)
-   and a standing generalization test (R2's benchmark family) with the law's predictions
-   pre-committed.
-
-**What this means for a new conversation.** Do not open by agreeing, and do not open by
-declaring a result final. Open by asking what the newest number *means for our specific
-system* and what question it opens. Peer-level pushback is expected and wanted; hedging and
-diplomatic softening are noise. When new evidence could alter a fundamental, question the
-fundamental — but remember the system under question need not be the one we started on
-(the register died; the live system is now anchoring/escape, and that migration is the
-point, not a detour).
 
 ## 11. References *(external work this record engages; formal citations to be fitted at paper stage)*
 
