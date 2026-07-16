@@ -1,0 +1,125 @@
+{
+  "_label": "H2b near-miss band \u2014 B1/TRACE/HINT k=25, all fresh [PHASE_4.md H2b]",
+  "n": 39,
+  "excluded_no_artifact": [],
+  "recoveries": {
+    "B1": 24,
+    "TRACE": 23,
+    "HINT": 34
+  },
+  "contrasts": {
+    "TRACE_vs_B1": {
+      "arm_only": 3,
+      "b1_only": 4,
+      "p_one_sided_mcnemar": 0.7734375
+    },
+    "HINT_vs_B1": {
+      "arm_only": 14,
+      "b1_only": 4,
+      "p_one_sided_mcnemar": 0.01544189453125
+    }
+  },
+  "per_tier": {
+    "1": {
+      "B1": 18,
+      "TRACE": 16,
+      "HINT": 26,
+      "n": 31
+    },
+    "2": {
+      "B1": 6,
+      "TRACE": 7,
+      "HINT": 8,
+      "n": 8
+    }
+  },
+  "recovered_qids": {
+    "B1": [
+      "1873_A",
+      "1873_B",
+      "1899_A",
+      "abc303_a",
+      "abc306_a",
+      "abc307_a",
+      "abc307_b",
+      "abc308_c",
+      "abc310_a",
+      "abc310_c",
+      "abc311_a",
+      "abc318_b",
+      "abc319_b",
+      "abc320_b",
+      "abc321_a",
+      "abc321_c",
+      "abc323_a",
+      "abc324_b",
+      "abc327_b",
+      "abc328_b",
+      "abc329_d",
+      "abc331_a",
+      "abc332_b",
+      "abc341_a"
+    ],
+    "TRACE": [
+      "1873_A",
+      "1873_B",
+      "1899_A",
+      "abc303_a",
+      "abc304_b",
+      "abc306_a",
+      "abc307_a",
+      "abc307_b",
+      "abc308_c",
+      "abc310_a",
+      "abc310_c",
+      "abc311_a",
+      "abc315_b",
+      "abc320_b",
+      "abc321_a",
+      "abc321_c",
+      "abc323_a",
+      "abc324_b",
+      "abc326_c",
+      "abc327_b",
+      "abc328_b",
+      "abc331_a",
+      "abc341_a"
+    ],
+    "HINT": [
+      "1873_A",
+      "1873_B",
+      "1883_B",
+      "1899_A",
+      "abc302_c",
+      "abc303_a",
+      "abc304_a",
+      "abc304_b",
+      "abc305_a",
+      "abc305_b",
+      "abc306_a",
+      "abc307_a",
+      "abc307_b",
+      "abc309_a",
+      "abc310_a",
+      "abc310_b",
+      "abc310_c",
+      "abc311_a",
+      "abc311_b",
+      "abc315_b",
+      "abc318_b",
+      "abc319_b",
+      "abc320_b",
+      "abc321_a",
+      "abc323_a",
+      "abc323_b",
+      "abc324_b",
+      "abc326_a",
+      "abc326_c",
+      "abc327_b",
+      "abc328_b",
+      "abc331_a",
+      "abc341_a",
+      "abc342_a"
+    ]
+  }
+}

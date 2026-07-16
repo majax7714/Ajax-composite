@@ -528,6 +528,48 @@ measured on the one family that responds to conditioning by degrading. Licensed
 reading only: the H2a harm is Qwen-scoped conditioning degradation (reading (i));
 n = 20 and one alternative family — no stronger generalization is claimed.
 
-*(H2b result lands below.)*
+### H2b RESULT (2026-07-16) — **the 55% favourite hit: HINT > B1, significant; TRACE nulls even inside the boundary**
+
+39/39 problems with usable failing artifacts. Recoveries (any-pass@25): **B1 24,
+TRACE 23, HINT 34**. Contrasts (paired exact McNemar, one-sided): **HINT vs B1:
+14 hint-only / 4 b1-only, p = 0.015 — significant** (the pre-registered 55%
+favourite); TRACE vs B1: 3/4, p = 0.77 — null (the 30% branch missed; trace
+feedback adds nothing even where the model nearly can). Per-tier: x=1 (n=31)
+B1 18 / HINT 26; x=2 (n=8) B1 6 / HINT 8. **Direction works inside the
+boundary — the competence-boundary thesis's falsifiable consequence confirmed,
+via the hint channel only.** [artifacts/h2b_near_miss.json].
+
+**The pre-flagged anomaly (hint win from a "harmful" channel), chased and
+resolved:** the manipulation set is **coverage-saturated** — E0-25 and HINT-25
+both recover 20/20 there — so the gate could only ever see per-sample quality,
+the axis D2b showed is *not* recovery-relevant. Coherent statement, and it is
+the law's own signature appearing on the quality axis: **on Qwen,
+hint-conditioning depresses per-sample quality (gate HARM) while directing
+coverage (H2b win)**; where coverage has room, the trade wins. The gate metric
+was mis-specified against the record's own D2b finding; the HARM verdict and the
+postponement it triggered stand above as recorded.
+
+### H2a part 2 — AMENDED pre-registration (2026-07-16, frozen before the run)
+
+**Why an amendment is licensed:** (i) the channel is sound (E-H2: hints lift
+DeepSeek per-sample); (ii) the coverage-form of the gate — "hints must
+demonstrably work where they can" — is now passed on Qwen itself (H2b,
+p = 0.015); (iii) the original gate's metric is documented above as
+mis-specified. This is a new instrument with a new registration, not a
+re-litigation of the fired gate.
+
+**Design:** HINT-50 vs fresh B1-50, medium 0/50 stratum (n = 68), frozen config,
+paired exact McNemar α = 0.05 one-sided, floor reference 2.0 (W0c), W2 power
+envelope (null forecloses r ≳ 0.15; r ∈ [0.05, 0.13) unresolvable). PULL/AST
+recorded; full recovery validation on any recovery.
+
+**Branches (odds):** **(a)** HINT significantly above B1 → approach-level
+direction crosses the boundary; "capacity to use direction" retracted-as-
+overclaim; the R3 null becomes "trace-channel null," not "direction null" —
+**30%**. **(b)** on-floor null → the boundary thesis takes its sharpest form:
+**direction helps exactly up to the competence boundary and not beyond** (H2b
+inside, null outside) — **45%**. **(c)** positive-unresolvable — **25%**.
+
+*(H2a part 2 RESULT lands below.)*
 
 ---
