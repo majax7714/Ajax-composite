@@ -1817,6 +1817,14 @@ and R3/BSF showed this model cannot generate it for itself.
   organically-trained models. *Our relation:* tension with F1's shallow-tail reading if
   universal; basis for H1's hypothesis that BCB flatness may be Qwen-pipeline-scoped
   (ledger below).
+- **Self-planning code generation (Jiang et al.).** Plan-then-implement with
+  code-davinci-002; includes a ground-truth-planning arm (plans supplied, implementation
+  only). *Our relation:* the structural precedent for the hint channel at ~100× our
+  scale; we compute-match and extend downward (ledger below).
+- **PlanSearch (arXiv 2409.03733).** Search over natural-language plans lifts pass@200 on
+  LiveCodeBench for frontier models; gains track idea-space diversity. *Our relation:*
+  the deployable ceiling of the direction channel; frames the record's open question as
+  the minimum scale of direction self-production (ledger below).
 
 *Note on independence (to state honestly at paper stage):* the anchoring/escape line was
 reached from our own DIAG-8 spin-off before we surveyed Tsui/Olausson; we position as
@@ -1976,6 +1984,47 @@ design constant. Each entry states (a) their setup specifics, (b) the delta to o
   AlphaCode's favor — both organic-corpus families show deep reachable tails on
   BCB (headroom +0.177/+0.252) and LCB-easy; F1 retracted-as-Qwen-scoped (§7.3).
   The synthetic-data *mechanism* remains unisolated, as pre-declared.*
+
+*The following entries added 2026-07-16 (Phase 5 J1 — [PHASE_5.md]; they inform
+the direction tranche's designs before any of it runs).*
+
+- **Self-planning code generation (Jiang et al.) → the hint channel's precedent
+  (J3/J4 design).** (a) Their setup: code-davinci-002 (175B-class),
+  HumanEval/MBPP, plan-then-implement prompting; baselines are Direct and
+  Code-CoT — **not compute-matched sampling**; critically, they ran a
+  **Ground-truth Planning arm** — supplying the model with plans and running
+  implementation only — which is structurally our HINT arm at ~100× scale.
+  (b) Our delta: 1.5B, compute-matched B1 controls, a pass@50 = 0 stratum,
+  leakage-audited two-sentence hints, execution-quantified. (c) **Licenses:**
+  the plan/implement decomposition as established territory we extend *downward*
+  and *compute-match* — §9.8's result is their ground-truth-planning arm asked
+  the question they never asked (does it beat resampling?). **Does not
+  license:** any expectation that *self*-planning works at 1.5B — their planner
+  was the same 175B-class model; J3 asks the compute-matched self-planning
+  question at 1/100th scale.
+- **PlanSearch (arXiv 2409.03733) → the deployable ceiling of the direction
+  channel (J3/J5 framing).** (a) Searching over natural-language plans before
+  implementing yields large pass@200 gains on LiveCodeBench with frontier
+  models; the driver is **diversity in idea space**, and search gains are
+  predictable from that diversity. (b) Ours is the opposite corner: direction
+  *supplied*, tiny model, provably-unreachable stratum. (c) **Licenses:**
+  framing the record's open question as **minimum scale of direction
+  self-production** — frontier models manufacture their own direction by
+  plan-space search; our 1.5B provably executes supplied direction (§9.8) and
+  provably fails to produce it (R3/BSF — J3 measures this directly). Somewhere
+  between is a switch-on point; J5's 7B cell would be the first data point
+  between the ends. **Does not license:** magnitudes, or assuming the switch-on
+  is smooth (idea-space diversity may be emergent, not gradual).
+- **"How Many Tries" + Codex entries, amended for the re-scoped 7B fork
+  (J5).** The original H3 fork (anchor channels worsen with scale, direction
+  channels improve) was framed to discriminate SINK-as-capacity from
+  SINK-as-distribution-matching; H1's inversion already broke that tie
+  (distribution-matching fails to explain Qwen's sink). *Amendment: the
+  7B-relevant questions are now (i) does the **Qwen conditioning pathology
+  persist at 7B** (family property vs small-Qwen property), and (ii) does
+  **direction self-production switch on by 7B** (the PlanSearch-frame minimum-
+  scale question). The HMT scale trend and Codex inverse-scaling readings remain
+  the priors for (i); neither speaks to (ii).*
 
 *Appendix pointers. Architecture [ARCHITECTURE.md]; decision log **D1–D16**
 [DECISIONS.md] (D11 precision, D14 statistical reproducibility, D15 retracted, D16 =
