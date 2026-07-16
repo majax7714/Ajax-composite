@@ -6,9 +6,10 @@ this architecture work" to "on what task can iterative refinement pay at all" �
 that reframing drives a stack rebuild (Phase M) and a pre-registered benchmark search
 (Phase 3) whose first hard result is itself a negative worth publishing.*
 
-*Living record — last updated 2026-07-15 (Phase-3R audits **RESOLVED**: **H1
-killed-as-artifact** by the landed R1b.2d retrain, **F2 retracted-as-structural** by the
-completed R2 grid, E5/E1 subset confound closed clean). All numbers trace to committed artifacts and
+*Living record — last updated 2026-07-16 (Phase 3b W0–W4 complete: elimination
+argument hardened, **R3 NULL at declared power**, D2c SINK, BEST+ABSTRACT zero —
+§9.7, [PHASE_3B.md]; Phase-3R audits resolved 2026-07-15: H1 killed-as-artifact, F2
+retracted-as-structural, E5/E1 closed clean). All numbers trace to committed artifacts and
 run records; sources cited inline as `[file]`. This is the canonical results document for
 the whole experiment. **New conversation: start with §10 (working method) and §9.5 (live
 status + restart ordering).** §§1–5 are the register experiment (Phases 0–2 + diagnostic
@@ -121,6 +122,17 @@ pool (corrupted likelihood + easy-to-discriminate failures), never to the verifi
 **Both audited claims have now fallen** — H1 killed-as-artifact (§9.1), F2
 retracted-as-structural (§9.2); what survives Phase 3R is the register null, the
 escape-distance law, and the LCB-easy feasible region.
+**Phase 3b executed 2026-07-16 (§9.7, [PHASE_3B.md]):** the elimination argument
+survived its own audit (measured anchor, closed repulsion hatch, temperature-bounded
+domain), and the frozen four-arm R3 returned a **powered, validated null** — with
+oracle-grade execution traces supplied verbatim, a 1.5B base model recovers nothing
+beyond the false-zero floor on a pass@50 = 0 stratum (floor predicted 2.0, observed
+2), conditioning on code *sinks* quality below the artifact it aims at, and adding
+the code anchor to trace feedback destroys the trace arm's small coverage.
+Sample-based refinement at this scale is closed: **escape requires direction, and
+direction requires capacity the model does not have — the constraint is not the
+feedback channel but the model's ability to use it.** Open: r ∈ [0.05, 0.13)
+(pre-declared unresolvable), and scales above 1.5B.
 
 ---
 
@@ -1099,7 +1111,20 @@ coverage 0.65/0.92/0.90/0.37). [artifacts/dmeasure_e7.json].
   premise test: condition on a ~40–60%-tests artifact, measure the generated candidate's
   `frac_tests` — flat → BEST-alone dead; climbing → a bigger result than scoped.
 
-### 9.5 Live status (2026-07-15, post-R1b.2d — **the Phase-3R audits are complete**)
+### 9.5 Live status (2026-07-16, post-W4 — **Phase 3b is executed and closed; see §9.7 verdicts**)
+
+> **Status supersession (2026-07-16).** Everything below this banner describes the
+> state at Phase-3R close (2026-07-15) and stands as the historical record. Current
+> state: the Phase-3b design cycle ([PHASE_3B.md]) ran W0→W4 to completion — W0a
+> anchor measured (prediction wrong, argument stretched), W1/E7 branch (a)
+> strengthened + the law's temperature-bounded domain, W2 medium stratum 68/78
+> (power: medium primary, easy demoted), W3 frozen, W4 executed: **D2c SINK, R3 NULL
+> at declared power, BEST+ABSTRACT zero (anchor poisons direction)** — §9.7. Nothing
+> is running. Open decisions (the user's, not run work): paper stage vs a scale
+> escalation (the only axis the null does not foreclose), and whether to spend on
+> the unresolvable band r ∈ [0.05, 0.13) with a larger stratum.
+
+*(historical, 2026-07-15)*
 
 **Closed:** judge fix; R1a; R1b.2a/b/c; D-measure incl. Addendum II (judge/D-measure
 pre-reg) and Addendum III (escape-distance law, temperature dose-response,
@@ -1215,6 +1240,32 @@ problems, artifact = band candidate nearest frac 0.5, verdict = CLIMB ~20% / FLA
 / SINK ~15% against the W0b copy-null and i.i.d.-null. **BEST-SO-FAR** (runs last): 30
 refinement-regime problems, five conditions, oracle-first by frac_tests; Addendum III
 §5 predictions stand.
+
+**VERDICTS (2026-07-16 — W4 executed; full detail + prediction accounting
+[PHASE_3B.md] W4 RESULTS).** **D2c/E6: SINK** (the 15% branch) — conditioning on a
+~0.49-frac artifact yields mean frac 0.374, significantly below copying (p ≈ 5×10⁻⁵)
+and below i.i.d. (0.468); copy fidelity on LCB/base is only 0.57 (the 0.83–0.98
+HumanEval/instruct regime does not transfer) — conditioning produces a *degraded
+blend*. **R3: NULL at declared power** (medium, primary): B1-50 recovered exactly 2 —
+the W0c floor prediction to the decimal — and every arm sits on the floor (ANCHOR 2,
+TRACE 1, MODELABS 3; TRACE vs B1 p = 0.875). The PULL column carries the mechanism:
+TRACE/MODELABS generated at i.i.d. distance (0.85 ≈ B1's 0.84) — *full escape with
+direction supplied* — and recovered nothing; at 1.5B the model cannot **use**
+direction on problems beyond its competence, at either end of the deployability
+spectrum. r ≥ 0.15 is foreclosed; r ∈ [0.05, 0.13) stands unresolvable as
+pre-declared. All 19 recovery events rerun-stable; contamination date-flag uniform
+(global LCB-vs-Qwen2.5 scope caveat, no arm-specific unlock pattern); the
+repeated-qid recoveries (abc314_a by all four easy arms) are the false-zero mechanism
+in the raw. **BEST-SO-FAR: the attractor cannot be aimed on this stack** — BEST
+conditioning lands at 0.255 mean frac against its own artifacts' 0.408 (the SINK
+replicated); LAST inherits its artifact's badness (0.086); the only coverage anywhere
+is ABSTRACT trace-only (2/30, p = 0.25 n.s.); and **BEST+ABSTRACT — the pre-registered
+favourite at 55% — got zero: adding the code anchor destroyed the trace arm's
+coverage.** The anchor poisons the direction. Phase verdict: sample-based refinement
+at 0.5–1.5B is closed with a powered, validated null — conditioning on code degrades,
+direction without code adds nothing over the floor, and their combination is worse
+than either; open remainders stated plainly: r ∈ [0.05, 0.13) on medium, and scales
+above 1.5B.
 
 ---
 

@@ -1,0 +1,47 @@
+{
+  "_label": "BEST-SO-FAR \u2014 five conditions [PHASE_3B W3 \u00a73]",
+  "n_problems": 30,
+  "conditions": {
+    "B1": {
+      "coverage": 0.0,
+      "mean_frac": 0.19188492063492063,
+      "vs_B1": null
+    },
+    "LAST": {
+      "coverage": 0.0,
+      "mean_frac": 0.08596688034188034,
+      "vs_B1": {
+        "only_LAST": 0,
+        "only_B1": 0,
+        "one_sided_p": 1.0
+      }
+    },
+    "BEST": {
+      "coverage": 0.0,
+      "mean_frac": 0.2550438797313797,
+      "vs_B1": {
+        "only_BEST": 0,
+        "only_B1": 0,
+        "one_sided_p": 1.0
+      }
+    },
+    "ABSTRACT": {
+      "coverage": 0.06666666666666667,
+      "mean_frac": 0.17415979853479854,
+      "vs_B1": {
+        "only_ABSTRACT": 2,
+        "only_B1": 0,
+        "one_sided_p": 0.25
+      }
+    },
+    "BESTABS": {
+      "coverage": 0.0,
+      "mean_frac": 0.25352335164835166,
+      "vs_B1": {
+        "only_BESTABS": 0,
+        "only_B1": 0,
+        "one_sided_p": 1.0
+      }
+    }
+  }
+}

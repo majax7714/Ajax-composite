@@ -522,3 +522,96 @@ prediction (75%) now looks conservative. Prediction accounting: SINK was the 15%
 branch — the modal FLAT (65%) call was **wrong**; the direction of the miss is the
 same as every D-measure surprise to date (the attractor is worse for repair than
 assumed, never better).
+
+### R3 — VERDICT: NULL at declared power (medium, primary); floor everywhere — [artifacts/r3_conditional_reachability.json]
+
+**Medium stratum (primary, n=68):**
+
+| arm | recoveries /68 | mean PULL vs artifact |
+|---|---|---|
+| B1-50 | **2** | 0.841 |
+| ANCHOR | 2 | 0.399 |
+| TRACE | 1 | 0.860 |
+| MODELABS | 3 | 0.845 |
+
+Primary TRACE vs B1: only-TRACE 1 / only-B1 2, one-sided p = 0.875. **The frozen rule
+fires on the null branch: r ≥ 0.15 is foreclosed at this scale/config; r ∈ [0.05,
+0.13) stands pre-declared unresolvable.** Three readings, in order of importance:
+
+1. **The false-zero floor model was exact:** W0c/W2 predicted E ≈ 2.01 lucky B1-50
+   recoveries; B1 recovered exactly 2. Every arm sits on that floor (1–3).
+2. **The PULL column resolves the Olausson ambiguity — and closes it harder than
+   expected.** TRACE and MODELABS (no code in context) generated at i.i.d. distance
+   from the artifact (0.85 ≈ B1's 0.84): *full escape with direction supplied* — and
+   recovered nothing. The null is not "anchoring ate the direction" and not "the model
+   can't produce direction" (the trace arm has no model in the loop): **at 1.5B the
+   model cannot USE direction on problems beyond its competence.** The feedback axis
+   itself is dead on this stratum, at both ends of the deployability spectrum.
+3. **No off-the-curve point exists.** D2b flatness is unbroken; the successful-R3
+   figure prediction never triggered.
+
+**Easy stratum (exploratory, unpowered, n=19):** B1 2 / ANCHOR 3 / TRACE 3 /
+MODELABS 3 (floor ≈ 3.6; TRACE vs B1 p = 0.5) — everything at or under the floor;
+labeled POSITIVE-BUT-UNRESOLVABLE by the rule, and the pre-registered power statement
+(power 0.25 even at r = 0.40) forbids reading anything into it.
+
+**Recovery validation (frozen protocol, all 19 events):** every recovery
+**rerun-stable** (zero judge flakiness). Contamination date-flag fires **uniformly**
+(all LCB problems in our pool predate the base model's training window) — a global
+scope caveat on LCB-vs-Qwen2.5 exposure, uninformative within-pool, and with no
+arm-specific pattern there is no feedback-unlocked-memorization signature. AST
+similarity vs the 50-draw failure pool: 0.28–0.79 on 17/19 events (fresh-shaped), one
+B1 event at 0.85 (in-distribution lucky draw — the textbook false zero). The
+repeated-qid pattern (abc314_a recovered by *all four* easy arms; abc339_b, abc330_b
+by two each) is the false-zero mechanism visible in the raw. **Error-type check (HMT
+ledger):** medium recovery events under-represent wrong_answer artifacts (4/8 = 50%
+vs 76% stratum base) and over-represent runtime/timeout (50% vs 24%) — the predicted
+skew, directionally, at uninterpretably small n.
+
+**Prediction accounting (frozen odds → outcomes):** ABSTRACT-trace significant 15% /
+positive-unresolvable 45% / **null-or-negative 40% ← fired** (medium). ANCHOR ≤ B1
+(75%) — held (tie). MODELABS ≤ TRACE (80%) — **wrong on counts** (3 > 1; p = 0.31,
+floor noise; recorded). Off-the-curve conditional — never triggered. Error-type skew
+(60%) — held directionally.
+
+### BEST-SO-FAR — the attractor cannot be aimed on this stack — [artifacts/bestsofar.json]
+
+30/30 frozen problems, 8 draws/condition:
+
+| condition | coverage | mean frac | vs B1 (McNemar) |
+|---|---|---|---|
+| B1 | 0.000 | 0.192 | — |
+| LAST | 0.000 | 0.086 | 0/0 |
+| BEST | 0.000 | **0.255** | 0/0 |
+| ABSTRACT | **0.067** | 0.174 | 2/0, p = 0.25 |
+| BEST+ABSTRACT | 0.000 | 0.254 | 0/0 |
+
+- **The D2c SINK replicates:** BEST artifacts average frac **0.408**; BEST-conditioned
+  generations average **0.255** — a degraded blend (fidelity 0.57) landing between
+  artifact and i.i.d., never above the artifact. "Hold-at-best" fails not because the
+  attractor holds (it can't — fidelity is too low on LCB/base) but because the blend
+  sinks below the thing it was aimed at. LAST is catastrophic (0.086 — anchoring to
+  the *last* attempt inherits its badness, mean LAST artifact frac 0.059).
+- **The only coverage anywhere is ABSTRACT (trace-only, no code): 2/30**, p = 0.25
+  n.s. — the same whisper as R3-easy's TRACE 3/19: direction-without-anchor is the
+  least-bad conditioning, on problems within competence, never significantly.
+- **Prediction accounting:** BEST > LAST (80%) — held (frac). BEST ≈ B1 hold-at-best —
+  superseded by the sharper SINK reading. ABSTRACT > BEST (60%) — held on coverage.
+  **BEST+ABSTRACT the favourite (55%) — WRONG:** zero coverage; adding the BEST code
+  to the trace *destroyed* ABSTRACT's coverage (0.067 → 0.000) — the anchor poisons
+  the direction, it does not complement it. The last mechanistically-live BEST-SO-FAR
+  condition is dead as scoped.
+
+### The phase verdict, one paragraph
+
+Phase 3b closes the sample-based-refinement question at 0.5–1.5B with a powered,
+validated null and a coherent mechanism: **conditioning on code degrades (SINK, twice
+replicated); direction without code rides at i.i.d. distance and adds nothing the
+false-zero floor doesn't already explain (R3, both strata); combining them lets the
+anchor poison the direction (BEST+ABSTRACT).** The escape-distance law holds
+everywhere it was tested, now with a measured anchor (W0a), a closed repulsion hatch
+(W1), a temperature-bounded domain (W1/W2), and a floor-exact stratum model (W0c). The
+elimination argument survived its audit; what it eliminates now includes every
+conditioning channel this stack can express. What it does *not* foreclose, stated
+plainly: r ∈ [0.05, 0.13) on medium (unresolvable by design), and everything at scales
+above 1.5B — where HMT's scale trend says the capacity to use direction may appear.
