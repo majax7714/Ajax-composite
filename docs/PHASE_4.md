@@ -188,3 +188,62 @@ no claim rests on this.
 
 **Writeup:** §9.3 "The law under structural distance" appended (same numbers,
 condensed); the two prediction misses stand there with these odds.
+
+---
+
+## H0b — reconciliation-ledger additions + one amendment (2026-07-16, DONE)
+
+Landed in WRITEUP §11: **Olausson entry AMENDED in place** (the outcome clause had
+imported their bottleneck localization one rung past our arms — trace ≠ their human
+conceptual-explanation oracle; the decomposition separated feedback *production* from
+the *trace channel*, and did not reach "use"; H2a is the missing rung). **Four new
+entries:** Chen et al. 2021 Codex alignment appendix (+ arXiv 2306.03438) → SINK as
+replication-plus-extension; the inverse-scaling reading of Codex → H3's
+opposite-directions prediction; Spurious Rewards 2506.10947 + 2507.10532 → H1's
+existence (family transfer as mandatory audit); AlphaCode → the H1 cell-(i)
+hypothesis (BCB flatness possibly Qwen-pipeline-scoped). Reference-list bullets added
+for the three new works.
+
+## H0c — writeup scoping corrections (2026-07-16, DONE)
+
+- Every claim-bearing "at this scale" in the abstract, §5, §7, §9 now reads "on
+  Qwen2.5-Coder at this scale"; a dated scope-correction banner opens the abstract
+  and documents the edit class (nothing silent).
+- SINK repositioned (§9.7 + abstract banner): quantified replication-plus-extension
+  of the Codex buggy-prompt phenomenon; dual-hypothesis paragraph added
+  (capacity vs distribution-matching; H3 discriminates).
+- Elimination argument scoped to **in-context channels** (§9.3.1 channel-scope
+  append): weight-space (TTT — named successor experiment, outside this record) and
+  search-space (feedback-guided search; multi-model sampling) were never enumerated.
+- §9.3.1 closing + §9.7 mechanism sentence amended: the R3 null bounds the bottleneck
+  at the **trace channel**, not at "use" (per the Olausson amendment).
+- MODELABS note at §9.7: 3 vs TRACE 1 is floor noise (p = 0.875); no
+  compression-helps reading.
+
+## H3 — cross-scale pre-registration (2026-07-16, FROZEN; running is a separate sign-off)
+
+**Basis:** §11 ledger entries (Codex inverse-scaling; "How Many Tries" scale trend).
+
+**Pre-registered prediction (directional only, no magnitudes licensed):** above 1.5B,
+the two channel categories move in **opposite directions** —
+
+- **Anchor-conditioning channels** (BEST / LAST / ANCHOR / BEST+ABSTRACT / D2c-style):
+  conditioned-quality delta vs i.i.d. **worsens** with scale (imitation /
+  distribution-matching: predicting continuation-of-buggy-code improves as the model
+  gets better at distribution-matching).
+- **Direction channels** (TRACE / HINT): recovery delta vs matched-compute B1
+  **improves** with scale ("How Many Tries": ≤ +5.5pp at 70B).
+
+**What it discriminates:** SINK-as-capacity predicts anchor channels *improve* with
+scale; SINK-as-distribution-matching predicts they *degrade*. The two readings are
+indistinguishable at a single scale by construction.
+
+**Design sketch for the optional spot check (NOT authorized by this pre-reg; cost
+gate + user sign-off required after H1/H2 report):** Qwen2.5-Coder-7B bf16 on L4
+(verify KV headroom at our context lengths), one D2c cell (44 problems) + one TRACE
+cell (medium stratum), same judge, seed 17, k matched to the 1.5B reference cells.
+Combined with H1 this de-confounds scale from family within one design.
+
+**Writeup:** §9.7 addendum (condensed) landed with H0c.
+
+---

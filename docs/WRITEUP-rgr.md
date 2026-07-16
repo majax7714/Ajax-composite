@@ -28,6 +28,24 @@ banner pointing into §9.*
 
 ## Abstract
 
+> **Scope correction (2026-07-16, Phase 4 H0c — [PHASE_4.md]).** Every finding in
+> this record was measured on **one model family** (Qwen2.5-Coder, 0.5–1.5B, base +
+> instruct); scale and family are confounded in every "at this scale" sentence.
+> After the Spurious-Rewards precedent (§11 ledger — an entire sub-literature's
+> conclusions turned out to be one family's pretraining priors), family transfer is
+> treated as a **mandatory audit, not a limitation paragraph**: claim-bearing "at
+> this scale" phrases now read "on Qwen2.5-Coder at this scale" throughout (abstract,
+> §5, §7, §9), and the H1 cross-family battery (DeepSeek-Coder-1.3B, StarCoder2-3B)
+> either widens each scope back with a measurement or narrows it permanently. Two
+> companion corrections land with this: **D2c's SINK** is repositioned as a
+> quantified replication-plus-extension of the Codex buggy-prompt imitation
+> phenomenon (§11 ledger), currently ambiguous between a capacity limit and faithful
+> distribution-matching — H3 (§9.7 addendum) pre-registers the cross-scale fork that
+> discriminates; and the **elimination argument** (§9.3.1) is scoped to *in-context
+> conditioning channels* — weight-space (test-time training) and search-space
+> (feedback-guided search, multi-model sampling) channels were never in its
+> enumeration.
+
 We test one claim in isolation: that an explicit internal state vector — a
 *register* — updated across refinement steps and gating generation improves
 correctness beyond what verification-plus-iteration already provides. We
@@ -68,8 +86,8 @@ documented negative that generalizes. Across **two benchmark families** (BigCode
 LiveCodeBench), two execution paradigms (unit test, stdin/stdout), three difficulty
 tiers, and two model scales, **no configuration offers the reachable tail refinement
 needs — pass@50 − pass@8 is capped at ~0.09–0.12, never the required ≥0.15** (Finding
-F2). The gate returns a **negative**, and it is structural: a code model at this scale
-solves a problem within a few samples or not at all (a peaked, not heavy-tailed,
+F2). The gate returns a **negative**, and it is structural: a Qwen2.5-Coder model at this
+scale solves a problem within a few samples or not at all (a peaked, not heavy-tailed,
 per-problem solution distribution), so pass@k saturates and sample-based refinement
 has almost no runway — the same "solve-within-8-or-not" shape that sank HumanEval,
 now shown to be a property of the whole task family, not an unlucky choice. **That
@@ -110,8 +128,8 @@ recompute before the content-blindness/neutral-attractor claim is called final.
 branch — F2 is retracted-as-structural**: with the tail un-suppressed, LiveCodeBench-easy
 has a feasible *region* (the whole base arm plus instruct T=1.2; headroom up to +0.25
 at in-band coverage) while BigCodeBench stays infeasible at every cell — the shallow
-tail was a property of benchmark-family × decoding, not of code at this scale, and
-Phase 3b now has a qualifying task (§9.2). The E5/E1 recompute closed clean (all
+tail was a property of benchmark-family × decoding, not of code on Qwen2.5-Coder at
+this scale, and Phase 3b now has a qualifying task (§9.2). The E5/E1 recompute closed clean (all
 conditions shared one identical subset; claims stand with a scope note — §9.3.1).
 **Resolved 2026-07-15, completing the audit:** the R1b.2d retrain landed and the
 **kill line fired — H1 is a quantization artifact** (retrained-V bf16 SE **0.090** vs
@@ -132,7 +150,15 @@ the code anchor to trace feedback destroys the trace arm's small coverage.
 Sample-based refinement at this scale is closed: **escape requires direction, and
 direction requires capacity the model does not have — the constraint is not the
 feedback channel but the model's ability to use it.** Open: r ∈ [0.05, 0.13)
-(pre-declared unresolvable), and scales above 1.5B.
+(pre-declared unresolvable), and scales above 1.5B. *[AMENDED 2026-07-16, Phase 4
+H0b/H0c: two over-reads in the last sentence, scoped rather than deleted. (i) "The
+constraint is the model's ability to use it" reaches one rung past the arms — the
+ceiling arm was an execution trace, which carries near-zero approach-level direction
+for a structural failure, so the null localizes the bottleneck no deeper than the
+trace channel; "capacity to use direction" is decided by the hint arm (H2a,
+[PHASE_4.md]). (ii) "Closed" holds for in-context conditioning channels on
+Qwen2.5-Coder at 0.5–1.5B; weight-space (test-time training) and search-space
+channels were never enumerated, and family transfer is under audit (H1).]*
 
 ---
 
@@ -343,7 +369,8 @@ self-refinement — distinct from execution-grounded self-correction, which B2 d
 not test). Conditioning on the previous attempt — higher-bandwidth than FULL's
 register, at ~2× the prompt-token cost (566,712 vs 281,064) — buys nothing; the
 pass@1 point estimate sits below B1 though its CI crosses 0. The Branch-A reading
-(§5.3) follows: cross-step conditioning of any kind buys nothing at this scale.
+(§5.3) follows: cross-step conditioning of any kind buys nothing on Qwen2.5-Coder at
+this scale *(family scope pending H1 — [PHASE_4.md])*.
 
 **Why this null is attributable, not ambiguous.** Every mundane explanation
 was measured and excluded:
@@ -446,7 +473,7 @@ committed here **before B2's number is known** (full statement in
 
 - **Branch A — B2 also ties B1.** Cross-step information of any kind, including
   raw text, buys nothing here. The null then says nothing about registers; it
-  says this task at this scale has no iteration headroom, as pass@8 = 0.842
+  says this task on this model at this scale has no iteration headroom, as pass@8 = 0.842
   predicts. The experiment was uninformative about the hypothesis, and the next
   step is task redesign, not architecture.
 - **Branch B — B2 beats B1.** Iteration pays, and a 128-dim latent through 8 soft
@@ -644,7 +671,7 @@ subset was withdrawn (D15 retracted); all screening is **random-sample only** no
 The confirmation step caught the bias *before* Phase 3b was built on it — which is the
 entire reason a confirmation step exists.
 
-### 7.4 Finding F2 — sample-based refinement has almost no runway on code at 0.5–1.5B
+### 7.4 Finding F2 — sample-based refinement has almost no runway on code at 0.5–1.5B *[scope: Qwen2.5-Coder — H0c 2026-07-16, pending H1]*
 
 > **⚠ Under audit ([PHASE_3R.md] R2; full detail §9.2).** F2's ≤0.12 headroom was
 > measured under three inherited tail-suppressors — top-p 0.95 (nucleus truncates the
@@ -699,7 +726,7 @@ tails; the ones with any more depth are below the band. **The gate returns a
 NEGATIVE.**
 
 The interpretation is structural and, we think, the real result of Phase 3. For a
-code model at this scale, a problem is largely **gettable-or-not within a few
+Qwen2.5-Coder model at this scale, a problem is largely **gettable-or-not within a few
 samples** — the solution distribution per problem is peaked, not heavy-tailed — so
 pass@k **saturates fast** (pass@50 ≈ pass@8 + ~0.1 everywhere). Iterative refinement
 needs the opposite: *reachable-but-improbable* solutions to steer a model toward. That
@@ -708,8 +735,10 @@ the obvious direction: a larger generator raises coverage (more saturation → *
 headroom, BigCodeBench 0.5B→1.5B moved coverage +0.14 but headroom only +0.02), so
 "use a bigger model" makes it worse, not better. This closes the loop on the original
 register null: HumanEval had no headroom (pass@8 0.85) — and it turns out *no* tested
-code benchmark at 0.5–1.5B has enough. The register experiment was starved of runway
-not by an unlucky benchmark choice but by a property of the whole task family.
+code benchmark at 0.5–1.5B (Qwen2.5-Coder) has enough. The register experiment was
+starved of runway not by an unlucky benchmark choice but by a property of the whole
+task family *(as sampled by this family — the AlphaCode tension and the cross-family
+check are [PHASE_4.md] H1 cell (i))*.
 
 **The fork (a decision for the next stage), and why F2 is the useful output.** Per the
 pre-registration, a benchmark clearing the gate does not exist at this scale, so 3b/3c
@@ -957,9 +986,9 @@ axes), temperature second (instruct +0.112→+0.209 across T), top-p alone nearl
 (instruct T=0.8: 0.525/+0.112 at top-p 1.0 vs 0.541/+0.122 at 0.95). **What survives,
 rescoped:** F1 — the function-call family's shallow tail — is now *decoding-controlled*
 (BigCodeBench infeasible even fully un-suppressed); the honest replacement statement is
-*"reachable headroom at 0.5–1.5B exists on competitive stdin/stdout benchmarks under
-un-suppressed sampling, and does not exist for function-call benchmarks at any tested
-decoding."* Prediction accounting: the pre-registered phase-level call ("at least one
+*"reachable headroom at 0.5–1.5B (Qwen2.5-Coder — H0c scope, pending H1) exists on
+competitive stdin/stdout benchmarks under un-suppressed sampling, and does not exist
+for function-call benchmarks at any tested decoding."* Prediction accounting: the pre-registered phase-level call ("at least one
 point clears → F2 retracted") was **correct**; the named clearing point (base BCB
 ~T=1.0) was **wrong** — BCB's trade-off has no feasible point, and the clearing came on
 LCB-easy, whose higher coverage floor lets temperature buy tail depth without leaving
@@ -1072,7 +1101,9 @@ things we currently believe, and they set R3's bar.
    conditioned cell, with E0 anchored at (0.396, ~0.90) *[superseded — measured anchor
    (0.594, 0.90) at T=1.2; see "E0 anchor, measured" below]*. Every measured point sits strictly
    under the i.i.d. anchor. R3 then either places a point *above* that line (directed escape
-   beats resampling) or the sample-based refinement paradigm is, at this scale, finished.
+   beats resampling) or the sample-based refinement paradigm is, at this scale, finished
+   *[H0c 2026-07-16: "finished" scoped — in-context channels, on Qwen2.5-Coder; see the
+   channel-scope append at the end of this section]*.
 
 **Tsui orthogonality, stated at the mechanism level (for related work).** Tsui's blind spot
 is a **detection** failure (can the model *notice* an error is present); ours is an
@@ -1143,7 +1174,8 @@ not re-wasting draws on the failed basin). E7 populated the region: same protoco
 explicit-avoidance framing, T ∈ {0.8, 1.2}. Outcome — **repulsion loses to i.i.d. by
 15–27 coverage points at matched compute** (E7 0.65/0.75 vs committed E0 0.92/0.90;
 paired: E7-only 1 and 4 problems vs E0-only 17 and 13), and the sharper mechanism
-finding is that **prompt-level repulsion is unachievable at this scale**: the
+finding is that **prompt-level repulsion is unachievable on Qwen2.5-Coder at this
+scale**: the
 avoidance instruction moved PULL just +0.02/+0.05 over plain "improve it" (0.196/0.357
 vs anchor 0.491/0.594) — told explicitly to leave the failed basin, the model
 generates inside copy territory anyway. The exclusion is now measured, not assumed;
@@ -1170,7 +1202,26 @@ supplied*, and recovered nothing. The elimination argument's arc closes at this
 scale: undirected escape approaches i.i.d. from below (item 1), repulsion cannot be
 expressed (W1), and **direction — the one surviving channel — requires a capacity to
 use it that 1.5B does not have.** r ≥ 0.15 is foreclosed; r ∈ [0.05, 0.13) and
-scales above 1.5B remain open, stated in §9.7.
+scales above 1.5B remain open, stated in §9.7. *[AMENDED 2026-07-16, Phase 4 H0b
+(Olausson ledger amendment): the bolded clause reaches one rung past the arms. The
+trace carries near-zero approach-level direction for a pass@50 = 0 structural
+failure, and MODELABS compresses the trace, so the arms bound the null at the
+**trace channel**, not at "use." The honest closing: direction *as any tested arm
+could carry it* went unused; whether stated approach-level direction (the Olausson
+oracle rung) crosses the boundary is H2a's hint arm ([PHASE_4.md]), the missing rung
+of this decomposition.]*
+
+**The elimination argument's channel scope, stated (2026-07-16, Phase 4 H0c).**
+Undirected escape (E0/E1/E2), repulsive escape (E7), and directed escape (R3's
+arms) are all **prompt-space conditioning** — the enumeration lives entirely inside
+the in-context category. Two channel categories were never in it: **weight-space**
+(test-time training on the failure — the one mechanism whose literature claims
+competence *extension*, not redistribution) and **search-space** (feedback-guided
+tree search over partial programs; multi-model sampling, where a different model's
+decorrelated errors are directed escape by construction). "Sample-based refinement
+at this scale is closed" therefore holds **within the in-context category on
+Qwen2.5-Coder at 0.5–1.5B** — that is the measured statement. TTT-on-the-stratum is
+the named successor experiment, explicitly outside this record.
 
 ### 9.4 R3 + BEST-SO-FAR *(pre-registered; ride R2's enriched pools)* — **RESOLVED 2026-07-16 (§9.7)**
 
@@ -1220,6 +1271,13 @@ scales above 1.5B remain open, stated in §9.7.
 > is running. Open decisions (the user's, not run work): paper stage vs a scale
 > escalation (the only axis the null does not foreclose), and whether to spend on
 > the unresolvable band r ∈ [0.05, 0.13) with a larger stratum.
+>
+> **Phase 4 opened (2026-07-16 — claim hardening, [PHASE_4.md]).** H0 landed: AST
+> robustness branch (a) — the law is structural (§9.3 append); Olausson amendment +
+> four ledger entries (§11); the global Qwen2.5-Coder scope correction, SINK
+> repositioning, elimination-argument channel scope (abstract banner, §9.3.1, §9.7);
+> H3 cross-scale fork pre-registered (§9.7 addendum). Next in order: H1 cross-family
+> battery (DeepSeek-Coder-1.3B, StarCoder2-3B) → H2 hint arm + near-miss band.
 
 *(historical, 2026-07-15)*
 
@@ -1348,13 +1406,24 @@ refinement-regime problems, five conditions, oracle-first by frac_tests; Addendu
 ~0.49-frac artifact yields mean frac 0.374, significantly below copying (p ≈ 5×10⁻⁵)
 and below i.i.d. (0.468); copy fidelity on LCB/base is only 0.57 (the 0.83–0.98
 HumanEval/instruct regime does not transfer) — conditioning produces a *degraded
-blend*. **R3: NULL at declared power** (medium, primary): B1-50 recovered exactly 2 —
+blend*. *[Repositioned 2026-07-16, H0c: SINK is a quantified
+replication-plus-extension of the Codex buggy-prompt imitation phenomenon (§11
+ledger) — the extension is the compute-matched, execution-quantified below-both-nulls
+result. Two causal stories fit it — SINK-as-capacity ("cannot use the anchor") and
+SINK-as-distribution-matching ("faithfully continues the quality register") — with
+opposite scale predictions; this record cannot distinguish them; the H3 addendum
+below pre-registers the discriminating fork.]* **R3: NULL at declared power** (medium, primary): B1-50 recovered exactly 2 —
 the W0c floor prediction to the decimal — and every arm sits on the floor (ANCHOR 2,
-TRACE 1, MODELABS 3; TRACE vs B1 p = 0.875). The PULL column carries the mechanism:
-TRACE/MODELABS generated at i.i.d. distance (0.85 ≈ B1's 0.84) — *full escape with
-direction supplied* — and recovered nothing; at 1.5B the model cannot **use**
-direction on problems beyond its competence, at either end of the deployability
-spectrum. r ≥ 0.15 is foreclosed; r ∈ [0.05, 0.13) stands unresolvable as
+TRACE 1, MODELABS 3; TRACE vs B1 p = 0.875 — and **MODELABS 3 vs TRACE 1 is floor
+noise, p = 0.875: it supports no compression-helps reading**). The PULL column
+carries the mechanism: TRACE/MODELABS generated at i.i.d. distance (0.85 ≈ B1's
+0.84; structural per H0a — AST ratio 1.048) — *full escape with direction supplied*
+— and recovered nothing; at 1.5B the model cannot **use** direction on problems
+beyond its competence, at either end of the deployability spectrum. *[AMENDED
+2026-07-16, H0b: "cannot use direction" over-reads — the arms bound the null at the
+trace channel (near-zero approach-level direction for structural failures); the
+use-capacity question is decided by H2a's hint arm ([PHASE_4.md]), the missing
+Olausson rung.]* r ≥ 0.15 is foreclosed; r ∈ [0.05, 0.13) stands unresolvable as
 pre-declared. All 19 recovery events rerun-stable; contamination date-flag uniform
 (global LCB-vs-Qwen2.5 scope caveat, no arm-specific unlock pattern); the
 repeated-qid recoveries (abc314_a by all four easy arms) are the false-zero mechanism
@@ -1367,7 +1436,23 @@ coverage.** The anchor poisons the direction. Phase verdict: sample-based refine
 at 0.5–1.5B is closed with a powered, validated null — conditioning on code degrades,
 direction without code adds nothing over the floor, and their combination is worse
 than either; open remainders stated plainly: r ∈ [0.05, 0.13) on medium, and scales
-above 1.5B.
+above 1.5B. *[H0c scope: "closed" = in-context conditioning channels, on
+Qwen2.5-Coder — §9.3.1 channel-scope append; family transfer under audit (H1).]*
+
+**Addendum (2026-07-16, Phase 4 H3) — the cross-scale fork, pre-registered; running
+it is a separate sign-off decision.** Basis: the Codex inverse-scaling and "How Many
+Tries" ledger entries (§11). **Prediction: above 1.5B the two channel categories move
+in opposite directions** — anchor-conditioning channels (BEST / LAST / ANCHOR /
+BEST+ABSTRACT) *worsen* with scale (imitation: buggy code is followed by more buggy
+code in pretraining data, so matching the artifact's quality register improves as
+distribution-matching improves), while direction channels (TRACE / HINT) *improve*
+(the "How Many Tries" scale trend). This converts "scales above 1.5B remain open"
+from a shrug into a falsifiable fork, and it discriminates the two SINK readings:
+**capacity** predicts anchor channels improve with scale (more capacity to exploit
+the anchor); **distribution-matching** predicts they degrade. Optional spot check
+(not authorized by this pre-registration; costed separately): Qwen2.5-Coder-7B bf16
+on L4, one D2c cell + one TRACE cell — combined with H1 this de-confounds scale from
+family within one design. [PHASE_4.md] H3.
 
 ---
 
@@ -1463,6 +1548,21 @@ point, not a detour).
   preprint (2026):** fresh-context / external-channel framings escape the correlated-error-
   mode problem. *Our relation:* corroborating context for "directed external signal" over
   "self-review"; cite as convergent, not foundational.
+- **Chen et al. (2021), Codex — alignment appendix; and the buggy-code-completion line
+  (arXiv 2306.03438).** Subtly buggy prompts induce more bugs than clean or no prompts,
+  though the model is capable of better; the gap *grows with scale* (an inverse-scaling
+  candidate, mechanism: imitation/distribution-matching). *Our relation:* the precedent
+  D2c's SINK replicates and extends (compute-matched, execution-quantified, below-both-nulls
+  — ledger below); the inverse-scaling reading is the basis of H3's cross-scale fork.
+- **Spurious Rewards (arXiv 2506.10947) + contamination follow-up (2507.10532).** Random-
+  reward RLVR gains on Qwen2.5-Math driven by Qwen-specific priors; failed on Llama3/OLMo2;
+  follow-up implicates contamination. *Our relation:* the cautionary precedent that
+  motivates Phase 4's cross-family battery (H1) — our record is single-family until H1
+  reports, and is scoped accordingly (ledger below).
+- **AlphaCode (Li et al., 2022).** Deep pass@k tails on competitive programming at scale on
+  organically-trained models. *Our relation:* tension with F1's shallow-tail reading if
+  universal; basis for H1's hypothesis that BCB flatness may be Qwen-pipeline-scoped
+  (ledger below).
 
 *Note on independence (to state honestly at paper stage):* the anchoring/escape line was
 reached from our own DIAG-8 spin-off before we surveyed Tsui/Olausson; we position as
@@ -1541,6 +1641,63 @@ design constant. Each entry states (a) their setup specifics, (b) the delta to o
   the right call and still nearly inert — the strongest avoidance instruction moved
   PULL only +0.02/+0.05 over "improve it" ([PHASE_3B.md] W1); token gravity dominates
   instruction at this scale.*
+
+*The following entries added 2026-07-16 (Phase 4 H0b — [PHASE_4.md]).*
+
+- **Chen et al. (2021), "Evaluating Large Language Models Trained on Code" (Codex),
+  alignment appendix → SINK positioning (H0c).** (a) They prompted Codex with subtly
+  buggy code and observed higher bug frequency in completions than with clean or no
+  prompts, framing it as the model *matching prompt quality while capable of better*
+  — a misalignment-by-imitation observation, qualitative, at Codex scale. Related
+  supporting line: buggy-code-completion (arXiv 2306.03438) — potential-bug prefixes
+  systematically depress pass rates across code LLMs. (b) Ours is compute-matched
+  against i.i.d., execution-quantified (frac_tests), on partial-credit artifacts, at
+  1.5B. (c) **Licenses:** repositioning D2c's SINK as a **replication-plus-extension
+  of a known phenomenon** — the extension being that the conditioned blend lands
+  *below both* the artifact's own frac and the i.i.d. baseline, quantified with a
+  copy-null. **Does not license:** treating SINK as novel, or importing their
+  "capable of better" interpretation — that is exactly the capacity-vs-
+  distribution-matching ambiguity H3 pre-registers (§9.7 addendum).
+- **The inverse-scaling reading of Codex's buggy-prompt result → H3's cross-scale
+  pre-registration.** (a) The buggy-vs-clean completion-quality gap *grows with model
+  size*; proposed mechanism is imitation — in pretraining data, buggy code is
+  followed by more buggy code, so predicting bugs is better distribution-matching.
+  (b) Directly applicable to our anchor channels (BEST/LAST/ANCHOR/BEST+ABSTRACT):
+  every one conditions generation on a code artifact of known (poor) quality.
+  (c) **Licenses:** a pre-registered *directional* prediction — anchor-conditioning
+  channels **worsen** with scale while direction channels (TRACE/HINT) **improve**
+  (per "How Many Tries"' scale trend); the two open-scale axes point in opposite
+  directions, which is the discriminating test between SINK-as-capacity and
+  SINK-as-distribution-matching. **Does not license:** any magnitude, or running the
+  test without a sign-off (H3 is pre-registration-only in Phase 4).
+- **Spurious Rewards (arXiv 2506.10947) + contamination follow-up (2507.10532) →
+  H1's existence.** (a) RLVR on Qwen2.5-Math with *random* rewards nearly matched
+  ground-truth rewards — driven by Qwen-specific pretraining priors (code-reasoning
+  strategies the reward merely surfaces); the same signals **failed outright on
+  Llama3 and OLMo2**; the authors explicitly recommend validating on diverse
+  families; the follow-up attributes much of Qwen's surge to
+  contamination/memorization. An entire sub-literature's conclusions turned out to
+  be properties of one model family. (b) Our entire record — the attractor
+  constants, the suppressor decomposition, the shallow BCB tail, the feasible
+  region — is measured on exactly one family (Qwen2.5-Coder), with scale and family
+  confounded in every claim. (c) **Licenses:** treating family-transfer as a
+  **mandatory audit** (H1's cross-family battery), not a limitation paragraph; and
+  H0c's interim rescoping of every "at this scale" to "on Qwen2.5-Coder at this
+  scale" until H1 reports. **Does not license:** assuming our findings *fail* to
+  transfer — that is what H1 measures, with per-finding branches and odds.
+- **AlphaCode (Li et al., 2022) → tail-structure scoping (H1 cell (i)).** (a) Deep
+  pass@k tails on competitive programming with large-scale sampling: solve rates
+  climb steadily with k (to k = 10⁵–10⁶) and with scale, on organically-trained
+  models. (b) Consistent with our LCB-easy feasible region (headroom exists, k=50);
+  in tension with BCB's flatness (F1) *if* flatness is read as universal.
+  (c) **Licenses:** the hypothesis H1 cell (i) tests — that BCB's shallow tail may
+  be partly a property of Qwen2.5-Coder's synthetic-heavy training pipeline
+  (peaked solution distributions), not of the task family; hence the
+  organic-corpus families (StarCoder2 on The Stack; DeepSeek-Coder) as the
+  comparison points. **Does not license:** expecting AlphaCode-scale tails at 1.3–3B,
+  or reading a Qwen-scoped F1 as a training-data *mechanism* claim — H1 scopes
+  findings; it does not isolate the synthetic-data variable (confounds recorded in
+  the H1 pre-registration).
 
 *Appendix pointers. Architecture [ARCHITECTURE.md]; decision log **D1–D16**
 [DECISIONS.md] (D11 precision, D14 statistical reproducibility, D15 retracted, D16 =
