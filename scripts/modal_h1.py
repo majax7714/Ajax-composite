@@ -1,4 +1,5 @@
-"""H1 — cross-family battery ([PHASE_4.md] H1, pre-registered 2026-07-16).
+"""Phase 4 Modal runner — H1 cross-family battery + H2 hint/near-miss arms
+([PHASE_4.md] H1/H2, pre-registered 2026-07-16).
 
 Families: deepseek-ai/deepseek-coder-1.3b-base, bigcode/starcoder2-3b.
 Cells per family (seed 17, top_p 1.0, T=0.8):
@@ -28,6 +29,7 @@ FAMILIES = {
     "deepseek": "deepseek-ai/deepseek-coder-1.3b-base",
     "starcoder2": "bigcode/starcoder2-3b",
 }
+QWEN_BASE = "Qwen/Qwen2.5-Coder-1.5B"  # the frozen Phase-3b config generator (H2 arms)
 LCB_DATASET = "livecodebench/code_generation"
 BCB_DATASET = "bigcode/bigcodebench"
 
@@ -412,9 +414,295 @@ def _load(name):
 
 # ---------------------------------------------------------------- entrypoints
 
+# ---- H2 frozen prompt wording + local plumbing ([PHASE_4.md] H2) ----
+
+def _hint_context(hint):
+    """Frozen HINT context block (parallel structure to the R3 TRACE block)."""
+    return f"Approach hint: {hint}\nWrite a correct complete program."
+
+
+def _trace_context(a):
+    """Frozen TRACE wording (modal_lcb._p3b_context, verbatim)."""
+    t = a["trace"]
+    return (f"A previous attempt failed {a['n_failed']} of {a['n_tests']} tests.\n"
+            f"First failing test:\ninput:\n{t['stdin']}\n"
+            f"expected output:\n{t['expected']}\nactual output:\n{t['actual']}\n"
+            "Write a correct complete program.")
+
+
+def _h2_frozen():
+    return json.loads((REPO / "artifacts/h2_hints_frozen.json").read_text())
+
+
+def _mcnemar_one_sided(b, c):
+    from math import comb
+    m = b + c
+    if m == 0:
+        return 1.0
+    return sum(comb(m, k) for k in range(b, m + 1)) / 2 ** m
+
+
+def _wilcoxon_mc_one_sided(diffs, trials=20000, seed=17):
+    """P(mean signed diff >= observed) under sign-flip null."""
+    import random as _r
+    rng = _r.Random(seed)
+    obs = sum(diffs) / len(diffs)
+    hits = 0
+    for _ in range(trials):
+        s = sum(d if rng.random() < 0.5 else -d for d in diffs) / len(diffs)
+        if s >= obs:
+            hits += 1
+    return (hits + 1) / (trials + 1)
+
+
+@app.function(image=LCB_EXEC_IMAGE, volumes={"/cache": VOL}, timeout=3600, cpu=8.0,
+              memory=16384)
+def h2_trace_capture(question_ids: list, codes: list, tag: str,
+                     cap_private: int = 12, timeout_s: int = 8) -> list:
+    """First-failing-case capture — duplicated verbatim from the frozen
+    modal_lcb.lcb_trace_capture (512-char cap)."""
+    def compute():
+        import json as _j
+        import os
+        import signal
+        import subprocess
+        import sys
+        import tempfile
+        from pathlib import Path as _P
+
+        from datasets import load_dataset
+
+        ds = load_dataset(LCB_DATASET, split="test")
+        by_id = {}
+        for i in range(len(ds)):
+            qid = ds[i]["question_id"]
+            if qid in set(question_ids):
+                try:
+                    cases = _j.loads(ds[i]["public_test_cases"]) + _j.loads(ds[i]["private_test_cases"])
+                except Exception:
+                    cases = _j.loads(ds[i]["public_test_cases"])
+                by_id[qid] = [c for c in cases if c.get("testtype") == "stdin"][:3 + cap_private]
+
+        PRE = ("import resource as _rs\n"
+               f"try: _rs.setrlimit(_rs.RLIMIT_CPU, ({timeout_s}, {timeout_s})); "
+               "_rs.setrlimit(_rs.RLIMIT_AS, (3*1024**3//2, 3*1024**3//2))\n"
+               "except Exception: pass\n")
+
+        def norm(s):
+            return "\n".join(l.rstrip() for l in s.strip("\n").split("\n")).rstrip()
+
+        def run_case(code, stdin_str):
+            with tempfile.TemporaryDirectory() as d:
+                (_P(d) / "s.py").write_text(PRE + code)
+                (_P(d) / "in.txt").write_text(stdin_str)
+                outf, errf = _P(d) / "o.txt", _P(d) / "e.txt"
+                with open(d + "/in.txt") as fin, open(outf, "wb") as fout, \
+                        open(errf, "wb") as ferr:
+                    try:
+                        p = subprocess.Popen([sys.executable, "s.py"], stdin=fin,
+                                             stdout=fout, stderr=ferr, cwd=d,
+                                             start_new_session=True)
+                    except Exception:
+                        return "runtime", "", ""
+                    try:
+                        p.wait(timeout=timeout_s)
+                        status = "ok" if p.returncode == 0 else "runtime"
+                    except subprocess.TimeoutExpired:
+                        status = "timeout"
+                    try:
+                        os.killpg(os.getpgid(p.pid), signal.SIGKILL)
+                    except (ProcessLookupError, PermissionError):
+                        pass
+                    try:
+                        p.wait(timeout=5)
+                    except Exception:
+                        pass
+                out = outf.read_text(errors="replace")
+                elines = [l for l in errf.read_text(errors="replace").strip().splitlines()
+                          if l.strip()]
+            return status, out, (elines[-1][:200] if elines else "")
+
+        def cut(s):
+            return s[:512]
+
+        out = []
+        for qid, code in zip(question_ids, codes):
+            cases = by_id.get(qid, [])
+            rec = {"qid": qid, "n_tests": len(cases), "n_failed": 0, "case_idx": None,
+                   "stdin": "", "expected": "", "actual": "", "err": ""}
+            if not code or not cases:
+                rec["err"] = "no_code" if not code else "no_tests"
+                out.append(rec)
+                continue
+            first = None
+            for i, c in enumerate(cases):
+                status, o, exc = run_case(code, c["input"])
+                bad = status != "ok" or norm(o) != norm(c["output"])
+                if bad:
+                    rec["n_failed"] += 1
+                    if first is None:
+                        first = (i, c, status, o, exc)
+            if first:
+                i, c, status, o, exc = first
+                actual = (exc or status) if status != "ok" else o
+                rec.update({"case_idx": i, "stdin": cut(c["input"]),
+                            "expected": cut(c["output"]), "actual": cut(actual),
+                            "err": "wrong_answer" if status == "ok" else status})
+            out.append(rec)
+        return out
+    return _cache_or(tag, compute)
+
+
 @app.local_entrypoint()
 def h1_prefetch():
     print(h1_download.remote())
+
+
+@app.local_entrypoint()
+def h2_manip():
+    """H2a manipulation-check gate: 20 mid-p̂ problems x {E0-25, HINT-25}, fresh,
+    frozen Qwen base config. Gate: mean uplift > 0 AND one-sided p < 0.05."""
+    import statistics as st
+
+    fz = _h2_frozen()
+    qids = fz["groups"]["manip_check"]
+    hints = fz["hints"]
+    items = ([{"qid": q, "context": None} for q in qids]
+             + [{"qid": q, "context": _hint_context(hints[q])} for q in qids])
+    gen = _load("h2_manip_cand") or _persist(
+        "h2_manip_cand", h1_gen_lcb.remote(QWEN_BASE, items, 25, tag="h2_manip_cand"))
+    res = _load("h2_manip_res") or _persist(
+        "h2_manip_res",
+        h1_lcb_exec.remote([g["qid"] for g in gen], [g["codes"] for g in gen],
+                           tag="h2_manip_res", short_circuit=True))
+    n = len(qids)
+    e0 = [sum(r["passed"] for r in row) / len(row) for row in res[:n]]
+    hi = [sum(r["passed"] for r in row) / len(row) for row in res[n:]]
+    diffs = [b - a for a, b in zip(e0, hi)]
+    p = _wilcoxon_mc_one_sided(diffs)
+    mean_d = st.mean(diffs)
+    gate = "PASS" if (mean_d > 0 and p < 0.05) else (
+        "HARM" if mean_d < -0.05 else "FAIL")
+    out = {"_label": "H2a manipulation check [PHASE_4.md H2a]", "n_problems": n,
+           "e0_mean_pass": st.mean(e0), "hint_mean_pass": st.mean(hi),
+           "mean_uplift": mean_d, "p_one_sided": p, "gate": gate,
+           "per_problem": [{"qid": q, "e0": a, "hint": b}
+                           for q, a, b in zip(qids, e0, hi)]}
+    (REPO / "artifacts/h2_manip_check.json").write_text(json.dumps(out, indent=2))
+    print(f"=== H2a manipulation check: E0 {st.mean(e0):.3f} → HINT {st.mean(hi):.3f} "
+          f"(Δ {mean_d:+.3f}, p {p:.4f}) → {gate} ===")
+
+
+@app.local_entrypoint()
+def h2a_stratum():
+    """H2a stratum arm (fires only on manipulation-gate PASS): medium 0/50 stratum
+    (n=68), fresh B1-50 vs HINT-50, paired exact McNemar."""
+    gate = json.loads((REPO / "artifacts/h2_manip_check.json").read_text())["gate"]
+    if gate != "PASS":
+        print(f"manipulation gate = {gate}; stratum run POSTPONED per pre-reg")
+        return
+    fz = _h2_frozen()
+    qids = fz["groups"]["stratum_medium"]
+    hints = fz["hints"]
+    items = ([{"qid": q, "context": None} for q in qids]
+             + [{"qid": q, "context": _hint_context(hints[q])} for q in qids])
+    gen = _load("h2a_cand") or _persist(
+        "h2a_cand", h1_gen_lcb.remote(QWEN_BASE, items, 50, tag="h2a_cand"))
+    res = _load("h2a_res") or _persist(
+        "h2a_res",
+        h1_lcb_exec.remote([g["qid"] for g in gen], [g["codes"] for g in gen],
+                           tag="h2a_res", short_circuit=True))
+    n = len(qids)
+    b1 = [any(r["passed"] for r in row) for row in res[:n]]
+    hi = [any(r["passed"] for r in row) for row in res[n:]]
+    b = sum(1 for x, y in zip(b1, hi) if y and not x)
+    c = sum(1 for x, y in zip(b1, hi) if x and not y)
+    p = _mcnemar_one_sided(b, c)
+    out = {"_label": "H2a stratum arm — HINT-50 vs fresh B1-50, medium 0/50 [PHASE_4.md H2a]",
+           "n": n, "b1_recoveries": sum(b1), "hint_recoveries": sum(hi),
+           "hint_only": b, "b1_only": c, "p_one_sided_mcnemar": p,
+           "recovered_qids": {"b1": [q for q, x in zip(qids, b1) if x],
+                              "hint": [q for q, x in zip(qids, hi) if x]},
+           "floor_reference_W0c": 2.0}
+    (REPO / "artifacts/h2a_hint_arm.json").write_text(json.dumps(out, indent=2))
+    print(f"=== H2a stratum: B1 {sum(b1)}, HINT {sum(hi)} (hint-only {b}, b1-only {c}, "
+          f"p {p:.4f}); floor ref 2.0 ===")
+
+
+@app.local_entrypoint()
+def h2b_band():
+    """H2b near-miss band: 39 problems x {B1-25, TRACE-25, HINT-25}, all fresh."""
+    fz = _h2_frozen()
+    qids = fz["groups"]["near_miss"]
+    hints = fz["hints"]
+
+    # artifact per problem: highest-frac FAILING candidate from the run-config pool
+    pools = {
+        "easy": ("lcb_cand_lcb_r2_base_T08.json", "lcb_res_lcb_r2_base_T08.json"),
+        "medium": ("lcb_cand_lcb_r2_base_medium_T08.json",
+                   "lcb_res_lcb_r2_base_medium_T08.json"),
+    }
+    art = {}
+    for _, (cf, rf) in pools.items():
+        cand = json.loads((REPO / "runs/modal" / cf).read_text())
+        res = json.loads((REPO / "runs/modal" / rf).read_text())
+        for qid, crow, rrow in zip(res["question_ids"], cand["codes"], res["results"]):
+            if qid not in qids or qid in art:
+                continue
+            best_i, best_f = None, -1.0
+            for i, (cd, r) in enumerate(zip(crow, rrow)):
+                if cd and not r["passed"] and r["frac"] > best_f:
+                    best_i, best_f = i, r["frac"]
+            if best_i is not None:
+                r = rrow[best_i]
+                art[qid] = {"qid": qid, "code": crow[best_i], "frac": r["frac"],
+                            "n_tests": r["n_tests"],
+                            "n_failed": r["n_tests"] - r["n_passed"]}
+    missing = [q for q in qids if q not in art]
+    if missing:
+        print(f"no failing artifact for {missing} (excluded, counted)")
+    aq = [q for q in qids if q in art]
+
+    traces = _load("h2b_traces") or _persist(
+        "h2b_traces",
+        h2_trace_capture.remote(aq, [art[q]["code"] for q in aq], tag="h2b_traces"))
+    tr_by = {t["qid"]: t for t in traces}
+    for q in aq:
+        art[q]["trace"] = {k: tr_by[q][k] for k in ("stdin", "expected", "actual")}
+
+    items = ([{"qid": q, "context": None} for q in aq]
+             + [{"qid": q, "context": _trace_context(art[q])} for q in aq]
+             + [{"qid": q, "context": _hint_context(hints[q])} for q in aq])
+    gen = _load("h2b_cand") or _persist(
+        "h2b_cand", h1_gen_lcb.remote(QWEN_BASE, items, 25, tag="h2b_cand"))
+    res = _load("h2b_res") or _persist(
+        "h2b_res",
+        h1_lcb_exec.remote([g["qid"] for g in gen], [g["codes"] for g in gen],
+                           tag="h2b_res", short_circuit=True))
+    n = len(aq)
+    arms = {"B1": res[:n], "TRACE": res[n:2 * n], "HINT": res[2 * n:]}
+    rec = {a: [any(r["passed"] for r in row) for row in rows]
+           for a, rows in arms.items()}
+    out = {"_label": "H2b near-miss band — B1/TRACE/HINT k=25, all fresh [PHASE_4.md H2b]",
+           "n": n, "excluded_no_artifact": missing,
+           "recoveries": {a: sum(v) for a, v in rec.items()},
+           "contrasts": {}}
+    for a in ("TRACE", "HINT"):
+        b = sum(1 for x, y in zip(rec["B1"], rec[a]) if y and not x)
+        c = sum(1 for x, y in zip(rec["B1"], rec[a]) if x and not y)
+        out["contrasts"][f"{a}_vs_B1"] = {
+            "arm_only": b, "b1_only": c, "p_one_sided_mcnemar": _mcnemar_one_sided(b, c)}
+    # per-tier (min-x) reporting
+    nmc = fz["near_miss_cells"]
+    tiers = {q: min(nmc[q].values()) for q in aq}
+    out["per_tier"] = {
+        str(t): {a: sum(1 for q, v in zip(aq, rec[a]) if tiers[q] == t and v)
+                 for a in rec} | {"n": sum(1 for q in aq if tiers[q] == t)}
+        for t in sorted(set(tiers.values()))}
+    out["recovered_qids"] = {a: [q for q, v in zip(aq, rec[a]) if v] for a in rec}
+    (REPO / "artifacts/h2b_near_miss.json").write_text(json.dumps(out, indent=2))
+    print(f"=== H2b: n={n} | " + " ".join(f"{a} {sum(v)}" for a, v in rec.items())
+          + " | " + json.dumps(out["contrasts"]) + " ===")
 
 
 @app.local_entrypoint()
