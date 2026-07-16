@@ -1016,6 +1016,32 @@ append-only ([PHASE_3R.md] Addenda II/III):
   mechanism, and it explains the split B2 (no feedback, copies) vs B2+fb (2 bits, still
   declines) vs Self-Debug (traces, works).
 
+**The law under structural distance (2026-07-16, Phase 4 H0a — pre-registered branch
+(a) fired, the 65% favourite; [PHASE_4.md] H0a, [artifacts/h0a_ast_distance.json]).**
+PULL is lexical, and stdin/stdout boilerplate compresses lexical distances — so every
+core plot was recomputed under a frozen structural metric (normalized Zhang–Shasha
+tree edit distance on canonicalized Python ASTs; identifiers/constants canonicalized,
+parse failures excluded and counted). **The law survives: escape is structural, not a
+token artifact.** Coverage-vs-distance monotonicity is metric-invariant (Spearman
+0.952 under AST, identical to lexical); every conditioned cell sits below the E0
+anchor at matched T (AST anchor row 0.232/0.275/0.328 at T=0/0.8/1.2 vs E1
+0.046/0.114/0.209); E7's repulsion stays inside copy territory; and the R3 trace arms'
+"generated at i.i.d. distance" is a structural fact (TRACE/B1 AST ratio 1.048 —
+ANCHOR, by contrast, structurally deep-copies at 0.38× B1). Two pre-registered misses
+stand: **L1b** (provenance test, 75% odds) failed as *mis-specified* — E1-vs-E2
+conflates verb with provenance; the correct instrument (D2a 2×2 under AST, post-hoc,
+labeled — [artifacts/h0a_d2a_ast_followup.json]) shows provenance Δ ≤ 0.034 vs verb
+Δ up to 0.127, so provenance-irrelevance survives structurally; and **L3** (60% odds)
+missed narrowly — E1@1.2 closes ~64% of the *structural* escape distance (vs 52%
+lexical), so the elimination argument's unclaimed room narrows to ~36% of the axis
+without closing. One sharpening beyond the registered legs: **E0@1.5's AST anchor
+equals E0@1.2's exactly (0.328 = 0.328) while lexical grew 0.594 → 0.740 — past the
+temperature boundary, extra token-distance is structurally empty motion** (broken
+surfaces over unchanged structures), tightening the law's temperature-bounded domain.
+Destination geometry (opportunistic, no claim rests on it): TRACE-medium's escaped
+mass spreads near-uniformly (max cluster fraction 0.20 — no second attractor);
+E1@1.2 stays moderately concentrated (0.47).
+
 ### 9.3.1 What the escape-distance law forces — the elimination argument *(the current frontier of thought)*
 
 Three consequences follow from D2b's refinement that the law is a **coverage/diversity**
@@ -1463,6 +1489,20 @@ design constant. Each entry states (a) their setup specifics, (b) the delta to o
   decomposition paid — both channels nulled together (TRACE 1, MODELABS 3, floor 2),
   which converts an ambiguous null into a specific one: the bottleneck at 1.5B is not
   feedback production (their result) but feedback* use *(§9.7).*
+  **[AMENDED 2026-07-16, Phase 4 H0b — the ledger applied to our own entry.]** The
+  outcome clause above imports Olausson's localization **one rung further than our
+  arms support**. Their bottleneck call came from a **human conceptual-explanation
+  arm** beating self-generated feedback; our ceiling arm was a **verbatim execution
+  trace**, which sits *below* their oracle rung and carries near-zero direction for a
+  pass@50 = 0 structural failure (output 17 ≠ expected 42 does not say which
+  algorithmic idea is wrong). MODELABS compresses the trace and cannot add direction
+  the trace lacks, so TRACE and MODELABS nulling together does **not** localize the
+  bottleneck at "use." Honest current statement: the decomposition separated feedback
+  *production* from the *trace channel*; it did not reach "use." The R3 null is
+  ambiguous between "1.5B cannot use direction" and "no arm ever contained
+  direction" until an approach-level hint arm (H2a, [PHASE_4.md]) fills the missing
+  rung. The "cannot use direction" sentences in §9.3.1/§9.7 are scoped accordingly
+  (H0c).
 - **Self-Debug (Chen et al.) → ABSTRACT-trace arm framing (W3).** (a) Gains measured
   against **greedy** (not compute-matched best-of-n), largest on
   near-correct-by-construction tasks (TransCoder, Spider) where errors are local; the

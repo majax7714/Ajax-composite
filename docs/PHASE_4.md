@@ -125,4 +125,66 @@ L5 is resolved separately from the branch rule either way.
 **Artifact:** `artifacts/h0a_ast_distance.json`. Writeup: appended to §9.3 as **"The
 law under structural distance."**
 
-*(H0a RESULT lands below this line after the run.)*
+### H0a RESULT (2026-07-16) — **branch (a): the law hardens; escape is structural**
+
+Implementation validated (classic ZS example = 2; C kernel ≡ pure-Python reference on
+200 random tree pairs). 23,400 distances; exclusions 512 parse-fail + 74 cap (~2.5%),
+714 no-code. [artifacts/h0a_ast_distance.json].
+
+| cell | AST-PULL | lexical PULL | | cell | AST-PULL | lexical PULL |
+|---|---|---|---|---|---|---|
+| E0 anchor @0 | **0.232** | 0.409 | | E5 @0 | 0.001 | 0.020 |
+| E0 anchor @0.8 | **0.275** | 0.491 | | E5 @0.8 | 0.027 | 0.066 |
+| E0 anchor @1.2 | **0.328** | 0.594 | | E5 @1.2 | 0.100 | 0.168 |
+| E0 anchor @1.5 | **0.328** | 0.740 | | E7 @0.8 | 0.148 | 0.196 |
+| E1 @0 | 0.046 | 0.075 | | E7 @1.2 | 0.252 | 0.357 |
+| E1 @0.8 | 0.114 | 0.176 | | E1 @1.5 | 0.289 | 0.560 |
+| E1 @1.2 | 0.209 | 0.309 | | R3-med B1 | 0.374 | 0.841 |
+| E2 @0 | 0.017 | 0.043 | | R3-med ANCHOR | 0.144 | 0.399 |
+| E2 @0.8 | 0.033 | 0.068 | | R3-med TRACE | 0.391 | 0.860 |
+| E2 @1.2 | 0.086 | 0.157 | | R3-med MODELABS | 0.355 | 0.845 |
+
+**Leg verdicts against the pre-registration:**
+
+- **L1 HOLDS** (80% ✓): every conditioned cell sits below the E0 anchor at matched T.
+- **L1b MISS (75% odds — wrong), and the miss is a specification error, recorded:**
+  E1-vs-E2 differ in the instruction verb as well as provenance, so the registered
+  test conflated the two axes. Post-hoc follow-up (unregistered, labeled —
+  [artifacts/h0a_d2a_ast_followup.json]) on the correct instrument, the D2a 2×2:
+  max provenance Δ 0.007/0.013/0.034 vs max verb Δ 0.023/0.076/0.127 at T=0/0.8/1.2 —
+  **provenance-irrelevance survives structurally** (verb ~3–4× provenance, the same
+  shape as lexical D2a). Both the miss and the correction stay on the page.
+- **L2 HOLDS** (65% ✓): Spearman ρ(coverage, AST-PULL) = **0.952** over the frozen
+  8-cell set — *identical* to the lexical ρ (0.952). The monotonicity is
+  metric-invariant.
+- **L3 MISS** (60% odds — wrong, narrowly): E1@1.2 / anchor = **0.636** > 0.60. The
+  stretch is smaller structurally than lexically (52%): E1@1.2 has closed ~64% of the
+  *structural* escape distance. The elimination argument's unclaimed room narrows
+  (~36% of the axis) but does not close; nothing measured reaches the anchor.
+- **L4 HOLDS** (80% ✓): E7 stays inside copy territory structurally (0.148/0.252 <
+  0.275/0.328).
+- **L5: iid_survives** (55% favourite ✓): TRACE/B1 = **1.048** — "generated at
+  i.i.d. distance" is a structural fact, not a token illusion; the §9.3.1/§9.7
+  mechanism sentences stand. ANCHOR deep-copies structurally (0.144 ≈ 0.38× B1).
+
+**Two findings beyond the registered legs (stated, not narrativized):**
+
+1. **The competence cliff is structurally empty motion.** E0@1.5's AST anchor equals
+   E0@1.2's exactly (0.328 = 0.328) while lexical PULL grew 0.594 → 0.740: past the
+   temperature boundary the extra token-distance buys **zero structural movement** —
+   broken surfaces over unchanged structures. The law's temperature-bounded domain
+   (W1/W2) sharpens: beyond T ≈ 1.2, lexical escape is noise, not exploration.
+2. **The lexical axis does run hot on stdin/stdout pools, as suspected** (B1 lexical
+   0.841 vs AST 0.374 — boilerplate compression is real in absolute terms), but every
+   relative claim — ordering, monotonicity, arm geometry — is preserved under the
+   structural metric. Branch (a) as pre-registered.
+
+**Leg D (destination geometry, opportunistic).** Within-set pairwise AST distance
+(≤12 codes/problem, seed 17): E1@1.2 pairwise 0.264, mean 4.85 clusters/problem, max
+cluster fraction 0.47 (moderately concentrated — attractor + spread); E7@1.2
+0.307/5.5/0.39; TRACE-medium 0.407/10.1/**0.20** (near-uniform spread — **no second
+attractor**; escaped mass genuinely spreads). Flagged for any future mechanism work;
+no claim rests on this.
+
+**Writeup:** §9.3 "The law under structural distance" appended (same numbers,
+condensed); the two prediction misses stand there with these odds.
