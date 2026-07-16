@@ -805,6 +805,28 @@ roughly half the project's remaining compute budget with zero scientific output.
 Run-loss modes are spend-loss modes; hardening is cheaper than any single recurrence
 ([scripts/modal_rgr.py] `r1b2d_train_eval`, commit `7e4ea2f`).
 
+5. **Judge-grade mismatch — a cost blind spot, not a run-loss mode *(appended
+   2026-07-16, from the W4 spend audit)*.** One W4 app billed ≈$31 against a ~$1
+   ephemeral-app baseline. Forensics (file-mtime stage timing + per-candidate error
+   records): ~6.5 h of judging on a cpu=32/64 GiB container (≈$5.5–6/h), trivial GPU.
+   The cause is a *grade mismatch*, not a runaway: the hardened judge deliberately
+   runs **all ~15 test cases per candidate, no short-circuit** (the enrichment design
+   — per-test frac, failing-case ids — that D2c/BEST-SO-FAR/W2 pools genuinely need),
+   but the R3 arms inherited it while their analysis reads only `passed`; and R3's
+   input is the worst case for all-cases mode — 13,600 candidates that are ~100%
+   failing **by construction** (50,650 case executions per arm; every failing case
+   run to completion; every TLE case burning the full 8 s; 202,600 one-case CPython
+   launches). A short-circuit-on-first-fail judge for the R3 arms would have cut
+   ~90% of case executions with zero loss to the frozen analysis: ≈$31 → ≈$4–6.
+   *Practice:* (a) match judge grade to the analysis need — any-pass contrasts get a
+   short-circuit judge, enrichment pools get the all-cases judge; (b) treat the
+   pool's failure rate as a cost input — an all-failing pool maximizes judge cost
+   exactly when all-cases mode is on; (c) size per-case timeouts to the model class
+   (8 s is generous for a 1.5B correctness check; 3–4 s loses nothing on a TLE-heavy
+   stratum); (d) batch a candidate's cases into one interpreter where isolation
+   allows; (e) right-size judge containers — cpu=32/64 GiB bills for the full wall
+   time whether saturated or not.
+
 ## 9. Phase 3R — auditing the two live claims, and the anchoring mechanism
 
 Phase 3 published two load-bearing results on *inherited* Phase-0 choices: **H1** (an
