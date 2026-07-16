@@ -461,6 +461,16 @@ near-reachable does not respond at 1.5B). Either branch is a paper-grade sentenc
 **Writeup:** H2a + H2b land as §9.8 ("completing the decomposition"), with the
 §9.7 headline amended in place per the branch taken.
 
-*(H1 scope-inheritance line inserted at freeze; H2 RESULTS land below after the runs.)*
+**H1 scope inheritance (inserted at freeze, 2026-07-16 — the pre-registration
+above is now FROZEN).** H2 runs entirely on the frozen Qwen2.5-Coder-1.5B config;
+per H1, the stratum platform (medium 0/50, the false-zero floor, the competence
+boundary) is a **Qwen-scoped instrument**, so every H2 verdict — including a
+hardened "a stated correct approach does not cross the boundary" — is a statement
+about **Qwen2.5-Coder at 1.5B**, not about small models generally. H1's SINK
+inversion sharpens what H2a tests: other families *use* a code anchor profitably;
+whether Qwen can use **direction without code** (the hint channel) is precisely
+the still-open decomposition rung. No H2 branch licenses removal of the Qwen scope.
+
+*(H2 RESULTS land below after the runs.)*
 
 ---
