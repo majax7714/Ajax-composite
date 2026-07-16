@@ -62,4 +62,56 @@ Phase-5 data named); §10 addendum (wandering failure mode + the index rule).
 
 ---
 
-*(J1–J5 pre-registrations and results append below as they land.)*
+## J1 — ledger entries (2026-07-16, DONE)
+
+Self-planning (Jiang et al.), PlanSearch (2409.03733), and the HMT/Codex 7B-fork
+amendment landed in §11 (list + ledger). Commit `81324e2`.
+
+## J2 — hint-informativeness grading
+
+**PRE-REGISTRATION (2026-07-16, frozen before any grading).**
+
+**Question:** the direction-richness dose-response on the channel that works — do
+the 13 stratum recoveries concentrate in fully-specified strategies, or do nudges
+suffice?
+
+**Rubric (frozen):** each hint graded, seeing only the problem statement and the
+hint, as exactly one of —
+- **COMPLETE** — names a full solution strategy: following it mechanically
+  (algorithm plus its key decisions) suffices to write a correct program; no
+  essential idea is missing.
+- **PARTIAL** — names the core technique or one key observation but leaves at
+  least one essential design decision unstated (data structure, case split,
+  second phase, critical edge handling).
+- **NUDGE** — orientation only: restates or reframes the problem, flags a
+  pitfall, or names a generic technique without problem-specific instantiation.
+
+**Blindness protocol, with the exposure stated honestly:** the orchestrating
+session has seen the recovery outcomes, so it does **not** grade. Grading is
+performed by a **fresh model instance** (same model family that drafted the
+hints; recorded) whose entire input is the frozen rubric plus the 125
+(problem statement, hint) pairs in **shuffled order (seed 17), with all group
+labels and any outcome information stripped**. Grades are returned per qid;
+the orchestrator only then joins grades to outcomes.
+
+**Analysis (frozen):** primary test — COMPLETE-share among the 13 recovered
+stratum problems vs the 55 non-recovered stratum problems, Fisher exact,
+one-sided (recoveries richer). Ceiling guard, pre-declared: if > 80% of the 68
+stratum hints grade COMPLETE, the test is **ceiling-limited / UNINFORMATIVE**
+and is reported as such (the drafter wrote full strategies where it could — a
+property of the hint set, not of the channel).
+
+**Pre-registered readings (odds):** **(a) concentration** (p < 0.05) → the
+channel needs full strategies; the cascade is hard — the hint-producer must
+essentially solve the problem at approach level — **35%**. **(b) no
+concentration** → nudges suffice; the production bar drops substantially —
+**40%**. **(c) ceiling-uninformative** — **25%**.
+
+**Outputs:** [artifacts/h5_hint_grades.json]; §9.8 addendum; Index row 10 gains
+the dose-response line; the grade joins the J3/J4 cross-tabulations.
+
+*(J2 RESULT lands below.)*
+
+---
+
+*(J3–J5 pre-registrations and results append below as they land.)*
