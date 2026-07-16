@@ -131,7 +131,37 @@ uncommon"), (iv) a different fresh grader instance. Same frozen analysis and
 ceiling guard. **Amended odds: concentration 30% / no concentration 40% /
 ceiling again 30%.**
 
-*(J2 amended RESULT lands below.)*
+### J2 amended RESULT (2026-07-16) — **ceiling again (30% branch), and now it is a measured property of the hint set**
+
+The anchored instrument (calibration anchors, marginal-doubt rule, fresh grader)
+returned **123 COMPLETE / 2 PARTIAL / 0 NUDGE**, with the grader reporting after
+item-by-item stress-testing that the hints "did not genuinely vary — nearly all
+specify the named algorithm plus loop structure, state definitions, case splits,
+and essential edge handling in full." **Verdict: true ceiling.** The
+dose-response question (do nudges suffice?) is **UNMEASURABLE on this hint set**
+— the drafter wrote complete strategies essentially everywhere. Three
+consequences, recorded:
+
+1. **Scope sharpening for the §9.8 result (Index row 10):** what crossed the
+   boundary was **complete-strategy-grade** direction — 13/68 is a statement
+   about full approach specifications, and says nothing yet about weaker
+   direction. A deliberately richness-varied hint set (COMPLETE / degraded /
+   nudge arms) is the future dose-response instrument; **not run this phase**
+   (named, not chartered).
+2. **The instrument works and is kept:** the anchored rubric discriminates when
+   variance exists (it found the two genuinely thinner hints and defended every
+   COMPLETE with the stress-test). It is the frozen grader for J3/J4 self-hints,
+   where variance is expected.
+3. **A real hint defect surfaced, recorded, not edited:** the frozen abc321_c
+   hint mechanically includes the zero subset (rank off-by-one hazard); the
+   abc334_c hint leaves the pairing-parity DP uninstantiated. The frozen set
+   stays frozen; both defects stand on the page.
+
+Grades: [runs/h2/grades_amended.json] → committed as
+[artifacts/h5_hint_grades.json] (both instruments + protocol notes).
+Prediction accounting: first instrument branch (c) at 25%; amended branch (c) at
+30% — the ceiling was the truth both times; the drafter's own registered odds
+underweighted it both times.
 
 ---
 
