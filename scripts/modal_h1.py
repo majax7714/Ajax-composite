@@ -599,12 +599,15 @@ def h2_manip(family: str = "qwen"):
 
 
 @app.local_entrypoint()
-def h2a_stratum():
-    """H2a stratum arm (fires only on manipulation-gate PASS): medium 0/50 stratum
-    (n=68), fresh B1-50 vs HINT-50, paired exact McNemar."""
+def h2a_stratum(amended: bool = False):
+    """H2a stratum arm: medium 0/50 stratum (n=68), fresh B1-50 vs HINT-50,
+    paired exact McNemar. Fires on manipulation-gate PASS, or under the AMENDED
+    pre-registration ([PHASE_4.md] H2a part 2: original gate metric documented as
+    mis-specified; coverage-form gate passed via H2b p=0.015)."""
     gate = json.loads((REPO / "artifacts/h2_manip_check.json").read_text())["gate"]
-    if gate != "PASS":
-        print(f"manipulation gate = {gate}; stratum run POSTPONED per pre-reg")
+    if gate != "PASS" and not amended:
+        print(f"manipulation gate = {gate}; stratum run POSTPONED per pre-reg "
+              "(run with --amended under the H2a part 2 registration)")
         return
     fz = _h2_frozen()
     qids = fz["groups"]["stratum_medium"]
