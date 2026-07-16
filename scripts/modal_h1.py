@@ -637,6 +637,81 @@ def h2a_stratum(amended: bool = False):
           f"p {p:.4f}); floor ref 2.0 ===")
 
 
+@app.function(image=GEN_IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=3600)
+def h5_selfhint_gen(model_id: str, question_ids: list, tag: str,
+                    max_tokens: int = 120):
+    """J3/J4 SELFHINT channel: an instruct model writes its own approach hint
+    from the problem statement alone. Frozen prompt [PHASE_5.md J3]."""
+    def compute():
+        import re
+
+        from datasets import load_dataset
+        from transformers import AutoTokenizer
+        from vllm import LLM, SamplingParams
+
+        ds = load_dataset(LCB_DATASET, split="test")
+        q = {ds[i]["question_id"]: ds[i]["question_content"] for i in range(len(ds))}
+        tok = AutoTokenizer.from_pretrained(model_id)
+
+        def prompt(qid):
+            user = (f"Problem:\n{q[qid][:2500]}\n\nIn at most two sentences, state "
+                    "the algorithmic approach a correct solution must take. "
+                    "Describe the idea only — no code, no variable names.")
+            return tok.apply_chat_template([{"role": "user", "content": user}],
+                                           add_generation_prompt=True, tokenize=False)
+
+        llm = LLM(model=model_id, dtype="bfloat16", gpu_memory_utilization=0.90,
+                  max_model_len=8192, seed=17)
+        sp = SamplingParams(n=1, temperature=0.0, max_tokens=max_tokens, seed=17)
+        outs = llm.generate([prompt(qid) for qid in question_ids], sp)
+        res = []
+        for qid, req in zip(question_ids, outs):
+            txt = re.sub(r"```.*?(```|$)", "", req.outputs[0].text, flags=re.DOTALL).strip()
+            res.append({"qid": qid, "selfhint": txt})
+        return res
+    return _cache_or(tag, compute)
+
+
+@app.local_entrypoint()
+def j3_selfhint():
+    """J3 — SELFHINT-50 on the 68-problem medium stratum [PHASE_5.md J3]."""
+    fz = _h2_frozen()
+    qids = fz["groups"]["stratum_medium"]
+    sh = _load("j3_selfhints") or _persist(
+        "j3_selfhints",
+        h5_selfhint_gen.remote("Qwen/Qwen2.5-Coder-1.5B-Instruct", qids,
+                               tag="j3_selfhints"))
+    by = {r["qid"]: r["selfhint"] for r in sh}
+    items = [{"qid": q, "context": _hint_context(by[q])} for q in qids]
+    gen = _load("j3_cand") or _persist(
+        "j3_cand", h1_gen_lcb.remote(QWEN_BASE, items, 50, tag="j3_cand"))
+    res = _load("j3_res") or _persist(
+        "j3_res",
+        h1_lcb_exec.remote([g["qid"] for g in gen], [g["codes"] for g in gen],
+                           tag="j3_res", short_circuit=True))
+    # controls: same-day fresh B1-50 and HINT-50 from the H2a amended run
+    h2a_res = json.loads((REPO / "runs/modal/h2a_res.json").read_text())
+    n = len(qids)
+    b1 = [any(r["passed"] for r in row) for row in h2a_res[:n]]
+    hint = [any(r["passed"] for r in row) for row in h2a_res[n:]]
+    selfh = [any(r["passed"] for r in row) for row in res]
+    def mcn(x, y):
+        b = sum(1 for a, bb in zip(x, y) if bb and not a)
+        c = sum(1 for a, bb in zip(x, y) if a and not bb)
+        return b, c, _mcnemar_one_sided(b, c)
+    b_vs, c_vs, p_vs_b1 = mcn(b1, selfh)
+    bh, ch, p_vs_hint = mcn(selfh, hint)
+    out = {"_label": "J3 — SELFHINT-50 vs B1-50/HINT-50, medium 0/50 [PHASE_5.md J3]",
+           "n": n, "b1_recoveries": sum(b1), "hint_recoveries": sum(hint),
+           "selfhint_recoveries": sum(selfh),
+           "selfhint_vs_b1": {"selfhint_only": b_vs, "b1_only": c_vs, "p": p_vs_b1},
+           "hint_vs_selfhint": {"hint_only": bh, "selfhint_only": ch, "p": p_vs_hint},
+           "recovered_qids_selfhint": [q for q, v in zip(qids, selfh) if v]}
+    (REPO / "artifacts/h5_selfhint_qwen.json").write_text(json.dumps(out, indent=2))
+    print(f"=== J3: B1 {sum(b1)} | SELFHINT {sum(selfh)} | HINT {sum(hint)} ; "
+          f"selfhint-vs-B1 p {p_vs_b1:.4f} ; hint-vs-selfhint p {p_vs_hint:.4f} ===")
+
+
 @app.local_entrypoint()
 def h2a_validate():
     """Recovery validation for the amended stratum run: judge rerun on the
