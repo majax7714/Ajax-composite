@@ -251,4 +251,38 @@ committed and before arms launch.)*
 
 ---
 
-*(J5 pre-registration/costing appends below.)*
+## J5 — the 7B fork: costed and presented (2026-07-16). **NOT RUN — sign-off required.**
+
+**Re-scoped questions (per the J1 ledger amendment):**
+1. **Does the Qwen conditioning pathology persist at 7B?** One D2c-style cell
+   (44 problems × {E0, E1} × k=8) + one hint-conditioning cell (the 20-problem
+   manip set × {E0, HINT} × k=25) on Qwen2.5-Coder-7B. Persists → family
+   property (the pathology note strengthens materially); vanishes → small-Qwen
+   property (scoped).
+2. **Does direction self-production switch on by 7B?** Requires a 7B-derived
+   medium stratum (78 × 50 screen, all-cases judge) then SELFHINT-50 + B1-50 on
+   that stratum (7B-Instruct writes the hints, J3 protocol) — the first data
+   point between our 1.5B floor and PlanSearch's frontier ceiling.
+
+**Feasibility (arithmetic; a ~$0.30 smoke would confirm before commitment):**
+Qwen2.5-Coder-7B bf16 ≈ 15.2 GB weights; L4 = 24 GB; at gpu_mem_util 0.90 the KV
+budget is ≈ 6 GB. With GQA (4 KV heads × 28 layers × 128 dim, fp16) KV ≈ 57
+KB/token → ≈ 105k tokens of KV ≈ ~12 concurrent 8k-context sequences — **fits on
+L4** with reduced batching (expect 3–5× slower generation than the 1.5B cells).
+L40S (48 GB) doubles throughput headroom at ~2× the rate.
+
+**Cost estimate:**
+| item | est. |
+|---|---|
+| 7B + 7B-Instruct download to volume | ~30 GB, one-off, ≈ $0 compute |
+| Q1 pathology cells (gen ~1.7k seqs + judging) | **$3–5** |
+| Q2 screen (3.9k gens + all-cases judge) | **$6–10** |
+| Q2 arms (2 × 50 × stratum ≈ 40–55 + selfhint gen) | **$5–9** |
+| **Total** | **≈ $15–25 on L4** (Q1 alone: $3–5) |
+
+**Recommendation, for the decision:** Q1 (pathology persistence) is the cheap,
+high-leverage half — it directly upgrades the Qwen-pathology extraction and
+stands alone. Q2 is the forward-looking half and roughly 4× Q1's cost. They can
+be authorized independently. Awaiting sign-off; nothing runs under this charter.
+
+*(Sign-off outcome recorded here when given.)*
