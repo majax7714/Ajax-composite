@@ -1,0 +1,8 @@
+{
+ "_label": "J4 hint extension \u2014 the three medium problems outside the frozen 125 [PHASE_5.md J4]; identical protocol (words only, no identifiers/numerals/code tokens, ~2 sentences, drafted from statements alone, automated screen clean)",
+ "hints": {
+  "abc327_c": "Check three families of constraints: every row, every column, and each of the nine non-overlapping three-by-three blocks must contain each digit exactly once; answer yes only when all checks pass.",
+  "abc339_c": "The initial passenger count must be just large enough that every running prefix stays non-negative: compute the minimum prefix sum, start from its negation when negative (otherwise zero), and add the overall total.",
+  "abc343_c": "Enumerate bases upward while the cube stays within the bound, keep the cubes whose decimal form reads the same both ways, and print the largest; the cube root of the bound keeps the loop small."
+ }
+}
