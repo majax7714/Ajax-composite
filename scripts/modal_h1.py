@@ -30,6 +30,8 @@ FAMILIES = {
     "starcoder2": "bigcode/starcoder2-3b",
 }
 QWEN_BASE = "Qwen/Qwen2.5-Coder-1.5B"  # the frozen Phase-3b config generator (H2 arms)
+QWEN7B = "Qwen/Qwen2.5-Coder-7B"                  # J5 (sign-off 2026-07-17)
+QWEN7B_INSTRUCT = "Qwen/Qwen2.5-Coder-7B-Instruct"
 LCB_DATASET = "livecodebench/code_generation"
 BCB_DATASET = "bigcode/bigcodebench"
 
@@ -725,6 +727,159 @@ def j3_selfhint():
 @app.local_entrypoint()
 def j4_prefetch():
     print(h5_download.remote(["deepseek-ai/deepseek-coder-1.3b-instruct"]))
+
+
+@app.local_entrypoint()
+def j5_prefetch():
+    print(h5_download.remote([QWEN7B, QWEN7B_INSTRUCT]))
+
+
+@app.local_entrypoint()
+def j5_smoke():
+    """J5 smoke gate + KV feasibility: 8 LCB-easy x 8 on 7B base."""
+    qids = _lcb_easy_qids()[:8]
+    gen = _load("j5_smoke_cand") or _persist(
+        "j5_smoke_cand",
+        h1_gen_lcb.remote(QWEN7B, [{"qid": q, "context": None} for q in qids], 8,
+                          tag="j5_smoke_cand"))
+    codes = [g["codes"] for g in gen]
+    flat = [c for row in codes for c in row]
+    wf = sum(1 for c in flat if c) / len(flat)
+    dg = sum(1 for c in flat if c and len(c) < 20) / max(1, sum(1 for c in flat if c))
+    res = _load("j5_smoke_res") or _persist(
+        "j5_smoke_res",
+        h1_lcb_exec.remote([g["qid"] for g in gen], codes, tag="j5_smoke_res",
+                           short_circuit=True))
+    npass = sum(1 for row in res for r in row if r["passed"])
+    ok = wf >= 0.85 and dg <= 0.10
+    print(f"=== J5 smoke (7B): wf {wf:.3f} dg {dg:.3f} passed {npass}/{len(flat)} "
+          f"→ {'PASS' if ok else 'FAIL'} ===")
+    print("sample:\n" + next((c for c in flat if c), "")[:300])
+
+
+@app.local_entrypoint()
+def j5_q1():
+    """J5 Q1 — pathology persistence at 7B: (a) D2c cell 44 x {E0,E1} x 8
+    all-cases; (b) language cell 20 x {E0,HINT} x 25 [PHASE_5.md J5]."""
+    import statistics as st
+
+    # Q1a — D2c cell
+    arts = _d2c_artifacts()
+    items = ([{"qid": a["qid"], "context": None} for a in arts]
+             + [{"qid": a["qid"], "context": _d2c_context(a)} for a in arts])
+    dgen = _load("j5_q1a_cand") or _persist(
+        "j5_q1a_cand", h1_gen_lcb.remote(QWEN7B, items, 8, tag="j5_q1a_cand"))
+    dres = _load("j5_q1a_res") or _persist(
+        "j5_q1a_res",
+        h1_lcb_exec.remote([g["qid"] for g in dgen], [g["codes"] for g in dgen],
+                           tag="j5_q1a_res"))
+    n = len(arts)
+    e0_frac = [st.mean(x["frac"] for x in row) for row in dres[:n]]
+    e1_frac = [st.mean(x["frac"] for x in row) for row in dres[n:]]
+    copy_null = [a["frac"] for a in arts]
+    d_iid = [b - a for a, b in zip(e0_frac, e1_frac)]
+    d_copy = [b - a for a, b in zip(copy_null, e1_frac)]
+    # one-sided: P(conditioned below null) via sign-flip on negated deltas
+    p_sink_iid = _wilcoxon_mc_one_sided([-x for x in d_iid])
+    p_sink_copy = _wilcoxon_mc_one_sided([-x for x in d_copy])
+    q1a = {"e0_mean_frac_iid": st.mean(e0_frac), "e1_mean_frac_cond": st.mean(e1_frac),
+           "copy_null_mean": st.mean(copy_null),
+           "delta_cond_minus_iid": st.mean(d_iid),
+           "delta_cond_minus_copy": st.mean(d_copy),
+           "p_one_sided_cond_below_iid": p_sink_iid,
+           "p_one_sided_cond_below_copy": p_sink_copy}
+    print(f"Q1a: iid {q1a['e0_mean_frac_iid']:.3f} | cond {q1a['e1_mean_frac_cond']:.3f} | "
+          f"copy {q1a['copy_null_mean']:.3f} | p_below_iid {p_sink_iid:.4f} "
+          f"p_below_copy {p_sink_copy:.4f}")
+
+    # Q1b — language cell
+    fz = _h2_frozen()
+    qids = fz["groups"]["manip_check"]
+    hints = fz["hints"]
+    items = ([{"qid": q, "context": None} for q in qids]
+             + [{"qid": q, "context": _hint_context(hints[q])} for q in qids])
+    mgen = _load("j5_q1b_cand") or _persist(
+        "j5_q1b_cand", h1_gen_lcb.remote(QWEN7B, items, 25, tag="j5_q1b_cand"))
+    mres = _load("j5_q1b_res") or _persist(
+        "j5_q1b_res",
+        h1_lcb_exec.remote([g["qid"] for g in mgen], [g["codes"] for g in mgen],
+                           tag="j5_q1b_res", short_circuit=True))
+    m = len(qids)
+    e0 = [sum(r["passed"] for r in row) / len(row) for row in mres[:m]]
+    hi = [sum(r["passed"] for r in row) / len(row) for row in mres[m:]]
+    diffs = [b - a for a, b in zip(e0, hi)]
+    q1b = {"e0_mean_pass": st.mean(e0), "hint_mean_pass": st.mean(hi),
+           "mean_uplift": st.mean(diffs),
+           "p_one_sided_uplift": _wilcoxon_mc_one_sided(diffs)}
+    print(f"Q1b: E0 {q1b['e0_mean_pass']:.3f} → HINT {q1b['hint_mean_pass']:.3f} "
+          f"(Δ {q1b['mean_uplift']:+.3f}, p {q1b['p_one_sided_uplift']:.4f})")
+
+    out = {"_label": "J5 Q1 — pathology persistence at 7B [PHASE_5.md J5]",
+           "model": QWEN7B, "q1a_d2c": q1a, "q1b_language": q1b}
+    (REPO / "artifacts/h5_7b_pathology.json").write_text(json.dumps(out, indent=2))
+    print("wrote artifacts/h5_7b_pathology.json")
+
+
+@app.local_entrypoint()
+def j5_q2_screen():
+    """J5 Q2 step 1 — 7B medium screen (78 x 50, all-cases)."""
+    med = json.loads((REPO / "runs/modal/lcb_res_lcb_r2_base_medium_T08.json").read_text())
+    qids = med["question_ids"]
+    gen = _load("j5_q2_screen_cand") or _persist(
+        "j5_q2_screen_cand",
+        h1_gen_lcb.remote(QWEN7B, [{"qid": q, "context": None} for q in qids], 50,
+                          tag="j5_q2_screen_cand"))
+    res = _load("j5_q2_screen_res") or _persist(
+        "j5_q2_screen_res",
+        h1_lcb_exec.remote([g["qid"] for g in gen], [g["codes"] for g in gen],
+                           tag="j5_q2_screen_res"))
+    import statistics as st
+    counts = [(len(row), sum(r["passed"] for r in row)) for row in res]
+    p8 = st.mean(_pass_at_k(n, c, 8) for n, c in counts)
+    p50 = st.mean(_pass_at_k(n, c, 50) for n, c in counts)
+    stratum = [q for q, row in zip(qids, res) if not any(r["passed"] for r in row)]
+    rich = sum(1 for q, row in zip(qids, res)
+               if q in stratum and any(0 < r["frac"] < 1 for r in row))
+    out = {"_label": "J5 Q2 step 1 — 7B medium screen [PHASE_5.md J5]",
+           "model": QWEN7B, "pass@8": p8, "pass@50": p50,
+           "stratum_size": len(stratum), "richness": rich, "stratum_qids": stratum}
+    (REPO / "artifacts/h5_7b_medium_screen.json").write_text(json.dumps(out, indent=2))
+    print(f"=== J5 Q2 screen: pass@8 {p8:.3f} pass@50 {p50:.3f} | "
+          f"stratum {len(stratum)}/78 | richness {rich} ===")
+
+
+@app.local_entrypoint()
+def j5_q2_arms():
+    """J5 Q2 step 3 — B1-50 / SELFHINT-50 on the 7B stratum (7B-Instruct writes
+    the self-hints). Launch only after the floor prediction is committed."""
+    scr = json.loads((REPO / "artifacts/h5_7b_medium_screen.json").read_text())
+    qids = scr["stratum_qids"]
+    sh = _load("j5_selfhints") or _persist(
+        "j5_selfhints",
+        h5_selfhint_gen.remote(QWEN7B_INSTRUCT, qids, tag="j5_selfhints"))
+    sh_by = {r["qid"]: r["selfhint"] for r in sh}
+    items = ([{"qid": q, "context": None} for q in qids]
+             + [{"qid": q, "context": _hint_context(sh_by[q])} for q in qids])
+    gen = _load("j5_arms_cand") or _persist(
+        "j5_arms_cand", h1_gen_lcb.remote(QWEN7B, items, 50, tag="j5_arms_cand"))
+    res = _load("j5_arms_res") or _persist(
+        "j5_arms_res",
+        h1_lcb_exec.remote([g["qid"] for g in gen], [g["codes"] for g in gen],
+                           tag="j5_arms_res", short_circuit=True))
+    n = len(qids)
+    b1 = [any(r["passed"] for r in row) for row in res[:n]]
+    se = [any(r["passed"] for r in row) for row in res[n:]]
+    b = sum(1 for x, y in zip(b1, se) if y and not x)
+    c = sum(1 for x, y in zip(b1, se) if x and not y)
+    out = {"_label": "J5 Q2 — B1-50 vs SELFHINT-50 on the 7B stratum [PHASE_5.md J5]",
+           "n": n, "b1_recoveries": sum(b1), "selfhint_recoveries": sum(se),
+           "selfhint_only": b, "b1_only": c,
+           "p_one_sided_mcnemar": _mcnemar_one_sided(b, c),
+           "recovered_qids": {"b1": [q for q, v in zip(qids, b1) if v],
+                              "selfhint": [q for q, v in zip(qids, se) if v]}}
+    (REPO / "artifacts/h5_7b_switchon.json").write_text(json.dumps(out, indent=2))
+    print(f"=== J5 Q2 arms: B1 {sum(b1)} | SELFHINT {sum(se)} "
+          f"(+{b}/-{c}, p {out['p_one_sided_mcnemar']:.4f}) ===")
 
 
 @app.local_entrypoint()
