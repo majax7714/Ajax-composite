@@ -314,7 +314,7 @@ currently believes.** Statuses: LIVE / KILLED / RETRACTED / REVERSED / SCOPED.
 | 9 | R3 null — "1.5B cannot use direction" | **REVERSED-AS-REFINED** | a *trace-channel* null: traces carry no usable direction (Qwen); content, not capacity, was the variable | §9.7, §9.8 |
 | 10 | Hint result — approach-level direction crosses the competence boundary (13/68 vs floor 2, p = 4.9e-4) | **LIVE** | Qwen-1.5B, medium stratum, oracle-derived **complete-strategy-grade** hints (J2: dose-response unmeasurable on this set — weaker direction untested); cross-family test = Phase 5 J4 | §9.8 + J2 addendum |
 | 11 | Qwen conditioning pathology (double dissociation: code and language channels degrade Qwen, lift DeepSeek) | **LIVE** | Qwen2.5-Coder-1.5B vs DeepSeek-1.3B (44-problem code cell; 20-problem language cell); StarCoder2 code-cell consistent | §9.8, [PHASE_4.md] |
-| 12 | Production bottleneck — "the model cannot produce hint-grade direction for itself" | **LIVE-BUT-INFERRED** (from MODELABS + BSF nulls, not a direct arm) | Qwen-1.5B; direct measurement = Phase 5 J3/J4 | §9.8 |
+| 12 | Production bottleneck — "the model cannot produce hint-grade direction for itself" | **LIVE-MEASURED** (J3 direct arm: SELFHINT on-floor at 3; 0/68 self-hints production-adequate; gap vs oracle hints p = 0.0032) | Qwen-1.5B measured; second family = J4 | §9.8 J3 addendum |
 | 13 | Temperature is a dose-responsive anti-anchoring intervention | LIVE | Qwen, HumanEval cells, within the law's domain | §9.3 |
 | 14 | Provenance near-irrelevance (instruction verb ≫ provenance) | LIVE | Qwen; holds under lexical and AST metrics | §9.3, H0a follow-up |
 | 15 | False-zero floor model (two-component mixture over k=50 pools) | LIVE — **2 exact hits** (predicted 2.01; B1 observed 2, twice independently) | LCB strata; third out-of-sample test pre-registered (J4, DeepSeek) | §9.6 |
@@ -1758,6 +1758,21 @@ surviving channel — now with its existence proof), the register null, and ever
 Qwen scope line from H1. The hint channel is oracle-fed by construction —
 deployable self-refinement still requires something that *generates* the hint,
 and R3/BSF showed this model cannot generate it for itself.
+
+**Addendum (2026-07-16, Phase 5 J3 — the production gap, measured; [PHASE_5.md]
+J3).** "The model cannot produce hint-grade direction for itself" was inferred
+from MODELABS/BSF; the direct arm now exists. Qwen2.5-Coder-1.5B-Instruct wrote
+its own approach hints from the statements alone (frozen prompt), and the base
+model ran SELFHINT-50 on the same 68-problem stratum: **3 recoveries — on the
+floor** (B1 2, p = 0.5) — against HINT's 13 (production gap p = 0.0032). Blind
+anchored grading with a registered correctness dimension explains it completely:
+**0 of 68 self-hints were production-adequate** (COMPLETE ∧ CORRECT; 0 COMPLETE,
+25 outright WRONG; cap-truncated tutorial preambles instead of two-sentence
+strategies), where the same instrument-class graded the oracle set 123/125
+COMPLETE. Both rungs of the Olausson decomposition are now measured at 1.5B:
+**uses complete-strategy direction (13/68); cannot produce it (0/68)**. The
+deployable shape at this scale is a cascade — a stronger producer feeding a
+small executor.
 
 **Addendum (2026-07-16, Phase 5 J2 — what grade of direction crossed the
 boundary).** All 125 frozen hints were graded by blind fresh-instance graders

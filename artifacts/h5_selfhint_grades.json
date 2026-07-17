@@ -1,0 +1,309 @@
+{
+ "_label": "J3 \u2014 self-hint grades (anchored blind instrument + correctness dim) [PHASE_5.md J3]",
+ "grader": "fresh blind instance a3ffdb1bfa414ae7e; orchestrator did not grade; shuffled label-free input",
+ "counts_info": {
+  "COMPLETE": 0,
+  "PARTIAL": 37,
+  "NUDGE": 31
+ },
+ "counts_correct": {
+  "CORRECT": 14,
+  "DOUBTFUL": 29,
+  "WRONG": 25
+ },
+ "production_adequate": 0,
+ "channel_characterization": "median 90 words (cap-truncated tutorial preambles; the 2-sentence constraint ignored); 68/68 contain numerals, 67/68 code/format tokens \u2014 the frozen prompt's output, recorded as-is",
+ "recovered_qids": [
+  "abc304_c",
+  "abc312_c",
+  "abc333_c"
+ ],
+ "recovered_grades": {
+  "abc304_c": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc312_c": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc333_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  }
+ },
+ "grades": {
+  "abc313_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc341_d": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc318_d": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc342_c": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc334_b": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc327_d": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc303_d": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc334_d": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc336_d": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc320_d": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc311_c": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc303_c": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc330_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc325_b": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc308_d": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc335_d": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc340_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc313_b": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "1883_C": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc306_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc318_c": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc319_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc341_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc333_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc319_d": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc334_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc343_d": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc315_d": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc339_d": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc301_d": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc322_d": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc311_d": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc302_d": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc336_c": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc312_d": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc307_d": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc337_c": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc337_d": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc305_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc307_c": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc338_c": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc302_b": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc322_c": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc304_d": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc314_d": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc329_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc325_c": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc312_c": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc320_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc309_d": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc315_c": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc332_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc314_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc309_c": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc301_c": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc304_c": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc310_d": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc328_c": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc321_d": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc339_b": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc330_d": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc333_d": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc306_d": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc323_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc331_c": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc324_c": {
+   "info": "NUDGE",
+   "correct": "CORRECT"
+  },
+  "abc335_c": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc342_d": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  }
+ }
+}

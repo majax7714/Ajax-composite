@@ -1,0 +1,22 @@
+{
+  "_label": "J3 \u2014 SELFHINT-50 vs B1-50/HINT-50, medium 0/50 [PHASE_5.md J3]",
+  "n": 68,
+  "b1_recoveries": 2,
+  "hint_recoveries": 13,
+  "selfhint_recoveries": 3,
+  "selfhint_vs_b1": {
+    "selfhint_only": 2,
+    "b1_only": 1,
+    "p": 0.5
+  },
+  "hint_vs_selfhint": {
+    "hint_only": 11,
+    "selfhint_only": 1,
+    "p": 0.003173828125
+  },
+  "recovered_qids_selfhint": [
+    "abc304_c",
+    "abc312_c",
+    "abc333_c"
+  ]
+}

@@ -212,7 +212,33 @@ the production gap in recoveries); cross-tab recovery × production-adequacy.
 **Artifacts:** h5_selfhint_qwen.json, h5_selfhint_grades.json. **Writeup:** §9.8
 extension + Index rows 10/12.
 
-*(J3 RESULT lands below.)*
+### J3 RESULT (2026-07-16) — **branch (a), the 45% favourite: the production failure is measured, and it is total**
+
+**Recoveries:** SELFHINT-50 = **3** vs B1-50 = 2 (p = 0.5 — on the floor) vs
+HINT-50 = 13; the production gap HINT-vs-SELFHINT is 11/1, **p = 0.0032**.
+[artifacts/h5_selfhint_qwen.json].
+
+**The cross-tabulation (blind anchored grading + registered correctness
+dimension):** informativeness **0 COMPLETE / 37 PARTIAL / 31 NUDGE**; correctness
+**14 CORRECT / 29 DOUBTFUL / 25 WRONG**; **production-adequate (COMPLETE ∧
+CORRECT) = 0/68 — 0%**, far under the 30% branch line. The same instrument-class
+graded the oracle set 123/125 COMPLETE — the discrimination is real (and
+retroactively confirms J2's ceiling was the hint set, not grader leniency).
+Channel shape, recorded: the instruct model ignores the two-sentence constraint
+and emits tutorial preambles that the frozen cap truncates (median 90 words);
+what reached the base model never once contained a complete correct strategy,
+and was outright wrong 37% of the time. The three recoveries grade
+PARTIAL/PARTIAL/NUDGE — floor-consistent, not direction-driven.
+[artifacts/h5_selfhint_grades.json].
+
+**Verdict:** at 1.5B on Qwen, the direction decomposition is now closed at both
+rungs, both measured: the model **uses** complete-strategy direction (13/68,
+§9.8) and **cannot produce** it (0/68 production-adequate; recovery on-floor).
+Olausson's localization — feedback production is the bottleneck — confirmed at
+1/70th their scale with a direct arm. Index row 12: LIVE-BUT-INFERRED →
+**LIVE-MEASURED (one family; J4 adds the second)**. The deployable shape at this
+scale is the cascade (a stronger producer feeding a small executor) — exactly
+the Self-planning ledger entry's structure, now with both rungs quantified.
 
 ---
 
