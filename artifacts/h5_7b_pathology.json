@@ -1,0 +1,19 @@
+{
+  "_label": "J5 Q1 \u2014 pathology persistence at 7B [PHASE_5.md J5]",
+  "model": "Qwen/Qwen2.5-Coder-7B",
+  "q1a_d2c": {
+    "e0_mean_frac_iid": 0.6590240725183907,
+    "e1_mean_frac_cond": 0.6090259487986761,
+    "copy_null_mean": 0.49448897062533426,
+    "delta_cond_minus_iid": -0.04999812371971464,
+    "delta_cond_minus_copy": 0.11453697817334181,
+    "p_one_sided_cond_below_iid": 0.07474626268686566,
+    "p_one_sided_cond_below_copy": 0.999850007499625
+  },
+  "q1b_language": {
+    "e0_mean_pass": 0.842,
+    "hint_mean_pass": 0.824,
+    "mean_uplift": -0.017999999999999995,
+    "p_one_sided_uplift": 0.695865206739663
+  }
+}

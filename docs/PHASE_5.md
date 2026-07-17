@@ -465,4 +465,27 @@ wanted).
 **Ops:** detach + volume-first persistence + short-circuit judging except where
 frac is the analysis (Q1a, Q2 screen); ~3–5× slower generation expected at 7B.
 
-*(J5 RESULTS land below.)*
+### J5 Q1 RESULT (2026-07-17) — **the conditioning pathology is a small-Qwen property; both frozen favourites hit**
+
+Smoke: PASS (wf 1.000, dg 0.000; 45/64 easy candidates pass — 7B ≈ 3× the 1.5B
+easy rate; L4 bf16 feasible as computed).
+
+- **Q1a, code channel — BLEND (45% favourite ✓).** On the same 44 artifacts:
+  7B own-iid **0.659**, conditioned **0.609**, copy-null 0.494. Conditioned sits
+  *between* the nulls — decisively above copying (p ≈ 1.0 against below-copy)
+  and only marginally below own-iid (p = 0.075). **No below-both-nulls
+  signature: the 1.5B sink vanishes into imitation at 7B** — a strong model
+  conditioned on a weak artifact shows the mild quality-matching drag the Codex
+  entry predicts, not the pathology.
+- **Q1b, language channel — harm vanishes (60% favourite ✓).** E0 0.842 →
+  HINT 0.824: Δ **−0.018** (p = 0.70), inside the pre-declared vanish band
+  (> −0.02) — with the near-saturation caveat reported (E0 approaches the 0.9
+  compression line but does not cross it).
+
+**Scope consequence (Index row 11 update pending Q2 close):** the double
+dissociation's Qwen side is a **Qwen2.5-Coder-1.5B** phenomenon — at 7B the same
+family behaves like DeepSeek/StarCoder2 (blend on code, no language harm). The
+pathology note's title sharpens from a family claim to a *small-model-of-this-
+family* claim. [artifacts/h5_7b_pathology.json].
+
+*(Q2 results land below.)*
