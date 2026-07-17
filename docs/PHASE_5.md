@@ -559,3 +559,41 @@ substrate the instrument requires.
    (blind anchored instrument + correctness, fresh agent, before any join).
 6. **Cost:** one L4 hard screen (~$3–5) + pooled arms (~$4–6): inside the
    signed-off ~$15–25 J5 envelope.
+
+### J5 Q2 extension RESULT, steps 1–2 (2026-07-17) — **pooled gate PASS; arms authorized to launch**
+
+**Ops note (§8):** the first hard-screen attempt timed out — the all-cases
+judge on 61 × 50 hard candidates exceeded one container's 4 h ceiling (hard
+failures burn full per-case timeouts). Re-run with the judge **sharded across 8
+containers** (identical frozen judge semantics, per-shard volume tags);
+generation pool reused from cache. [runs/modal/j5_hard_screen.log].
+
+**Screen ([artifacts/h5_7b_hard_screen.json]):** 61 hard stdin problems (the
+identical selection rule yields 61 < the 100 cap); pass@8 0.027 / **pass@50
+0.098** / **stratum 55/61 (90%)** / richness 48/55. **Prediction accounting:
+2 of 3 hit** — pass@50 inside [0.03, 0.20] ✓ (60%); stratum ≥ 60% ✓ (65%);
+**floor character MISSED**: E[fresh B1-50] = 2.09 > the committed ≤ 1.5 line
+(the 55% favourite was wrong — the hard tail is near-zero-*ish* but livelier
+than predicted).
+
+**Hard floor fit ([artifacts/h5_7b_hard_floor_fit.json],
+[scripts/j5_hard_floor_fit.py] — W0c instrument unchanged):** **π₀ = 0.760**
+— the point mass *returns* at hard difficulty (P(reachable | 0/50) = 0.158;
+near-misses x=1: 3, x=2: 2). The difficulty axis moves the 7B stratum from
+live tail (medium: π₀ = 0, E = 5.11) back toward a true floor.
+
+**Committed floor prediction (the instrument's FIFTH out-of-sample test,
+committed here before any arm runs): a fresh B1-50 on the 55-problem 7B hard
+stratum recovers E = 2.09; point prediction 2; acceptable band [0, 4] (~94%
+predictive mass); ≥ 5 falsifies the fit.** Scored separately from the medium
+band [2, 9] on the B1 arm, per the frozen extension protocol.
+
+**Pooled power gate — PASS.** Exact heterogeneous-floor envelope (medium 46 at
+f = 0.111 + hard 55 at f = 0.038; trinomial convolution): at r = 0.20,
+**marginal 0.816** (governing reading, ≥ 0.70 ✓) / uplift 0.984. At r = 0.15:
+0.478 / 0.902; r = 0.10: 0.124 / 0.647 — effects below r ≈ 0.15 are
+under-powered under the marginal reading and pre-declared accordingly.
+
+**Arms launch on the pooled 101-problem stratum** (B1-50 / SELFHINT-50,
+7B-Instruct self-hints, frozen prompt, short-circuit judge), per the frozen
+extension registration. Branches and odds unchanged.

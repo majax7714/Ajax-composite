@@ -1,0 +1,123 @@
+{
+  "_label": "J5 Q2 extension step 2 \u2014 W0c floor fit on the 7B hard stratum [PHASE_5.md J5; instrument's 5th out-of-sample test] + pooled power",
+  "model": "Qwen/Qwen2.5-Coder-7B",
+  "counts": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    2,
+    2,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    5,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "n_zero": 55,
+  "near_x1_x2": {
+    "1": 3,
+    "2": 2
+  },
+  "fits": {
+    "mixture": {
+      "loglik": -27.91569343132501,
+      "alpha": 0.6021941745089991,
+      "beta": 36.26378238125748,
+      "pi0": 0.76,
+      "P_reachable_given_zero": 0.15756652224213563,
+      "fresh50_recovery_prob_per_zero_problem": 0.037981716936898224,
+      "expected_B1_50_recoveries_in_stratum": 2.0889944315294025
+    },
+    "pure_beta_upper": {
+      "loglik": -27.95673422962488,
+      "alpha": 0.08576255742999264,
+      "beta": 22.372228064662554,
+      "pi0": 0.0,
+      "P_reachable_given_zero": 1.0,
+      "fresh50_recovery_prob_per_zero_problem": 0.04425901638026852,
+      "expected_B1_50_recoveries_in_stratum": 2.434245900914769
+    }
+  },
+  "committed_band_90pct": {
+    "lo": 0,
+    "hi": 4,
+    "mass": 0.9426021151931294
+  },
+  "pooled_power": {
+    "strata": [
+      {
+        "n": 46,
+        "f": 0.11107466085068007
+      },
+      {
+        "n": 55,
+        "f": 0.037981716936898224
+      }
+    ],
+    "r=0.10": {
+      "marginal": 0.12365314597724722,
+      "uplift": 0.6467106824837897
+    },
+    "r=0.15": {
+      "marginal": 0.4779591233470554,
+      "uplift": 0.9018044068370602
+    },
+    "r=0.20": {
+      "marginal": 0.8155852590454205,
+      "uplift": 0.9839732009761489
+    },
+    "gate_rule": "marginal r=0.20 >= 0.70",
+    "gate_pass": true
+  }
+}
