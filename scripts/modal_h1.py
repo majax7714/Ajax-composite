@@ -764,6 +764,93 @@ def j4_screen():
 
 
 @app.local_entrypoint()
+def j4_arms():
+    """J4 step 2 — DeepSeek four-arm stratum contrast: B1/TRACE/HINT/SELFHINT-50
+    on the 76-problem DeepSeek-native stratum [PHASE_5.md J4]."""
+    scr = json.loads((REPO / "artifacts/h5_deepseek_medium_screen.json").read_text())
+    qids = scr["stratum_qids"]
+    fz = _h2_frozen()
+    ext = json.loads((REPO / "artifacts/h5_hints_extension.json").read_text())["hints"]
+    hints = {**fz["hints"], **ext}
+
+    # artifacts from the DeepSeek-native screen pool (frozen R3 rule)
+    cand = _load("j4_screen_cand")
+    res = _load("j4_screen_res")
+    art = {}
+    for g, row in zip(cand, res):
+        if g["qid"] not in qids:
+            continue
+        best_i, best_f = None, -1.0
+        for i, (cd, r) in enumerate(zip(g["codes"], row)):
+            if cd and r["frac"] > best_f:
+                best_i, best_f = i, r["frac"]
+        if best_i is not None:
+            r = row[best_i]
+            art[g["qid"]] = {"qid": g["qid"], "code": g["codes"][best_i],
+                             "frac": r["frac"], "n_tests": r["n_tests"],
+                             "n_failed": r["n_tests"] - r["n_passed"]}
+    missing = [q for q in qids if q not in art]
+    if missing:
+        print(f"{len(missing)} stratum problems without usable artifact "
+              f"(excluded from TRACE, kept in other arms): {missing}")
+    aq = [q for q in qids if q in art]
+
+    traces = _load("j4_traces") or _persist(
+        "j4_traces",
+        h2_trace_capture.remote(aq, [art[q]["code"] for q in aq], tag="j4_traces"))
+    tr_by = {t["qid"]: t for t in traces}
+    for q in aq:
+        art[q]["trace"] = {k: tr_by[q][k] for k in ("stdin", "expected", "actual")}
+
+    sh = _load("j4_selfhints") or _persist(
+        "j4_selfhints",
+        h5_selfhint_gen.remote("deepseek-ai/deepseek-coder-1.3b-instruct", qids,
+                               tag="j4_selfhints"))
+    sh_by = {r["qid"]: r["selfhint"] for r in sh}
+
+    items = ([{"qid": q, "context": None} for q in qids]
+             + [{"qid": q, "context": _trace_context(art[q])} for q in aq]
+             + [{"qid": q, "context": _hint_context(hints[q])} for q in qids]
+             + [{"qid": q, "context": _hint_context(sh_by[q])} for q in qids])
+    gen = _load("j4_arms_cand") or _persist(
+        "j4_arms_cand",
+        h1_gen_lcb.remote(FAMILIES["deepseek"], items, 50, tag="j4_arms_cand"))
+    res4 = _load("j4_arms_res") or _persist(
+        "j4_arms_res",
+        h1_lcb_exec.remote([g["qid"] for g in gen], [g["codes"] for g in gen],
+                           tag="j4_arms_res", short_circuit=True))
+    n = len(qids)
+    na = len(aq)
+    seg = {"B1": (qids, res4[:n]), "TRACE": (aq, res4[n:n + na]),
+           "HINT": (qids, res4[n + na:2 * n + na]),
+           "SELFHINT": (qids, res4[2 * n + na:])}
+    rec = {a: {q: any(r["passed"] for r in row) for q, row in zip(qs_, rows)}
+           for a, (qs_, rows) in seg.items()}
+
+    def mcn(xa, xb, universe):
+        b = sum(1 for q in universe if rec[xb].get(q) and not rec[xa].get(q))
+        c = sum(1 for q in universe if rec[xa].get(q) and not rec[xb].get(q))
+        return {"arm_only": b, "base_only": c, "p": _mcnemar_one_sided(b, c)}
+
+    out = {"_label": "J4 — DeepSeek four-arm stratum contrast [PHASE_5.md J4]",
+           "n_stratum": n, "n_trace_arm": na,
+           "recoveries": {a: sum(v.values()) for a, v in rec.items()},
+           "contrasts": {
+               "TRACE_vs_B1": mcn("B1", "TRACE", aq),
+               "HINT_vs_B1": mcn("B1", "HINT", qids),
+               "SELFHINT_vs_B1": mcn("B1", "SELFHINT", qids),
+               "HINT_vs_TRACE": mcn("TRACE", "HINT", aq),
+               "HINT_vs_SELFHINT": mcn("SELFHINT", "HINT", qids)},
+           "floor_prediction_committed": 0.0,
+           "recovered_qids": {a: sorted(q for q, v in rec[a].items() if v)
+                              for a in rec}}
+    (REPO / "artifacts/h5_deepseek_fourarm.json").write_text(json.dumps(out, indent=2))
+    print(f"=== J4 arms: " + " | ".join(f"{a} {sum(v.values())}" for a, v in rec.items()))
+    for k, v in out["contrasts"].items():
+        print(f"  {k}: +{v['arm_only']}/-{v['base_only']} p={v['p']:.4f}")
+
+
+@app.local_entrypoint()
 def h2a_validate():
     """Recovery validation for the amended stratum run: judge rerun on the
     recovered problems' HINT rows (fresh tag), stability per recovery."""
