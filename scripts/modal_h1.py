@@ -882,6 +882,103 @@ def j5_q2_arms():
           f"(+{b}/-{c}, p {out['p_one_sided_mcnemar']:.4f}) ===")
 
 
+@app.function(image=LCB_EXEC_IMAGE, volumes={"/cache": VOL}, timeout=1800,
+              cpu=2.0, memory=8192)
+def j5_hard_qids(cap: int = 100, seed: int = 17) -> list:
+    """LCB hard stdin population under the identical selection rule that built
+    the W2 medium population [PHASE_5.md J5 Q2 extension]."""
+    import json as _j
+    import random as _rnd
+
+    from datasets import load_dataset
+    ds = load_dataset(LCB_DATASET, split="test")
+    idx = []
+    for i in range(len(ds)):
+        if ds[i]["difficulty"] != "hard":
+            continue
+        try:
+            pub = _j.loads(ds[i]["public_test_cases"])
+            if pub and pub[0].get("testtype") == "stdin":
+                idx.append(i)
+        except Exception:
+            pass
+    _rnd.Random(seed).shuffle(idx)
+    return [ds[i]["question_id"] for i in idx[:cap]]
+
+
+@app.local_entrypoint()
+def j5_hard_screen():
+    """J5 Q2 extension step 1 — 7B hard screen (cap-100 x 50, all-cases judge)
+    [PHASE_5.md J5 Q2 extension pre-registration]."""
+    qids = _load("j5_hard_qids") or _persist("j5_hard_qids", j5_hard_qids.remote())
+    gen = _load("j5_hard_screen_cand") or _persist(
+        "j5_hard_screen_cand",
+        h1_gen_lcb.remote(QWEN7B, [{"qid": q, "context": None} for q in qids], 50,
+                          tag="j5_hard_screen_cand"))
+    res = _load("j5_hard_screen_res") or _persist(
+        "j5_hard_screen_res",
+        h1_lcb_exec.remote([g["qid"] for g in gen], [g["codes"] for g in gen],
+                           tag="j5_hard_screen_res"))
+    import statistics as st
+    counts = [(len(row), sum(r["passed"] for r in row)) for row in res]
+    p8 = st.mean(_pass_at_k(n, c, 8) for n, c in counts)
+    p50 = st.mean(_pass_at_k(n, c, 50) for n, c in counts)
+    stratum = [q for q, row in zip(qids, res) if not any(r["passed"] for r in row)]
+    rich = sum(1 for q, row in zip(qids, res)
+               if q in stratum and any(0 < r["frac"] < 1 for r in row))
+    out = {"_label": "J5 Q2 extension step 1 — 7B hard screen [PHASE_5.md J5]",
+           "model": QWEN7B, "n_problems": len(qids), "pass@8": p8, "pass@50": p50,
+           "stratum_size": len(stratum), "richness": rich, "stratum_qids": stratum}
+    (REPO / "artifacts/h5_7b_hard_screen.json").write_text(json.dumps(out, indent=2))
+    print(f"=== J5 hard screen: pass@8 {p8:.3f} pass@50 {p50:.3f} | "
+          f"stratum {len(stratum)}/{len(qids)} | richness {rich} ===")
+
+
+@app.local_entrypoint()
+def j5_pooled_arms():
+    """J5 Q2 extension steps 3-4 — B1-50 / SELFHINT-50 on the POOLED stratum
+    (medium 46 + hard). Launch only after the hard-floor prediction is committed
+    and the pooled power gate passes [PHASE_5.md J5 Q2 extension]."""
+    med = json.loads((REPO / "artifacts/h5_7b_medium_screen.json").read_text())
+    hard = json.loads((REPO / "artifacts/h5_7b_hard_screen.json").read_text())
+    qids = med["stratum_qids"] + hard["stratum_qids"]
+    n_med = len(med["stratum_qids"])
+    sh = _load("j5_selfhints_pooled") or _persist(
+        "j5_selfhints_pooled",
+        h5_selfhint_gen.remote(QWEN7B_INSTRUCT, qids, tag="j5_selfhints_pooled"))
+    sh_by = {r["qid"]: r["selfhint"] for r in sh}
+    items = ([{"qid": q, "context": None} for q in qids]
+             + [{"qid": q, "context": _hint_context(sh_by[q])} for q in qids])
+    gen = _load("j5_pooled_arms_cand") or _persist(
+        "j5_pooled_arms_cand",
+        h1_gen_lcb.remote(QWEN7B, items, 50, tag="j5_pooled_arms_cand"))
+    res = _load("j5_pooled_arms_res") or _persist(
+        "j5_pooled_arms_res",
+        h1_lcb_exec.remote([g["qid"] for g in gen], [g["codes"] for g in gen],
+                           tag="j5_pooled_arms_res", short_circuit=True))
+    n = len(qids)
+    b1 = [any(r["passed"] for r in row) for row in res[:n]]
+    se = [any(r["passed"] for r in row) for row in res[n:]]
+    b = sum(1 for x, y in zip(b1, se) if y and not x)
+    c = sum(1 for x, y in zip(b1, se) if x and not y)
+    out = {"_label": "J5 Q2 — B1-50 vs SELFHINT-50 on the pooled 7B stratum "
+                     "[PHASE_5.md J5 Q2 extension]",
+           "n": n, "n_medium": n_med, "n_hard": n - n_med,
+           "b1_recoveries": sum(b1), "selfhint_recoveries": sum(se),
+           "b1_recoveries_medium": sum(b1[:n_med]),
+           "b1_recoveries_hard": sum(b1[n_med:]),
+           "selfhint_recoveries_medium": sum(se[:n_med]),
+           "selfhint_recoveries_hard": sum(se[n_med:]),
+           "selfhint_only": b, "b1_only": c,
+           "p_one_sided_mcnemar": _mcnemar_one_sided(b, c),
+           "recovered_qids": {"b1": [q for q, v in zip(qids, b1) if v],
+                              "selfhint": [q for q, v in zip(qids, se) if v]}}
+    (REPO / "artifacts/h5_7b_switchon.json").write_text(json.dumps(out, indent=2))
+    print(f"=== J5 pooled arms: B1 {sum(b1)} (med {out['b1_recoveries_medium']} "
+          f"hard {out['b1_recoveries_hard']}) | SELFHINT {sum(se)} "
+          f"(+{b}/-{c}, p {out['p_one_sided_mcnemar']:.4f}) ===")
+
+
 @app.local_entrypoint()
 def j4_screen():
     """J4 step 1 — DeepSeek medium screen: 78 problems, k=50, all-cases judge

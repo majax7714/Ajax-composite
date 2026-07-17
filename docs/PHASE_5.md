@@ -489,3 +489,73 @@ pathology note's title sharpens from a family claim to a *small-model-of-this-
 family* claim. [artifacts/h5_7b_pathology.json].
 
 *(Q2 results land below.)*
+
+### J5 Q2 step-1/step-2 RESULT (2026-07-17) — screen favourite hit; **the 7B "floor" is not a floor; power gate FIRED**
+
+**Screen:** pass@8 0.206 / pass@50 **0.410** / **stratum 46/78** — inside the
+pre-registered [35, 55] band (**55% favourite ✓**). Richness 46/46 (every
+stratum problem shows partial credit). [artifacts/h5_7b_medium_screen.json].
+
+**Floor fit ([artifacts/h5_7b_floor_fit.json], [scripts/j5_floor_fit.py] — the
+W0c instrument unchanged):** **π₀ = 0.000** — the point mass vanishes at 7B.
+P(reachable | 0/50) = 1.0; near-misses x=1: **11**, x=2: 1 (DeepSeek had zero).
+The mixture and the pure-Beta upper bound coincide (E 5.11 vs 4.93) because
+there is no unreachable component to disagree about. **Observation (not
+predicted): the 7B medium stratum is a live tail, not a false-zero floor — the
+near-zero-floor substrate that made W2/J4 clean does not exist for 7B on
+LCB-medium.**
+
+**Committed floor prediction (the instrument's FOURTH out-of-sample test,
+committed here before any arm runs): a fresh B1-50 on the 46-problem 7B medium
+stratum recovers E = 5.11 problems; point prediction 5; acceptable band
+[2, 9] (~94% predictive mass); ≤ 1 or ≥ 10 falsifies the fit.** This is the
+first non-degenerate test of the Beta-binomial component — the three prior
+tests (2.01→2, 2.01→2, 0.00→1-in-band) were all near-zero floors.
+
+**Power rule accounting — GATE FIRED.** The frozen rule computes the exact-
+McNemar envelope "from the observed stratum size **and floor**". Floor-aware
+envelope (n = 46, per-problem floor f = 0.111, trinomial enumeration, reject at
+exact one-sided p ≤ 0.05): power at r = 0.20 = **0.223** reading r as the arm's
+marginal recovery rate, **0.695** reading r as uplift over the floor — **both
+< 0.70**. (Instrument validation: the same computation at J4's floor→0 reduces
+to the b ≥ 5 threshold and reproduces the recorded J4 envelope: 0.888 / 0.993 /
+1.000 vs recorded 0.890 / 0.994 / ~1.00.) **Per the frozen rule, arms do NOT
+launch on the medium stratum alone; the pre-committed extension path activates
+below.**
+
+### J5 Q2 extension pre-registration (2026-07-17, FROZEN before the hard screen runs)
+
+Of the two extension shapes named by the frozen rule, second-temperature
+pooling is rejected on its face: it re-screens the same 46 live problems and
+cannot change the floor character that killed the power. The **LCB-hard
+screen** is the extension of record — hard problems restore the near-zero-floor
+substrate the instrument requires.
+
+1. **Population:** LCB hard stdin problems under the *identical* selection rule
+   that built the W2 medium population (`_stdin_problems(ds, "hard")`, seed-17
+   shuffle, cap 100), frozen config, k = 50, all-cases judge (frac is consumed:
+   richness + floor fit).
+2. **Screen predictions (odds):** pass@50 ∈ [0.03, 0.20] **60%**; stratum
+   ≥ 60% of the hard population **65%**; hard-floor near-zero character
+   (E[fresh B1-50 recoveries] ≤ 1.5 on the hard stratum) **55%**.
+3. **After the screen:** W0c floor fit on the hard stratum; **its E[fresh
+   B1-50 recoveries] + band committed to this file BEFORE arms (the
+   instrument's fifth out-of-sample test)**. Pooled-stratum power: the same
+   floor-aware exact-McNemar envelope on the pooled stratum (medium 46 at
+   f = 0.111 + hard at its fitted floor), **governed by the stricter marginal-r
+   reading; arms launch iff pooled power ≥ 0.70 at r = 0.20** (uplift reading
+   reported alongside). If the pooled gate also fails, J5 Q2 closes as
+   **structurally unresolvable at 7B under this budget** — no further
+   extension under this sign-off.
+4. **Arms (pooled stratum):** B1-50 / SELFHINT-50, 7B-Instruct self-hints
+   under the frozen J3 prompt, frozen config, short-circuit judge (§8 cost
+   rule — frac not consumed in arms). The committed medium-floor prediction
+   (band [2, 9]) and the hard-floor prediction are each scored on the B1 arm
+   **per-stratum, separately**; the primary SELFHINT-vs-B1 test is the paired
+   exact one-sided McNemar on the pooled stratum.
+5. **Branches:** the frozen J5 Q2 branches and odds — (a) 40% / (b) 10% /
+   (c) 25% / (d) 25%, production-adequate ≥ 30% at 45% — carry over unchanged,
+   now read against the pooled stratum. Self-hint grading protocol unchanged
+   (blind anchored instrument + correctness, fresh agent, before any join).
+6. **Cost:** one L4 hard screen (~$3–5) + pooled arms (~$4–6): inside the
+   signed-off ~$15–25 J5 envelope.
