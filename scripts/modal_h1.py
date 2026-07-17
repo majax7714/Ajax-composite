@@ -637,6 +637,16 @@ def h2a_stratum(amended: bool = False):
           f"p {p:.4f}); floor ref 2.0 ===")
 
 
+@app.function(image=DL_IMAGE, volumes={"/cache": VOL}, timeout=3600)
+def h5_download(models: list):
+    from huggingface_hub import snapshot_download
+    for mid in models:
+        print("downloading", mid)
+        snapshot_download(mid)
+    VOL.commit()
+    return models
+
+
 @app.function(image=GEN_IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=3600)
 def h5_selfhint_gen(model_id: str, question_ids: list, tag: str,
                     max_tokens: int = 120):
@@ -710,6 +720,47 @@ def j3_selfhint():
     (REPO / "artifacts/h5_selfhint_qwen.json").write_text(json.dumps(out, indent=2))
     print(f"=== J3: B1 {sum(b1)} | SELFHINT {sum(selfh)} | HINT {sum(hint)} ; "
           f"selfhint-vs-B1 p {p_vs_b1:.4f} ; hint-vs-selfhint p {p_vs_hint:.4f} ===")
+
+
+@app.local_entrypoint()
+def j4_prefetch():
+    print(h5_download.remote(["deepseek-ai/deepseek-coder-1.3b-instruct"]))
+
+
+@app.local_entrypoint()
+def j4_screen():
+    """J4 step 1 — DeepSeek medium screen: 78 problems, k=50, all-cases judge
+    (frac consumed by artifact selection + richness) [PHASE_5.md J4]."""
+    med = json.loads((REPO / "runs/modal/lcb_res_lcb_r2_base_medium_T08.json").read_text())
+    qids = med["question_ids"]
+    gen = _load("j4_screen_cand") or _persist(
+        "j4_screen_cand",
+        h1_gen_lcb.remote(FAMILIES["deepseek"],
+                          [{"qid": q, "context": None} for q in qids], 50,
+                          tag="j4_screen_cand"))
+    res = _load("j4_screen_res") or _persist(
+        "j4_screen_res",
+        h1_lcb_exec.remote([g["qid"] for g in gen], [g["codes"] for g in gen],
+                           tag="j4_screen_res"))
+    import statistics as st
+    counts = [(len(row), sum(r["passed"] for r in row)) for row in res]
+    p1 = st.mean(c / n for n, c in counts)
+    p8 = st.mean(_pass_at_k(n, c, 8) for n, c in counts)
+    p50 = st.mean(_pass_at_k(n, c, 50) for n, c in counts)
+    stratum = [q for q, row in zip(qids, res) if not any(r["passed"] for r in row)]
+    near = {x: sum(1 for _, c in counts if c == x) for x in (1, 2)}
+    rich = sum(1 for q, row in zip(qids, res)
+               if q in stratum and any(0 < r["frac"] < 1 for r in row))
+    out = {"_label": "J4 step 1 — DeepSeek LCB-medium screen [PHASE_5.md J4]",
+           "model": FAMILIES["deepseek"], "n_problems": len(qids), "k": 50,
+           "pass@1": p1, "pass@8": p8, "pass@50": p50,
+           "stratum_size_pass50_eq_0": len(stratum), "near_x1_x2": near,
+           "stratum_with_partial_credit": rich,
+           "stratum_qids": stratum}
+    (REPO / "artifacts/h5_deepseek_medium_screen.json").write_text(json.dumps(out, indent=2))
+    print(f"=== J4 screen: pass@1 {p1:.3f} pass@8 {p8:.3f} pass@50 {p50:.3f} | "
+          f"stratum {len(stratum)}/{len(qids)} (x=1:{near[1]} x=2:{near[2]}) | "
+          f"richness {rich}/{len(stratum)} ===")
 
 
 @app.local_entrypoint()

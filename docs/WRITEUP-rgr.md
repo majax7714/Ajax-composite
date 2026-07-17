@@ -312,7 +312,7 @@ currently believes.** Statuses: LIVE / KILLED / RETRACTED / REVERSED / SCOPED.
 | 7 | Elimination argument (undirected ≤ i.i.d.; repulsion inexpressible; direction the sole surviving channel) | **LIVE, completed** — direction now has an existence proof | measured on Qwen-1.5B; in-context channels only; weight-/search-space never enumerated | §9.3.1, §9.8 |
 | 8 | D2c SINK (conditioning on partial-credit code degrades below both nulls) | **SCOPED + INVERTED** | Qwen-specific pathology; DeepSeek/StarCoder2 *climb* under the same artifacts | §9.7 markers, [PHASE_4.md] H1 |
 | 9 | R3 null — "1.5B cannot use direction" | **REVERSED-AS-REFINED** | a *trace-channel* null: traces carry no usable direction (Qwen); content, not capacity, was the variable | §9.7, §9.8 |
-| 10 | Hint result — approach-level direction crosses the competence boundary (13/68 vs floor 2, p = 4.9e-4) | **LIVE** | Qwen-1.5B, medium stratum, oracle-derived hints; cross-family test = Phase 5 J4 | §9.8 |
+| 10 | Hint result — approach-level direction crosses the competence boundary (13/68 vs floor 2, p = 4.9e-4) | **LIVE** | Qwen-1.5B, medium stratum, oracle-derived **complete-strategy-grade** hints (J2: dose-response unmeasurable on this set — weaker direction untested); cross-family test = Phase 5 J4 | §9.8 + J2 addendum |
 | 11 | Qwen conditioning pathology (double dissociation: code and language channels degrade Qwen, lift DeepSeek) | **LIVE** | Qwen2.5-Coder-1.5B vs DeepSeek-1.3B (44-problem code cell; 20-problem language cell); StarCoder2 code-cell consistent | §9.8, [PHASE_4.md] |
 | 12 | Production bottleneck — "the model cannot produce hint-grade direction for itself" | **LIVE-BUT-INFERRED** (from MODELABS + BSF nulls, not a direct arm) | Qwen-1.5B; direct measurement = Phase 5 J3/J4 | §9.8 |
 | 13 | Temperature is a dose-responsive anti-anchoring intervention | LIVE | Qwen, HumanEval cells, within the law's domain | §9.3 |
@@ -1758,6 +1758,22 @@ surviving channel — now with its existence proof), the register null, and ever
 Qwen scope line from H1. The hint channel is oracle-fed by construction —
 deployable self-refinement still requires something that *generates* the hint,
 and R3/BSF showed this model cannot generate it for itself.
+
+**Addendum (2026-07-16, Phase 5 J2 — what grade of direction crossed the
+boundary).** All 125 frozen hints were graded by blind fresh-instance graders
+under a frozen three-level rubric (COMPLETE / PARTIAL / NUDGE), twice — a bare
+instrument, then an anchored one registered before its regrade. Both hit the
+pre-declared ceiling guard: **123–125/125 grade COMPLETE** ("the hints read like
+reference-solution summaries" — the anchored grader, after item-by-item
+stress-testing). Verdict: **true ceiling — the drafter wrote complete strategies
+essentially everywhere, so the direction-richness dose-response is unmeasurable
+on this set.** The sharpening this buys: the 13/68 result is a
+**complete-strategy-grade** direction result; whether weaker direction (nudges,
+partial observations) crosses the boundary is open and would need a
+deliberately-varied hint set — named as a future instrument, not chartered.
+Two hint defects the anchored grader surfaced (abc321_c zero-subset rank hazard;
+abc334_c DP left uninstantiated) stand recorded in the frozen set.
+[artifacts/h5_hint_grades.json; PHASE_5.md J2.]
 
 ---
 

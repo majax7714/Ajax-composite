@@ -216,4 +216,39 @@ extension + Index rows 10/12.
 
 ---
 
-*(J4–J5 pre-registrations and results append below as they land.)*
+## J4 — the DeepSeek four-arm stratum contrast (the phase centerpiece)
+
+**PRE-REGISTRATION, step 1 — the screen (2026-07-16, frozen before the run).**
+
+**Why J4 leads the GPU budget:** the Qwen conditioning pathology retroactively
+contaminates every conditioning-based null in the record — R3's trace null,
+BSF's zero, "the anchor poisons the direction" were all measured on the one
+family where conditioning is toxic. "Traces carry no direction for structural
+failures" is written as a *content* claim but evidenced only on Qwen.
+
+**Screen (step 1):** DeepSeek-Coder-1.3B-base on the full 78-problem LCB-medium
+stdin population (the W2 population), k = 50, T = 0.8, top_p 1.0, seed 17, the
+frozen all-cases judge (frac is consumed: artifact selection + richness),
+right-sized container. Derive DeepSeek's own pass@50 = 0 stratum; fit the W0c
+two-component floor. **The floor's E[fresh B1-50 recoveries] prediction is
+committed to this file BEFORE any arm runs — the instrument's third out-of-sample
+test.** Screen predictions (odds 60%): pass@8 ∈ [0.02, 0.08], pass@50 ∈
+[0.08, 0.18], stratum 60–72/78.
+
+**Power rule (frozen):** compute the W2 exact-McNemar power envelope from the
+observed stratum size and floor. If power at r = 0.20 is < 70%, arms do NOT
+launch on this stratum alone — an extension (LCB-hard screen or second
+temperature pooling) gets its own pre-registration first. No improvisation.
+
+**Hint coverage:** 75/78 medium problems carry frozen audited hints; the three
+uncovered (abc343_c, abc327_c, abc339_c — all off-stratum for Qwen) get fresh
+hints drafted under the identical protocol + automated screen + blind audit,
+frozen in [artifacts/h5_hints_extension.json] before arms run.
+
+*(Step-1 RESULT + floor prediction land here; step 2 — the four-arm
+pre-registration with forks and odds — freezes after the floor prediction is
+committed and before arms launch.)*
+
+---
+
+*(J5 pre-registration/costing appends below.)*
