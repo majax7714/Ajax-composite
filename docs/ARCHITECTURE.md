@@ -1,5 +1,10 @@
 # Architecture
 
+> **Status note (2026-07-17, appended — content below unrevised):** Historical.
+> Describes `src/rgr/` for the original register experiment (frozen since
+> Phase 2). Later-phase experiment code lives in `scripts/modal_*.py`; the
+> current entry point is [WRITEUP-rgr.md](WRITEUP-rgr.md).
+
 How the four components fit together, how information is allowed to flow, and
 where each piece lives in `src/rgr/`. The design constraint that everything else
 serves: **the register update is the only channel that carries information across

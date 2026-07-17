@@ -1,5 +1,11 @@
 # Phase plan and gates
 
+> **Status note (2026-07-17, appended — content below unrevised):** This gate
+> log covers Phases 0–2 and M. Phase K (Kaggle → Modal lift-and-shift) and each
+> phase from 3 on carry their own gate logs (PHASE_K.md, PHASE_3.md,
+> PHASE_3R.md, PHASE_3B.md, PHASE_4.md, PHASE_5.md); the claim-level index is
+> journal §0.
+
 Operational checklist version of brief §10–§11. A phase is done when every box
 is checked and its gate verdict is recorded here (date + numbers). **Do not
 proceed past a failed gate by tuning until it passes.**

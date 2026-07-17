@@ -1,137 +1,114 @@
-# RGR — Register-Gated Refinement
+# Ajax Composite
 
-A minimal, falsifiable experiment for one claim:
+A public, append-only record of machine-learning experiments run under one
+discipline. The product here is not any single result — most of the headline
+claims this project has produced were subsequently killed by their own
+pre-registered gates, and the record says so on the page. **The product is the
+method**, applied repeatedly until the record itself became the primary
+artifact: pre-registered questions, scoped verdicts, calibrated instruments,
+and meaning extracted from failures, in chronological truth.
 
-> **An explicit internal state vector — a "register" — that gates generation and is
-> updated across refinement steps improves calibration and correctness beyond what
-> verification-plus-iteration already buys you.**
+The canonical document is **[docs/WRITEUP-rgr.md](docs/WRITEUP-rgr.md)** — the
+journal. Everything else in the repository exists to make the journal's numbers
+traceable: phase charters holding the pre-registrations, committed result
+artifacts, and the runner scripts that produced them.
 
-The register is the *only* channel that carries information across refinement steps.
-Ablate its updates and the loop collapses, by construction, into verifier-reranked
-best-of-n — so the central ablation and one of the baselines are the same object.
+## The method
 
-Full motivation and constraints: [docs/build-brief.md](docs/build-brief.md).
-This README is the operational entry point; the brief is the source of truth for
-the claim and kill criteria.
+Every experiment in the composite runs under the same rules:
 
-## The three hypotheses (each with a pre-committed kill criterion)
+- **Pre-register before running.** Predictions, odds, decision rules, and
+  branch interpretations are committed to the phase document *before* the run.
+  Falsified predictions stay on the page with their odds; the record keeps a
+  running account of where our priors were wrong.
+- **Append, never revise.** Documents grow by dated addenda. Retracted claims
+  keep their original text under a dated banner. There is no silent editing of
+  history — "the only failure mode is silent drift."
+- **Gates are binding.** Each claim carries a pre-committed kill criterion.
+  A failed gate is a recorded negative, not a tuning target; nothing proceeds
+  past a failed gate by tuning until it passes.
+- **Instruments are calibrated out-of-sample.** Measurement tools (judges,
+  floor models, graders) are frozen before use and tested by committed
+  prediction on data they have not seen; instrument failures are recorded the
+  same way claim failures are.
+- **Verdicts are scoped.** No finding keeps an unscoped "at this scale" or
+  "for this model" — cross-family and cross-scale checks assign each claim
+  GENERALIZES / single-family-scoped / MIXED.
+- **External results enter through a ledger.** Any outside paper used in a
+  design decision gets a reconciliation-ledger entry: what it claims, what we
+  measured, and how the two square.
 
-| | Claim | Gate |
+The full statement of the method, with the history that forced each rule, is
+§10 of the journal — deliberately placed directly after the abstract.
+
+## The arc, in one breath
+
+An execution-grounded verifier seemed to carry load (it didn't — quantization
+artifact); a learned cross-step register carried none; the null, fully
+localized, reframed the question to "where can refinement pay at all"; the
+search for that answer produced an anchoring/escape-distance law, an
+elimination argument, a false-zero floor model that predicts to the decimal,
+and a cross-family audit that retracted our platform negatives as one family's
+pathology — and finally an existence proof that approach-level direction
+crosses the competence boundary, moving the open question to where direction
+comes from.
+
+## Map of the composite
+
+| Phase | Charter | What it was |
 |---|---|---|
-| **H1** | An execution-trained verifier's confidence ranks correctness better than generator log-likelihood | Verifier AUROC must clear likelihood AUROC by a real margin, or stop |
-| **H2** | Register-gated refinement beats best-of-n (B1) *and* in-context refinement (B2) at matched compute | FULL must beat both, or the register is dead (publishable negative) |
-| **H3** | Settling depth tracks difficulty; adaptive stopping beats fixed-K at matched mean compute | Weaker gate; H3 failing does not sink H2 |
+| 0–2 | [build-brief.md](docs/build-brief.md), [PHASES.md](docs/PHASES.md) | The original RGR experiment: register-gated refinement. H1 passed (later killed as artifact), H2 killed clean — the register is dead |
+| Diagnostics | [DIAGNOSTICS.md](docs/DIAGNOSTICS.md), [PRE-B2-HANDOFF.md](docs/PRE-B2-HANDOFF.md) | What the H2 null means; predictions committed before B2 ran |
+| K, M | [PHASE_K.md](docs/PHASE_K.md), [PHASE_M.md](docs/PHASE_M.md) | Kaggle → Modal lift-and-shift, then the vLLM/bf16 stack rebuild (100× throughput) with re-baselined gates |
+| 3, 3R | [PHASE_3.md](docs/PHASE_3.md), [PHASE_3R.md](docs/PHASE_3R.md) | Reframe: "when does cross-step conditioning pay?" — then three audits that killed H1-as-artifact and retracted F2 |
+| 3b | [PHASE_3B.md](docs/PHASE_3B.md) | The mechanism arc: escape-distance law, elimination argument, trace null at declared power, false-zero floor instrument |
+| 4 | [PHASE_4.md](docs/PHASE_4.md) | Claim hardening: cross-family battery (DeepSeek, StarCoder2), F1/SINK retracted as one-family-scoped, oracle hints cross the competence boundary |
+| 5 | [PHASE_5.md](docs/PHASE_5.md) | The journal turn (the record becomes the primary artifact) + where direction comes from: models execute direction they cannot manufacture |
 
-**H1 gates H2 gates H3.** We do not tune past a failed gate.
+## How to read
 
-## Architecture in one screen
-
-```
-r ← r_0(problem)                        # problem-encoded init (D4)
-for t in 0..T_max:
-    candidate ← G(problem, r)           # regenerate conditioned on register
-    v ← V(problem, candidate)           # verifier is register-blind in v1 (D3)
-    if v ≥ τ: break                     # fixed threshold (D5)
-    r ← U(r, φ(candidate), v)           # GRU update — the only cross-step channel
-return best candidate by v
-```
-
-- **G** — frozen ~1.5B code model (4-bit), conditioned on the register via k learned
-  soft-prompt embeddings.
-- **r** — the register, `d_r = 128` (D1). Initialized from a pooled encoding of the
-  problem; updated only by U.
-- **U** — a small GRU cell over `(r, φ(candidate), v)`, trained by imitation first (D2).
-- **V** — small verifier trained on sandboxed execution labels. Its score gates the
-  loop; its negative log is the energy.
-
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full design and
-[docs/DECISIONS.md](docs/DECISIONS.md) for the resolved open decisions (D1–D8),
-including why the ablation is *freeze-r-at-r_0*, not zero-r, given the
-problem-encoded init.
+Start with the journal, in its designed order: **§10** (the working method —
+the document's thesis), then **§0** (Claims & Scope Index — what the project
+currently believes, claim by claim, with status and pointers), then **§9.5**
+(live status). Historical section numbering is preserved; the reading order
+10 → 0 → 1 is intentional.
 
 ## Repository map
 
 ```
-docs/               Design docs: brief, architecture, decisions, metrics,
-                    compute accounting (frozen before any run), phase plan
-configs/            TOML experiment configs, one per phase, layered on base.toml
-src/rgr/
-  types.py          Problem / Candidate / StepRecord / Trajectory (pure stdlib)
-  config.py         Typed config loading (stdlib tomllib)
-  generator/        G: model wrapper, soft-prompt injection, format discipline
-  register/         r_0 encoder, GRU update U, dynamics diagnostics
-  verifier/         V: pooled-feature MLP, φ feature extraction
-  execution/        Sandbox protocol + Daytona backend + guarded local dev backend
-  loop/             The refinement loop, baselines B0/B1/B1'/B2, compute ledger
-  data/             MBPP (train), HumanEval (held-out), split discipline
-  evals/            pass@k (unbiased), AUROC/ECE/Brier, problem-level bootstrap
-  training/         Label generation, verifier training, register imitation
-scripts/            One entry point per phase, each printing its gate verdict
-tests/              Stdlib-runnable tests for all pure-logic modules
+docs/               The record: the journal (WRITEUP-rgr.md), phase charters
+                    with pre-registrations and results, frozen design docs of
+                    the original experiment (brief, architecture, decisions,
+                    metrics, compute accounting)
+artifacts/          Committed result JSONs — every number in the journal
+                    traces to a file here or a run record
+scripts/            Runners and analysis: Modal apps (modal_*.py) for
+                    generation/execution/battery runs, plus local analysis
+                    scripts (floor fits, AST distance, validations)
+src/rgr/            The original register experiment's codebase (frozen since
+                    Phase 2): loop, baselines, verifier, register, sandbox
+                    execution, pure-stdlib metrics
+tests/              Stdlib-runnable tests for the pure-logic modules
+configs/            TOML experiment configs from the original experiment
+runs/               (gitignored) raw generation/execution pools — kept locally
+                    and on the Modal volume; artifacts/ carries the numbers
 ```
 
-Design rule enforced throughout: **everything that decides the experiment's
-verdict (loop control flow, compute accounting, metrics) is pure stdlib Python and
-tested locally.** Torch/transformers live only at the model edges
-(`generator/`, `register/`, `verifier/` internals), so the experiment logic can
-never silently depend on an untested GPU path.
+## Reproducibility
 
-## Status
+Frozen sampling configs (temperature, seed, stop sequences), frozen judges,
+and volume-first persistence are specified per phase in the charters; §8 of
+the journal is the operational ledger. Exact bit-reproducibility was retired
+for a statistical standard when the stack moved to vLLM (decision D14, Phase
+M) — reruns are compared distributionally, and rerun-stability checks are part
+of each result's validation. Raw pools are not in git; the committed
+`artifacts/` files are the numbers of record.
 
-**Phase 2 — H2 gate FAILED (2026-07-12): the register is dead as claimed.**
-FULL (register-gated refinement) ties B1 (verifier-reranked best-of-n,
-register frozen at r_0) *exactly* at matched compute on HumanEval: 0.6829 vs
-0.6829, CI [−0.049, +0.055]. Diagnostics rule out the mundane outs — register
-dynamics healthy, verifier not stale, imitation training verifiably steered
-teacher-forced likelihood (−11% val) — the steering simply did not survive
-sampling at 1.5B. This is the clean negative the pre-registered design was
-built to surface (brief §1 H2 kill criterion).
+## Provenance
 
-Standing positive results: H1 PASSED — the execution-trained verifier beats
-self-fluency decisively (AUROC 0.795 vs 0.696, within-problem 0.719 vs 0.568)
-and lifts best-of-8 from 0.628 to 0.671 pass@1. Phase 0 baselines frozen and
-bit-for-bit reproducible.
-
-**B2 complete (2026-07-12): Branch A — the standing prediction held.** In-context
-refinement (prev. candidate + a scalar verifier-confidence estimate in prompt —
-**no execution feedback**; intrinsic self-refinement) reaches pass@1 0.6220 and
-does *not* beat B1 (Δ(B2−B1) −0.061, CI [−0.134, +0.012]) — higher-bandwidth
-cross-step conditioning, at ~2× the prompt-token cost, buys nothing here. The H2
-null is thus about the *task*, not registers per se; the reason to redesign is the
-**channel-independent ceiling** (pass@8 0.84 minus the few DIAG-1 shows dissolve
-under resampling), not "iteration is dead." All pre-registered before running
-([docs/PRE-B2-HANDOFF.md](docs/PRE-B2-HANDOFF.md)).
-
-Diagnostics ([docs/DIAGNOSTICS.md](docs/DIAGNOSTICS.md)) decide *what the null
-means* — DIAG-1 (register effect non-positive; "unreachable" set < 26) and DIAG-4
-(objective units; opened the 1.7×-teacher-forced → 0.000-sampled puzzle, a
-string-vs-class failure) are in; DIAG-5/3/2/6 run next. None reopens the H2
-verdict. A gated infra migration to Modal/vLLM/fp16 is pre-registered but must not
-start until the record closes ([docs/PHASE_M.md](docs/PHASE_M.md)). See
-[docs/PHASES.md](docs/PHASES.md) for the gate log.
-
-## Quickstart
-
-```bash
-pip install -e ".[dev]"      # local: pure-logic work + tests
-pip install -e ".[model]"    # GPU env (Kaggle): torch/transformers extras
-pip install daytona          # execution sandbox SDK (any box that runs labels)
-make test                    # runs the stdlib test suite
-```
-
-Credentials: the Daytona key is read from `DAYTONA_API_KEY` or the gitignored
-`rgb-daytona.txt` at the repo root. Never commit it.
-
-### Phase 0 on the GPU box (Kaggle T4/P100)
-
-```bash
-git clone <this repo> && cd rgr
-pip install -e ".[model]" daytona
-export DAYTONA_API_KEY=...                     # or place rgb-daytona.txt at repo root
-python scripts/phase0_lock_baselines.py --handcheck          # §11.1: inspect BY HAND
-python scripts/phase0_lock_baselines.py --lock --seed-tag lock_a
-python scripts/phase0_lock_baselines.py --lock --seed-tag lock_b   # reproducibility gate
-```
-
-Training runs on Kaggle/rented GPU; the 8600G box is for orchestration, analysis,
-and dashboards only (§7 of the brief).
+The repository began as **RGR — Register-Gated Refinement**, a single
+falsifiable experiment whose claim was killed by its own pre-registered gate
+(H2, 2026-07-12). The original README, brief, and design docs are preserved
+unrevised (see `docs/`, and git history for the pre-composite README). The
+package name `rgr` is kept for continuity; what the repository *is* now is the
+composite record described above.

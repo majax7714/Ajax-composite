@@ -1,5 +1,11 @@
 # Metrics
 
+> **Status note (2026-07-17, appended — content below unrevised):** The
+> estimators here (unbiased pass@k, AUROC/ECE/Brier, bootstrap) remain the
+> spec for their implementations. Later-phase instruments — PULL/AST-PULL,
+> the false-zero floor model, exact McNemar, the hint-grading rubric — are
+> specified in the phase charters and journal §0.1 (Instruments).
+
 Definitions and estimators, fixed before any run. Implementations live in
 `rgr/evals/` (pure stdlib, unit-tested); this file is the spec they implement.
 

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "rgr"
 version = "0.1.0"
-description = "Register-Gated Refinement: does a learned latent register carried across refinement steps improve correctness and calibration at matched compute?"
+description = "Ajax Composite: an append-only record of pre-registered ML experiments on refinement, anchoring, and where direction comes from. Package name kept from the original RGR experiment."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }

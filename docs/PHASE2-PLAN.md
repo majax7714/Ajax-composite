@@ -1,5 +1,9 @@
 # Phase 2 execution plan (written 2026-07-11, pre-build hedge)
 
+> **Status note (2026-07-17, appended — content below unrevised):** Historical
+> execution plan, fully executed (Phase 2 closed 2026-07-12; gate log in
+> [PHASES.md](PHASES.md)).
+
 If this session ends, a fresh session executes this document top-to-bottom.
 Context: Phases 0–1 are CLOSED (see PHASES.md gate log). Verifier of record =
 V-v2b QLoRA adapter at `runs/kaggle/phase1_v2b/runs/phase1_v2b/lora` (D9).

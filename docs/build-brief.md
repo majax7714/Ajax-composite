@@ -1,5 +1,11 @@
 # Register-Gated Refinement (RGR) — Build Brief
 
+> **Status note (2026-07-17, appended — content below unrevised):** Historical.
+> This brief specifies the original RGR experiment (Phases 0–2). The claim it
+> defines was killed by its own pre-registered gate (H2 FAIL, 2026-07-12); the
+> brief remains the frozen spec of record for §§1–5 of the journal. Current
+> entry point: [WRITEUP-rgr.md](WRITEUP-rgr.md) and the repository README.
+
 *Working title; rename to taste. `RGR` abbreviates cleanly and stays descriptive.*
 
 ---

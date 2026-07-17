@@ -1,5 +1,10 @@
 # Compute accounting (frozen)
 
+> **Status note (2026-07-17, appended — content below unrevised):** Historical
+> for Phases 0–2, with its two logged amendments (Phase M). From Phase 3 on,
+> cost/compute rules live in the phase charters and journal §8 (operational
+> ledger).
+
 §8 of the brief: *"Matched-compute accounting is fiddly and easy to get wrong in
 a way that flatters FULL. Decide the accounting rule before running, write it
 down, don't touch it."* This document is that rule. It was written before any

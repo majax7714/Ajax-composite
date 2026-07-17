@@ -1,5 +1,10 @@
 # Decisions
 
+> **Status note (2026-07-17, appended — content below unrevised):** Covers
+> D1–D14 (Phases 0–M, including the D14 statistical-reproducibility standard,
+> still in force). From Phase 3 on, decisions are recorded in the phase
+> charters (PHASE_3*.md, PHASE_4.md, PHASE_5.md) and indexed in the journal.
+
 Resolutions of the open decisions in §9 of the [build brief](build-brief.md), plus
 infrastructure decisions made during scaffolding. Each entry states the decision,
 the consequence, and what would cause us to revisit it. Decisions are frozen for

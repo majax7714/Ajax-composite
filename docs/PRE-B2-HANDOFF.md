@@ -1,6 +1,11 @@
 # Pre-B2 handoff — post-mortem, frozen B2 spec, and the diagnostics that
 # decide what the H2 null means
 
+> **Status note (2026-07-17, appended — content below unrevised):** Historical,
+> fully executed. B2 ran under this frozen spec (Branch A held); the
+> diagnostics it pre-registered are complete in
+> [DIAGNOSTICS.md](DIAGNOSTICS.md).
+
 *Committed 2026-07-12, **before B2 has run**. Everything in §3 (branch
 interpretation of B2) and §4 (diagnostic predictions) is pre-registered: the
 interpretations and predictions are written down now so they cannot be

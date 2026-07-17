@@ -1,5 +1,9 @@
 # Diagnostics — what the H2 null means
 
+> **Status note (2026-07-17, appended — content below unrevised):** Complete.
+> All diagnostics ran; none reopened the H2 verdict. The downstream arc they
+> launched (reframe → mechanism → cross-family) is journal §§7–9.
+
 One paragraph per diagnostic: procedure, the number(s), and whether the
 **pre-registered prediction held**. Full procedures and the committed predictions
 live in [PRE-B2-HANDOFF.md] §4; this file is where results land as they run.
