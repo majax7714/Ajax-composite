@@ -2176,3 +2176,29 @@ IV), [scripts/h0a_ast_distance.py] + [scripts/h0a_d2a_followup.py] (H0a),
 [scripts/modal_h1.py] (Phase 4 runner: H1 battery + H2 arms),
 [scripts/h2a_struct_validation.py] (H2a validation). Difficulty proxies
 [artifacts/phase0_difficulty_proxy.csv].*
+
+---
+
+**Record-integrity note [2026-07-17].** The repository was published to
+GitHub (github.com/majax7714/Ajax-composite) and its git history rewritten
+once, on this date, to strip AI co-author trailers from commit messages
+(`filter-branch --msg-filter`, force-push). No tracked file content, commit
+subjects, author identities, or dates changed — only message trailer lines.
+Commit hashes cited in this journal and the phase documents before this date
+refer to the pre-rewrite history; per append-never-revise the inline citations
+stand, and this mapping resolves them in the published history:
+
+| pre-rewrite | published | subject |
+|---|---|---|
+| 7e4ea2f | d07d5be | R1b.2d: preemption-proof checkpoint/resume plumbing |
+| d6cbf37 | b8f0989 | Addendum II SS1: fix the judge — run ALL tests |
+| eec132e | 1398eb5 | R2 executor: guard sandbox output read |
+| 86c48ea | 3a3d217 | Phase 1: batched sampling, label pipeline, verifier training |
+| 00ddc84 | 510223d | Phase M — M4 DONE (V retrain required) + fix M3 logprob bug |
+| cc716f5 | e743069 | Plumbing: run LCB images hub-offline |
+| 48987b8 | 3e37d16 | H2 hint set frozen (125 hints, leakage-screened) |
+| 81324e2 | 41cb119 | J1: ledger entries — Self-planning, PlanSearch, HMT/Codex |
+
+(`2e1fd397` in PHASE_K.md is a HuggingFace model-revision hash, not a repo
+commit; it is unaffected.) Hashes cited after this date refer to the published
+history directly.
