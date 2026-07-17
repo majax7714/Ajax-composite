@@ -24,12 +24,22 @@ cross-family audit that retracted our platform negatives as one family's
 pathology — and finally an existence proof that approach-level direction crosses
 the competence boundary, moving the open question to where direction comes from.*
 
-*Living record — last updated 2026-07-17 (**Phase 5 complete — the journal turn
-+ where direction comes from, [PHASE_5.md]**: the record reframed as the primary
-artifact (§0 Claims & Scope Index); the production question answered on two
-families — 1.3–1.5B models execute complete-strategy direction they cannot
-manufacture (§9.9); the trace null shown to be a content fact cross-family; the
-false-zero floor 3-for-3; the 7B fork costed and sign-off gated. Previously
+*Living record — last updated 2026-07-17 (**J5 — the 7B fork, signed off and
+running, [PHASE_5.md] J5**: Q1 landed — **the conditioning pathology is a
+small-Qwen (1.5B) property**: at 7B the code channel *blends* (conditioned 0.609
+between copy-null 0.494 and own-iid 0.659 — no below-both-nulls signature) and
+the language harm vanishes (Δ −0.018, ns); both frozen favourites hit. Q2: the
+medium screen hit its band (stratum 46/78) but the **power gate fired** — the 7B
+medium stratum is a **live tail, not a false-zero floor** (π₀ = 0, eleven 1/50
+near-misses; E[fresh B1-50] = 5.11 committed as the floor instrument's fourth
+out-of-sample test, band [2, 9]); the pre-registered LCB-hard extension is in
+flight — §9.9 J5 addendum, §9.5. Earlier same day: **Phase 5 complete — the
+journal turn + where direction comes from, [PHASE_5.md]**: the record reframed
+as the primary artifact (§0 Claims & Scope Index); the production question
+answered on two families — 1.3–1.5B models execute complete-strategy direction
+they cannot manufacture (§9.9); the trace null shown to be a content fact
+cross-family; the false-zero floor 3-for-3; the 7B fork costed and sign-off
+gated. Previously
 2026-07-16: **Phase 4 complete — claim hardening, [PHASE_4.md]**: the cross-family battery retracted F1 and the SINK as
 Qwen2.5-Coder-scoped — the SINK *inverts* off-Qwen — while the feasible region and
 the anchoring law generalize (and the law survives structural-AST recomputation);
@@ -95,6 +105,9 @@ see §0.)*
 > GENERALIZES** — conditioning pulls generations deep into the artifact's
 > neighborhood on all three families. One line: the negative *platform* claims
 > were a portrait of Qwen2.5-Coder; the *mechanism* is family-general.
+> *(2026-07-17, J5 Q1: the sink is also scale-bounded within the family — at
+> Qwen-7B it vanishes into the family-general blend, and the language-channel
+> harm vanishes with it; §9.9 J5 addendum, Index rows 8/11.)*
 
 We test one claim in isolation: that an explicit internal state vector — a
 *register* — updated across refinement steps and gating generation improves
@@ -227,6 +240,13 @@ Deployability caveat, stated plainly: the hint is oracle-derived, and R3/BSF
 showed the model cannot produce hint-grade direction for itself — the bottleneck
 moves from "use" back to "production," which is Olausson's original localization,
 confirmed at 1/70th their scale.
+**J5 (2026-07-17, running):** the 7B fork's first cell **rescopes the pathology
+to 1.5B** — at 7B both the code-channel sink and the language-channel harm
+vanish and the family rejoins DeepSeek/StarCoder2 (both frozen favourites hit);
+the switch-on question met a pre-registered power gate en route — 7B's medium
+stratum is a *live tail* (π₀ = 0), not a false-zero floor — so the
+hard-difficulty extension is running under its own pre-registration. §9.9 J5
+addendum, [PHASE_5.md] J5.
 
 ---
 
@@ -315,20 +335,24 @@ currently believes.** Statuses: LIVE / KILLED / RETRACTED / REVERSED / SCOPED.
 | 5 | F2: no code benchmark offers refinement runway at this scale | **RETRACTED twice** (structural reading → R2; family reading → H1) | LCB-easy feasible on Qwen; runway wider off-Qwen (both families > Qwen) | §7.4, §9.2 |
 | 6 | Escape-distance law (coverage monotone in escape distance; conditioning is a coverage effect, D2b) | **LIVE** | form: 3 families + lexical + structural-AST metrics; constants: family parameters; domain T ≲ 1.2, boundary descends with difficulty; in-context channels | §9.3, §9.3.1 |
 | 7 | Elimination argument (undirected ≤ i.i.d.; repulsion inexpressible; direction the sole surviving channel) | **LIVE, completed** — direction now has an existence proof | measured on Qwen-1.5B; in-context channels only; weight-/search-space never enumerated | §9.3.1, §9.8 |
-| 8 | D2c SINK (conditioning on partial-credit code degrades below both nulls) | **SCOPED + INVERTED** | Qwen-specific pathology; DeepSeek/StarCoder2 *climb* under the same artifacts | §9.7 markers, [PHASE_4.md] H1 |
+| 8 | D2c SINK (conditioning on partial-credit code degrades below both nulls) | **SCOPED + INVERTED**; scale-bounded (J5 Q1: vanishes at Qwen-7B into the family-general blend) | Qwen2.5-Coder-**1.5B**-specific pathology; DeepSeek/StarCoder2 *climb*, Qwen-7B blends, under the same artifacts | §9.7 markers, §9.9 J5 addendum, [PHASE_4.md] H1 |
 | 9 | R3 null — "1.5B cannot use direction" | **REVERSED-AS-REFINED** | a *trace-channel* null, now **cross-family**: traces sit on the floor on Qwen (1/68) and DeepSeek (2/76) — a content fact, not the Qwen pathology; content, not capacity, was the variable | §9.7, §9.8, §9.9 |
 | 10 | Hint result — approach-level direction crosses the competence boundary (13/68 vs floor 2, p = 4.9e-4) | **LIVE — GENERALIZES** (J4: DeepSeek 9/76, p = 0.0039) | both families, medium strata, oracle-derived **complete-strategy-grade** hints (J2: dose-response unmeasurable on this set — weaker direction untested) | §9.8, §9.9 |
-| 11 | Qwen conditioning pathology (double dissociation: code and language channels degrade Qwen, lift DeepSeek) | **LIVE** | Qwen2.5-Coder-1.5B vs DeepSeek-1.3B (44-problem code cell; 20-problem language cell); StarCoder2 code-cell consistent | §9.8, [PHASE_4.md] |
-| 12 | Production bottleneck — "the model cannot produce hint-grade direction for itself" | **LIVE-MEASURED, cross-family** (SELFHINT on-floor both families; production-adequate 0/68 Qwen, 1/76 DeepSeek) | 1.3–1.5B, both families; the cascade is the deployable shape; minimum self-production scale open (J5 7B, sign-off gated) | §9.9 |
+| 11 | Qwen conditioning pathology (double dissociation: code and language channels degrade Qwen, lift DeepSeek) | **LIVE — SCOPED-TO-1.5B** (J5 Q1, 2026-07-17: at 7B the code channel blends and the language harm vanishes; both frozen favourites hit) | Qwen2.5-Coder-**1.5B** vs DeepSeek-1.3B (44-problem code cell; 20-problem language cell); StarCoder2 code-cell consistent; 7B behaves like the other families | §9.8, §9.9 J5 addendum, [PHASE_5.md] J5 |
+| 12 | Production bottleneck — "the model cannot produce hint-grade direction for itself" | **LIVE-MEASURED, cross-family** (SELFHINT on-floor both families; production-adequate 0/68 Qwen, 1/76 DeepSeek) | 1.3–1.5B, both families; the cascade is the deployable shape; minimum self-production scale open — J5 7B running: medium power gate fired (live tail), pooled hard-extension arms pending their gate | §9.9 |
 | 13 | Temperature is a dose-responsive anti-anchoring intervention | LIVE | Qwen, HumanEval cells, within the law's domain | §9.3 |
 | 14 | Provenance near-irrelevance (instruction verb ≫ provenance) | LIVE | Qwen; holds under lexical and AST metrics | §9.3, H0a follow-up |
-| 15 | False-zero floor model (two-component mixture over k=50 pools) | LIVE — **3 for 3** (2.01→2, 2.01→2, 0.00→1-in-band) | two families, two stratum shapes | §9.6, §9.9 |
+| 15 | False-zero floor model (two-component mixture over k=50 pools) | LIVE — **3 for 3** (2.01→2, 2.01→2, 0.00→1-in-band); **4th test committed** (7B medium: E = 5.11, band [2, 9], first non-degenerate test, pending arms) | two families, three stratum shapes — and a structural discovery: at 7B-medium the point mass vanishes (π₀ = 0, a live tail, not a false-zero floor) | §9.6, §9.9 J5 addendum, [PHASE_5.md] J5 |
 
 ### 0.1 Instruments *(journal products independent of any claim)*
 
 - **The false-zero floor model** (§9.6) — **3-for-3** across two families and two
   stratum shapes (2.01→2, 2.01→2, 0.00→1-in-band); turns "pass@50 = 0" from a
-  label into an instrument with a stated noise floor.
+  label into an instrument with a stated noise floor. *(2026-07-17: fourth test
+  committed on the 7B medium stratum — E = 5.11, band [2, 9] — the first
+  non-degenerate test of the Beta-binomial component; and the instrument's
+  diagnostic use surfaced new structure: π₀ = 0 at 7B-medium, a live tail whose
+  power consequences fired a pre-registered gate. [PHASE_5.md] J5.)*
 - **The reconciliation ledger** (§11) — no external result imported as truth;
   setup/delta/licenses per entry; it has caught *our own* overclaims twice
   (Olausson rung; Codex "replication" framing).
@@ -358,7 +382,11 @@ No commitment implied; the journal decides when an extraction is ripe.
    ([PHASE_4.md]) + J4's four-arm table (traces null on the pathology-free
    family). Fastest to publishable, audience primed post-Spurious-Rewards.
    *Optional strengthener:* J5-Q1 (7B persistence, $3–5, sign-off gated).
-   **Extraction-ready.**
+   **Extraction-ready.** *(2026-07-17: the J5-Q1 strengthener ran — the
+   pathology **vanishes** at 7B, both frozen favourites hit. The note's title
+   sharpens from a family claim to a small-model-of-this-family claim, and it
+   gains a clean scale boundary: 1.5B pathological, 7B blends like the other
+   families. §9.9 J5 addendum.)*
 3. **The methods record** — §10 + §0.1 + the prediction-accounting trail (now
    including three floor hits and the J2/J3 grading instruments); needs no new
    data, only extraction.
@@ -1533,6 +1561,25 @@ the named successor experiment, explicitly outside this record.
 > authorizable) and awaits sign-off. Nothing is running. The extraction decision
 > is open with the Index current: the mechanism paper and the Qwen pathology
 > note both have their Phase-5 data.
+>
+> **J5 RUNNING (2026-07-17 — both questions signed off, [PHASE_5.md] J5).**
+> Smoke PASS (L4 bf16; 7B ≈ 3× the 1.5B easy pass rate). **Q1 landed, both
+> frozen favourites hit: the conditioning pathology is a small-Qwen (1.5B)
+> property.** Code channel: conditioned 0.609 sits *between* copy-null 0.494
+> and own-iid 0.659 — the blend, not the below-both-nulls signature (p = 0.075
+> vs iid, p ≈ 1.0 vs copy); language channel: Δ −0.018 (ns), harm vanished
+> (near-saturation caveat reported). Index row 11 rescoped; the pathology-note
+> extraction gains a scale boundary. **Q2 in flight, one gate already fired:**
+> the medium screen hit its committed band (stratum 46/78, 55% favourite) but
+> the floor fit found a **live tail, not a false-zero floor** (π₀ = 0, eleven
+> 1/50 near-misses, E[fresh B1-50] = 5.11 — committed as the instrument's
+> fourth out-of-sample test, band [2, 9]); the floor-aware power envelope gave
+> 0.22–0.70 at r = 0.20, under the frozen ≥ 0.70 rule — **arms did not launch
+> on the medium stratum alone**; the pre-registered LCB-hard extension
+> (identical selection rule, its own committed odds, a fifth floor test before
+> arms, pooled power gate) is running. If the pooled gate also fails, Q2
+> closes as structurally unresolvable at 7B under this budget. §9.9 J5
+> addendum; results land in [PHASE_5.md].
 
 *(historical, 2026-07-15)*
 
@@ -1746,6 +1793,9 @@ audit), **frozen before the H1 battery reported** (commit `48987b8`).
    Qwen degrades under conditioning of either kind (code −0.095, language −0.096)
    on the same problems where DeepSeek benefits from both (+0.107, +0.088).
    **Qwen2.5-Coder-specific conditioning degradation, now shown on two channels.**
+   *(Scope sharpened 2026-07-17, J5 Q1: the pathology is a **1.5B** property —
+   at 7B the code channel blends and the language harm vanishes, both frozen
+   favourites hit; §9.9 J5 addendum, Index row 11.)*
 3. **Near-miss band (H2b): direction works inside the boundary — the 55%
    favourite hit.** On 39 problems at x ∈ {1,2}/50, HINT-25 recovers **34 vs
    B1's 24** (p = 0.015); TRACE-25 nulls (23, p = 0.77). The apparent
@@ -1855,6 +1905,39 @@ timeout-class failures enriched among recoveries again (33% vs 12% base).
    question above it is the **minimum scale of self-production** (PlanSearch
    ledger frame; the J5 7B cell is the first data point between our floor and
    the frontier ceiling, awaiting sign-off).
+
+**J5 addendum (2026-07-17) — the 7B fork, first results *(run in flight; full
+accounting in [PHASE_5.md] J5)*.** Both questions signed off and running on
+Qwen2.5-Coder-7B (base; 7B-Instruct writes the Q2 self-hints).
+
+- **Q1 — the pathology is a small-Qwen property (both frozen favourites
+  hit).** On the same 44 artifacts, 7B conditioned frac 0.609 sits *between*
+  copy-null 0.494 and its own i.i.d. 0.659 — decisively above copying
+  (p ≈ 1.0 against below-copy), marginally below own-iid (p = 0.075): the
+  **blend** the other families show, not the below-both-nulls sink. The
+  language-channel harm vanishes (E0 0.842 → HINT 0.824, Δ −0.018, p = 0.70;
+  near-saturation caveat pre-declared and reported). The §9.8 double
+  dissociation's Qwen side is therefore a **Qwen2.5-Coder-1.5B** phenomenon:
+  at 7B the family rejoins DeepSeek/StarCoder2. Index row 11 rescoped;
+  [artifacts/h5_7b_pathology.json].
+- **Q2 — the switch-on measurement; a pre-registered gate fired en route.**
+  The medium screen hit its committed band (stratum 46/78, the 55% favourite;
+  pass@50 0.410). But the W0c fit found **no false-zero floor at 7B-medium**:
+  π₀ = 0, every stratum problem reachable, eleven 1/50 near-misses,
+  **E[fresh B1-50 recoveries] = 5.11** — committed before any arm as the
+  floor instrument's **fourth out-of-sample test** (point 5, band [2, 9]; the
+  first non-degenerate test of its Beta-binomial component). The floor-aware
+  exact-McNemar envelope then gave power 0.223 (marginal) / 0.695 (uplift) at
+  r = 0.20 — under the frozen ≥ 0.70 rule — so **arms did not launch on the
+  medium stratum alone**. The pre-registered extension (LCB-hard screen,
+  identical selection rule, committed odds, a fifth floor test before arms,
+  pooled power gate governed by the stricter marginal reading) is in flight.
+  Two things are already scientific content regardless of the arms outcome:
+  the 7B "hard problem" set at medium difficulty is a **live tail** (the
+  substrate that made the 1.5B switch-on question clean does not exist at 7B
+  on this difficulty), and the floor instrument now has a committed prediction
+  in genuinely new territory. [artifacts/h5_7b_medium_screen.json],
+  [artifacts/h5_7b_floor_fit.json], [scripts/j5_floor_fit.py].
 
 ---
 
