@@ -271,9 +271,52 @@ uncovered (abc343_c, abc327_c, abc339_c — all off-stratum for Qwen) get fresh
 hints drafted under the identical protocol + automated screen + blind audit,
 frozen in [artifacts/h5_hints_extension.json] before arms run.
 
-*(Step-1 RESULT + floor prediction land here; step 2 — the four-arm
-pre-registration with forks and odds — freezes after the floor prediction is
-committed and before arms launch.)*
+### J4 step-1 RESULT (2026-07-17) + the committed floor prediction
+
+Screen: pass@1 0.005 / pass@8 0.022 / **pass@50 0.026** — DeepSeek's medium tail
+is nearly flat; **stratum 76/78** (a strict superset of Qwen's 68; zero
+near-misses; the two solved problems solved at x = 9 and 12); richness 71/76
+with partial credit. **Screen prediction accounting: WRONG overall** (pass@8 in
+range at 0.022, but pass@50 0.026 far below [0.08, 0.18] and stratum 76 above
+60–72 — the 60% odds were misplaced; DeepSeek trades Qwen's thin medium tail for
+none at all). [artifacts/h5_deepseek_medium_screen.json].
+
+**Floor prediction, committed before any arm runs (the instrument's third
+out-of-sample test):** two-component fit π₀ = 0.975, **E[fresh B1-50 recoveries
+on the 76-problem stratum] = 0.00** (pure-Beta upper bound 0.35). Point
+prediction: **B1 recovers 0** (acceptable band 0–1; ≥2 falsifies the fit).
+[artifacts/h5_deepseek_floor_fit.json].
+
+**Power (frozen rule):** 0.890 at r = 0.10, 0.994 at r = 0.15, ~1.00 at
+r = 0.20 — clears the ≥ 0.70 @ r = 0.20 rule with room; **arms launch on this
+stratum alone**; r < 0.08 pre-declared unresolvable.
+
+### J4 step 2 — four-arm pre-registration (2026-07-17, FROZEN before arms)
+
+**Arms (76 problems, DeepSeek-Coder-1.3B-base, frozen config, one generation
+batch):** B1-50 / TRACE-50 (artifact = highest-frac candidate from the
+DeepSeek-native screen pool, frozen R3 rule; frozen trace-capture) / HINT-50
+(the frozen 125 + 3-extension hints — complete-strategy grade per J2) /
+SELFHINT-50 (deepseek-coder-1.3b-instruct writes its own, J3 frozen prompt;
+graded blind post-run, correctness dimension included). Judge: short-circuit
+(recovery is the analysis). Full recovery validation on every recovery.
+
+**Forks (odds):**
+- **TRACE > B1 significant** → the trace null was Qwen-scoped; "traces carry no
+  direction" retracts to a Qwen fact; the pathology note gains its sharpest line
+  — **25%**.
+- **TRACE ≈ floor AND HINT fires** → the content localization (§9.8 item 5)
+  generalizes across families and hardens enormously — **40%** (my favourite).
+- **HINT ≈ floor on DeepSeek** → §9.8's hint result takes a family scope — the
+  phase's biggest possible surprise; **pre-committed contingency:** the
+  gate-misfire joint then requires a fresh-stratum Qwen replication — **20%**
+  (HINT significant 55% / unresolvable 25% / floor 20%).
+- **SELFHINT:** floor **70%** / significant 10% / unresolvable 20%;
+  production-adequate share < 30%: **85%**.
+- Cross-arm: HINT > TRACE significant — **50%**; HINT > SELFHINT significant —
+  **55%**.
+
+*(J4 arms RESULT lands below.)*
 
 ---
 
