@@ -915,10 +915,18 @@ def j5_hard_screen():
         "j5_hard_screen_cand",
         h1_gen_lcb.remote(QWEN7B, [{"qid": q, "context": None} for q in qids], 50,
                           tag="j5_hard_screen_cand"))
-    res = _load("j5_hard_screen_res") or _persist(
-        "j5_hard_screen_res",
-        h1_lcb_exec.remote([g["qid"] for g in gen], [g["codes"] for g in gen],
-                           tag="j5_hard_screen_res"))
+    res = _load("j5_hard_screen_res")
+    if res is None:
+        # Sharded judging (§8 container right-sizing): one 8-cpu container hit
+        # its 4h ceiling on the full 61x50 hard set. Frozen judge semantics
+        # unchanged; per-shard volume tags keep the run resumable.
+        chunk = 8
+        shards = [gen[i:i + chunk] for i in range(0, len(gen), chunk)]
+        calls = [h1_lcb_exec.spawn([g["qid"] for g in s], [g["codes"] for g in s],
+                                   tag=f"j5_hard_screen_res_s{k}")
+                 for k, s in enumerate(shards)]
+        res = [row for c in calls for row in c.get()]
+        _persist("j5_hard_screen_res", res)
     import statistics as st
     counts = [(len(row), sum(r["passed"] for r in row)) for row in res]
     p8 = st.mean(_pass_at_k(n, c, 8) for n, c in counts)
