@@ -412,4 +412,57 @@ high-leverage half — it directly upgrades the Qwen-pathology extraction and
 stands alone. Q2 is the forward-looking half and roughly 4× Q1's cost. They can
 be authorized independently. Awaiting sign-off; nothing runs under this charter.
 
-*(Sign-off outcome recorded here when given.)*
+**SIGN-OFF (2026-07-17): the user authorized BOTH questions** ("run both j5 to
+question 7b evidence"). Budget envelope as costed (~$15–25).
+
+### J5 run pre-registration (2026-07-17, frozen before any 7B generation)
+
+**Models:** Qwen/Qwen2.5-Coder-7B (base; all conditioning cells and arms) and
+Qwen/Qwen2.5-Coder-7B-Instruct (self-hint producer only). Per-family smoke gate
+first (8 × 8 on the frozen scaffold, wf ≥ 0.85 / dg ≤ 0.10) — doubles as the KV
+feasibility check.
+
+**Q1a — D2c-style cell:** the frozen 44 artifacts × {E0, E1-D2C} × k = 8,
+all-cases judge. **Decision rule, sharpened for a stronger model (frozen):** the
+pathology signature is **below-both-nulls** — conditioned mean frac < copy-null
+(0.494) AND < 7B's own E0 i.i.d. null, paired one-sided MC Wilcoxon p < 0.05
+against each. A conditioned value *between* artifact and own-iid is the **blend**
+(what the other families do — with a strong model, imitation alone predicts
+being pulled *down* toward a 0.49 artifact, so "conditioned < iid" alone is NOT
+the pathology; below-both is). **Odds: pathology persists (below-both) 35% /
+blend (between; pathology vanishes into imitation) 45% / conditioned ≥ iid
+(conditioning neutral-or-helps) 20%.**
+
+**Q1b — language-channel cell:** the frozen 20-problem manip set × {E0, HINT} ×
+k = 25, frozen hints, per-sample mean pass. **Odds: harm vanishes (mean Δ >
+−0.02) 60% / harm persists (Δ < −0.05) 25% / middle 15%.** (Saturation caveat
+pre-declared: if E0 mean pass > 0.9 the cell is compressed and reported as
+such.)
+
+**Q2 — the switch-on measurement:**
+1. 7B medium screen (78 × 50, frozen config, all-cases judge). Prediction:
+   stratum ∈ [35, 55] of 78, odds 55%.
+2. Floor fit (W0c model); **E[fresh B1-50 recoveries] committed here before
+   arms — the instrument's fourth out-of-sample test.** Power rule: arms launch
+   only if power ≥ 0.70 at r = 0.20 on the observed stratum; else extension by
+   further pre-registration.
+3. Arms: **B1-50 / SELFHINT-50** on the 7B stratum (7B-Instruct writes its own
+   hints, J3 frozen prompt; persisted; blind-graded with the anchored
+   instrument + correctness dimension before any join).
+4. **Branches (odds):** **(a) floor + production-inadequate hints** (< 30%
+   adequate) → switch-on lies above 7B; the cascade remains the only deployable
+   shape through 7B — **40%**. **(b) floor despite adequate hints (≥ 30%)** →
+   a use-failure at 7B on its own stratum — **10%**. **(c) SELFHINT > B1
+   significant** (McNemar p < 0.05) → **self-refinement switches on at-or-below
+   7B** — the forward-looking headline; Index row 12 rescoped — **25%**.
+   **(d) positive-unresolvable** — **25%**. Production-adequate share ≥ 30%:
+   **45%**.
+
+**Not run (out of authorization):** an oracle-HINT arm on the 7B stratum (would
+measure 7B's direction-use ceiling; noted as the natural companion if ever
+wanted).
+
+**Ops:** detach + volume-first persistence + short-circuit judging except where
+frac is the analysis (Q1a, Q2 screen); ~3–5× slower generation expected at 7B.
+
+*(J5 RESULTS land below.)*
