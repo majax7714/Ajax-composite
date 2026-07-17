@@ -1,0 +1,24 @@
+{
+ "novelty_min_ast_vs_failpool": {
+  "1883_B": 0.162,
+  "abc304_c": 0.357,
+  "abc310_c": 0.241,
+  "abc326_c": 0.199,
+  "abc328_c": 0.294,
+  "abc329_c": 0.28,
+  "abc330_d": 0.298,
+  "abc340_c": 0.372,
+  "abc343_c": 0.314
+ },
+ "error_type": {
+  "stratum_base": {
+   "wrong_answer": 61,
+   "runtime": 6,
+   "timeout": 9
+  },
+  "hint_recovered": {
+   "wrong_answer": 6,
+   "timeout": 3
+  }
+ }
+}

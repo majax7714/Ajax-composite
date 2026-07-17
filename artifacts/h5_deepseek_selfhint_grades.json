@@ -1,0 +1,335 @@
+{
+ "_label": "J4 \u2014 DeepSeek self-hint grades (anchored blind instrument) [PHASE_5.md J4]",
+ "grader": "fresh blind instance a2ca294230e8029bf; shuffled label-free input",
+ "counts_info": {
+  "COMPLETE": 1,
+  "PARTIAL": 30,
+  "NUDGE": 45
+ },
+ "counts_correct": {
+  "CORRECT": 11,
+  "DOUBTFUL": 31,
+  "WRONG": 34
+ },
+ "production_adequate": 1,
+ "selfhint_recovered_grades": {
+  "abc312_c": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc313_b": {
+   "info": "NUDGE",
+   "correct": "CORRECT"
+  },
+  "abc326_c": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  }
+ },
+ "grades": {
+  "abc303_c": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc313_b": {
+   "info": "NUDGE",
+   "correct": "CORRECT"
+  },
+  "abc312_d": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc343_d": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc302_b": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc309_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc306_c": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc327_d": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc330_c": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc311_d": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc343_c": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "1883_B": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc307_d": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "1883_C": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc336_d": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc310_d": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc320_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc310_c": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc312_c": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc340_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc333_c": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc315_d": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc319_d": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc306_d": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc328_c": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc341_d": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc304_d": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc335_d": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc342_c": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc323_c": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc329_c": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc337_d": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc334_c": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc301_c": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc333_d": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc302_d": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc301_d": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc314_d": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc309_d": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc342_d": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc304_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc308_c": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc339_d": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc337_c": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc325_b": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc338_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc307_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc322_c": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc315_c": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc331_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc332_c": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc308_d": {
+   "info": "COMPLETE",
+   "correct": "CORRECT"
+  },
+  "abc324_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc313_c": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc321_d": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc329_d": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc339_b": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc302_c": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc334_d": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc330_d": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc321_c": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  },
+  "abc341_c": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc325_c": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc322_d": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc305_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc326_c": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc311_c": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc336_c": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc318_c": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc320_d": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc319_c": {
+   "info": "NUDGE",
+   "correct": "DOUBTFUL"
+  },
+  "abc303_d": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc335_c": {
+   "info": "NUDGE",
+   "correct": "WRONG"
+  },
+  "abc314_c": {
+   "info": "PARTIAL",
+   "correct": "CORRECT"
+  },
+  "abc334_b": {
+   "info": "PARTIAL",
+   "correct": "DOUBTFUL"
+  },
+  "abc318_d": {
+   "info": "PARTIAL",
+   "correct": "WRONG"
+  }
+ }
+}

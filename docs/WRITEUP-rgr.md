@@ -24,8 +24,13 @@ cross-family audit that retracted our platform negatives as one family's
 pathology — and finally an existence proof that approach-level direction crosses
 the competence boundary, moving the open question to where direction comes from.*
 
-*Living record — last updated 2026-07-16 (**Phase 4 complete — claim hardening,
-[PHASE_4.md]**: the cross-family battery retracted F1 and the SINK as
+*Living record — last updated 2026-07-17 (**Phase 5 complete — the journal turn
++ where direction comes from, [PHASE_5.md]**: the record reframed as the primary
+artifact (§0 Claims & Scope Index); the production question answered on two
+families — 1.3–1.5B models execute complete-strategy direction they cannot
+manufacture (§9.9); the trace null shown to be a content fact cross-family; the
+false-zero floor 3-for-3; the 7B fork costed and sign-off gated. Previously
+2026-07-16: **Phase 4 complete — claim hardening, [PHASE_4.md]**: the cross-family battery retracted F1 and the SINK as
 Qwen2.5-Coder-scoped — the SINK *inverts* off-Qwen — while the feasible region and
 the anchoring law generalize (and the law survives structural-AST recomputation);
 the completed decomposition **reversed the use-capacity claim**: oracle-grade
@@ -311,18 +316,19 @@ currently believes.** Statuses: LIVE / KILLED / RETRACTED / REVERSED / SCOPED.
 | 6 | Escape-distance law (coverage monotone in escape distance; conditioning is a coverage effect, D2b) | **LIVE** | form: 3 families + lexical + structural-AST metrics; constants: family parameters; domain T ≲ 1.2, boundary descends with difficulty; in-context channels | §9.3, §9.3.1 |
 | 7 | Elimination argument (undirected ≤ i.i.d.; repulsion inexpressible; direction the sole surviving channel) | **LIVE, completed** — direction now has an existence proof | measured on Qwen-1.5B; in-context channels only; weight-/search-space never enumerated | §9.3.1, §9.8 |
 | 8 | D2c SINK (conditioning on partial-credit code degrades below both nulls) | **SCOPED + INVERTED** | Qwen-specific pathology; DeepSeek/StarCoder2 *climb* under the same artifacts | §9.7 markers, [PHASE_4.md] H1 |
-| 9 | R3 null — "1.5B cannot use direction" | **REVERSED-AS-REFINED** | a *trace-channel* null: traces carry no usable direction (Qwen); content, not capacity, was the variable | §9.7, §9.8 |
-| 10 | Hint result — approach-level direction crosses the competence boundary (13/68 vs floor 2, p = 4.9e-4) | **LIVE** | Qwen-1.5B, medium stratum, oracle-derived **complete-strategy-grade** hints (J2: dose-response unmeasurable on this set — weaker direction untested); cross-family test = Phase 5 J4 | §9.8 + J2 addendum |
+| 9 | R3 null — "1.5B cannot use direction" | **REVERSED-AS-REFINED** | a *trace-channel* null, now **cross-family**: traces sit on the floor on Qwen (1/68) and DeepSeek (2/76) — a content fact, not the Qwen pathology; content, not capacity, was the variable | §9.7, §9.8, §9.9 |
+| 10 | Hint result — approach-level direction crosses the competence boundary (13/68 vs floor 2, p = 4.9e-4) | **LIVE — GENERALIZES** (J4: DeepSeek 9/76, p = 0.0039) | both families, medium strata, oracle-derived **complete-strategy-grade** hints (J2: dose-response unmeasurable on this set — weaker direction untested) | §9.8, §9.9 |
 | 11 | Qwen conditioning pathology (double dissociation: code and language channels degrade Qwen, lift DeepSeek) | **LIVE** | Qwen2.5-Coder-1.5B vs DeepSeek-1.3B (44-problem code cell; 20-problem language cell); StarCoder2 code-cell consistent | §9.8, [PHASE_4.md] |
-| 12 | Production bottleneck — "the model cannot produce hint-grade direction for itself" | **LIVE-MEASURED** (J3 direct arm: SELFHINT on-floor at 3; 0/68 self-hints production-adequate; gap vs oracle hints p = 0.0032) | Qwen-1.5B measured; second family = J4 | §9.8 J3 addendum |
+| 12 | Production bottleneck — "the model cannot produce hint-grade direction for itself" | **LIVE-MEASURED, cross-family** (SELFHINT on-floor both families; production-adequate 0/68 Qwen, 1/76 DeepSeek) | 1.3–1.5B, both families; the cascade is the deployable shape; minimum self-production scale open (J5 7B, sign-off gated) | §9.9 |
 | 13 | Temperature is a dose-responsive anti-anchoring intervention | LIVE | Qwen, HumanEval cells, within the law's domain | §9.3 |
 | 14 | Provenance near-irrelevance (instruction verb ≫ provenance) | LIVE | Qwen; holds under lexical and AST metrics | §9.3, H0a follow-up |
-| 15 | False-zero floor model (two-component mixture over k=50 pools) | LIVE — **2 exact hits** (predicted 2.01; B1 observed 2, twice independently) | LCB strata; third out-of-sample test pre-registered (J4, DeepSeek) | §9.6 |
+| 15 | False-zero floor model (two-component mixture over k=50 pools) | LIVE — **3 for 3** (2.01→2, 2.01→2, 0.00→1-in-band) | two families, two stratum shapes | §9.6, §9.9 |
 
 ### 0.1 Instruments *(journal products independent of any claim)*
 
-- **The false-zero floor model** (§9.6) — calibrated to the decimal, twice; turns
-  "pass@50 = 0" from a label into an instrument with a stated noise floor.
+- **The false-zero floor model** (§9.6) — **3-for-3** across two families and two
+  stratum shapes (2.01→2, 2.01→2, 0.00→1-in-band); turns "pass@50 = 0" from a
+  label into an instrument with a stated noise floor.
 - **The reconciliation ledger** (§11) — no external result imported as truth;
   setup/delta/licenses per entry; it has caught *our own* overclaims twice
   (Olausson rung; Codex "replication" framing).
@@ -345,14 +351,17 @@ currently believes.** Statuses: LIVE / KILLED / RETRACTED / REVERSED / SCOPED.
 No commitment implied; the journal decides when an extraction is ripe.
 
 1. **The mechanism paper** — escape-distance law + elimination argument + the
-   hint existence proof (§9.3–9.8). Still needs: the J2 dose-response grade, J4's
-   cross-family trace/hint scope lines.
+   hint existence proof + the production gap (§9.3–9.9). *Phase-5 data landed:*
+   J2 (complete-strategy scope note; dose-response needs a future varied set),
+   J4 (cross-family trace/hint scope lines). **Extraction-ready.**
 2. **The Qwen pathology note** — the double dissociation + SINK inversion
-   ([PHASE_4.md]); fastest to publishable, audience primed post-Spurious-Rewards.
-   Still needs: J4's four-arm table; strengthened by J5's 7B persistence cell if
-   authorized.
-3. **The methods record** — §10 + §0.1 + the prediction-accounting trail; needs
-   no new data, only extraction.
+   ([PHASE_4.md]) + J4's four-arm table (traces null on the pathology-free
+   family). Fastest to publishable, audience primed post-Spurious-Rewards.
+   *Optional strengthener:* J5-Q1 (7B persistence, $3–5, sign-off gated).
+   **Extraction-ready.**
+3. **The methods record** — §10 + §0.1 + the prediction-accounting trail (now
+   including three floor hits and the J2/J3 grading instruments); needs no new
+   data, only extraction.
 
 ## 1. The claim and its kill criteria
 
@@ -1510,6 +1519,20 @@ the named successor experiment, explicitly outside this record.
 > check (pre-registered, sign-off gated); TTT-on-the-stratum (named successor,
 > outside this record); self-generated-hint experiments (the production
 > bottleneck, §9.8); the r ∈ [0.05, 0.13) band.
+>
+> **PHASE 5 CLOSED (2026-07-16/17 — the journal turn + the direction tranche,
+> [PHASE_5.md]).** J0: this record is now the primary artifact (title, §0 index,
+> §10 promoted). J2: the oracle hints grade at a true COMPLETE ceiling
+> (dose-response unmeasurable on that set — scope note on §9.8). J3/J4: **the
+> production question is answered on two families** — models at 1.3–1.5B execute
+> supplied complete-strategy direction (Qwen 13/68; DeepSeek 9/76, p = 0.0039)
+> and cannot manufacture it (self-hint arms on the floor; production-adequacy
+> 0/68 and 1/76); **the trace null is a content fact, not the Qwen pathology**
+> (floor on both families); the false-zero floor is **3-for-3** (§9.9). J5: the
+> 7B fork is costed (Q1 pathology $3–5, Q2 switch-on $11–19, independently
+> authorizable) and awaits sign-off. Nothing is running. The extraction decision
+> is open with the Index current: the mechanism paper and the Qwen pathology
+> note both have their Phase-5 data.
 
 *(historical, 2026-07-15)*
 
@@ -1790,6 +1813,49 @@ Two hint defects the anchored grader surfaced (abc321_c zero-subset rank hazard;
 abc334_c DP left uninstantiated) stand recorded in the frozen set.
 [artifacts/h5_hint_grades.json; PHASE_5.md J2.]
 
+### 9.9 Where direction comes from — the production question, answered on two families *(Phase 5 J3/J4, 2026-07-16/17; [PHASE_5.md])*
+
+Phase 4 left one claim inferred rather than measured ("the model cannot produce
+hint-grade direction for itself") and one worry unresolved (the Qwen conditioning
+pathology retroactively contaminates every conditioning-based null — was the
+trace null Qwen's toxicity rather than the trace's emptiness?). Phase 5 measured
+both, on both families.
+
+**J3 — Qwen self-hint arm.** Qwen-1.5B-Instruct wrote its own approach hints
+(frozen prompt); the base ran SELFHINT-50 on the 68-problem stratum: **3
+recoveries, on the floor** (B1 2, p = 0.5), vs oracle-HINT's 13 (gap p = 0.0032).
+Blind anchored grading with a correctness dimension: **0/68 self-hints
+production-adequate** (0 COMPLETE; 25 WRONG; cap-truncated tutorial preambles).
+The same instrument-class graded the oracle set 123/125 COMPLETE.
+
+**J4 — the DeepSeek four-arm contrast** (its own screen → floor → power → arms,
+each step pre-registered). DeepSeek's medium tail is nearly flat (pass@50 0.026;
+stratum 76/78; the committed floor prediction was **0**, band 0–1 — **B1
+observed 1: the instrument's third consecutive out-of-sample hit**). Arms:
+**B1 1 / TRACE 2 / HINT 9 / SELFHINT 3.** HINT vs B1 p = 0.0039; TRACE on the
+floor (p = 0.5); SELFHINT floor-consistent with **1/76 production-adequate**
+self-hints (34 WRONG). All 15 recoveries rerun-stable; every HINT recovery
+structurally novel vs its entire failure pool (≥ 0.162 normalized-AST);
+timeout-class failures enriched among recoveries again (33% vs 12% base).
+
+**What two families settle (the registered 40% favourite fork):**
+
+1. **The trace null is a content fact, not a Qwen fact.** Traces sit on the
+   floor on the family conditioning *helps* — the pathology never explains it.
+   "Verbatim execution feedback carries no usable direction for structural
+   failures" now holds cross-family, and the retro-contamination worry over
+   R3/BSF is resolved in the record's favor.
+2. **The hint result generalizes:** complete-strategy direction crosses the
+   competence boundary on both families (r ≈ 0.19 Qwen, r ≈ 0.12 DeepSeek).
+3. **The production failure generalizes:** 0/68 and 1/76 production-adequate
+   self-hints; self-hint arms on the floor both times. At 1.3–1.5B, models
+   **execute** direction they **cannot manufacture** — Olausson's localization,
+   measured at both rungs on two families. The deployable shape at this scale is
+   the **cascade** (a stronger producer feeding a small executor); the open
+   question above it is the **minimum scale of self-production** (PlanSearch
+   ledger frame; the J5 7B cell is the first data point between our floor and
+   the frontier ceiling, awaiting sign-off).
+
 ---
 
 ## 11. References *(external work this record engages; formal citations to be fitted at paper stage)*
@@ -2032,7 +2098,11 @@ the direction tranche's designs before any of it runs).*
   the question they never asked (does it beat resampling?). **Does not
   license:** any expectation that *self*-planning works at 1.5B — their planner
   was the same 175B-class model; J3 asks the compute-matched self-planning
-  question at 1/100th scale.
+  question at 1/100th scale. *Outcome (2026-07-16/17, §9.9): asked and answered
+  on two families — supplied plans work (their ground-truth-planning arm,
+  compute-matched, beats resampling decisively at 1.3–1.5B), self-planning does
+  not (production-adequacy 0/68 and 1/76). Their decomposition survives scaling
+  down; their self-planning result does not.*
 - **PlanSearch (arXiv 2409.03733) → the deployable ceiling of the direction
   channel (J3/J5 framing).** (a) Searching over natural-language plans before
   implementing yields large pass@200 gains on LiveCodeBench with frontier
@@ -2045,7 +2115,11 @@ the direction tranche's designs before any of it runs).*
   provably fails to produce it (R3/BSF — J3 measures this directly). Somewhere
   between is a switch-on point; J5's 7B cell would be the first data point
   between the ends. **Does not license:** magnitudes, or assuming the switch-on
-  is smooth (idea-space diversity may be emergent, not gradual).
+  is smooth (idea-space diversity may be emergent, not gradual). *Outcome
+  (2026-07-17, §9.9): the floor end of the frame is now measured twice —
+  self-production is absent at 1.3B and 1.5B (production-adequacy ≈ 0 with
+  instruct-variant producers); the switch-on lies above; J5's 7B cell remains
+  the next data point, sign-off gated.*
 - **"How Many Tries" + Codex entries, amended for the re-scoped 7B fork
   (J5).** The original H3 fork (anchor channels worsen with scale, direction
   channels improve) was framed to discriminate SINK-as-capacity from
@@ -2087,7 +2161,12 @@ H0a/H1/H2 pre-registrations + results, E-H2, the amended H2a part 2, H3 frozen
 fork) [artifacts/h0a_ast_distance.json, h0a_d2a_ast_followup.json,
 h1_smoke_{deepseek,starcoder2}.json, h1_cross_family.json, h2_hints_frozen.json,
 h2_manip_check.json, h2_manip_check_deepseek.json, h2b_near_miss.json,
-h2a_hint_arm.json, h2a_rerun_stability.json, h2a_validation_struct.json].
+h2a_hint_arm.json, h2a_rerun_stability.json, h2a_validation_struct.json];
+**Phase 5** ([PHASE_5.md] — J0 reframe, J1–J5)
+[artifacts/h5_hint_grades.json, h5_selfhint_qwen.json, h5_selfhint_grades.json,
+h5_deepseek_medium_screen.json, h5_deepseek_floor_fit.json,
+h5_hints_extension.json, h5_deepseek_fourarm.json, h5_deepseek_rerun.json,
+h5_deepseek_selfhint_grades.json, h5_deepseek_validation_struct.json].
 Scripts: [scripts/modal_rgr.py] (T4 verifier/retrain), [scripts/modal_phasem.py]
 (L4 gates + D-measure/D2a/E7), [scripts/modal_phase3a.py] (BigCodeBench screen + R2),
 [scripts/modal_lcb.py] (LiveCodeBench + Phase-3b W4: p3b_* entrypoints),

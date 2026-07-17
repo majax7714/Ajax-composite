@@ -1,0 +1,64 @@
+{
+  "_label": "J4 \u2014 DeepSeek four-arm stratum contrast [PHASE_5.md J4]",
+  "n_stratum": 76,
+  "n_trace_arm": 76,
+  "recoveries": {
+    "B1": 1,
+    "TRACE": 2,
+    "HINT": 9,
+    "SELFHINT": 3
+  },
+  "contrasts": {
+    "TRACE_vs_B1": {
+      "arm_only": 2,
+      "base_only": 1,
+      "p": 0.5
+    },
+    "HINT_vs_B1": {
+      "arm_only": 8,
+      "base_only": 0,
+      "p": 0.00390625
+    },
+    "SELFHINT_vs_B1": {
+      "arm_only": 3,
+      "base_only": 1,
+      "p": 0.3125
+    },
+    "HINT_vs_TRACE": {
+      "arm_only": 8,
+      "base_only": 1,
+      "p": 0.01953125
+    },
+    "HINT_vs_SELFHINT": {
+      "arm_only": 8,
+      "base_only": 2,
+      "p": 0.0546875
+    }
+  },
+  "floor_prediction_committed": 0.0,
+  "recovered_qids": {
+    "B1": [
+      "abc304_c"
+    ],
+    "TRACE": [
+      "abc308_c",
+      "abc326_c"
+    ],
+    "HINT": [
+      "1883_B",
+      "abc304_c",
+      "abc310_c",
+      "abc326_c",
+      "abc328_c",
+      "abc329_c",
+      "abc330_d",
+      "abc340_c",
+      "abc343_c"
+    ],
+    "SELFHINT": [
+      "abc312_c",
+      "abc313_b",
+      "abc326_c"
+    ]
+  }
+}

@@ -851,6 +851,33 @@ def j4_arms():
 
 
 @app.local_entrypoint()
+def j4_validate():
+    """J4 recovery validation: judge rerun on every recovered (arm, qid) row."""
+    out4 = json.loads((REPO / "artifacts/h5_deepseek_fourarm.json").read_text())
+    scr = json.loads((REPO / "artifacts/h5_deepseek_medium_screen.json").read_text())
+    qids = scr["stratum_qids"]
+    gen = _load("j4_arms_cand")
+    n = len(qids)
+    na = out4["n_trace_arm"]
+    offs = {"B1": (0, qids), "TRACE": (n, qids[:na]), "HINT": (n + na, qids),
+            "SELFHINT": (2 * n + na, qids)}
+    sub = []
+    for arm, rq in out4["recovered_qids"].items():
+        off, universe = offs[arm]
+        for q in rq:
+            i = universe.index(q)
+            sub.append((f"{arm}:{q}", gen[off + i]))
+    rr = _load("j4_res_rerun") or _persist(
+        "j4_res_rerun",
+        h1_lcb_exec.remote([g["qid"] for _, g in sub], [g["codes"] for _, g in sub],
+                           tag="j4_res_rerun", short_circuit=True))
+    stable = {key: bool(any(r["passed"] for r in row)) for (key, _), row in zip(sub, rr)}
+    ok = sum(stable.values())
+    (REPO / "artifacts/h5_deepseek_rerun.json").write_text(json.dumps(stable, indent=1))
+    print(f"rerun stability: {ok}/{len(stable)} recovered rows reproduce: {stable}")
+
+
+@app.local_entrypoint()
 def h2a_validate():
     """Recovery validation for the amended stratum run: judge rerun on the
     recovered problems' HINT rows (fresh tag), stability per recovery."""

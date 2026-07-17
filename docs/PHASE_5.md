@@ -316,9 +316,67 @@ graded blind post-run, correctness dimension included). Judge: short-circuit
 - Cross-arm: HINT > TRACE significant — **50%**; HINT > SELFHINT significant —
   **55%**.
 
-*(J4 arms RESULT lands below.)*
+### J4 arms RESULT (2026-07-17) — **the 40% favourite fork fired: content localization generalizes; the floor hits a third time**
+
+| arm | recoveries /76 | vs B1 (McNemar) |
+|---|---|---|
+| B1-50 | **1** (floor predicted **0**, band 0–1 — **third consecutive out-of-sample hit**) | — |
+| TRACE-50 | 2 | p = 0.50 — **floor** |
+| HINT-50 | **9** | 8/0, **p = 0.0039** |
+| SELFHINT-50 | 3 | p = 0.31 — floor-consistent |
+
+Cross-arm: HINT > TRACE p = 0.020 (50% odds ✓); HINT > SELFHINT p = 0.055
+(the 55%-significant prediction **missed narrowly** — direction consistent,
+line not crossed). [artifacts/h5_deepseek_fourarm.json].
+
+**Fork accounting:** fork 2 — TRACE ≈ floor AND HINT fires — was the registered
+40% favourite and **fired**. TRACE-significant (25%) and HINT-floor (20%,
+with its Qwen-replication contingency) did not. SELFHINT-floor 70% ✓;
+production-adequate < 30% at 85% ✓ (measured **1/76 = 1.3%**; 1 COMPLETE / 30
+PARTIAL / 45 NUDGE; 34 WRONG — the 1.3B-instruct producer is *worse* than
+Qwen's; the three SELFHINT recoveries grade PARTIAL/NUDGE — not
+complete-strategy-driven). [artifacts/h5_deepseek_selfhint_grades.json].
+
+**Validation (all passed):** 15/15 recovered rows across all four arms
+rerun-stable [artifacts/h5_deepseek_rerun.json]; every HINT recovery ≥ 0.162
+normalized-AST from *every* candidate in its 50-failure pool (range
+0.162–0.372 — novel structures, not repairs); error-type: timeout-class
+enriched again (3/9 = 33% vs 12% base — the HMT pattern, second family).
+[artifacts/h5_deepseek_validation_struct.json].
+
+**What J4 settles, cross-family:**
+1. **"Traces carry no usable direction for structural failures" is a CONTENT
+   fact, not a Qwen fact** — trace arms sit on the floor on both families (Qwen
+   1/68, DeepSeek 2/76), including on the family that conditioning helps. The
+   retro-contamination worry (the pathology poisoning R3's null) is resolved:
+   the trace null survives on the pathology-free family.
+2. **The hint result GENERALIZES:** complete-strategy direction crosses the
+   competence boundary on both families (Qwen 13/68 r≈0.19; DeepSeek 9/76
+   r≈0.12, p = 0.0039).
+3. **The production failure GENERALIZES:** self-hint arms on the floor on both
+   families with production-adequacy 0/68 and 1/76 — the cascade is the
+   deployable shape at 1.3–1.5B regardless of family.
+4. **The floor instrument is 3-for-3** across two families and two stratum
+   shapes (2.01→2, 2.01→2, 0.00→1-in-band).
 
 ---
+
+## PHASE GATE — CLOSED (2026-07-17)
+
+**Gate conditions, audited:** J0 landed, Index seeded and **current** (rows 9,
+10, 12, 15 updated with Phase-5 outcomes; instruments and extractions
+refreshed) ✓. Production question measured on two families (J3: 0/68; J4: 1/76
+production-adequate; self-hint arms on-floor both) ✓. Trace-content claim
+carries its cross-family scope line (Index row 9; §9.9) ✓. Hint dose-response
+graded (J2: true ceiling, scope note in place) ✓. 7B decision costed and
+presented (J5) ✓. **Phase prediction accounting:** J2 ceiling under-priced
+twice (25%, 30%); J3 branch (a) favourite ✓ (45%); J4 screen prediction WRONG
+(pass@50 and stratum size); J4 fork-2 favourite ✓ (40%); HINT>SELFHINT-significant
+missed narrowly (p = 0.055 vs 55% odds); floor prediction ✓ third time.
+
+**The extraction decision now sits with the user, Index in hand:** the mechanism
+paper and the pathology note are extraction-ready; the methods record needs only
+writing. The one measurement between our floor and the frontier is J5's Q2.
 
 ## J5 — the 7B fork: costed and presented (2026-07-16). **NOT RUN — sign-off required.**
 
