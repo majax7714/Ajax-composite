@@ -597,3 +597,57 @@ under-powered under the marginal reading and pre-declared accordingly.
 **Arms launch on the pooled 101-problem stratum** (B1-50 / SELFHINT-50,
 7B-Instruct self-hints, frozen prompt, short-circuit judge), per the frozen
 extension registration. Branches and odds unchanged.
+
+### J5 Q2 arms RESULT (2026-07-17) — **B1 2 / SELFHINT 5, p = 0.125; the falsified 4th floor test exposed a harness confound that also explains the "trend"**
+
+**Arms ([artifacts/h5_7b_switchon.json]):** on the pooled 101 stratum —
+**B1-50: 2** (medium 1, hard 1) / **SELFHINT-50: 5** (medium 4, hard 1);
+discordants +3/−0; exact one-sided McNemar **p = 0.125** — not significant;
+branch (c) does not fire.
+
+**Floor-test scoring (committed terms):**
+- **5th test (hard): HIT** — B1 hard = 1, inside the committed [0, 4].
+- **4th test (medium): FALSIFIED** — B1 medium = 1, below the committed
+  [2, 9] band (≤ 1 falsifies). The instrument's first miss: **4-for-5.**
+
+**Post-hoc diagnostic (labeled as such; run before the self-hint grades
+returned).** The falsification demanded an explanation and produced one that
+reinterprets the arms comparison itself: **49.9% (medium) / 45.6% (hard) of
+the arms-B1 samples are byte-identical to the screen pool** — same seed 17 +
+same prompt through vLLM regenerates ≈ half the pool verbatim (J4 DeepSeek
+control: 45.2% — a harness property, not this run). The SELFHINT arm shares
+**1/2300** samples with the screen (hint prefixes change the sampling). Three
+consequences, computed:
+
+1. **The "fresh draw" premise behind the committed E was operationally
+   violated.** Correcting per-problem effective fresh draws (50 − identical):
+   E[B1] medium 5.11 → **3.02** (observed 1, P(X ≤ 1) ≈ 0.20 — no longer
+   falsification-grade), hard 2.09 → **1.31** (observed 1). The 4th-test
+   falsification stands on its committed terms, but the miss is mostly the
+   harness, not the Beta-binomial component.
+2. **The paired McNemar was structurally asymmetric:** B1 replays known-failing
+   samples half the time; SELFHINT explores fresh space. Under a
+   *neutral-hints* null, SELFHINT-50 is effectively the true fresh-draw arm:
+   **E[SELFHINT | hints do nothing] = 7.20 — observed 5.** The +3/−0 pattern
+   is fully accounted for by the asymmetry; **there is no evidence of a
+   positive self-hint effect at 7B** (if anything the point estimate sits
+   below the neutral expectation).
+3. **Record-wide caveat (§8-class):** every same-seed "fresh B1-50" in this
+   record carries ≈ 45–50% screen-pool correlation. Prior floor hits and the
+   HINT results survive — those strata had near-zero floors, where halving an
+   E of ≈ 0–2 cannot move any conclusion (Qwen 13-vs-floor is stronger, not
+   weaker, under a suppressed B1) — but the caveat attaches to the record, and
+   the live 7B-medium tail is where it finally bit. Future fresh-draw arms
+   must use a distinct seed.
+
+**Branch adjudication rule (committed NOW, before the blind grades return —
+the grading agent is running and has seen no outcomes):** (c) is off
+(p = 0.125). (d) "positive-unresolvable" is set aside *with reasons on the
+page*: the observed positive trend is quantitatively attributable to the
+measured draw-correlation asymmetry, and SELFHINT sits at-or-below the
+neutral-draw expectation — the outcome is floor-equivalent. Therefore:
+**production-adequate share < 30% → branch (a)** (the 40% favourite: switch-on
+lies above 7B, the cascade remains the deployable shape); **share ≥ 30% →
+branch (b)** (floor despite adequate hints — reported with the pre-declared
+power caveat: effects below r ≈ 0.15 are unresolvable under the marginal
+reading, so (b) is a scoped no-lift statement, not a proven use-failure).

@@ -1,0 +1,28 @@
+{
+  "_label": "J5 Q2 \u2014 B1-50 vs SELFHINT-50 on the pooled 7B stratum [PHASE_5.md J5 Q2 extension]",
+  "n": 101,
+  "n_medium": 46,
+  "n_hard": 55,
+  "b1_recoveries": 2,
+  "selfhint_recoveries": 5,
+  "b1_recoveries_medium": 1,
+  "b1_recoveries_hard": 1,
+  "selfhint_recoveries_medium": 4,
+  "selfhint_recoveries_hard": 1,
+  "selfhint_only": 3,
+  "b1_only": 0,
+  "p_one_sided_mcnemar": 0.125,
+  "recovered_qids": {
+    "b1": [
+      "abc303_c",
+      "abc305_e"
+    ],
+    "selfhint": [
+      "abc303_c",
+      "abc339_d",
+      "abc330_c",
+      "abc335_c",
+      "abc305_e"
+    ]
+  }
+}
