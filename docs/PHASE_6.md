@@ -426,3 +426,14 @@ job: caught the wall before any battery spend.
   entrypoints (`j6_prefetch/j6_smoke/j6_pathology`, L4/bf16). Exact record stack →
   **no re-baseline and no anchor needed** (new cells compare directly to the
   existing Modal 1.5B/7B); zero new work; ~$20–30. The original frozen P1 design.
+
+**DECISION (2026-07-17): (B) Modal bf16** [author's call]. The Kaggle re-baseline
+(and its fp16 workaround) is **retired** — the T4 bf16 wall makes free Kaggle a
+precision change the phase centerpiece shouldn't carry. P1 runs on the existing
+Modal j6 entrypoints, same L4/bf16 stack as the 1.5B/7B reference, so **the
+ORIGINAL frozen P1 pre-registration applies unchanged**: no re-baseline, no stack
+anchor, branches/odds as frozen. Only the **three new checkpoints**
+(Qwen-Coder-0.5B, 3B, general-1.5B) are generated; the 1.5B (`dmeasure_d2c_partial_credit.json`)
+and 7B (`h5_7b_pathology.json`) cells are the existing Modal results. The Kaggle
+kernel + launch integration stay in the tree (unused) as the recorded
+infrastructure of a measured dead-end.
