@@ -496,3 +496,40 @@ don't harmonize). The underdog code branch fired; the favourite recipe branch fi
 **Decision-rule origin line (for the Index):** **CODER-STAGE diet, competence-windowed
 (code sink 1.5–3B, absent at 0.5B floor and 7B), MIXED across channels
 (language harm 1.5B-only).** [artifacts/h6_size_curve.json, h6_pathology_origin_*.json].
+
+---
+
+## PHASE GATE — CLOSED (2026-07-18)
+
+The five closure conditions, audited:
+
+1. **Pathology Index row carries a measured origin line** ✓ — rows 8/11:
+   CODER-STAGE diet, competence-windowed, MIXED channels (§9.9 P1 addendum).
+2. **Flagship HINT contrast on a distinct-seed measured control; §8 caveat
+   amended** ✓ — P2: distinct-seed B1 = 2, in-band; §8 computed → measured.
+3. **Distinct-seed protocol codified in §8/§10** ✓ — §8 harness caveat + §10
+   addendum; standing rule.
+4. **Every LIVE/SCOPED Index row carries its claims-to-evidence extension** ✓ —
+   §0.3 (11 rows, all artifacts verified present; rows 8/10/11/15 updated with
+   Phase-6 outcomes).
+5. **The note revision reflects P1's branch** ✓ — §0.2 candidate 2 respec'd as a
+   transcription-ready spec around the Coder-stage / competence-window / MIXED
+   result (no paper written, per the phase framing note).
+
+**Prediction accounting, full phase:** P0 admission rule resolved (H-tie demoted;
+StarCoder2 the falsifier). P2 floor prediction **hit** (6th test, 5-for-6). P1
+code shape **NON-MONOTONE** (15% underdog, but mechanistic — competence window),
+recipe **CODER-STAGE** (55% favourite), cross-channel **MIXED**; SLOPE (50%) and
+STEP (20%) both missed — the pre-registered dichotomy was too coarse for the
+competence window, and the record says so rather than forcing a fit. No gate was
+passed by tuning.
+
+**Cost:** P2 ~$3 (Modal) + P1 3 checkpoints ~$6–10 (Modal) + one failed Kaggle
+smoke ($0, free tier). Kaggle re-baseline retired at its smoke (T4 bf16 wall) —
+recorded dead-end, infra kept.
+
+**Open (author's, Index in hand):** the extraction decision (the pathology note
+now has its origin measurement; §0.2 candidate 2 is transcription-ready); the
+successor questions in §0.4 (dose-response hint set; 3B→7B window-close bracket
+and 7B–72B switch-on; TTT/weight-space) — named, not chartered. **Nothing is
+running; Phase 6 is fully closed.**

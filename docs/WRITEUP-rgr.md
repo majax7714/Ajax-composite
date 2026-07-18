@@ -24,7 +24,19 @@ cross-family audit that retracted our platform negatives as one family's
 pathology — and finally an existence proof that approach-level direction crosses
 the competence boundary, moving the open question to where direction comes from.*
 
-*Living record — last updated 2026-07-17 (**J5 CLOSED — the 7B fork,
+*Living record — last updated 2026-07-18 (**PHASE 6 CLOSED — where the pathology
+comes from + extraction-readiness, [PHASE_6.md]**: the small-Qwen conditioning
+pathology's origin is **measured** — a **Coder-continued-pretraining-diet ×
+competence-window** effect (general-1.5B, same arch/tie/scale, is clean; the code
+sink is 1.5B–3B, absent at the 0.5B floor and 7B; the language harm is 1.5B-only
+→ **MIXED** across channels), so it is neither architecture/tie (H-tie demoted at
+P0 by StarCoder2, tied-yet-friendly) nor base recipe. The flagship
+HINT-13-vs-floor number now stands on a **distinct-seed measured control** (P2:
+fresh B1 = 2, floor instrument 5-for-6; §8 caveat computed → measured; §10
+distinct-seed protocol codified), and every LIVE/SCOPED claim carries a
+claims-to-evidence row (§0.3). En route, a Kaggle re-baseline was retired at its
+smoke — free T4s can't run bf16 — a recorded dead-end. §9.9 P1 addendum, §9.5.
+Previously **J5 CLOSED — the 7B fork,
 [PHASE_5.md] J5**: Q1 — **the conditioning pathology is a small-Qwen (1.5B)
 property**: at 7B the code channel *blends* (0.609 between the nulls) and the
 language harm vanishes (Δ −0.018, ns); both frozen favourites hit. Q2 —
@@ -399,12 +411,33 @@ No commitment implied; the journal decides when an extraction is ripe.
 2. **The Qwen pathology note** — the double dissociation + SINK inversion
    ([PHASE_4.md]) + J4's four-arm table (traces null on the pathology-free
    family). Fastest to publishable, audience primed post-Spurious-Rewards.
-   *Optional strengthener:* J5-Q1 (7B persistence, $3–5, sign-off gated).
-   **Extraction-ready.** *(2026-07-17: the J5-Q1 strengthener ran — the
-   pathology **vanishes** at 7B, both frozen favourites hit. The note's title
-   sharpens from a family claim to a small-model-of-this-family claim, and it
-   gains a clean scale boundary: 1.5B pathological, 7B blends like the other
-   families. §9.9 J5 addendum.)*
+   **Extraction-ready.** *(Spec updated 2026-07-18, Phase 6 P3 — the note is now a
+   transcription of journal state; no paper is written under this record.)*
+   The transcription-ready spec, with each claim's evidence in §0.3 rows 8/11:
+   - **Title/scope:** a **Qwen2.5-Coder-small** conditioning pathology, and
+     specifically a **Coder-continued-pretraining-diet** one — *not* a family
+     claim, *not* architecture/tie (P0 + P1). general-1.5B (same arch/tie/scale,
+     general Qwen2.5) is clean.
+   - **Three dissociation axes:** (i) *channel* — code + language both degrade
+     Qwen-1.5B, both lift DeepSeek (§9.8); (ii) *family* — Qwen-Coder-1.5B vs
+     DeepSeek-1.3B / StarCoder2-3B (§9.7/H1); (iii) *within-family scale/competence*
+     — sink at 1.5B–3B, absent at 0.5B (competence floor) and 7B (blends up), and
+     the language harm is **1.5B-only** (P1, §9.9 P1 addendum). Axis (iii) is the
+     new P6 contribution; the two-channel boundary mismatch is a **MIXED** result,
+     stated as such, not smoothed.
+   - **The §5 "mechanism" slot** = the measured origin line: **Coder-stage diet ×
+     a competence window**; copy-fidelity does not track the sink (degradation at
+     matched fidelity). No causal isolation of the synthetic-data variable is
+     claimed (see limitations).
+   - **Spurious-Rewards relationship, corrected:** their effect is on Qwen2.5-**Math-7B**
+     (random-reward RLVR surfacing pretraining priors); **ours vanishes at
+     Coder-7B** and lives at 1.5B–3B. Two *distinct* Qwen phenomena — related only
+     as "family-specific pretraining artifacts," stated as such; do not conflate.
+   - **Limitations to print on the tin:** Coder-3B is Qwen-Research-licensed (P0);
+     the synthetic-data *mechanism* is not isolated (H1's confound, standing); the
+     scale where the window closes (3B→7B) is unbracketed; StarCoder2's language
+     channel is untested; fp16/other-stack replication is open (the Kaggle T4
+     dead-end).
 3. **The methods record** — §10 + §0.1 + the prediction-accounting trail (now
    including three floor hits and the J2/J3 grading instruments); needs no new
    data, only extraction.
@@ -1711,8 +1744,15 @@ the named successor experiment, explicitly outside this record.
 > re-baseline). **Origin measured: CODER-STAGE diet** (general-1.5B clean),
 > **competence-windowed** code sink (1.5–3B; absent at the 0.5B floor and 7B), and
 > **MIXED** across channels (language harm 1.5B-only) — §9.9 P1 addendum, Index
-> rows 8/11. **P3 remaining:** the pathology-note revision around this branch.
-> Nothing running.
+> rows 8/11.
+>
+> **PHASE 6 CLOSED (2026-07-18).** All five gate conditions met: origin line
+> (rows 8/11), flagship on a distinct-seed measured control (§8 computed →
+> measured), distinct-seed protocol codified (§8/§10), claims-to-evidence tables
+> (§0.3, 11 rows), pathology-note spec respec'd (§0.2). **Nothing running.** Open
+> (author's, Index in hand): the extraction decision (pathology note is
+> transcription-ready); §0.4 successors (dose-response set; 3B→7B window-close +
+> 7B–72B switch-on; TTT) — named, not chartered.
 
 *(historical, 2026-07-15)*
 
