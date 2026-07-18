@@ -943,6 +943,15 @@ def j5_hard_screen():
 
 
 @app.local_entrypoint()
+def j5_dump_hard_questions():
+    """Statements for the 7B hard stratum (self-hint grading needs them)."""
+    hard = json.loads((REPO / "artifacts/h5_7b_hard_screen.json").read_text())
+    out = h1_dump_questions.remote(hard["stratum_qids"])
+    (REPO / "runs/modal/j5_hard_questions.json").write_text(json.dumps(out))
+    print(f"dumped {len(out['questions'])} hard statements")
+
+
+@app.local_entrypoint()
 def j5_pooled_arms():
     """J5 Q2 extension steps 3-4 — B1-50 / SELFHINT-50 on the POOLED stratum
     (medium 46 + hard). Launch only after the hard-floor prediction is committed
