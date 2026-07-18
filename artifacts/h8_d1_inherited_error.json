@@ -1,0 +1,71 @@
+{
+  "_label": "Phase 8 D1 inherited-error [PHASE_8.md D1]",
+  "metric": "excess = |G\u2229A| - |G|*|A|/n; paired one-sided E1>E0 across problems",
+  "cells": [
+    {
+      "cell": "coder1p5b_sink",
+      "kind": "coder1p5b",
+      "n_problems": 44,
+      "dropped": 0,
+      "mean_e1_excess": 1.4949,
+      "mean_e0_excess": 0.1793,
+      "delta_e1_minus_e0": 1.3157,
+      "mean_e1_jaccard": 0.6592,
+      "mean_e0_jaccard": 0.3473,
+      "p_one_sided_e1_gt_e0": 0.0,
+      "n_problems_e1_gt_e0": "40/44",
+      "elaboration_ratio_mean": 0.5889,
+      "elaboration_n": 312,
+      "verdict": "RECLASS-consistent (E1 excess > E0, p<0.05)"
+    },
+    {
+      "cell": "qwen3b_sink",
+      "kind": "coder3b",
+      "n_problems": 44,
+      "dropped": 0,
+      "mean_e1_excess": 1.6816,
+      "mean_e0_excess": 0.1488,
+      "delta_e1_minus_e0": 1.5327,
+      "mean_e1_jaccard": 0.6772,
+      "mean_e0_jaccard": 0.2878,
+      "p_one_sided_e1_gt_e0": 0.0,
+      "n_problems_e1_gt_e0": "43/44",
+      "elaboration_ratio_mean": 0.6382,
+      "elaboration_n": 305,
+      "verdict": "RECLASS-consistent (E1 excess > E0, p<0.05)"
+    },
+    {
+      "cell": "M4_coder7b",
+      "kind": "m4",
+      "n_problems": 20,
+      "dropped": 0,
+      "mean_e1_excess": 0.704,
+      "mean_e0_excess": 0.2321,
+      "delta_e1_minus_e0": 0.472,
+      "mean_e1_jaccard": 0.3667,
+      "mean_e0_jaccard": 0.1874,
+      "p_one_sided_e1_gt_e0": 0.0018,
+      "n_problems_e1_gt_e0": "17/20",
+      "elaboration_ratio_mean": 0.6119,
+      "elaboration_n": 101,
+      "verdict": "RECLASS-consistent (E1 excess > E0, p<0.05)"
+    },
+    {
+      "cell": "M1_deepseek1p3b",
+      "kind": "m1",
+      "n_problems": 38,
+      "dropped": 1,
+      "mean_e1_excess": 2.52,
+      "mean_e0_excess": 0.288,
+      "delta_e1_minus_e0": 2.232,
+      "mean_e1_jaccard": 0.8891,
+      "mean_e0_jaccard": 0.5061,
+      "p_one_sided_e1_gt_e0": 0.0,
+      "n_problems_e1_gt_e0": "36/38",
+      "elaboration_ratio_mean": 0.8397,
+      "elaboration_n": 287,
+      "verdict": "RECLASS-consistent (E1 excess > E0, p<0.05)"
+    }
+  ],
+  "d1_call": "D1 => M-OOD or MIXED (see per-cell)"
+}

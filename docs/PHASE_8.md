@@ -154,6 +154,33 @@ the confounds are independent of the mechanism call.
 *(D1 and D2 results + the mechanism call are appended below after they run; D3 and the
 C-cells await the GPU sign-off gate.)*
 
+### D1 RESULT (2026-07-18) — **as-pre-registered: INCONCLUSIVE (control not at null); corrected D1′ below**
+
+`h8_d1_inherited_error.json`. All three sink cells show E1 excess-overlap ≫ E0:
+Coder-1.5B +1.50 vs +0.18 (p < 1e-4), Coder-3B +1.68 vs +0.15 (p < 1e-4), M4 +0.70 vs
++0.23 (p = 0.0018). **But the clean control M1 shows the *largest* effect** — E1 +2.52
+vs E0 +0.29 (p < 1e-4), fidelity **0.84** (near-copy). M1 *lifts* (+0.050) yet inherits
+the artifact's failing tests most strongly, because it **copies up** to an
+above-its-level artifact. **The pre-registered control assumption (M1 at null) is
+FALSIFIED.** Inheritance-of-failing-tests is **imitation pull** — family-general,
+maximal in the clean copying cell — so the excess-overlap metric conflates imitation
+with the sink and is **inconclusive as a discriminator**. (Recorded straight; the
+falsified control is itself informative — it confirms the mechanism frame's
+"imitation pull" term is family-general, the Codex baseline.)
+
+### D1′ — corrected, sink-specific discriminator *(pre-registered here BEFORE computing)*
+
+The sink is the **E1-vs-E0 marginal degradation**, not total inheritance. Isolate it:
+per test t, `induced(t) = P(E1 fails t) − P(E0 fails t)` (positive = conditioning
+*breaks* t). Metric per problem: **mean induced on the artifact's failing tests A minus
+mean induced on non-A tests**. Paired one-sided (contrast > 0) across problems.
+- **M-RECLASS:** Coder sink cells show contrast **> 0** (p < 0.05) — conditioning
+  breaks the **same** tests the artifact fails (its specific bugs propagate).
+- **M-OOD:** contrast **≈ 0** — the induced failures are uniform across tests,
+  uncorrelated with the artifact's particular errors.
+- **Control M1:** ≈ 0 (it lifts; little induced failure to distribute) — under D1′ the
+  control is *expected* near-null by construction, repairing D1's flaw.
+
 ---
 
 ## C — Confound closures *(pre-registered here; each ~$4–10; AWAIT SIGN-OFF)*
