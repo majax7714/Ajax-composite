@@ -1,0 +1,181 @@
+# Phase 9 — diet or provenance? The generated 2×2, and the self-conditioning question
+
+*Charter received 2026-07-18. Append-only; every run pre-registered with odds and
+decision rules committed before it launches. This document is the Phase-9
+pre-registration and result log.*
+
+## 0. The question and the confound
+
+**Charter question:** is the sink caused by the **Coder diet**, or by conditioning a
+model on its **own (self/family) near-quality output** — and does the mechanism call
+survive a provenance-clean look?
+
+**The two stories the record cannot yet distinguish:**
+- **H-DIET** (the standing origin line): Coder-stage training → sink at match; artifact
+  provenance irrelevant.
+- **H-SELF** (newly live): models sink when conditioned on their **own** near-quality
+  output; the clean models were clean because the fixed-donor rule fed every one of them
+  **foreign** code (Qwen-Coder-1.5B-base), and the Coder cells sank because every one saw
+  **self/family** code.
+
+**Every Phase-7/8 cell sits on the confounded diagonal:** Coder × self-family = sink;
+clean × foreign = clean. The off-diagonal was never sampled. The **one** point off the
+pattern is the P0.1 anomaly — **Coder-1.5B conditioned on its own base output
+(unsurprising, D3 ratio 0.94) sinks anyway** — and it sat in a Phase-8 table labeled as
+a caveat, not a hypothesis. (general-1.5B being clean on Coder-1.5B-base artifacts means
+that if H-SELF fires it is **self-model**, not base-family — general's own output ≠
+Coder-1.5B-base output, so general saw foreign and stayed clean, consistent with both.)
+
+**The stakes if H-SELF fires** (priced as the *bigger* branch, not the ugly one):
+self-conditioning at near-match quality is what the record's entire refinement arc was —
+BEST-SO-FAR conditioned Qwen on its own best output; the D2c sink, the anchor-poisoning,
+the conditioning-hostility findings all ran the self-ish diagonal. A fired H-SELF makes
+the Phase-3b–5 refinement nulls **retroactively reinterpretable** as instances of one
+self-conditioning hazard, unifying the journal's two threads. Scope pre-declared (§0.3
+P0.3 cross-references).
+
+## 1. Standing rules
+
+Unchanged: append-only; pre-register odds/decision rules first; no learned verifier;
+reconciliation-ledger entries; §8 ledger + stack fingerprint; distinct-seed protocol;
+**matched-relation rule with the iterative-targeting amendment — every cell targets a
+*measured* Δ_art (i.i.d. measured on the cell's own problem subset first, band set from
+that), never a mined proxy**; Index current at close.
+
+## P0 — Free amendments — **LANDED**
+
+- **P0.1 — mechanism label OOD-leaning → OPEN.** The one provenance-clean D3 point
+  (Coder-1.5B, ratio 0.94, self-donor) is unsurprising yet sinks, contradicting the OOD
+  lean (which rode on the smaller-sibling-donor cells). Amended in PHASE_8 mechanism
+  call, §9.9 P8 addendum, Index rows 8/11, §0.2, §0.4. The pricing below inherits this
+  honest prior.
+- **P0.2 — the self-conditioning fact indexed** (§0.3): Coder-1.5B sinks on its own base
+  generations at its own level — evidence for **both** H-DIET and H-SELF; the 2×2
+  assigns it.
+- **P0.3 — BSF/D2c cross-references placed** (§0.3): Phase-3b BEST-SO-FAR + the D2c sink
+  ran self-provenance near-match conditioning; reinterpretation contingent on H-SELF,
+  scope pre-declared, no conclusion drawn.
+
+---
+
+## G1 — The generated 2×2 *(centerpiece; 4 cells ~$20; the D3 sweep rides free)*
+
+**PRE-REGISTRATION (2026-07-18 — FROZEN pending sign-off).**
+
+**Design principle: provenance and generation-method must not move together.** Phase-8's
+C1-reframe would have compared generated-self against mined-foreign history — the exact
+trap the §10 amendment codifies. So **all four cells use generated artifacts, one
+transform, one selection rule, both generators.** The generated-artifact variable is held
+constant and **cancels in every within-model contrast**.
+
+| cell | conditioned model | artifact provenance | band (position) |
+|---|---|---|---|
+| **G1a** | DeepSeek-1.3B | **self** (DeepSeek-generated) | DeepSeek's measured match |
+| **G1b** | DeepSeek-1.3B | **foreign** (Coder-1.5B-generated) | same (DeepSeek's match) |
+| **G1c** | Qwen-Coder-1.5B | **self** (Coder-1.5B-generated) | Coder's measured match |
+| **G1d** | Qwen-Coder-1.5B | **foreign** (DeepSeek-generated) | same (Coder's match) |
+
+**Protocol (frozen):**
+1. **Fix the problem set first**: the 44 D2c problems, minus any where *either* generator
+   cannot band-cover *any* of the four cells' bands (one shared subset for all four —
+   reported, with the dropped list).
+2. **Iterative targeting** (§10 amendment): measure each conditioned model's i.i.d. on the
+   subset with a **distinct seed**; set each model's band = subset-i.i.d. ± 0.05.
+3. **Generate** (same transform): high-T (T = 1.2) sampling of each generator on the
+   subset, k = 50; judge all-cases for per-candidate frac; per problem select the
+   nearest-frac candidate **in the conditioned model's band**.
+4. **Report achieved Δ_art per cell** (= mean artifact frac − conditioned model's i.i.d.
+   on the *covered* subset). **If any cell's achieved Δ_art is outside ±0.08 of 0,
+   re-target once** (recompute band from the covered-subset i.i.d.), then report honestly
+   — a cell that missed its straddle is **not** called matched.
+5. **Condition** each model (E0 + E1, k = 8, seed 17, all-cases judge, stack fingerprint).
+   **Sink signature** (Phase-7 committed): cond < subset-i.i.d., one-sided p < 0.05,
+   effect ≤ −0.05, per cell. The generated-artifact scope (C5) applies to **absolute
+   Δ_cond**; the **within-phase factorial contrasts are the results.**
+
+**Branches + odds (priced post-P0; neither main effect a favourite):**
+- **DIET main effect — 38%** (G1c, G1d sink; G1a, G1b clean): Coder sinks on *both* self
+  and foreign artifacts; DeepSeek clean on both → **H-DIET stands, provenance-controlled
+  at last**; rung-2's confound closes; the origin line survives its final named confound.
+- **PROVENANCE main effect — 30%** (G1a, G1c sink; G1b, G1d clean): each model sinks on
+  its **own** output, clean on foreign → **H-SELF fires**; the pathology reframes to
+  self-conditioning; the Index rescopes rungs 2–3, the P0.3 cross-references **activate**,
+  and the close carries the Phase-4-dissociation re-decomposition plan (it becomes a
+  provenance artifact) — retraction-grade, priced now.
+- **INTERACTION — 20%** (only G1c — self × Coder — sinks): the sink needs **both**; the
+  narrowest claim yet, both stories partially survive, the note narrows again. (The one
+  existing clean point *is* self × Coder and sinks — this branch has direct support.)
+- **UGLY — 12%** (all four sink / none sink): generated artifacts behave categorically
+  unlike mined ones (the generation variable dominates — the C5-scope warning realized);
+  the mined-vs-generated delta becomes its own finding. Priced, not hidden.
+
+**Free D3 sweep** (one forward pass per cell — each model's perplexity on its self set,
+its foreign set, and its own-E0 baseline — crossing surprise × provenance for two
+models). **Two pre-registered readings** (the mechanism question's first provenance-clean
+look):
+- **OOD refuted** — the **self column is unsurprising** (self = on-manifold: surprise
+  ratio ≲ 1 for G1a-self and G1c-self) **yet sinks** → the sink is **decoupled from
+  surprise**; the P0.1 anomaly generalizes and OOD loses its remaining ground.
+- **OOD supported** — surprise **co-varies with the sink** across the grid (the sinking
+  cells are the more-surprising ones; foreign > self in surprise *and* the sinks fall on
+  the surprising cells) → OOD regains clean footing.
+
+**Artifacts (planned):** `h9_2x2_G1{a,b,c,d}.json` (per cell + stack block),
+`h9_2x2_generated_sets.json` (subset, i.i.d.s, bands, achieved Δ_art, coverage),
+`h9_d3_sweep.json`. **Writeup:** §9.9 P9 addendum; Index rows 8/11 branch; relational
+figure gains the four G-cells (marked generated, C5-visually-distinct).
+
+---
+
+## G2 — Contingent cells *(pre-registered now, launched per G1's branch; ~$10–15)*
+
+- **If DIET main effect:** **phi-1 at its true match** (iterative targeting) — the
+  Phase-8 sub-threshold lean (−0.033, lift-excluding CI) converts to a decision; the
+  family-n = 2 question becomes the last open rung, this cell make-or-break. (Ledger note
+  from Phase 8 carries over.)
+- **If PROVENANCE main effect:** **StarCoder2-3B × self-generated at match** — the third
+  family on the self column; H-SELF's generality is the new rung-2; one more family
+  decides two-model-fact vs general. (phi defers; its lean gets reinterpreted first.)
+- **If INTERACTION:** both defer; the interaction's **replication** — a second Coder
+  checkpoint (Coder-3B) on the self/foreign pair — takes the slot.
+- **The below-zero clean cell** (C2's sign question) stays queued behind everything,
+  iterative-targeted, launched only if budget remains (three points already; a fourth is
+  polish, not load-bearing).
+
+---
+
+## Journal work + sequencing + gate
+
+**Journal:** origin-line + claim-ladder re-stated with the branch (rung-2
+provenance-controlled / rescoped-to-self / narrowed-to-conjunction); mechanism line
+carries the D3-sweep reading; relational figure gains the G-cells; **note stays gated**
+(§0.2 — fourth gate, and the right one: its central dissociation is on trial; if H-DIET
+fires, the next revision is plausibly its last before the extraction decision — stated as
+status, not promise). Successors named (internals probe — now sharpened to self-vs-foreign
+attention; 0.5B generated; dose-response; 7B–72B; TTT).
+
+**Order:** P0 ✓ → **G1 pre-reg frozen (this file)** → **[SIGN-OFF GATE]** → subset fixed +
+subset-i.i.d.s measured (distinct seeds) → artifacts generated + banded → 4 cells → D3
+sweep → branch recorded → G2 per branch → Index/figure/ladder → close.
+
+**[SIGN-OFF GATE — author decisions before GPU spend]:**
+1. Go/no-go on the generated 2×2 (~$20) + free D3 sweep.
+2. Generation transform: T = 1.2, k = 50, per-problem nearest-frac-in-band — confirm.
+3. G2 pre-authorized to launch on its fired branch (~$10–15), or pause for a second
+   sign-off after G1's branch is known?
+
+**Phase gate — Phase 9 closes when:** the P0 amendments are landed (✓); the 2×2's branch
+is recorded with **achieved Δ_art per cell**; the mechanism line carries the
+provenance-clean D3 reading; the G2 contingency for the fired branch is resolved or
+deferred-with-reason; the claim ladder states the post-2×2 rung; the note's gating
+reflects the outcome.
+
+## What this phase protects
+
+Every Phase-7/8 cell sat on one diagonal of a 2×2 nobody had drawn; the one point off the
+pattern sat in a table labeled as a caveat instead of a hypothesis. This phase draws the
+square and samples all four corners with the generation variable held flat. If H-DIET
+survives it survives everything and the origin line stands on unshiftable ground; if
+H-SELF fires, the pathology thread and the refinement thread collapse into one
+phenomenon — making five phases of conditioning nulls not a detour from the original
+refinement question but its answer, from the direction nobody registered.
