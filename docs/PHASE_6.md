@@ -399,3 +399,30 @@ GPU/stack differs). Per-checkpoint smoke gate first (wf ≥ 0.85 / dg ≤ 0.10).
 Outputs `runs/kaggle/<mode>/` → `artifacts/h6_pathology_origin_kaggle_<name>.json`.
 The five-point join + free-rider curves land in a local CPU analysis
 (`j6_size_curve.py`) once cells return.
+
+### P1 Kaggle smoke — FAILED (2026-07-17): the T4 cannot run bf16
+
+The qwen3b smoke (`rgr-j6-qwen3b-smoke`) reached the GPU and failed at engine
+init with a **hard, informative** error:
+`ValueError: Bfloat16 is only supported on GPUs with compute capability ≥ 8.0.
+Your Tesla T4 GPU has compute capability 7.5. You can use float16 instead.`
+[runs/kaggle/j6_qwen3b_smoke/rgr-j6-qwen3b-smoke.log].
+
+**The free-Kaggle re-baseline's premise is broken.** Kaggle's free accelerators —
+T4 (sm_75) and P100 (sm_60) — are both **pre-Ampere** and cannot run bf16 under
+vLLM; the launcher already pins T4 (P100's sm_60 is dropped by Kaggle's torch).
+The record's stack is **bf16** (D11). So Kaggle can only run **fp16**, which is a
+**precision** boundary, not just the GPU boundary the amendment assumed — a bigger
+stack change, and one the record has never crossed. The smoke gate did exactly its
+job: caught the wall before any battery spend.
+
+**Options, decision pending (author's call):**
+- **(A) Kaggle fp16, anchor-gated** — set the kernel `dtype="float16"`, run the
+  1.5B cell first (free) as combined smoke + *precision* anchor. If fp16-1.5B
+  reproduces the bf16 signature (below-both-nulls, 0.374 ± 0.05) → free fp16
+  battery, scoped "fp16, anchored to bf16"; if it drifts → fp16 changes the
+  measurement and we fall back. Free if precision transfers; self-correcting.
+- **(B) Modal bf16** — run the battery on the **already-built** Modal j6
+  entrypoints (`j6_prefetch/j6_smoke/j6_pathology`, L4/bf16). Exact record stack →
+  **no re-baseline and no anchor needed** (new cells compare directly to the
+  existing Modal 1.5B/7B); zero new work; ~$20–30. The original frozen P1 design.
