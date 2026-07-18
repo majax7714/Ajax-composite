@@ -383,6 +383,19 @@ This is **M-OOD-leaning**; **M-RECLASS is disfavored** (its exemplar-credibility
 prediction failed at D3) **but not excluded** (D3 is weak/blunt with a donor confound,
 and D1 cannot separate the two). **Label: OOD-leaning.**
 
+> **⚠ AMENDED to OPEN (2026-07-18, Phase 9 P0.1 — the ledger applied to ourselves).**
+> The OOD lean over-reached. D3's coder mean (1.12) is carried by **3B/7B/0.5B** —
+> exactly the cells whose donor is a *smaller-sibling* model (the caveat D3 itself
+> flags). The **one provenance-clean D3 point** is **Coder-1.5B (ratio 0.94)**: its
+> donor *is* Coder-1.5B-base, so it is a model conditioned on **its own** near-quality
+> output, finding it **unsurprising** (on-manifold, as self-output should be) — **and it
+> sinks anyway** (−0.095). The only clean point **contradicts** the OOD lean (OOD needs
+> the artifact to be off-manifold; here it is on-manifold and sinks). **Corrected label:
+> OOD-leaning only on provenance-confounded cells; the provenance-clean cell dissents →
+> mechanism = OPEN.** This also surfaces an **unlabeled self-conditioning sink** the
+> record has carried since Phase 7 (Coder-1.5B on its own base generations). Both are
+> what Phase 9's 2×2 exists to resolve.
+
 ## C-CELL RESULTS (2026-07-18)
 
 | cell | intended | landed (actual Δ_art) | Δ_cond (CI) | p | sink? | verdict |
