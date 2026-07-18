@@ -1617,6 +1617,24 @@ the named successor experiment, explicitly outside this record.
 > candidate papers now have their 7B data); the 7B–frontier switch-on bracket;
 > the dose-response hint set; the distinct-seed protocol is a standing rule,
 > not a decision.
+>
+> **PHASE 6 OPENED (2026-07-17 — where the pathology comes from + extraction-
+> readiness, [PHASE_6.md]).** Pre-registration frozen; **nothing running (no
+> GPU)**. **P0 done (free config gates):** tie flags pulled for all record
+> models — the tie boundary in the Qwen-Coder line falls at 3B→7B (0.5/1.5/3B
+> tied, 7B untied), and **H-tie is demoted to an interaction term** because
+> **StarCoder2-3B is tied yet conditioning-friendly** (the falsifier the
+> committed admission rule described; DeepSeek's literal trigger was untied and
+> did not fire). Revision pins + the Coder-3B license note recorded. **P1**
+> (pathology-origin discriminator battery: the two cheap cells on
+> Qwen-Coder-0.5B/3B + general-1.5B; 3B is the slope-vs-open-step crux) and
+> **P2** (distinct-seed verification of the flagship HINT-13-vs-floor number —
+> the floor instrument's **6th** out-of-sample test) are pre-registered with
+> odds and decision rules; **P2's floor prediction is committed: E = 2.01,
+> point 2, 94% band [0, 4], ≥ 5 falsifies** ([scripts/j6_p2_floor_predict.py],
+> reproducing §9.6's 2.01). **P3** (claims-to-evidence tables + the pathology-
+> note revision) is journal work. Results land in [PHASE_6.md]; the Index and
+> §8/§9.9 update as they do.
 
 *(historical, 2026-07-15)*
 
