@@ -1984,6 +1984,12 @@ def j8_matched(cell: str = "C2_deepseek_below0"):
 
 
 @app.local_entrypoint()
+def j8_prefetch_phi():
+    """Fetch + revision-pin phi-1 to the volume cache (offline images need it first)."""
+    print(j6_download.remote(PHI1, PHI1_REV))
+
+
+@app.local_entrypoint()
 def j8_phi_smoke():
     """C3 phi-1 smoke gate (its prompt format differs — a FAIL is reported, not forced)."""
     qids = _lcb_easy_qids()[:8]
