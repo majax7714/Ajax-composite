@@ -1,0 +1,564 @@
+{
+  "_label": "Phase 8 C-cell matched sets [PHASE_8.md C2/C4]",
+  "donor": "runs/modal/lcb_cand_lcb_r2_base_T08.json (Qwen2.5-Coder-1.5B-base)",
+  "cells": {
+    "C2_deepseek_below0": {
+      "model": "deepseek-ai/deepseek-coder-1.3b-base",
+      "target_artifact_frac": 0.322,
+      "band": [
+        0.272,
+        0.372
+      ],
+      "band_halfwidth": 0.05,
+      "note": "DeepSeek at Delta_art=-0.04 (iid 0.362): closes the band asymmetry (no clean model measured at Delta_art<=0)",
+      "n": 29,
+      "mean_artifact_frac": 0.3277,
+      "dropped_count": 51,
+      "artifacts": [
+        {
+          "qid": "abc326_b",
+          "cand_idx": 4,
+          "code": "from itertools import combinations\n\ndef is_326_like(n):\n    return 10 <= n < 1000 and 10*(n//10) * (n%10) == n%100\n\ndef smallest_326_like(n):\n    for i in range(n, 1000):\n        if is_326_like(i):\n            return i\n    return None\n\nn = int(input())\nprint(smallest_326_like(n))",
+          "frac": 0.3333333333333333,
+          "n_tests": 15,
+          "n_failed": 10
+        },
+        {
+          "qid": "abc302_a",
+          "cand_idx": 18,
+          "code": "import sys\n\nA, B = map(int, sys.stdin.readline().split())\nprint(A // B)",
+          "frac": 0.3333333333333333,
+          "n_tests": 15,
+          "n_failed": 10
+        },
+        {
+          "qid": "abc310_a",
+          "cand_idx": 11,
+          "code": "import sys\n\nN, P, Q = map(int, sys.stdin.readline().strip().split())\nD = list(map(int, sys.stdin.readline().strip().split()))\n\nans = P\nfor i in range(N):\n    if D[i] > Q:\n        ans = min(ans, P + D[i])\n\nprint(ans)",
+          "frac": 0.3333333333333333,
+          "n_tests": 15,
+          "n_failed": 10
+        },
+        {
+          "qid": "abc343_a",
+          "cand_idx": 1,
+          "code": "A, B = map(int, input().split())\nprint(9 - (A + B))",
+          "frac": 0.3333333333333333,
+          "n_tests": 12,
+          "n_failed": 8
+        },
+        {
+          "qid": "abc337_b",
+          "cand_idx": 1,
+          "code": "# Read the input\nS = input().strip()\n\n# Check if S is an Extended ABC string\nif S.count('A') == S.count('B') == S.count('C') == 1:\n    print(\"Yes\")\nelse:\n    print(\"No\")",
+          "frac": 0.3333333333333333,
+          "n_tests": 15,
+          "n_failed": 10
+        },
+        {
+          "qid": "abc304_b",
+          "cand_idx": 48,
+          "code": "# Read the input.\nN = int(input())\n\n# Determine which case applies.\nif N > 0 and N < 1000:\n    print(N)\nelif N >= 1000 and N < 10000:\n    print(N // 10)\nelif N >= 10000 and N < 100000:\n    print(N // 100)\nelif N >= 100000 and N < 1000000:\n    print(N // 1000)\nelif N >= 1000000 and N < 10000000:\n    print(N // 10000)\nelif N >= 10000000 and N < 100000000:\n    print(N // 100000)\nelif N >= 100000000 and N < 1000000000:\n    print(N // 1000000)",
+          "frac": 0.3333333333333333,
+          "n_tests": 15,
+          "n_failed": 10
+        },
+        {
+          "qid": "abc342_b",
+          "cand_idx": 17,
+          "code": "import sys\n\nN = int(sys.stdin.readline())\nP = list(map(int, sys.stdin.readline().split()))\nQ = int(sys.stdin.readline())\nfor i in range(Q):\n    A, B = map(int, sys.stdin.readline().split())\n    if P[A-1] < P[B-1]:\n        print(A)\n    elif P[A-1] > P[B-1]:\n        print(B)\n    else:\n        print(min(A, B))",
+          "frac": 0.2857142857142857,
+          "n_tests": 14,
+          "n_failed": 10
+        },
+        {
+          "qid": "abc321_b",
+          "cand_idx": 8,
+          "code": "# read input\nN, x = map(int, input().split())\nA = list(map(int, input().split()))\n\n# sort scores\nA.sort()\n\n# find minimum score needed in round N\nif N > 2:\n    # exclude the highest and lowest scores\n    score_needed = x - (sum(A[:N-3]) + sum(A[N-1+3:]))\n    if score_needed < 0:\n        print(-1)\n    else:\n        print(score_needed)\nelse:\n    print(0)",
+          "frac": 0.3333333333333333,
+          "n_tests": 15,
+          "n_failed": 10
+        },
+        {
+          "qid": "abc315_a",
+          "cand_idx": 17,
+          "code": "import sys\nstring = list(sys.stdin.readline().rstrip())\nfor i in range(len(string)):\n    if string[i] == (\"a\" or \"e\" or \"i\" or \"o\" or \"u\"):\n        string[i] = \"\"\nprint(*string, sep=\"\")",
+          "frac": 0.3333333333333333,
+          "n_tests": 12,
+          "n_failed": 8
+        },
+        {
+          "qid": "abc301_b",
+          "cand_idx": 0,
+          "code": "from typing import List\n\ndef insert_sequence(sequence: List[int]) -> List[int]:\n    while True:\n        differences = [abs(a - b) for a, b in zip(sequence, sequence[1:])]\n        if all(diff == 1 for diff in differences):\n            break\n        i = differences.index(max(differences))\n        if sequence[i] < sequence[i+1]:\n            sequence[i:i+2] = list(range(sequence[i]+1, sequence[i+1]))\n        else:\n            sequence[i:i+2] = list(range(sequence[i-1], sequence[i]))\n    return sequence\n\nN = int(input())\nsequence = list(map(int, input().split()))\nprint(*insert_sequence(sequence))",
+          "frac": 0.3,
+          "n_tests": 10,
+          "n_failed": 7
+        },
+        {
+          "qid": "abc329_a",
+          "cand_idx": 5,
+          "code": "import sys\n\n# Read input from standard input\ninput_str = sys.stdin.read().strip()\n\n# Loop through the characters of the string and print them separated by a space\nfor char in input_str:\n    if char != input_str[-1]:\n        print(char, end=' ')\n    else:\n        print(char)",
+          "frac": 0.3333333333333333,
+          "n_tests": 9,
+          "n_failed": 6
+        },
+        {
+          "qid": "abc319_b",
+          "cand_idx": 9,
+          "code": "n = int(input())\ns = \"\"\nfor i in range(n+1):\n    j = 1\n    while j*j <= n:\n        if n % j == 0:\n            if i % (n // j) == 0:\n                s += str(j)\n                break\n            if i % (n // (n // j)) == 0:\n                s += str(n // j)\n                break\n        j += 1\n    else:\n        s += \"-\"\nprint(s)",
+          "frac": 0.3333333333333333,
+          "n_tests": 15,
+          "n_failed": 10
+        },
+        {
+          "qid": "abc311_a",
+          "cand_idx": 0,
+          "code": "n = int(input())\ns = input()\ncnt = 0\nfor i, c in enumerate(s):\n    cnt += c in 'ABC'\n    if cnt == 3:\n        print(i + 1)\n        break",
+          "frac": 0.3076923076923077,
+          "n_tests": 13,
+          "n_failed": 9
+        },
+        {
+          "qid": "abc303_a",
+          "cand_idx": 1,
+          "code": "n = int(input())\ns, t = input(), input()\nfor i in range(n):\n    if s[i] != t[i] and (s[i] not in '01' or t[i] not in '01'):\n        print('No')\n        exit()\nprint('Yes')",
+          "frac": 0.3333333333333333,
+          "n_tests": 15,
+          "n_failed": 10
+        },
+        {
+          "qid": "abc305_a",
+          "cand_idx": 3,
+          "code": "# Read the position of Takahashi\nN = int(input())\n\n# Find the position of the nearest water station\nwater_station = N + 5 if N % 5 else N\n\n# Print the distance between the start and water station\nprint(water_station)",
+          "frac": 0.3,
+          "n_tests": 10,
+          "n_failed": 7
+        },
+        {
+          "qid": "abc321_a",
+          "cand_idx": 46,
+          "code": "x = int(input())\nif x >= 10:\n    if x < 100:\n        print(\"Yes\" if x >= 10 and x < 100 else \"No\")\n        exit(0)\n    if x < 1000:\n        if (x // 100) < (x // 10 % 10) and (x // 10) > (x % 10):\n            print(\"Yes\")\n        else:\n            print(\"No\")\n        exit(0)\n    if x < 100000:\n        if (x // 1000) < (x // 100 % 10) and (x // 100) > (x // 10 % 10) and (x // 10) < (x % 10):\n            print(\"Yes\")\n        else:\n            print(\"No\")\n        exit(0)\n    if x >= 100000:\n        print(\"No\")\n        exit(0)\nelse:\n    print(\"No\")",
+          "frac": 0.3333333333333333,
+          "n_tests": 15,
+          "n_failed": 10
+        },
+        {
+          "qid": "abc333_b",
+          "cand_idx": 42,
+          "code": "import sys\n\n# read the input as a string\ninput_str = sys.stdin.read()\n\n# split the string into two parts\nsplit_str = input_str.split('\\n')\n\n# extract the two line segments\nline_1 = split_str[0]\nline_2 = split_str[1]\n\n# get the lengths of the line segments\nlength_1 = line_1.count('A') + line_1.count('C') + line_1.count('E')\nlength_2 = line_2.count('B') + line_2.count('D') + line_2.count('E')\n\n# compare the lengths\nif length_1 == length_2:\n    print(\"Yes\")\nelse:\n    print(\"No\")",
+          "frac": 0.3333333333333333,
+          "n_tests": 15,
+          "n_failed": 10
+        },
+        {
+          "qid": "abc331_a",
+          "cand_idx": 36,
+          "code": "# Read from standard input\nM, D = map(int, input().split())\ny, m, d = map(int, input().split())\n\n# Calculate the year, month, and day that follow\ny += 1\nm = m if m < 12 else 1\nd = d if d < D else 1\n\n# Print the result\nprint(y, m, d)",
+          "frac": 0.36363636363636365,
+          "n_tests": 11,
+          "n_failed": 7
+        },
+        {
+          "qid": "abc336_b",
+          "cand_idx": 6,
+          "code": "n = int(input())\nprint(bin(n).count('0') - 1)",
+          "frac": 0.3333333333333333,
+          "n_tests": 15,
+          "n_failed": 10
+        },
+        {
+          "qid": "abc305_b",
+          "cand_idx": 17,
+          "code": "def main():\n    p, q = input().split()\n    if p == \"A\":\n        if q == \"B\":\n            print(3)\n        elif q == \"C\":\n            print(4)\n        elif q == \"D\":\n            print(5)\n        elif q == \"E\":\n            print(6)\n        elif q == \"F\":\n            print(10)\n        else:\n            print(14)\n    elif p == \"B\":\n        if q == \"C\":\n            print(1)\n        elif q == \"D\":\n            print(5)\n        elif q == \"E\":\n            print(6)\n        elif q == \"F\":\n            print(11)\n        else:\n            print(15)\n    elif p == \"C\":\n        if q == \"D\":\n            print(4)\n        elif q == \"E\":\n            print(6)\n        elif q == \"F\":\n            print(11)\n        else:\n            print(16)\n    elif p == \"D\":\n        if q == \"E\":\n            print(1)\n        elif q == \"F\":\n            print(5)\n        else:\n            print(6)\n    elif p == \"E\":\n        if q == \"F\":\n            print(5)\n        else:\n            print(6)\n    elif p == \"F\":\n        if q == \"G\":\n            print(9)\n        else:\n            print(10)\n    else:\n        print(20)\n\nif __name__ == \"__main__\":\n    main()",
+          "frac": 0.2857142857142857,
+          "n_tests": 14,
+          "n_failed": 10
+        },
+        {
+          "qid": "abc324_b",
+          "cand_idx": 32,
+          "code": "n = int(input())\nn = n if n & 1 else n >> 1\nprint(\"Yes\" if all(n % p for p in [2, 3]) else \"No\")",
+          "frac": 0.3333333333333333,
+          "n_tests": 15,
+          "n_failed": 10
+        },
+        {
+          "qid": "abc329_b",
+          "cand_idx": 8,
+          "code": "# read input\nN = int(input())\nA = list(map(int, input().split()))\n\n# find index of largest element\nmax_index = A.index(max(A))\n\n# find index of second largest element\nsecond_max_index = A.index(max(A[:max_index] + A[max_index + 1:]))\n\n# print answer\nprint(A[second_max_index])",
+          "frac": 0.3333333333333333,
+          "n_tests": 15,
+          "n_failed": 10
+        },
+        {
+          "qid": "abc303_b",
+          "cand_idx": 21,
+          "code": "n, m = map(int, input().split())\na = [list(map(int, input().split())) for _ in range(m)]\nans = 0\nfor i in range(n):\n    for j in range(i+1, n):\n        for k in range(m):\n            if a[k][i] == j or a[k][j] == i:\n                ans += 1\n                break\nprint(ans // 2)",
+          "frac": 0.35714285714285715,
+          "n_tests": 14,
+          "n_failed": 9
+        },
+        {
+          "qid": "abc322_a",
+          "cand_idx": 8,
+          "code": "# read input\nN = int(input())\nS = input()\n\n# search for \"ABC\"\nfor i in range(1, N-1):\n    if S[i:i+3] == \"ABC\":\n        print(i)\n        break\nelse:\n    print(-1)",
+          "frac": 0.2727272727272727,
+          "n_tests": 11,
+          "n_failed": 8
+        },
+        {
+          "qid": "abc340_a",
+          "cand_idx": 33,
+          "code": "from sys import stdin, stdout\n\na, b, d = map(int, stdin.readline().strip().split())\n\nif a == b:\n    stdout.write(str(a))\n    exit()\n\nif a > b:\n    d = -d\n\nwhile a <= b:\n    stdout.write(str(a) + \" \" if a < b else \"\")\n    a += d",
+          "frac": 0.3333333333333333,
+          "n_tests": 12,
+          "n_failed": 8
+        },
+        {
+          "qid": "abc323_b",
+          "cand_idx": 0,
+          "code": "N = int(input())\nS = [input() for _ in range(N)]\n\nwins = [0]*N\nfor i in range(N):\n    for j in range(N):\n        if S[i][j] == 'o':\n            wins[j] += 1\n        elif S[i][j] == 'x':\n            wins[i] += 1\nrank = sorted(range(N), key=lambda x: (-wins[x], x))\nfor i in range(N):\n    print(rank[N-1-i]+1, end=' ')",
+          "frac": 0.3333333333333333,
+          "n_tests": 12,
+          "n_failed": 8
+        },
+        {
+          "qid": "abc328_b",
+          "cand_idx": 6,
+          "code": "n = int(input())\nd = [int(x) for x in input().split()]\nans = 0\nfor i in range(n):\n    for j in range(1, d[i]+1):\n        if len(set(str(i) + str(j))) == 1:\n            ans += 1\nprint(ans)",
+          "frac": 0.3333333333333333,
+          "n_tests": 15,
+          "n_failed": 10
+        },
+        {
+          "qid": "abc323_a",
+          "cand_idx": 6,
+          "code": "n = input() # read the input\nif '0' not in n[1::2]: print(\"Yes\") # print the answer\nelse: print(\"No\")",
+          "frac": 0.3333333333333333,
+          "n_tests": 15,
+          "n_failed": 10
+        },
+        {
+          "qid": "abc338_b",
+          "cand_idx": 0,
+          "code": "from typing import Counter\n\ndef most_frequent_character(s: str) -> str:\n    counts = Counter(s)\n    max_count = max(counts.values())\n    most_frequent_chars = sorted(counts.keys(), key=lambda c: (counts[c], c))\n    return most_frequent_chars[-1]\n\n# Read input from standard input\ninput_str = input().strip()\n\n# Print the most frequent character\nprint(most_frequent_character(input_str))",
+          "frac": 0.36363636363636365,
+          "n_tests": 11,
+          "n_failed": 7
+        }
+      ]
+    },
+    "C4_coder7b_widerN": {
+      "model": "Qwen/Qwen2.5-Coder-7B",
+      "target_artifact_frac": 0.659,
+      "band": [
+        0.559,
+        0.759
+      ],
+      "band_halfwidth": 0.1,
+      "note": "Coder-7B at match, wider band +/-0.10 -> n~37 (40 unreachable from this donor); confirms/bounds the n=20 Phase-7 sink",
+      "n": 37,
+      "mean_artifact_frac": 0.6483,
+      "dropped_count": 43,
+      "artifacts": [
+        {
+          "qid": "abc326_b",
+          "cand_idx": 16,
+          "code": "# Read the input from standard input\nN = int(input())\n\n# Find the smallest 326-like number greater than or equal to N\nwhile True:\n    N += 1\n    if int(str(N)[0]) * int(str(N)[1]) == int(str(N)[2]):\n        break\n\n# Print the answer to standard output\nprint(N)",
+          "frac": 0.6,
+          "n_tests": 15,
+          "n_failed": 6
+        },
+        {
+          "qid": "abc322_b",
+          "cand_idx": 11,
+          "code": "import sys\n\nN, M = map(int, input().split())\nS = input().strip()\nT = input().strip()\n\nif N > M:\n    print(3)\nelif S == T:\n    print(0)\nelif S in T and S != T[:N]:\n    print(2)\nelse:\n    print(1)",
+          "frac": 0.6,
+          "n_tests": 15,
+          "n_failed": 6
+        },
+        {
+          "qid": "abc302_a",
+          "cand_idx": 28,
+          "code": "import math\n\n# read input from standard input\na, b = map(int, input().split())\n\n# calculate minimum number of attacks required\nmin_attacks = math.ceil(a / b)\n\n# write answer to standard output\nprint(min_attacks)",
+          "frac": 0.7333333333333333,
+          "n_tests": 15,
+          "n_failed": 4
+        },
+        {
+          "qid": "abc310_a",
+          "cand_idx": 2,
+          "code": "n, p, q, *ds = map(int, open(0).read().split())\nprint(min(p, q) + min(ds))",
+          "frac": 0.6666666666666666,
+          "n_tests": 15,
+          "n_failed": 5
+        },
+        {
+          "qid": "abc343_a",
+          "cand_idx": 0,
+          "code": "A, B = map(int, input().split())\nprint(9 if A + B == 9 else A + B + 1)",
+          "frac": 0.6666666666666666,
+          "n_tests": 12,
+          "n_failed": 4
+        },
+        {
+          "qid": "abc337_b",
+          "cand_idx": 28,
+          "code": "s = input()\nif s in 'AAAAABBBBCCCC':\n    print('Yes')\nelse:\n    print('No')",
+          "frac": 0.6666666666666666,
+          "n_tests": 15,
+          "n_failed": 5
+        },
+        {
+          "qid": "abc327_a",
+          "cand_idx": 4,
+          "code": "from sys import stdin\n\nN = int(stdin.readline())\nS = stdin.readline()[:-1]\n\na_pos = None\nfor i in range(1, N):\n\tif S[i-1] == 'a' and S[i] == 'b':\n\t\tif a_pos is None:\n\t\t\ta_pos = i - 1\n\t\telse:\n\t\t\tif a_pos < i - 1:\n\t\t\t\tprint('Yes')\n\t\t\t\texit()\n\nprint('No')",
+          "frac": 0.6,
+          "n_tests": 15,
+          "n_failed": 6
+        },
+        {
+          "qid": "abc304_b",
+          "cand_idx": 20,
+          "code": "# Read the input from standard input\nN = int(input())\n\n# Determine the number of digits in N and truncate the appropriate digit\ndigits = str(N)\nif len(digits) <= 7:\n    print(N)\nelif len(digits) <= 8:\n    print(digits[:-1])\nelif len(digits) <= 9:\n    print(digits[:-2])\nelif len(digits) <= 10:\n    print(digits[:-3])\nelif len(digits) <= 11:\n    print(digits[:-4])\nelif len(digits) <= 12:\n    print(digits[:-5])\nelif len(digits) <= 13:\n    print(digits[:-6])\nelif len(digits) <= 14:\n    print(digits[:-7])\nelif len(digits) <= 15:\n    print(digits[:-8])\nelse:\n    print(digits[:-9])",
+          "frac": 0.6666666666666666,
+          "n_tests": 15,
+          "n_failed": 5
+        },
+        {
+          "qid": "1873_A",
+          "cand_idx": 0,
+          "code": "t = int(input())\nfor _ in range(t):\n    s = input()\n    if s == 'abc':\n        print('YES')\n    elif s[0] == s[2]:\n        print('YES')\n    else:\n        print('NO')",
+          "frac": 0.6,
+          "n_tests": 5,
+          "n_failed": 2
+        },
+        {
+          "qid": "abc301_a",
+          "cand_idx": 7,
+          "code": "N = int(input())\nS = input()\n\ntakahashi_wins = 0\naoki_wins = 0\n\nfor i in range(N):\n    if S[i] == 'T':\n        takahashi_wins += 1\n    else:\n        aoki_wins += 1\n\nif takahashi_wins > aoki_wins:\n    print('T')\nelif takahashi_wins < aoki_wins:\n    print('A')\nelse:\n    print('T') if S[-1] == 'T' else print('A')",
+          "frac": 0.6666666666666666,
+          "n_tests": 15,
+          "n_failed": 5
+        },
+        {
+          "qid": "abc314_b",
+          "cand_idx": 15,
+          "code": "import sys\n\nN = int(input())\nB = []\nfor _ in range(N):\n    C = int(input())\n    A = list(map(int, input().split()))\n    B.append((C, A))\nX = int(input())\n\ncount = 0\nfor i in range(N):\n    C, A = B[i]\n    if X in A:\n        count += 1\n\nprint(count)\nfor i in range(N):\n    C, A = B[i]\n    if X in A:\n        print(i + 1, end=' ')",
+          "frac": 0.6,
+          "n_tests": 15,
+          "n_failed": 6
+        },
+        {
+          "qid": "abc309_a",
+          "cand_idx": 8,
+          "code": "# read input\nA, B = map(int, input().split())\n\n# determine if the two squares are adjacent horizontally\nif 7 <= A and A <= 9 and 1 <= B and B <= 3:\n    print(\"Yes\")\nelse:\n    print(\"No\")",
+          "frac": 0.6923076923076923,
+          "n_tests": 13,
+          "n_failed": 4
+        },
+        {
+          "qid": "abc318_a",
+          "cand_idx": 2,
+          "code": "n, m, p = map(int, input().split())\n# Initialize the count of days on which Takahashi can see a full moon\ncount = 0\n# Start from day 1 and iterate until day n\nfor day in range(1, n+1):\n    # Check if the current day is a multiple of p and it is later than m\n    if day % p == 0 and day > m:\n        count += 1\n# Print the count\nprint(count)",
+          "frac": 0.6,
+          "n_tests": 15,
+          "n_failed": 6
+        },
+        {
+          "qid": "abc310_b",
+          "cand_idx": 13,
+          "code": "N, M = map(int, input().split())\nprices = []\nfunctions = []\n\nfor i in range(N):\n    P, C, *F = map(int, input().split())\n    prices.append(P)\n    functions.append(F)\n\nfor i in range(N):\n    for j in range(i + 1, N):\n        if prices[i] >= prices[j]:\n            all_in = True\n            for f in functions[i]:\n                if f not in functions[j]:\n                    all_in = False\n                    break\n            if all_in:\n                print('Yes')\n                exit()\n\nprint('No')",
+          "frac": 0.7333333333333333,
+          "n_tests": 15,
+          "n_failed": 4
+        },
+        {
+          "qid": "abc313_a",
+          "cand_idx": 24,
+          "code": "import sys\n\n# read input\nn = int(sys.stdin.readline().strip())\np = list(map(int, sys.stdin.readline().strip().split()))\n\n# find the minimum non-negative integer x such that P_1 + x > P_i for all i \\neq 1\nx = 0\nfor i in range(1, n):\n    if p[i] <= p[0]:\n        x = max(x, p[i] - p[0] + 1)\n\n# print the answer\nprint(x)",
+          "frac": 0.6,
+          "n_tests": 15,
+          "n_failed": 6
+        },
+        {
+          "qid": "abc324_a",
+          "cand_idx": 3,
+          "code": "input_str = \"3 2 4\"\ninput_list = list(map(int, input_str.split()))\nprint(\"Yes\" if input_list.count(input_list[0]) == len(input_list) else \"No\")",
+          "frac": 0.6,
+          "n_tests": 15,
+          "n_failed": 6
+        },
+        {
+          "qid": "abc332_a",
+          "cand_idx": 44,
+          "code": "N, S, K = map(int, input().split())\nP = [0] * N\nQ = [0] * N\nfor i in range(N):\n    P[i], Q[i] = map(int, input().split())\n    if Q[i] >= S:\n        K = 0\n    else:\n        K = 500\n    P[i] *= Q[i]\nP.sort(reverse=True)\nans = 0\nfor i in range(N):\n    ans += P[i]\nprint(ans + max(0, S - ans - K))",
+          "frac": 0.7333333333333333,
+          "n_tests": 15,
+          "n_failed": 4
+        },
+        {
+          "qid": "abc319_b",
+          "cand_idx": 35,
+          "code": "import sys\n\ndef read_input():\n    return int(sys.stdin.readline())\n\nn = read_input()\ns = []\nfor i in range(n+1):\n    for j in range(1, 10):\n        if i % (n/j) == 0:\n            s.append(j % 10)\n            break\n    else:\n        s.append(-1)\nprint(''.join(str(k) for k in s))",
+          "frac": 0.6,
+          "n_tests": 15,
+          "n_failed": 6
+        },
+        {
+          "qid": "abc311_a",
+          "cand_idx": 39,
+          "code": "if __name__ == '__main__':\n    N = int(input())\n    S = input()\n    count = 0\n    for i in range(N):\n        if all(x in S[:i] for x in 'ABC'):\n            print(i)\n            break",
+          "frac": 0.6923076923076923,
+          "n_tests": 13,
+          "n_failed": 4
+        },
+        {
+          "qid": "abc303_a",
+          "cand_idx": 3,
+          "code": "input_str = \"3\\nl0w\\n1ow\"\nwords = input_str.split(\"\\n\")\nN = int(words[0])\nS = words[1]\nT = words[2]\n\n# Create a list of tuples where each tuple contains a character from S and T\nchar_pairs = [(S[i], T[i]) for i in range(N)]\n\n# Use a set to keep track of the unique characters seen so far\nunique_chars = set()\n\n# Iterate over each character pair\nfor a, b in char_pairs:\n    # If the characters are not similar, print No and exit the program\n    if a != b:\n        if a not in unique_chars and b not in unique_chars:\n            unique_chars.add(a)\n            unique_chars.add(b)\n        else:\n            print(\"No\")\n            exit(0)\n\n# If all character pairs are similar, print Yes\nprint(\"Yes\")",
+          "frac": 0.6666666666666666,
+          "n_tests": 15,
+          "n_failed": 5
+        },
+        {
+          "qid": "abc305_a",
+          "cand_idx": 8,
+          "code": "# read input\nN = int(input())\n\n# calculate position of nearest water station\nposition = N // 5 * 5\n\n# print output\nprint(position)",
+          "frac": 0.7,
+          "n_tests": 10,
+          "n_failed": 3
+        },
+        {
+          "qid": "abc312_a",
+          "cand_idx": 18,
+          "code": "S = input()\nif S in \"ACEBDFCG\":\n    print(\"Yes\")\nelse:\n    print(\"No\")",
+          "frac": 0.6428571428571429,
+          "n_tests": 14,
+          "n_failed": 5
+        },
+        {
+          "qid": "abc308_a",
+          "cand_idx": 19,
+          "code": "s = input().split()\nfor i in range(1, 8):\n    if int(s[i]) < int(s[i-1]):\n        print(\"No\")\n        exit()\nfor i in range(1, 9):\n    if int(s[i]) % 25 != 0:\n        print(\"No\")\n        exit()\nprint(\"Yes\")",
+          "frac": 0.6666666666666666,
+          "n_tests": 15,
+          "n_failed": 5
+        },
+        {
+          "qid": "abc326_a",
+          "cand_idx": 0,
+          "code": "x, y = map(int, input().split())\nif (y - x) % 5 <= 3:\n    print(\"Yes\")\nelse:\n    print(\"No\")",
+          "frac": 0.6,
+          "n_tests": 15,
+          "n_failed": 6
+        },
+        {
+          "qid": "abc321_a",
+          "cand_idx": 0,
+          "code": "n = int(input())\nm = 0\nwhile n > 0:\n    m = int(str(n % 10) + str(m))\n    n = n // 10\nif m > n:\n    print('Yes')\nelse:\n    print('No')",
+          "frac": 0.6,
+          "n_tests": 15,
+          "n_failed": 6
+        },
+        {
+          "qid": "abc327_b",
+          "cand_idx": 8,
+          "code": "import math\n\nb = int(input())\nfor a in range(1, int(math.sqrt(b))+1):\n    if a**a == b:\n        print(a)\n        break\nelse:\n    print(-1)",
+          "frac": 0.6666666666666666,
+          "n_tests": 15,
+          "n_failed": 5
+        },
+        {
+          "qid": "abc307_b",
+          "cand_idx": 3,
+          "code": "from collections import defaultdict\nfrom typing import Tuple\n\ndef is_palindrome(s: str) -> bool:\n    return s == s[::-1]\n\ndef find_distinct_palindromes(strings: Tuple[str, ...]) -> bool:\n    counts = defaultdict(int)\n    for s in strings:\n        counts[s] += 1\n\n    for s in strings:\n        for i in range(1, len(s)):\n            if is_palindrome(s[:i]) and is_palindrome(s[i:]):\n                return True\n            if is_palindrome(s[:i]) and is_palindrome(s[i+1:]):\n                return True\n            if is_palindrome(s[:i+1]) and is_palindrome(s[i:i+1]):\n                return True\n\n    return False\n\nif __name__ == \"__main__\":\n    N = int(input())\n    strings = tuple(input() for _ in range(N))\n\n    if find_distinct_palindromes(strings):\n        print(\"Yes\")\n    else:\n        print(\"No\")",
+          "frac": 0.6,
+          "n_tests": 15,
+          "n_failed": 6
+        },
+        {
+          "qid": "abc333_b",
+          "cand_idx": 27,
+          "code": "from math import sqrt\n\nP = {'A': (0, 0), 'B': (1, 0), 'C': (sqrt(3)/2, sqrt(3)/2), 'D': (sqrt(3)/2, -sqrt(3)/2), 'E': (-sqrt(3)/2, -sqrt(3)/2)}\n\ndef get_distance(p1, p2):\n    return sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)\n\nS1, S2 = input()\nT1, T2 = input()\n\nif get_distance(P[S1], P[S2]) == get_distance(P[T1], P[T2]):\n    print('Yes')\nelse:\n    print('No')",
+          "frac": 0.6666666666666666,
+          "n_tests": 15,
+          "n_failed": 5
+        },
+        {
+          "qid": "abc331_a",
+          "cand_idx": 14,
+          "code": "def next_day(y, m, d, days_in_month):\n    if d < days_in_month:\n        return y, m, d + 1\n    else:\n        if m == 12:\n            return y + 1, 1, 1\n        else:\n            return y, m + 1, 1\n\nM, D = map(int, input().split())\ny, m, d = map(int, input().split())\n\ny, m, d = next_day(y, m, d, D)\n\nprint(y, m, d)",
+          "frac": 0.7272727272727273,
+          "n_tests": 11,
+          "n_failed": 3
+        },
+        {
+          "qid": "abc336_b",
+          "cand_idx": 48,
+          "code": "# Read the input.\nN = int(input())\n\n# Find the leading zero.\nleading_zero = 0\nwhile N % 2 == 0:\n    leading_zero += 1\n    N //= 2\n\n# Find the number of trailing zeros.\ntrailing_zero = 0\nwhile N % 2 == 1 and N != 0:\n    trailing_zero += 1\n    N //= 2\n\n# Print the answer.\nprint(max(leading_zero, trailing_zero))",
+          "frac": 0.6666666666666666,
+          "n_tests": 15,
+          "n_failed": 5
+        },
+        {
+          "qid": "abc342_a",
+          "cand_idx": 30,
+          "code": "# Read input from standard input\nS = input()\n\n# Find the index of the first character that is different from the middle character\nfor i in range(len(S)):\n    if i == len(S)//2 or i == len(S)//2 - 1 or i == len(S)//2 + 1:\n        continue\n    if S[i] != S[len(S)//2]:\n        print(i + 1)\n        break",
+          "frac": 0.6153846153846154,
+          "n_tests": 13,
+          "n_failed": 5
+        },
+        {
+          "qid": "abc324_b",
+          "cand_idx": 5,
+          "code": "import sys\n\nN = int(sys.stdin.readline().strip())\n\nfor x in range(0, 6):\n    for y in range(0, 6):\n        if 2**x * 3**y == N:\n            print(\"Yes\")\n            sys.exit()\n\nprint(\"No\")",
+          "frac": 0.6666666666666666,
+          "n_tests": 15,
+          "n_failed": 5
+        },
+        {
+          "qid": "abc337_a",
+          "cand_idx": 35,
+          "code": "import sys\n\ndef read_ints():\n    return list(map(int, next(sys.stdin).split()))\n\nN = int(next(sys.stdin))\n\nsum_takahashi = sum(read_ints())\nsum_aoki = sum(read_ints())\n\nif sum_takahashi > sum_aoki:\n    print(\"Takahashi\")\nelif sum_takahashi < sum_aoki:\n    print(\"Aoki\")\nelse:\n    print(\"Draw\")",
+          "frac": 0.6153846153846154,
+          "n_tests": 13,
+          "n_failed": 5
+        },
+        {
+          "qid": "abc320_b",
+          "cand_idx": 8,
+          "code": "# read input string\ns = input()\n\n# use dynamic programming to find the maximum length of a contiguous substring of s that is a palindrome\n# dp[i][j] is the maximum length of a contiguous substring of s[i:j] that is a palindrome\ndp = [[0]*len(s) for i in range(len(s))]\nfor i in range(len(s)):\n    dp[i][i] = 1\nfor i in range(1, len(s)):\n    for j in range(len(s)-i):\n        if s[j]==s[j+i] and dp[j+1][j+i-1]:\n            dp[j][j+i] = i+1\n# print maximum length of a contiguous substring of s that is a palindrome\nprint(max(dp[i][j] for i in range(len(s)) for j in range(i,len(s))))",
+          "frac": 0.6666666666666666,
+          "n_tests": 15,
+          "n_failed": 5
+        },
+        {
+          "qid": "abc340_a",
+          "cand_idx": 23,
+          "code": "# Read first term, last term, and common difference from standard input\nA, B, D = map(int, input().split())\n\n# Check if such an arithmetic sequence exists\nif A < B and D != 0 and (B - A) % D == 0:\n    # Calculate the number of terms in the sequence\n    n = (B - A) // D + 1\n    \n    # Generate and print the sequence\n    for i in range(n):\n        print(A + i * D, end=' ')\nelse:\n    print(\"No arithmetic sequence exists\")",
+          "frac": 0.6666666666666666,
+          "n_tests": 12,
+          "n_failed": 4
+        },
+        {
+          "qid": "abc323_a",
+          "cand_idx": 7,
+          "code": "for c in input():\n    if c != '0':\n        print('No')\n        break\nelse:\n    print('Yes')",
+          "frac": 0.6,
+          "n_tests": 15,
+          "n_failed": 6
+        },
+        {
+          "qid": "abc338_b",
+          "cand_idx": 1,
+          "code": "from collections import Counter\nimport sys\n\nif __name__ == '__main__':\n    S = sys.stdin.readline().strip()\n    c = Counter(S)\n    ans = sorted(c.most_common(), key=lambda x: (x[0], x[1]))[0]\n    print(ans[0])",
+          "frac": 0.6363636363636364,
+          "n_tests": 11,
+          "n_failed": 4
+        }
+      ]
+    }
+  }
+}

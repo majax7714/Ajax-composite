@@ -1796,3 +1796,255 @@ def j7_matched(cell: str = "M1_deepseek1p3b"):
           f"| actual Δart {mean_copy-mean_e0:+.3f} | p_below_iid {p_sink_iid:.4f} "
           f"| MATCHED-SINK {matched_sink} (n={n}"
           f"{'' if cinfo['min_n_met'] else ' <MIN_N — underpowered'}) ===")
+
+
+# ========================================================================
+# Phase 8 — mechanism (D3 perplexity) + confound closures (C2/C3/C4)
+# ([PHASE_8.md]). Additive; reuses h1_gen_lcb / h1_lcb_exec / _d2c_* / _stack_block.
+# ========================================================================
+
+PHI1 = "microsoft/phi-1"
+PHI1_REV = "d4c0adcb065e84e00ca814e35cba3012ea9841ab"  # synthetic code pedagogy (C3)
+
+# C-cell -> (model_id, revision, seed). DeepSeek/Coder7B reuse the P0.1 pins;
+# C4 uses a DISTINCT seed (43) from the M4 run (17) per the distinct-seed protocol.
+J8_CELLS = {
+    "C2_deepseek_below0": ("deepseek-ai/deepseek-coder-1.3b-base",
+                           "c919139c3a9b4070729c8b2cca4847ab29ca8d94", 17),
+    "C4_coder7b_widerN":  ("Qwen/Qwen2.5-Coder-7B",
+                           "0396a76181e127dfc13e5c5ec48a8cee09938b02", 43),
+}
+
+PPL_IMAGE = (
+    modal.Image.debian_slim(python_version="3.12")
+    .pip_install("torch==2.8.0", "transformers==4.57.0", "accelerate")
+    .env({"HF_HOME": "/cache/hf", "TOKENIZERS_PARALLELISM": "false",
+          "HF_HUB_OFFLINE": "1", "HF_DATASETS_OFFLINE": "1"})
+)
+
+
+@app.function(image=PPL_IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=3600)
+def j8_ppl(model_id: str, revision: str, groups: dict, tag: str):
+    """D3 — mean per-token NLL of `model_id` on each group of code strings.
+    Returns {group: {mean_nll, n_seqs}}. Blunt exemplar-credibility proxy."""
+    def compute():
+        import torch
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        tok = AutoTokenizer.from_pretrained(model_id, revision=revision)
+        model = AutoModelForCausalLM.from_pretrained(
+            model_id, revision=revision, torch_dtype=torch.bfloat16).to("cuda").eval()
+        out = {}
+        for name, codes in groups.items():
+            nlls = []
+            for c in codes:
+                if not c:
+                    continue
+                ids = tok(c, return_tensors="pt", truncation=True,
+                          max_length=1024).input_ids.to("cuda")
+                if ids.shape[1] < 2:
+                    continue
+                with torch.no_grad():
+                    nlls.append(float(model(ids, labels=ids).loss))
+            out[name] = {"mean_nll": (sum(nlls) / len(nlls)) if nlls else None,
+                         "n_seqs": len(nlls)}
+        return out
+    return _cache_or(tag, compute)
+
+
+def _e0_codes(cand_pool, n):
+    """Flatten the E0 (first n) half of a gen cand pool into code strings."""
+    return [c for row in cand_pool[:n] for c in row["codes"] if c]
+
+
+@app.local_entrypoint()
+def j8_d3():
+    """D3 — artifact perplexity probe ([PHASE_8.md] D3; now DECISIVE per the D-rule).
+    For each cell's model: mean NLL on (a) its conditioning artifacts, (b) its own E0
+    generations (self-baseline). RECLASS => Coder models find matched artifacts as
+    UNSURPRISING as their own output (surprise_ratio ~ 1) yet sink; OOD => elevated
+    surprise on matched artifacts for Coder vs non-Coder. Writes h8_d3_perplexity.json."""
+    d2c = _d2c_artifacts()
+    d2c_codes = [a["code"] for a in d2c]
+    h7 = json.loads((REPO / "artifacts/h7_matched_artifacts.json").read_text())["cells"]
+    donor_cand = json.loads(
+        (REPO / "runs/modal/lcb_cand_lcb_r2_base_T08.json").read_text())["codes"]
+    donor_res = json.loads(
+        (REPO / "runs/modal/lcb_res_lcb_r2_base_T08.json").read_text())
+    donor_cb = dict(zip(donor_res["question_ids"], donor_cand))
+
+    def matched_codes(cell):
+        return [donor_cb[a["qid"]][a["cand_idx"]] for a in h7[cell]["artifacts"]]
+
+    def matched_e0(cell):
+        return _e0_codes(_load(f"j7_cand_{cell}"), h7[cell]["n"])
+
+    # 1.5B base self-gens: donor candidates (non-artifact), up to 6/problem
+    art_ci = {a["qid"]: a["cand_idx"] for a in d2c}
+    base_self = []
+    for a in d2c:
+        got = 0
+        for i, c in enumerate(donor_cb[a["qid"]]):
+            if c and i != art_ci[a["qid"]]:
+                base_self.append(c)
+                got += 1
+                if got >= 6:
+                    break
+
+    # (name, model, rev, diet, artifacts, self_e0)
+    specs = [
+        ("coder1p5b_sink", QWEN_BASE, QWEN_BASE_REV, "coder", d2c_codes, base_self),
+        ("coder3b_sink", *J6_MODELS["qwen3b"], "coder", d2c_codes,
+         _e0_codes(_load("j6_q1a_cand_qwen3b"), 44)),
+        ("M4_coder7b_sink", *J7_MODELS["M4_coder7b"], "coder",
+         matched_codes("M4_coder7b"), matched_e0("M4_coder7b")),
+        ("M5_coder0p5b", *J7_MODELS["M5_coder0p5b"], "coder",
+         matched_codes("M5_coder0p5b"), matched_e0("M5_coder0p5b")),
+        ("M1_deepseek_clean", *J7_MODELS["M1_deepseek1p3b"], "organic",
+         matched_codes("M1_deepseek1p3b"), matched_e0("M1_deepseek1p3b")),
+        ("M2_general_clean", *J7_MODELS["M2_general1p5b"], "general",
+         matched_codes("M2_general1p5b"), matched_e0("M2_general1p5b")),
+        ("M3_starcoder_clean", *J7_MODELS["M3_starcoder2_3b"], "organic",
+         matched_codes("M3_starcoder2_3b"), matched_e0("M3_starcoder2_3b")),
+    ]
+    rows = {}
+    for name, mid, rev, diet, arts, self_g in specs:
+        r = _load(f"j8_ppl_{name}") or _persist(
+            f"j8_ppl_{name}",
+            j8_ppl.remote(mid, rev, {"artifacts": arts, "self_e0": self_g},
+                          tag=f"j8_ppl_{name}"))
+        pa, ps = r["artifacts"]["mean_nll"], r["self_e0"]["mean_nll"]
+        ratio = pa / ps if (pa and ps) else None
+        rows[name] = {"diet": diet, "model": mid, "ppl_artifacts": pa, "ppl_self": ps,
+                      "surprise_ratio": ratio}
+        print(f"{name:20s} diet={diet:8s} ppl_art={pa:.3f} ppl_self={ps:.3f} "
+              f"ratio={ratio:.3f}")
+
+    coder_r = [v["surprise_ratio"] for k, v in rows.items() if v["diet"] == "coder"]
+    other_r = [v["surprise_ratio"] for k, v in rows.items() if v["diet"] != "coder"]
+    mc = sum(coder_r) / len(coder_r)
+    mo = sum(other_r) / len(other_r)
+    call = ("D3 => M-RECLASS-consistent (Coder surprise_ratio ~ non-Coder; matched "
+            "artifacts are exemplar-credible, not off-manifold)" if mc <= mo + 0.10
+            else "D3 => M-OOD-consistent (Coder matched artifacts MORE surprising)")
+    print(f"\nmean surprise_ratio  coder={mc:.3f}  non-coder={mo:.3f}\nD3 CALL: {call}")
+    out = {"_label": "Phase 8 D3 artifact perplexity [PHASE_8.md D3]",
+           "rows": rows, "mean_ratio_coder": round(mc, 4),
+           "mean_ratio_noncoder": round(mo, 4), "d3_call": call}
+    (REPO / "artifacts/h8_d3_perplexity.json").write_text(json.dumps(out, indent=2))
+    print("wrote artifacts/h8_d3_perplexity.json")
+
+
+def _matched_cell(model_id, rev, seed, arts, cell, source_label):
+    """Shared C-cell runner: E0 + E1 on `arts`, all-cases judge, sink signature."""
+    import random
+    import statistics as st
+    n = len(arts)
+    items = ([{"qid": a["qid"], "context": None} for a in arts]
+             + [{"qid": a["qid"], "context": _d2c_context(a)} for a in arts])
+    dgen = _load(f"j8_cand_{cell}") or _persist(
+        f"j8_cand_{cell}",
+        h1_gen_lcb.remote(model_id, items, 8, tag=f"j8_cand_{cell}", seed=seed,
+                          revision=rev))
+    dres = _load(f"j8_res_{cell}") or _persist(
+        f"j8_res_{cell}",
+        h1_lcb_exec.remote([g["qid"] for g in dgen], [g["codes"] for g in dgen],
+                           tag=f"j8_res_{cell}"))
+    e0 = [st.mean(x["frac"] for x in row) for row in dres[:n]]
+    e1 = [st.mean(x["frac"] for x in row) for row in dres[n:]]
+    copy_null = [a["frac"] for a in arts]
+    d_iid = [b - a for a, b in zip(e0, e1)]
+    p_sink = _wilcoxon_mc_one_sided([-x for x in d_iid])
+    me0, me1, mc = st.mean(e0), st.mean(e1), st.mean(copy_null)
+    effect = me1 - me0
+    rng = random.Random(17)
+    boot = sorted(st.mean(rng.choice(d_iid) for _ in d_iid) for _ in range(2000))
+    ci = [round(boot[49], 4), round(boot[1949], 4)]
+    sink = bool(me1 < me0 and p_sink < 0.05 and effect <= -0.05)
+    out = {"_label": f"Phase 8 {cell} [PHASE_8.md]", "cell": cell, "model": model_id,
+           "revision": rev, "seed": seed, "n_problems": n, "source": source_label,
+           "mean_iid_e0": round(me0, 4), "mean_cond_e1": round(me1, 4),
+           "mean_copy_null": round(mc, 4), "delta_cond_minus_iid": round(effect, 4),
+           "delta_cond_minus_iid_ci95": ci, "actual_delta_art": round(mc - me0, 4),
+           "p_one_sided_cond_below_iid": p_sink, "matched_sink_signature": sink,
+           "stack": _stack_block()}
+    (REPO / f"artifacts/h8_matched_{cell}.json").write_text(json.dumps(out, indent=2))
+    print(f"=== j8 {cell}: iid {me0:.3f} → cond {me1:.3f} (copy {mc:.3f}) | "
+          f"Δvs_iid {effect:+.3f} CI {ci} | actual Δart {mc-me0:+.3f} | "
+          f"p_below_iid {p_sink:.4f} | SINK {sink} (n={n}, seed {seed}) ===")
+    return out
+
+
+@app.local_entrypoint()
+def j8_matched(cell: str = "C2_deepseek_below0"):
+    """C2/C4 confound cells (run j7_smoke on the model first if new)."""
+    model_id, rev, seed = J8_CELLS[cell]
+    c = json.loads((REPO / "artifacts/h8_c_artifacts.json").read_text())["cells"][cell]
+    _matched_cell(model_id, rev, seed, c["artifacts"], cell,
+                  f"mined donor @ {c['band']} (n={c['n']})")
+
+
+@app.local_entrypoint()
+def j8_phi_smoke():
+    """C3 phi-1 smoke gate (its prompt format differs — a FAIL is reported, not forced)."""
+    qids = _lcb_easy_qids()[:8]
+    gen = _load("j8_phi_smoke_cand") or _persist(
+        "j8_phi_smoke_cand",
+        h1_gen_lcb.remote(PHI1, [{"qid": q, "context": None} for q in qids], 8,
+                          tag="j8_phi_smoke_cand", revision=PHI1_REV))
+    flat = [c for g in gen for c in g["codes"]]
+    wf = sum(1 for c in flat if c) / len(flat)
+    dg = sum(1 for c in flat if c and len(c) < 20) / max(1, sum(1 for c in flat if c))
+    res = _load("j8_phi_smoke_res") or _persist(
+        "j8_phi_smoke_res",
+        h1_lcb_exec.remote([g["qid"] for g in gen], [g["codes"] for g in gen],
+                           tag="j8_phi_smoke_res", short_circuit=True))
+    npass = sum(1 for row in res for r in row if r["passed"])
+    ok = wf >= 0.85 and dg <= 0.10
+    print(f"=== j8 phi smoke: wf {wf:.3f} dg {dg:.3f} passed {npass}/{len(flat)} → "
+          f"{'PASS' if ok else 'FAIL — REPORT, do not force'} ===")
+    print("sample:\n" + next((c for c in flat if c), "")[:400])
+
+
+@app.local_entrypoint()
+def j8_c3_phi():
+    """C3 — phi-1 at its OWN match (two-phase: measure iid → mine → condition).
+    Second synthetic-code family; moves the diet attribution past n=1. Run
+    j8_phi_smoke first. Writes artifacts/h8_matched_C3_phi1_match.json."""
+    import statistics as st
+    arts44 = _d2c_artifacts()
+    qids = [a["qid"] for a in arts44]  # measure phi iid on the D2c problem universe
+    # Phase 1 — phi i.i.d. on the cell problems
+    e0gen = _load("j8_c3_phi_e0") or _persist(
+        "j8_c3_phi_e0",
+        h1_gen_lcb.remote(PHI1, [{"qid": q, "context": None} for q in qids], 8,
+                          tag="j8_c3_phi_e0", revision=PHI1_REV))
+    e0res = _load("j8_c3_phi_e0res") or _persist(
+        "j8_c3_phi_e0res",
+        h1_lcb_exec.remote([g["qid"] for g in e0gen], [g["codes"] for g in e0gen],
+                           tag="j8_c3_phi_e0res"))
+    iid_by_qid = {q: st.mean(x["frac"] for x in row)
+                  for q, row in zip(qids, e0res)}
+    phi_iid = st.mean(iid_by_qid.values())
+    print(f"phi-1 i.i.d. on {len(qids)} problems: {phi_iid:.3f}")
+
+    # Phase 2 — mine donor at phi's match band, condition phi on it
+    donor = json.loads((REPO / "runs/modal/lcb_cand_lcb_r2_base_T08.json").read_text())
+    dres = json.loads((REPO / "runs/modal/lcb_res_lcb_r2_base_T08.json").read_text())
+    cb = dict(zip(dres["question_ids"], donor["codes"]))
+    rb = dict(zip(dres["question_ids"], dres["results"]))
+    lo, hi = phi_iid - 0.05, phi_iid + 0.05
+    arts = []
+    for q in dres["question_ids"]:
+        inb = [(i, r) for i, r in enumerate(rb[q]) if lo <= r["frac"] <= hi and cb[q][i]]
+        if inb:
+            i, r = min(inb, key=lambda ir: (abs(ir[1]["frac"] - phi_iid), ir[0]))
+            arts.append({"qid": q, "cand_idx": i, "code": cb[q][i], "frac": r["frac"],
+                         "n_tests": r["n_tests"], "n_failed": r["n_tests"] - r["n_passed"]})
+    print(f"phi matched set: n={len(arts)} at band [{lo:.3f},{hi:.3f}]")
+    (REPO / "artifacts/h8_c3_phi_matched_set.json").write_text(
+        json.dumps({"phi_iid": phi_iid, "band": [lo, hi], "n": len(arts),
+                    "artifacts": arts}, indent=2))
+    if len(arts) < 20:
+        print(f"WARN: phi coverage {len(arts)} < 20 — scoped/underpowered, recorded")
+    _matched_cell(PHI1, PHI1_REV, 17, arts, "C3_phi1_match",
+                  f"phi iid {phi_iid:.3f}; mined donor @ [{lo:.3f},{hi:.3f}] (n={len(arts)})")

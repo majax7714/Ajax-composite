@@ -310,6 +310,27 @@ binds: C5, then the C1 mirror). Index/figure/ledger updates → close.
 3. **C4:** accept n ≈ 37 ceiling (±0.10 band), or defer 7B confirmation?
 4. **C3:** phi-1.5 the second-family pick — confirm, and the ledger entry lands first.
 
+### Sign-off decisions (2026-07-18) + concrete parameters
+
+**Author decisions:** run the **core battery — D3 + C2 + C4 + C3**; **defer C1**
+(provenance recorded OPEN); **drop C5**. Frozen parameters:
+- **D3** (now decisive): perplexity of 7 cell-models on their conditioning artifacts
+  vs their own E0 generations (surprise_ratio). `j8_d3`.
+- **C2** DeepSeek-1.3B at Δ_art −0.04: donor mined @ 0.322 ±0.05, **n = 29**, seed 17.
+  `j8_matched C2_deepseek_below0`.
+- **C4** Coder-7B at match, wider band **±0.10, n = 37** (40 unreachable — recorded),
+  **distinct seed 43** (M4 used 17). `j8_matched C4_coder7b_widerN`.
+- **C3** **phi-1** (code, not phi-1.5 — the synthetic-*code* pedagogy model; SHA
+  `d4c0adcb…`, tie=False), two-phase (measure iid → mine donor at its band → condition),
+  smoke-gated (fail reported not forced). Ledger entry landed (§11). `j8_phi_smoke`
+  then `j8_c3_phi`.
+- **C1 DEFERRED — provenance confound recorded OPEN:** the sink cells saw diet-matched
+  (Coder-1.5B-base) artifacts, the clean cells diet-mismatched; DeepSeek's self-pool is
+  un-minable (4/80) and generating self-artifacts would put the generated-artifact
+  variable into the highest-stakes cell. Recorded as a standing OPEN confound + a named
+  successor (generated-self-artifact provenance cell).
+- **C5 dropped** (0.5B lower bound stays OPEN, named successor).
+
 **Phase gate — Phase 8 closes when:** the mechanism call is recorded (RECLASS / OOD /
 MIXED, D1+D2 agreement stated, D3 noted); the provenance (C1) and band-asymmetry (C2)
 confounds are resolved or explicitly reframed; the diet attribution carries family-n =

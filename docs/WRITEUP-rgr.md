@@ -2608,6 +2608,23 @@ the direction tranche's designs before any of it runs).*
   **direction self-production switch on by 7B** (the PlanSearch-frame minimum-
   scale question). The HMT scale trend and Codex inverse-scaling readings remain
   the priors for (i); neither speaks to (ii).*
+- **phi-1 (Gunasekar et al. 2023, "Textbooks Are All You Need") → C3, the
+  second-synthetic-code-family cell (Phase 8).** (a) *Their setup:* phi-1 (1.3B) is
+  trained on ~7B tokens — a GPT-4-classifier-filtered "educational" subset of The
+  Stack/StackOverflow (~6B) plus **~1B tokens of GPT-3.5-*generated* synthetic Python
+  textbooks + exercises**, the synthetic component being explicit
+  **problem→authoritative-solution pedagogy**. (b) *Delta to Qwen-Coder:* Qwen2.5-Coder's
+  synthetic is one component of a massive proprietary continued-pretraining corpus
+  ("scaled code synthesis"); phi-1's is a *purer, dominant* instance of the exact
+  **document grammar M-RECLASS invokes** (problem→trusted-solution exercises), at
+  ~1/10th the model size. Both are "synthetic-heavy code," but phi-1 is the closest
+  existing **independent replication of the diet**, not a copy of the recipe.
+  (c) *Licenses:* phi at match **sinking** would move the diet attribution from n=1 to
+  **n=2** and license "synthetic code pedagogy produces the sink" as a generalization
+  (ladder rung 3); phi **clean** narrows the attribution to "something in *Qwen's*
+  Coder stage" — it does **not** license "code diets do this" either way (phi is one
+  more code model; the unlicensed rung stays unlicensed). The training-data delta is
+  the interpretation hinge and is stated here before the run.
 
 *Appendix pointers. Architecture [ARCHITECTURE.md]; decision log **D1–D16**
 [DECISIONS.md] (D11 precision, D14 statistical reproducibility, D15 retracted, D16 =
