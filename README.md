@@ -51,7 +51,13 @@ elimination argument, a false-zero floor model that predicts to the decimal,
 and a cross-family audit that retracted our platform negatives as one family's
 pathology — and finally an existence proof that approach-level direction
 crosses the competence boundary, moving the open question to where direction
-comes from.
+comes from. That pathology's origin was then measured — a
+continued-pretraining-diet effect inside a narrow competence window — and
+immediately turned on itself: the origin line was found to rest on a confound
+(every family had been compared at a different model–artifact quality relation),
+so the current phase re-measures the sink with each model matched to its own
+quality, to decide whether the claim narrows to one diet or widens into a
+conditioning law.
 
 ## Map of the composite
 
@@ -64,14 +70,20 @@ comes from.
 | 3b | [PHASE_3B.md](docs/PHASE_3B.md) | The mechanism arc: escape-distance law, elimination argument, trace null at declared power, false-zero floor instrument |
 | 4 | [PHASE_4.md](docs/PHASE_4.md) | Claim hardening: cross-family battery (DeepSeek, StarCoder2), F1/SINK retracted as one-family-scoped, oracle hints cross the competence boundary |
 | 5 | [PHASE_5.md](docs/PHASE_5.md) | The journal turn (the record becomes the primary artifact) + where direction comes from: models execute direction they cannot manufacture |
+| 6 | [PHASE_6.md](docs/PHASE_6.md) | Where the pathology comes from + extraction-readiness: origin measured (a Coder-continued-pretraining diet × a competence window, MIXED across code/language channels; the tie hypothesis demoted); the flagship floor verified on a distinct-seed control (instrument 5-for-6); the claims-to-evidence layer (§0.3) built |
+| 7 | [PHASE_7.md](docs/PHASE_7.md) | *(open)* Is the sink Qwen's, the diet's, or everyone's? Phase 6's origin line was position-confounded — friendly non-Coder models were only ever measured at a different model–artifact quality relation, never in the region where the sink lives. The matched-artifact battery mines artifacts to each model's own quality and samples that region off-Coder for the first time |
 
 ## How to read
 
 Start with the journal, in its designed order: **§10** (the working method —
 the document's thesis), then **§0** (Claims & Scope Index — what the project
 currently believes, claim by claim, with status and pointers), then **§9.5**
-(live status). Historical section numbering is preserved; the reading order
-10 → 0 → 1 is intentional.
+(live status). Within §0, **§0.3** is the claims-to-evidence layer — each live
+claim mapped to its artifact, test, number, scope line, and stack lineage — so
+that an extraction is *selecting rows, not re-deriving support*. The dated
+**living-record line** at the top of the journal always states the current phase
+and where it stands. Historical section numbering is preserved; the reading
+order 10 → 0 → 1 is intentional.
 
 ## Repository map
 
