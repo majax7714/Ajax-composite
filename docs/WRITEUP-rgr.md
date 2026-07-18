@@ -24,16 +24,21 @@ cross-family audit that retracted our platform negatives as one family's
 pathology — and finally an existence proof that approach-level direction crosses
 the competence boundary, moving the open question to where direction comes from.*
 
-*Living record — last updated 2026-07-17 (**J5 — the 7B fork, signed off and
-running, [PHASE_5.md] J5**: Q1 landed — **the conditioning pathology is a
-small-Qwen (1.5B) property**: at 7B the code channel *blends* (conditioned 0.609
-between copy-null 0.494 and own-iid 0.659 — no below-both-nulls signature) and
-the language harm vanishes (Δ −0.018, ns); both frozen favourites hit. Q2: the
-medium screen hit its band (stratum 46/78) but the **power gate fired** — the 7B
-medium stratum is a **live tail, not a false-zero floor** (π₀ = 0, eleven 1/50
-near-misses; E[fresh B1-50] = 5.11 committed as the floor instrument's fourth
-out-of-sample test, band [2, 9]); the pre-registered LCB-hard extension is in
-flight — §9.9 J5 addendum, §9.5. Earlier same day: **Phase 5 complete — the
+*Living record — last updated 2026-07-17 (**J5 CLOSED — the 7B fork,
+[PHASE_5.md] J5**: Q1 — **the conditioning pathology is a small-Qwen (1.5B)
+property**: at 7B the code channel *blends* (0.609 between the nulls) and the
+language harm vanishes (Δ −0.018, ns); both frozen favourites hit. Q2 —
+**self-production does not switch on by 7B**: branch (a) at 40% (the
+favourite); the self-hint arm is floor-equivalent and only **5/101 (5%)** of
+7B self-hints are production-adequate (vs 0/68 at 1.5B, 1/76 DeepSeek); the
+cascade remains the only deployable shape through 7B. En route the record
+gained structure: the 7B medium stratum is a **live tail, not a false-zero
+floor** (π₀ = 0; the medium power gate fired; the pre-registered hard
+extension restored the substrate, π₀ = 0.76, pooled gate passed 0.816); the
+floor instrument went **4-for-5**, and its one falsification exposed a
+measured harness confound — same-seed vLLM regeneration makes "fresh" B1 arms
+≈ 50% screen-identical (§8 caveat; it also dissolves the apparent SELFHINT
+trend) — §9.9 J5 addendum, §9.5. Earlier same day: **Phase 5 complete — the
 journal turn + where direction comes from, [PHASE_5.md]**: the record reframed
 as the primary artifact (§0 Claims & Scope Index); the production question
 answered on two families — 1.3–1.5B models execute complete-strategy direction
@@ -339,20 +344,21 @@ currently believes.** Statuses: LIVE / KILLED / RETRACTED / REVERSED / SCOPED.
 | 9 | R3 null — "1.5B cannot use direction" | **REVERSED-AS-REFINED** | a *trace-channel* null, now **cross-family**: traces sit on the floor on Qwen (1/68) and DeepSeek (2/76) — a content fact, not the Qwen pathology; content, not capacity, was the variable | §9.7, §9.8, §9.9 |
 | 10 | Hint result — approach-level direction crosses the competence boundary (13/68 vs floor 2, p = 4.9e-4) | **LIVE — GENERALIZES** (J4: DeepSeek 9/76, p = 0.0039) | both families, medium strata, oracle-derived **complete-strategy-grade** hints (J2: dose-response unmeasurable on this set — weaker direction untested) | §9.8, §9.9 |
 | 11 | Qwen conditioning pathology (double dissociation: code and language channels degrade Qwen, lift DeepSeek) | **LIVE — SCOPED-TO-1.5B** (J5 Q1, 2026-07-17: at 7B the code channel blends and the language harm vanishes; both frozen favourites hit) | Qwen2.5-Coder-**1.5B** vs DeepSeek-1.3B (44-problem code cell; 20-problem language cell); StarCoder2 code-cell consistent; 7B behaves like the other families | §9.8, §9.9 J5 addendum, [PHASE_5.md] J5 |
-| 12 | Production bottleneck — "the model cannot produce hint-grade direction for itself" | **LIVE-MEASURED, cross-family** (SELFHINT on-floor both families; production-adequate 0/68 Qwen, 1/76 DeepSeek) | 1.3–1.5B, both families; the cascade is the deployable shape; minimum self-production scale open — J5 7B running: medium power gate fired (live tail), pooled hard-extension arms pending their gate | §9.9 |
+| 12 | Production bottleneck — "the model cannot produce hint-grade direction for itself" | **LIVE-MEASURED, cross-family + cross-scale** (J5 Q2 branch (a), the 40% favourite: floor-equivalent self-hint arm at 7B; production-adequate 0/68 Qwen-1.5B, 1/76 DeepSeek, **5/101 Qwen-7B**) | 1.3B–7B; **switch-on lies above 7B** — the cascade is the deployable shape through 7B; the open bracket is 7B–frontier (PlanSearch frame) | §9.9 J5 addendum, [PHASE_5.md] J5 |
 | 13 | Temperature is a dose-responsive anti-anchoring intervention | LIVE | Qwen, HumanEval cells, within the law's domain | §9.3 |
 | 14 | Provenance near-irrelevance (instruction verb ≫ provenance) | LIVE | Qwen; holds under lexical and AST metrics | §9.3, H0a follow-up |
-| 15 | False-zero floor model (two-component mixture over k=50 pools) | LIVE — **3 for 3** (2.01→2, 2.01→2, 0.00→1-in-band); **4th test committed** (7B medium: E = 5.11, band [2, 9], first non-degenerate test, pending arms) | two families, three stratum shapes — and a structural discovery: at 7B-medium the point mass vanishes (π₀ = 0, a live tail, not a false-zero floor) | §9.6, §9.9 J5 addendum, [PHASE_5.md] J5 |
+| 15 | False-zero floor model (two-component mixture over k=50 pools) | LIVE — **4 for 5** (2.01→2, 2.01→2, 0.00→1-in-band, hard 2.09→1-in-band; **medium 4th test FALSIFIED**, 5.11→1 — traced to the same-seed harness confound, §8 caveat, not the Beta-binomial component: corrected E 3.02, P(X≤1) ≈ 0.20) | two families, three stratum shapes; structural discovery: π₀ = 0 at 7B-medium (live tail), π₀ = 0.76 at 7B-hard (the floor returns with difficulty) | §9.6, §9.9 J5 addendum, [PHASE_5.md] J5 |
 
 ### 0.1 Instruments *(journal products independent of any claim)*
 
 - **The false-zero floor model** (§9.6) — **3-for-3** across two families and two
   stratum shapes (2.01→2, 2.01→2, 0.00→1-in-band); turns "pass@50 = 0" from a
-  label into an instrument with a stated noise floor. *(2026-07-17: fourth test
-  committed on the 7B medium stratum — E = 5.11, band [2, 9] — the first
-  non-degenerate test of the Beta-binomial component; and the instrument's
-  diagnostic use surfaced new structure: π₀ = 0 at 7B-medium, a live tail whose
-  power consequences fired a pre-registered gate. [PHASE_5.md] J5.)*
+  label into an instrument with a stated noise floor. *(2026-07-17, J5 close:
+  now **4-for-5** — hard 5th test hit (2.09 → 1-in-band); the medium 4th test
+  (5.11 → 1, **falsified**) was traced to the same-seed harness confound, not
+  the model component (§8 seed-policy caveat) — the falsification that found a
+  record-wide bias. Structural discoveries: π₀ = 0 at 7B-medium (live tail),
+  π₀ = 0.76 at 7B-hard. [PHASE_5.md] J5.)*
 - **The reconciliation ledger** (§11) — no external result imported as truth;
   setup/delta/licenses per entry; it has caught *our own* overclaims twice
   (Olausson rung; Codex "replication" framing).
@@ -1032,6 +1038,21 @@ historical result of the retired stack (recoverable at tag `pre-phase-m-hf-nf4`)
 compared to a post-migration number; Phase M's M3 re-baseline established a *new*
 reference, not a correction of the old.
 
+**Seed-policy caveat (2026-07-17, J5 — a measured harness property).** Seed 17
+throughout has a cost the record only saw when a floor prediction falsified:
+**same-seed vLLM regeneration of the same prompt reproduces ≈ 45–50% of a
+50-sample pool byte-for-byte** (measured on Qwen-7B medium/hard arms and a J4
+DeepSeek control). Any "fresh B1-50" drawn with the screen's seed is therefore
+≈ half-correlated with the screen pool — and since strata are *defined* by
+zero passes on that pool, the fresh arm's recovery expectation is suppressed,
+while differently-prompted arms (HINT/SELFHINT: 1/2300 identical) are not.
+On near-zero floors this bias is invisible (halving E ≈ 0–2 moves nothing, and
+it works *against* the hint results, not for them); on the 7B live tail it
+falsified the committed 4th floor test and manufactured an apparent
+SELFHINT-vs-B1 trend that dissolves under the neutral-draw correction
+([PHASE_5.md] J5 arms RESULT). Standing rule going forward: **fresh-draw
+control arms use a distinct seed from the screen that defined their stratum.**
+
 Infrastructure: Kaggle then Modal T4 for Phases 0–2 and the diagnostics (~25+
 T4-hours), Modal L4 (vLLM) for Phase M and Phase 3, Daytona sandboxes for Phase-0–2
 execution (12,100 runs; sandbox-fault rates 0.2% / 0.0% / 0.3%, faults scored as
@@ -1580,6 +1601,22 @@ the named successor experiment, explicitly outside this record.
 > arms, pooled power gate) is running. If the pooled gate also fails, Q2
 > closes as structurally unresolvable at 7B under this budget. §9.9 J5
 > addendum; results land in [PHASE_5.md].
+>
+> **J5 CLOSED (same day).** The hard extension restored the substrate
+> (π₀ = 0.76; screen 2/3 predictions hit, floor-character missed at E 2.09 >
+> 1.5) and the pooled gate passed (0.816 at r = 0.20, marginal). Arms: B1 2 /
+> SELFHINT 5, p = 0.125 — **branch (a), the 40% favourite: self-production
+> does not switch on by 7B** (blind grades: 5/101 production-adequate — the
+> 45%-priced ≥ 30% prediction missed; the join shows recoveries do not
+> concentrate on adequate hints). Floor instrument 4-for-5: hard 5th test hit
+> (1 ∈ [0, 4]); medium 4th test **falsified** (1 vs [2, 9]) — diagnosed to the
+> same-seed regeneration confound (§8 seed-policy caveat: "fresh" B1 arms are
+> ≈ 50% screen-identical; the correction also dissolves the +3/−0 SELFHINT
+> trend into the neutral-draw expectation). **Nothing is running; J5 and
+> Phase 5 are fully closed.** Open decisions (the user's): extraction (both
+> candidate papers now have their 7B data); the 7B–frontier switch-on bracket;
+> the dose-response hint set; the distinct-seed protocol is a standing rule,
+> not a decision.
 
 *(historical, 2026-07-15)*
 
@@ -1906,8 +1943,8 @@ timeout-class failures enriched among recoveries again (33% vs 12% base).
    ledger frame; the J5 7B cell is the first data point between our floor and
    the frontier ceiling, awaiting sign-off).
 
-**J5 addendum (2026-07-17) — the 7B fork, first results *(run in flight; full
-accounting in [PHASE_5.md] J5)*.** Both questions signed off and running on
+**J5 addendum (2026-07-17) — the 7B fork *(CLOSED same day; full accounting in
+[PHASE_5.md] J5)*.** Both questions signed off, run, and closed on
 Qwen2.5-Coder-7B (base; 7B-Instruct writes the Q2 self-hints).
 
 - **Q1 — the pathology is a small-Qwen property (both frozen favourites
@@ -1938,6 +1975,30 @@ Qwen2.5-Coder-7B (base; 7B-Instruct writes the Q2 self-hints).
   on this difficulty), and the floor instrument now has a committed prediction
   in genuinely new territory. [artifacts/h5_7b_medium_screen.json],
   [artifacts/h5_7b_floor_fit.json], [scripts/j5_floor_fit.py].
+- **Q2 closed — branch (a), the 40% favourite: self-production does not switch
+  on by 7B.** The hard extension restored the floor substrate (61 hard stdin
+  problems; stratum 55/61; **π₀ = 0.76** — the point mass returns with
+  difficulty; fifth floor test committed: E = 2.09, band [0, 4]); the pooled
+  gate passed (0.816 at r = 0.20). Arms on the pooled 101: **B1 2 / SELFHINT
+  5, p = 0.125** — floor-equivalent; blind anchored grades: **5/101 (5%)
+  production-adequate** (0% at Qwen-1.5B, 1.3% at DeepSeek — production climbs
+  with scale but stays an order of magnitude under the bar), and recoveries do
+  not concentrate on adequate hints. **The cascade remains the only deployable
+  shape through 7B; the switch-on bracket moves to 7B–frontier.**
+  [artifacts/h5_7b_hard_screen.json], [artifacts/h5_7b_hard_floor_fit.json],
+  [artifacts/h5_7b_switchon.json], [artifacts/h5_7b_selfhint_grades.json].
+- **The falsified floor test paid for itself.** The medium 4th test failed
+  (B1 1 vs band [2, 9]) and the mandated diagnosis found a harness confound
+  invisible to every previous arm: **same-seed vLLM regeneration reproduces
+  ≈ 50% of a pool byte-for-byte**, suppressing "fresh" B1 arms relative to
+  differently-prompted arms (§8 seed-policy caveat, with the J4 control at
+  45%). The correction (corrected E[B1] 3.02/1.31; neutral-draw E[SELFHINT]
+  7.20 vs observed 5) simultaneously de-falsifies the model's *component*
+  (the miss was operational) and dissolves the apparent SELFHINT trend —
+  one committed prediction caught a record-wide bias and prevented a false
+  positive in the same stroke. Prior near-zero-floor results are unaffected
+  (the bias works against the hint results, not for them). Standing rule:
+  fresh-draw arms use a distinct seed henceforth.
 
 ---
 

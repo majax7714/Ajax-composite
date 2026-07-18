@@ -651,3 +651,56 @@ lies above 7B, the cascade remains the deployable shape); **share ≥ 30% →
 branch (b)** (floor despite adequate hints — reported with the pre-declared
 power caveat: effects below r ≈ 0.15 are unresolvable under the marginal
 reading, so (b) is a scoped no-lift statement, not a proven use-failure).
+
+### J5 Q2 grading RESULT + branch determination (2026-07-17) — **branch (a), the 40% favourite: switch-on lies above 7B**
+
+**Blind grades ([artifacts/h5_7b_selfhint_grades.json]; fresh instance, J2
+anchored instrument + correctness dimension, shuffled label-free input, grades
+produced before any join):** COMPLETE 16 / PARTIAL 66 / NUDGE 19; CORRECT 30 /
+DOUBTFUL 23 / WRONG 48. **Production-adequate (COMPLETE ∧ CORRECT): 5/101 =
+5.0%** — far below the 30% line. The 45%-priced "adequate share ≥ 30%"
+prediction **MISSED** (production improves with scale but slowly: 0/68 at
+Qwen-1.5B → 1/76 at DeepSeek-1.3B → 5/101 at Qwen-7B). Grader convention note,
+recorded: fully-mechanical-but-infeasible recipes (e.g. clear TLE) were graded
+COMPLETE/WRONG — specification and validity separated, ties broken downward.
+
+**Join (after grades landed):** the recoveries do not concentrate on adequate
+hints — of the three SELFHINT-only recoveries, one rode a COMPLETE/CORRECT
+hint (abc330_c), one a NUDGE/DOUBTFUL, one a PARTIAL/WRONG; both arms-shared
+recoveries rode PARTIAL hints. Consistent with the neutral-fresh-draw reading
+of the arm.
+
+**BRANCH (a) FIRES per the committed adjudication — the 40% favourite.**
+Self-production of hint-grade direction does not switch on by 7B: the
+self-hint arm is floor-equivalent (and neutral-draw-consistent), and 95% of
+7B's self-hints fail the production-adequacy bar the oracle set passes at
+98.4%. **The cascade remains the only deployable shape through 7B; the
+switch-on scale lies above it.** Index row 12 rescopes accordingly; the open
+question moves to the 7B–frontier gap (PlanSearch ledger frame).
+
+### J5 CLOSE (2026-07-17) — both questions answered; prediction accounting
+
+- **Q1: the conditioning pathology is a Qwen2.5-Coder-1.5B property** — at 7B
+  the code channel blends (0.609 between the nulls) and the language harm
+  vanishes (Δ −0.018 ns). Both frozen favourites hit (45%, 60%).
+- **Q2: self-production does not switch on by 7B** — branch (a) at 40% (the
+  favourite). En route: the medium power gate fired (46-problem live tail,
+  π₀ = 0), the pre-registered hard extension restored the substrate
+  (π₀ = 0.76), the pooled gate passed (0.816), and the arms ran clean.
+- **The floor instrument is 4-for-5**, and its one falsification (medium 4th
+  test, B1 1 vs band [2, 9]) was traced to a measured harness confound
+  (same-seed ≈ 50% pool regeneration) that also dissolves the apparent
+  SELFHINT trend — the instrument caught, in one committed test, a bias that
+  had sat invisibly under every near-zero-floor arm in the record.
+- **Prediction accounting, full run:** favourites hit — Q1a blend 45% ✓, Q1b
+  vanish 60% ✓, Q2 screen band 55% ✓, hard pass@50 60% ✓, hard stratum 65% ✓,
+  branch (a) 40% ✓. Missed — hard floor character 55% (E 2.09 > 1.5), medium
+  4th floor test (falsified, diagnosed), adequate-share ≥ 30% at 45% (observed
+  5%). No gate was passed by tuning; every branch fired on committed terms.
+- **Cost:** within the signed-off ~$15–25 envelope (screens + cells + arms +
+  one timed-out judge attempt re-run sharded).
+
+**J5 is closed.** Writeup updates land with this commit (§9.9 J5 close, Index
+rows 8/11/12/15, §9.5, §8 harness caveat). Named-not-chartered successors: a
+distinct-seed fresh-draw protocol (mandatory for any future arm), the 7B–72B
+switch-on bracket, the dose-response hint set.
