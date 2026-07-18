@@ -32,6 +32,20 @@ FAMILIES = {
 QWEN_BASE = "Qwen/Qwen2.5-Coder-1.5B"  # the frozen Phase-3b config generator (H2 arms)
 QWEN7B = "Qwen/Qwen2.5-Coder-7B"                  # J5 (sign-off 2026-07-17)
 QWEN7B_INSTRUCT = "Qwen/Qwen2.5-Coder-7B-Instruct"
+
+# Phase 6 P1 discriminator battery — pinned revisions (main SHAs resolved
+# 2026-07-17, [PHASE_6.md] P0.1). (short_name -> (model_id, revision)).
+J6_MODELS = {
+    "qwen05b": ("Qwen/Qwen2.5-Coder-0.5B",
+                "8123ea2e9354afb7ffcc6c8641d1b2f5ecf18301"),
+    "qwen3b": ("Qwen/Qwen2.5-Coder-3B",
+               "09d9bc5d376b0cfa0100a0694ea7de7232525803"),
+    "qwen15b_general": ("Qwen/Qwen2.5-1.5B",
+                        "8faed761d45a263340a0528343f099c05c9a4323"),
+}
+# Phase 6 P2 — distinct-seed verification of the flagship floor number.
+QWEN_BASE_REV = "df3ce67c0e24480f20468b6ef2894622d69eb73b"  # 1.5B-Coder base @ main
+P2_SEED = 41  # DISTINCT from the record's seed 17 (mandatory distinct-seed protocol)
 LCB_DATASET = "livecodebench/code_generation"
 BCB_DATASET = "bigcode/bigcodebench"
 
@@ -87,9 +101,11 @@ def h1_download():
 
 @app.function(image=GEN_IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=7200)
 def h1_gen_lcb(model_id: str, items: list, n: int, tag: str,
-               temperature: float = 0.8, top_p: float = 1.0, seed: int = 17):
+               temperature: float = 0.8, top_p: float = 1.0, seed: int = 17,
+               revision: str = None):
     """Frozen R2/p3b fenced-completion scaffold, parametrized by model.
-    items: [{qid, context|None}]."""
+    items: [{qid, context|None}]. `revision` (added Phase 6, no-op default —
+    existing frozen callers omit it) pins the exact HF commit at load time."""
     def compute():
         from datasets import load_dataset
         from vllm import LLM, SamplingParams
@@ -105,7 +121,8 @@ def h1_gen_lcb(model_id: str, items: list, n: int, tag: str,
                     "input and writes the answer to standard output:\n\n```python\n")
 
         llm = LLM(model=model_id, dtype="bfloat16", gpu_memory_utilization=0.90,
-                  max_model_len=8192, seed=seed)
+                  max_model_len=8192, seed=seed,
+                  **({"revision": revision} if revision else {}))
         sp = SamplingParams(n=n, temperature=temperature, top_p=top_p,
                             max_tokens=1536, seed=seed, stop=["```", "\nProblem:"])
         outs = llm.generate([prompt(it) for it in items], sp)
@@ -1427,3 +1444,193 @@ def h1_report():
     (REPO / "artifacts/h1_cross_family.json").write_text(json.dumps(out, indent=2))
     print(json.dumps(out, indent=2))
     print("wrote artifacts/h1_cross_family.json")
+
+
+# ========================================================================
+# Phase 6 P1 — pathology-origin discriminator battery ([PHASE_6.md] P1).
+# The two frozen J5 Q1 cells (D2c code + language manipulation), pointed at
+# new checkpoints via J6_MODELS. Additive: the frozen j5_* entrypoints and
+# their committed 7B outputs are untouched; every tag/output here is
+# namespaced by the model short-name, and the model load is revision-pinned.
+# ========================================================================
+
+def _j6_model(name):
+    if name not in J6_MODELS:
+        raise SystemExit(f"unknown checkpoint '{name}'; choose from {list(J6_MODELS)}")
+    return J6_MODELS[name]
+
+
+@app.function(image=DL_IMAGE, volumes={"/cache": VOL}, timeout=3600)
+def j6_download(model_id: str, revision: str):
+    from huggingface_hub import snapshot_download
+    print("downloading", model_id, "@", revision)
+    snapshot_download(model_id, revision=revision)
+    VOL.commit()
+    return {"model": model_id, "revision": revision}
+
+
+@app.local_entrypoint()
+def j6_prefetch(name: str = "qwen3b"):
+    """Fetch + revision-pin one P1 checkpoint to the volume cache."""
+    model_id, rev = _j6_model(name)
+    print(j6_download.remote(model_id, rev))
+
+
+@app.local_entrypoint()
+def j6_smoke(name: str = "qwen3b"):
+    """Per-checkpoint smoke gate (charter): 8 LCB-easy x 8, wf>=0.85 dg<=0.10."""
+    model_id, rev = _j6_model(name)
+    qids = _lcb_easy_qids()[:8]
+    gen = _load(f"j6_smoke_cand_{name}") or _persist(
+        f"j6_smoke_cand_{name}",
+        h1_gen_lcb.remote(model_id, [{"qid": q, "context": None} for q in qids], 8,
+                          tag=f"j6_smoke_cand_{name}", revision=rev))
+    codes = [g["codes"] for g in gen]
+    flat = [c for row in codes for c in row]
+    wf = sum(1 for c in flat if c) / len(flat)
+    dg = sum(1 for c in flat if c and len(c) < 20) / max(1, sum(1 for c in flat if c))
+    res = _load(f"j6_smoke_res_{name}") or _persist(
+        f"j6_smoke_res_{name}",
+        h1_lcb_exec.remote([g["qid"] for g in gen], codes,
+                           tag=f"j6_smoke_res_{name}", short_circuit=True))
+    npass = sum(1 for row in res for r in row if r["passed"])
+    ok = wf >= 0.85 and dg <= 0.10
+    print(f"=== j6 smoke ({name} = {model_id} @ {rev[:12]}): wf {wf:.3f} dg {dg:.3f} "
+          f"passed {npass}/{len(flat)} → {'PASS' if ok else 'FAIL'} ===")
+    print("sample:\n" + next((c for c in flat if c), "")[:300])
+
+
+@app.local_entrypoint()
+def j6_pathology(name: str = "qwen3b"):
+    """P1 — the two frozen cells on one checkpoint (run j6_smoke first).
+    Q1a D2c code cell (44 x {E0,E1} x 8, all-cases judge, mean frac);
+    Q1b language cell (20 x {E0,HINT} x 25, per-sample mean pass).
+    Writes artifacts/h6_pathology_origin_<name>.json (blend geometry +
+    language band); raw pools persist to runs/modal/j6_* for the free-rider
+    copy-fidelity/size-curve analysis."""
+    import statistics as st
+    model_id, rev = _j6_model(name)
+
+    # Q1a — D2c code-conditioning cell (blend geometry: cond vs iid vs copy)
+    arts = _d2c_artifacts()
+    items = ([{"qid": a["qid"], "context": None} for a in arts]
+             + [{"qid": a["qid"], "context": _d2c_context(a)} for a in arts])
+    dgen = _load(f"j6_q1a_cand_{name}") or _persist(
+        f"j6_q1a_cand_{name}",
+        h1_gen_lcb.remote(model_id, items, 8, tag=f"j6_q1a_cand_{name}", revision=rev))
+    dres = _load(f"j6_q1a_res_{name}") or _persist(
+        f"j6_q1a_res_{name}",
+        h1_lcb_exec.remote([g["qid"] for g in dgen], [g["codes"] for g in dgen],
+                           tag=f"j6_q1a_res_{name}"))
+    n = len(arts)
+    e0_frac = [st.mean(x["frac"] for x in row) for row in dres[:n]]
+    e1_frac = [st.mean(x["frac"] for x in row) for row in dres[n:]]
+    copy_null = [a["frac"] for a in arts]
+    d_iid = [b - a for a, b in zip(e0_frac, e1_frac)]
+    d_copy = [b - a for a, b in zip(copy_null, e1_frac)]
+    p_sink_iid = _wilcoxon_mc_one_sided([-x for x in d_iid])
+    p_sink_copy = _wilcoxon_mc_one_sided([-x for x in d_copy])
+    q1a = {"e0_mean_frac_iid": st.mean(e0_frac), "e1_mean_frac_cond": st.mean(e1_frac),
+           "copy_null_mean": st.mean(copy_null),
+           "delta_cond_minus_iid": st.mean(d_iid),
+           "delta_cond_minus_copy": st.mean(d_copy),
+           "p_one_sided_cond_below_iid": p_sink_iid,
+           "p_one_sided_cond_below_copy": p_sink_copy}
+    print(f"Q1a ({name}): iid {q1a['e0_mean_frac_iid']:.3f} | cond "
+          f"{q1a['e1_mean_frac_cond']:.3f} | copy {q1a['copy_null_mean']:.3f} | "
+          f"p_below_iid {p_sink_iid:.4f} p_below_copy {p_sink_copy:.4f}")
+
+    # Q1b — language-channel cell (harm vanish/persist band)
+    fz = _h2_frozen()
+    qids = fz["groups"]["manip_check"]
+    hints = fz["hints"]
+    items = ([{"qid": q, "context": None} for q in qids]
+             + [{"qid": q, "context": _hint_context(hints[q])} for q in qids])
+    mgen = _load(f"j6_q1b_cand_{name}") or _persist(
+        f"j6_q1b_cand_{name}",
+        h1_gen_lcb.remote(model_id, items, 25, tag=f"j6_q1b_cand_{name}", revision=rev))
+    mres = _load(f"j6_q1b_res_{name}") or _persist(
+        f"j6_q1b_res_{name}",
+        h1_lcb_exec.remote([g["qid"] for g in mgen], [g["codes"] for g in mgen],
+                           tag=f"j6_q1b_res_{name}", short_circuit=True))
+    m = len(qids)
+    e0 = [sum(r["passed"] for r in row) / len(row) for row in mres[:m]]
+    hi = [sum(r["passed"] for r in row) / len(row) for row in mres[m:]]
+    diffs = [b - a for a, b in zip(e0, hi)]
+    q1b = {"e0_mean_pass": st.mean(e0), "hint_mean_pass": st.mean(hi),
+           "mean_uplift": st.mean(diffs),
+           "p_one_sided_uplift": _wilcoxon_mc_one_sided(diffs),
+           "saturation_caveat": st.mean(e0) > 0.9}
+    print(f"Q1b ({name}): E0 {q1b['e0_mean_pass']:.3f} → HINT {q1b['hint_mean_pass']:.3f} "
+          f"(Δ {q1b['mean_uplift']:+.3f}, p {q1b['p_one_sided_uplift']:.4f})"
+          + ("  [SATURATED >0.9 — compressed cell]" if q1b["saturation_caveat"] else ""))
+
+    out = {"_label": f"Phase 6 P1 — pathology origin cell, {name} [PHASE_6.md P1]",
+           "model": model_id, "revision": rev,
+           "q1a_d2c": q1a, "q1b_language": q1b}
+    (REPO / f"artifacts/h6_pathology_origin_{name}.json").write_text(
+        json.dumps(out, indent=2))
+    print(f"wrote artifacts/h6_pathology_origin_{name}.json")
+
+
+@app.local_entrypoint()
+def j6_p2_distinct_seed():
+    """P2 — distinct-seed fresh B1-50 on the frozen Qwen 68-problem medium
+    stratum ([PHASE_6.md] P2; the floor instrument's 6th out-of-sample test,
+    first under a satisfied fresh-draw premise). Committed prediction (frozen
+    in scripts/j6_p2_floor_predict.py): E = 2.01, point 2, band [0,4],
+    >=5 falsifies. Seed 41 (distinct from the record's 17); revision-pinned
+    (the medium screen predates revision-pinning, so under D14's statistical
+    standard the intended difference from the screen is the seed). The committed
+    prediction is fit from the screen pool's own near-miss counts and is
+    therefore seed/revision-agnostic."""
+    fz = _h2_frozen()
+    qids = fz["groups"]["stratum_medium"]
+    assert len(qids) == 68, f"stratum {len(qids)} != 68"
+    items = [{"qid": q, "context": None} for q in qids]
+    gen = _load("j6_p2_b1_cand") or _persist(
+        "j6_p2_b1_cand",
+        h1_gen_lcb.remote(QWEN_BASE, items, 50, tag="j6_p2_b1_cand",
+                          seed=P2_SEED, revision=QWEN_BASE_REV))
+    res = _load("j6_p2_b1_res") or _persist(
+        "j6_p2_b1_res",
+        h1_lcb_exec.remote([g["qid"] for g in gen], [g["codes"] for g in gen],
+                           tag="j6_p2_b1_res", short_circuit=True))
+    rec = [any(r["passed"] for r in row) for row in res]
+    n_rec = sum(rec)
+    verdict = ("in-band" if n_rec <= 4 else "FALSIFIES-high(>=5)")
+
+    # Distinct-seed protocol validation (informational): confirm this arm is NOT
+    # ~50% byte-identical to the same-seed screen pool (the J5 confound).
+    ident = None
+    try:
+        scr = json.loads(
+            (REPO / "runs/modal/lcb_cand_lcb_r2_base_medium_T08.json").read_text())
+        res0 = json.loads(
+            (REPO / "runs/modal/lcb_res_lcb_r2_base_medium_T08.json").read_text())
+        scr_by_qid = dict(zip(res0["question_ids"], scr["codes"]))
+        same = tot = 0
+        for g in gen:
+            base = set(c for c in (scr_by_qid.get(g["qid"]) or []) if c)
+            for c in g["codes"]:
+                tot += 1
+                if c and c in base:
+                    same += 1
+        ident = same / tot if tot else None
+    except Exception as e:  # noqa: BLE001 — validation only, never blocks the verdict
+        ident = f"unavailable ({e})"
+
+    out = {"_label": "Phase 6 P2 — distinct-seed fresh B1-50, Qwen medium stratum "
+                     "[PHASE_6.md P2; floor instrument 6th out-of-sample test]",
+           "model": QWEN_BASE, "revision": QWEN_BASE_REV, "seed": P2_SEED,
+           "n_stratum": len(qids), "recoveries": n_rec,
+           "committed_prediction": {"E": 2.01, "point": 2, "band_94pct": [0, 4],
+                                    "falsifies_high": 5,
+                                    "source": "scripts/j6_p2_floor_predict.py"},
+           "verdict": verdict,
+           "identical_to_screen_frac": ident,
+           "recovered_qids": [q for q, v in zip(qids, rec) if v]}
+    (REPO / "artifacts/h6_p2_distinct_seed_b1.json").write_text(json.dumps(out, indent=2))
+    print(f"=== P2 distinct-seed B1-50 (seed {P2_SEED}): {n_rec} recoveries — "
+          f"committed band [0,4], >=5 falsifies → {verdict} "
+          f"(identical-to-screen {ident}) ===")

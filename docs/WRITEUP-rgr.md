@@ -397,6 +397,46 @@ No commitment implied; the journal decides when an extraction is ripe.
    including three floor hits and the J2/J3 grading instruments); needs no new
    data, only extraction.
 
+### 0.3 Claims-to-evidence — the extraction transcription layer *(Phase 6 P3, 2026-07-17; maintained with §0)*
+
+*(The purpose stated plainly, [PHASE_6.md] P3: after this table, extracting a
+paper/talk/cited sentence is **selecting rows, not re-deriving support**. One row
+per LIVE/SCOPED §0 claim, with the exact artifact, the test + number, the scope
+line, and the §8 caveat that attaches. KILLED/RETRACTED rows (1, 2, 4, 5) are
+excluded — their evidence lives in their retraction banners. Rows carrying a
+Phase-6 "pending" gain their line when P1/P2 land.)*
+
+| # | claim (tag) | evidencing artifact(s) | key test + number | scope line | §8 caveat / pending |
+|---|---|---|---|---|---|
+| 3 | register-null localization | `h2_result.json`, `diag2/3/5_*.json` | Δ(FULL−B1) = 0.000, CI [−0.049, +0.055]; W₀ transfer ×1.33→×0.28 (DIAG-5); U starvation: φ passed-AUROC 0.558, KL 0.117 nats directionless, Δpass 0.000 in-domain | that stack (d_r 128, 8 soft tokens, GRU), imitation regime, 1.5B frozen G | retired HF/4-bit stack — numbers never cross the M-boundary |
+| 6 | escape-distance law | `dmeasure_conditioning.json` (`per_sample_D2b`), `h0a_ast_distance.json` | coverage monotone in PULL, Spearman **0.952** under AST = lexical; D2b mean-per-sample-pass flat ~0.20 at every T | form: 3 families + lexical + AST; constants: family params; domain T ≲ 1.2 (descends with difficulty); in-context channels | — |
+| 7 | elimination argument | `dmeasure_e7.json`, `w0a_e0_anchor.json`, `h2a_hint_arm.json` | E7 repulsion loses **15–27 coverage pts** to i.i.d. (0.65/0.75 vs 0.92/0.90); direction existence proof HINT 13 vs floor 2, p = 4.9e-4 | Qwen-1.5B; in-context channels only; weight-/search-space never enumerated | — |
+| 8 | D2c SINK (scoped+inverted, scale-bounded) | `dmeasure_d2c_partial_credit.json`, `h1_cross_family.json`, `h5_7b_pathology.json` | Qwen-1.5B cond **0.374** < copy 0.494 & < iid 0.468 (below-both, p ≈ 5e-5 vs copy); DeepSeek inverts 0.468 vs iid 0.362 (p ≈ 0.003); StarCoder2 +0.046 n.s.; **Qwen-7B 0.609 blend** | Qwen2.5-Coder-**1.5B**-specific; vanishes at 7B | all-cases judge (frac consumed) |
+| 9 | R3 trace null (reversed-as-refined; content fact) | `r3_conditional_reachability.json`, `h5_deepseek_fourarm.json` | TRACE floor: Qwen **1/68** (p = 0.875 vs B1), DeepSeek **2/76** (p = 0.50); generated at i.i.d. PULL 0.85 | cross-family (both), structural failures, **trace channel** (not "use") | near-zero-floor strata — same-seed confound cannot move it |
+| 10 | hint result (generalizes) | `h2a_hint_arm.json`, `h2a_rerun_stability.json`, `h2a_validation_struct.json`, `h5_deepseek_fourarm.json` | Qwen **13/68** (11 hint-only/0, p = 4.9e-4, r ≈ 0.19); DeepSeek **9/76** (8/0, p = 0.0039, r ≈ 0.12); all rerun-stable; ≥ 0.16 AST-novel; timeout-class enriched | both families, medium strata, **complete-strategy-grade** hints (dose-response unmeasured — J2 ceiling 123/125 COMPLETE) | same-seed B1 control suppressed → contrast **conservative**; **P2 pending** = distinct-seed measured control ([PHASE_6.md]) |
+| 11 | Qwen pathology / double dissociation (scoped-to-1.5B) | `h1_cross_family.json`, `h2_manip_check.json`, `h2_manip_check_deepseek.json`, `h5_7b_pathology.json` | Qwen code −0.095, language −0.096; DeepSeek +0.107 / +0.088 (double dissociation); Qwen-7B blends, harm vanishes (Δ −0.018 ns) | Qwen2.5-Coder-**1.5B** vs DeepSeek-1.3B (44 code / 20 language); StarCoder2 code-consistent; 7B like other families | 7B language near-saturation (E0 → 0.9); **P1 pending** = measured origin line ([PHASE_6.md]) |
+| 12 | production bottleneck (cross-family + cross-scale) | `h5_selfhint_qwen.json` + `_grades`, `h5_deepseek_selfhint_grades.json`, `h5_7b_selfhint_grades.json` | production-adequate self-hints **0/68** (Qwen-1.5B), **1/76** (DeepSeek-1.3B), **5/101** (Qwen-7B); self-hint arms floor-equivalent all three | 1.3B–7B; switch-on above 7B; cascade is the deployable shape through 7B | 7B arm read under same-seed confound (branch (a) adjudicated on the neutral-draw correction) |
+| 13 | temperature dose-response | `dmeasure_conditioning.json` | T 0.8→1.2 coverage: E0 −0.02 (flat), E1 +0.10, E2 +0.18 (more-anchored ~2×) | Qwen, HumanEval cells, within the law's domain (T ≲ 1.2) | — |
+| 14 | provenance near-irrelevance | `dmeasure_d2a_verb_provenance.json`, `h0a_d2a_ast_followup.json` | provenance ΔPULL ≤ 0.028 (lexical) / ≤ 0.034 (AST) vs verb up to +0.127 (3–4×) | Qwen; holds under lexical and AST | — |
+| 15 | false-zero floor model (4-for-5) | `w0c_stratum_falsezero.json`, `h5_deepseek_floor_fit.json`, `h5_7b_floor_fit.json`, `h5_7b_hard_floor_fit.json`, `scripts/j6_p2_floor_predict.py` | hits 2.01→2, 2.01→2, 0.00→1, hard 2.09→1; miss medium 5.11→1 (harness confound; corrected E 3.02, P(X≤1) ≈ 0.20) | two families, three stratum shapes; π₀ = 0 at 7B-medium (live tail), 0.76 at 7B-hard | the same-seed confound is the miss that found it; distinct-seed now mandatory; **P2 = the 6th test** (committed E 2.01, band [0,4]) |
+
+### 0.4 Open successors *(named, not chartered — [PHASE_6.md] P3; carried without commitment)*
+
+Recorded here so the Index is also the map of what is *deliberately not being run*.
+
+- **Origin of the small-Qwen pathology** — Phase 6 P1's live question (INTERACTION /
+  DISCONTINUITY-OPEN / RECIPE-DEEP / CODER-STAGE); H-tie demoted to an interaction
+  term at P0 (StarCoder2-3B is tied yet friendly).
+- **The dose-response hint set** — J2's ceiling (123/125 COMPLETE) left the
+  richness threshold unmeasured; a deliberately-varied COMPLETE/degraded/nudge set
+  is the instrument. Disclosed wherever the 13/68 result is cited.
+- **The 7B→72B switch-on bracket** — self-production is absent through 7B (0/68 →
+  1/76 → 5/101); the switch-on lies above (PlanSearch frame). A phase of its own if
+  ever chartered.
+- **Weight-space / search-space channels (TTT, feedback-guided search, multi-model
+  sampling)** — never in the elimination argument's in-context enumeration;
+  recorded as outside scope since Phase 4, not as closed.
+
 ## 1. The claim and its kill criteria
 
 Three hypotheses were pre-registered with kill criteria before any
