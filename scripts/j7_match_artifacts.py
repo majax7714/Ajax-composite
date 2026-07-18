@@ -1,7 +1,9 @@
 """Phase 7 P1 — matched-artifact miner ([PHASE_7.md] P1).
 
-Mines per-model matched artifact sets from the FIXED donor pool (the Qwen-1.5B-base
-LCB-easy enriched pool that produced the original 0.494 set) so that each model is
+Mines per-model matched artifact sets from the FIXED donor pool (the
+Qwen2.5-Coder-1.5B-base LCB-easy enriched pool that produced the original 0.494 set;
+its `model` field is Qwen/Qwen2.5-Coder-1.5B — note it is Coder-diet, not general
+Qwen: relevant to the Phase-8 provenance confound) so that each model is
 conditioned at its OWN quality match (Delta_art ~ 0), holding artifact SOURCE
 constant while artifact LEVEL moves. This repairs the position confound named in
 [PHASE_7.md] section 0: the fixed-0.494 design conditioned every model on the same
@@ -74,7 +76,7 @@ def _mine_cell(target, qids, codes_by_qid, rows_by_qid):
 def main():
     qids, codes_by_qid, rows_by_qid = _load_donor()
     out = {"_label": "Phase 7 P1 matched artifact sets [PHASE_7.md P1]",
-           "donor": "runs/modal/lcb_cand_lcb_r2_base_T08.json (Qwen2.5-1.5B-base, LCB-easy, T=0.8)",
+           "donor": "runs/modal/lcb_cand_lcb_r2_base_T08.json (Qwen2.5-Coder-1.5B-base, LCB-easy, T=0.8)",
            "band_halfwidth": BAND, "min_n": MIN_N, "cells": {}}
 
     print(f"{'cell':20s} {'model':40s} {'target':>7s} {'n':>4s} {'mean_art':>9s} "

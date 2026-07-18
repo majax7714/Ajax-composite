@@ -2295,7 +2295,18 @@ the first time.
   at all. H-universal (non-Coder sinks too) and H-diet-modulated (universal negative
   pressure, diet-graded) are both **rejected**: the non-Coder response at match is
   flat-to-*positive*, a clean dissociation, not a shallow curve. The Coder-stage
-  origin survives the confound it was built on.
+  origin survives the confound it was built on. *(Power caveat, Phase 8 P0: the clean
+  cells' CIs — M1 [−0.021, +0.116], M3 [−0.075, +0.088], M2 [−0.066, +0.059] —
+  exclude **Coder-magnitude** sinks (≤ −0.09) but not a **shallow universal pressure**
+  of −0.02…−0.05. The rejection stands **as stated** — no *visible* negative pressure
+  — but the shallow-diet-modulated variant is **OPEN-at-current-n**, not excluded.)*
+  *(Donor-provenance note, Phase 8 P0: the fixed donor is **Qwen2.5-Coder-1.5B-base**
+  (not general Qwen — a mislabel corrected in [PHASE_7.md]/`j7_match_artifacts.py`).
+  So every sink cell was conditioned on **diet-matched** (Coder) artifacts and every
+  clean cell on **diet-mismatched** artifacts — the dissociation is confounded with
+  artifact provenance, and even P6's general-1.5B "clean control" saw foreign-diet
+  artifacts. Phase 8 C1 is built to close this; note the mining coverage wall it
+  hits.)*
 - **The code sink is NOT scale-bounded — 7B sinks at match; the P6 "window" upper
   bound was position.** Qwen-Coder-7B, read "friendly/blend" in J5/P6, had only ever
   been measured at Δ_art −0.165 (its i.i.d. 0.659 far *above* the 0.494 artifact —

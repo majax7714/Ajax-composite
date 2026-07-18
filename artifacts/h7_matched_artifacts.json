@@ -1,6 +1,6 @@
 {
   "_label": "Phase 7 P1 matched artifact sets [PHASE_7.md P1]",
-  "donor": "runs/modal/lcb_cand_lcb_r2_base_T08.json (Qwen2.5-1.5B-base, LCB-easy, T=0.8)",
+  "donor": "runs/modal/lcb_cand_lcb_r2_base_T08.json (Qwen2.5-Coder-1.5B-base, LCB-easy, T=0.8)",
   "band_halfwidth": 0.05,
   "min_n": 30,
   "cells": {

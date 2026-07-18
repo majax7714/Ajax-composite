@@ -183,10 +183,14 @@ match** (Δ_art ≈ 0), and if so, does its depth depend on **diet**?
 - **Artifacts are mined, not generated.** Per-model matched sets are drawn from the
   record's persisted partial-credit pool by binning per-problem donor candidates to
   the target band. **Fixed-donor rule:** all matched sets come from the **one**
-  donor pool — `runs/modal/lcb_cand_lcb_r2_base_T08.json` (Qwen2.5-1.5B-base,
-  LCB-easy, T=0.8), the pool that produced the original 0.494 set — so artifact
-  **source** stays constant while artifact **level** moves. The matched design must
-  not trade the position confound for a source confound.
+  donor pool — `runs/modal/lcb_cand_lcb_r2_base_T08.json` (**Qwen2.5-Coder-1.5B-base**,
+  LCB-easy, T=0.8; **corrected 2026-07-18, Phase 8 P0 — mislabeled "Qwen2.5-1.5B-base"
+  here; the pool's `model` field is Qwen/Qwen2.5-Coder-1.5B**), the pool that produced
+  the original 0.494 set — so artifact **source** stays constant while artifact
+  **level** moves. The matched design must not trade the position confound for a
+  source confound. *(Consequence, Phase 8: the donor being Coder-diet means every
+  sink cell saw diet-matched artifacts and every clean cell diet-mismatched ones — a
+  provenance confound C1 targets.)*
 - **Target** = the model's own global i.i.d. frac (record value); **band** =
   target ± 0.05; **one matched artifact per problem** (in-band donor candidate
   nearest the target, deterministic tie-break by index). Problems with no in-band
