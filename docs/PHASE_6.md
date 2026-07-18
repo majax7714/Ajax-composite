@@ -251,6 +251,28 @@ via the exact W0c machinery — `scripts/j6_p2_floor_predict.py`,
 **Artifacts:** `scripts/j6_p2_floor_predict.py` (committed prediction, this file);
 `h6_p2_distinct_seed_b1.json` (the run result, planned).
 
+### P2 RESULT (2026-07-17) — **in-band; the flagship floor is now measured, not argued**
+
+Distinct-seed (41) fresh B1-50 on the Qwen 68-problem medium stratum recovered
+**2** — the committed point prediction exactly (E 2.01, band [0, 4]). **The floor
+instrument's 6th out-of-sample test HITS → 5-for-6** (its first genuinely-fresh
+draw on the flagship stratum). [artifacts/h6_p2_distinct_seed_b1.json].
+
+- **Decorrelation confirmed:** the distinct-seed arm is **0.27** byte-identical to
+  the screen pool, vs the same-seed **~0.50** the J5 diagnostic measured — the
+  distinct seed did its job (a genuinely-independent control, not a half-replay).
+- **The §8 caveat converts computed → measured.** Same-seed suppression is now
+  *shown* invisible at this near-zero floor: same-seed and distinct-seed B1 both
+  recovered 2, exactly as §8 argued ("halving E ≈ 0–2 moves nothing"). So the
+  flagship **HINT-13-vs-floor-2** contrast (p = 4.9e-4) stands on a **measured
+  distinct-seed control**, not a computed one — the referee objection ("the control
+  was ~50% replays") is answered with a number.
+- **No below-band branch was reachable** (one-sided floor), and none occurred.
+
+Writeup landed: §8 caveat amended (computed → measured); §10 addendum codifying
+the distinct-seed protocol; Index rows 10 (HINT: distinct-seed verified) and 15
+(floor: 5-for-6); §0.3 rows 10/15 updated.
+
 ---
 
 ## P3 — Extraction-readiness *(journal work; no paper is written under this handoff)*

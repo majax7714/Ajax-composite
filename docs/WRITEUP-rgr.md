@@ -325,6 +325,18 @@ works if the failures are failures of something specific. One rule is added:
 **every phase's writeup work includes updating the Claims & Scope Index (§0); a
 phase is not closed with the index stale.**
 
+**Addendum (2026-07-17, Phase 6 P2 — the distinct-seed protocol, codified).** A
+committed floor test (J5 medium 4th) falsified because same-seed vLLM
+regeneration reproduces ≈ 45–50% of a screen pool byte-for-byte, silently
+suppressing every "fresh" control drawn with the screen's own seed. The rule that
+follows is now part of the method: **any arm described as a fresh draw uses a seed
+distinct from the seed that built the population it is compared against.** Phase 6
+P2 was its inaugural *measured* application — a distinct-seed B1 (screen overlap
+0.27 vs ~0.50 same-seed) verified the flagship floor on a genuinely-independent
+control. The protocol is recorded operationally in §8; the general lesson is the
+methodological one — a committed prediction, by falsifying, exposed a record-wide
+bias that had sat invisible under every near-zero-floor arm.
+
 ## 0. Claims & Scope Index *(the journal's map — seeded 2026-07-16, Phase 5 J0; maintained at every phase close)*
 
 Every claim this record has ever made, its current status, and the scope the
@@ -342,12 +354,12 @@ currently believes.** Statuses: LIVE / KILLED / RETRACTED / REVERSED / SCOPED.
 | 7 | Elimination argument (undirected ≤ i.i.d.; repulsion inexpressible; direction the sole surviving channel) | **LIVE, completed** — direction now has an existence proof | measured on Qwen-1.5B; in-context channels only; weight-/search-space never enumerated | §9.3.1, §9.8 |
 | 8 | D2c SINK (conditioning on partial-credit code degrades below both nulls) | **SCOPED + INVERTED**; scale-bounded (J5 Q1: vanishes at Qwen-7B into the family-general blend) | Qwen2.5-Coder-**1.5B**-specific pathology; DeepSeek/StarCoder2 *climb*, Qwen-7B blends, under the same artifacts | §9.7 markers, §9.9 J5 addendum, [PHASE_4.md] H1 |
 | 9 | R3 null — "1.5B cannot use direction" | **REVERSED-AS-REFINED** | a *trace-channel* null, now **cross-family**: traces sit on the floor on Qwen (1/68) and DeepSeek (2/76) — a content fact, not the Qwen pathology; content, not capacity, was the variable | §9.7, §9.8, §9.9 |
-| 10 | Hint result — approach-level direction crosses the competence boundary (13/68 vs floor 2, p = 4.9e-4) | **LIVE — GENERALIZES** (J4: DeepSeek 9/76, p = 0.0039) | both families, medium strata, oracle-derived **complete-strategy-grade** hints (J2: dose-response unmeasurable on this set — weaker direction untested) | §9.8, §9.9 |
+| 10 | Hint result — approach-level direction crosses the competence boundary (13/68 vs floor 2, p = 4.9e-4) | **LIVE — GENERALIZES** (J4: DeepSeek 9/76, p = 0.0039; **P2: floor distinct-seed verified**) | both families, medium strata, oracle-derived **complete-strategy-grade** hints (J2: dose-response unmeasurable on this set — weaker direction untested); the flagship contrast stands on a measured distinct-seed control (P2, fresh B1 = 2) | §9.8, §9.9, [PHASE_6.md] P2 |
 | 11 | Qwen conditioning pathology (double dissociation: code and language channels degrade Qwen, lift DeepSeek) | **LIVE — SCOPED-TO-1.5B** (J5 Q1, 2026-07-17: at 7B the code channel blends and the language harm vanishes; both frozen favourites hit) | Qwen2.5-Coder-**1.5B** vs DeepSeek-1.3B (44-problem code cell; 20-problem language cell); StarCoder2 code-cell consistent; 7B behaves like the other families | §9.8, §9.9 J5 addendum, [PHASE_5.md] J5 |
 | 12 | Production bottleneck — "the model cannot produce hint-grade direction for itself" | **LIVE-MEASURED, cross-family + cross-scale** (J5 Q2 branch (a), the 40% favourite: floor-equivalent self-hint arm at 7B; production-adequate 0/68 Qwen-1.5B, 1/76 DeepSeek, **5/101 Qwen-7B**) | 1.3B–7B; **switch-on lies above 7B** — the cascade is the deployable shape through 7B; the open bracket is 7B–frontier (PlanSearch frame) | §9.9 J5 addendum, [PHASE_5.md] J5 |
 | 13 | Temperature is a dose-responsive anti-anchoring intervention | LIVE | Qwen, HumanEval cells, within the law's domain | §9.3 |
 | 14 | Provenance near-irrelevance (instruction verb ≫ provenance) | LIVE | Qwen; holds under lexical and AST metrics | §9.3, H0a follow-up |
-| 15 | False-zero floor model (two-component mixture over k=50 pools) | LIVE — **4 for 5** (2.01→2, 2.01→2, 0.00→1-in-band, hard 2.09→1-in-band; **medium 4th test FALSIFIED**, 5.11→1 — traced to the same-seed harness confound, §8 caveat, not the Beta-binomial component: corrected E 3.02, P(X≤1) ≈ 0.20) | two families, three stratum shapes; structural discovery: π₀ = 0 at 7B-medium (live tail), π₀ = 0.76 at 7B-hard (the floor returns with difficulty) | §9.6, §9.9 J5 addendum, [PHASE_5.md] J5 |
+| 15 | False-zero floor model (two-component mixture over k=50 pools) | LIVE — **5 for 6** (2.01→2, 2.01→2, 0.00→1-in-band, hard 2.09→1-in-band, **P2 distinct-seed 2.01→2-in-band**; **medium 4th test FALSIFIED**, 5.11→1 — traced to the same-seed harness confound, §8 caveat, not the Beta-binomial component: corrected E 3.02, P(X≤1) ≈ 0.20) | two families, three stratum shapes; structural discovery: π₀ = 0 at 7B-medium (live tail), π₀ = 0.76 at 7B-hard (the floor returns with difficulty) | §9.6, §9.9 J5 addendum, [PHASE_5.md] J5, [PHASE_6.md] P2 |
 
 ### 0.1 Instruments *(journal products independent of any claim)*
 
@@ -413,12 +425,12 @@ Phase-6 "pending" gain their line when P1/P2 land.)*
 | 7 | elimination argument | `dmeasure_e7.json`, `w0a_e0_anchor.json`, `h2a_hint_arm.json` | E7 repulsion loses **15–27 coverage pts** to i.i.d. (0.65/0.75 vs 0.92/0.90); direction existence proof HINT 13 vs floor 2, p = 4.9e-4 | Qwen-1.5B; in-context channels only; weight-/search-space never enumerated | — |
 | 8 | D2c SINK (scoped+inverted, scale-bounded) | `dmeasure_d2c_partial_credit.json`, `h1_cross_family.json`, `h5_7b_pathology.json` | Qwen-1.5B cond **0.374** < copy 0.494 & < iid 0.468 (below-both, p ≈ 5e-5 vs copy); DeepSeek inverts 0.468 vs iid 0.362 (p ≈ 0.003); StarCoder2 +0.046 n.s.; **Qwen-7B 0.609 blend** | Qwen2.5-Coder-**1.5B**-specific; vanishes at 7B | all-cases judge (frac consumed) |
 | 9 | R3 trace null (reversed-as-refined; content fact) | `r3_conditional_reachability.json`, `h5_deepseek_fourarm.json` | TRACE floor: Qwen **1/68** (p = 0.875 vs B1), DeepSeek **2/76** (p = 0.50); generated at i.i.d. PULL 0.85 | cross-family (both), structural failures, **trace channel** (not "use") | near-zero-floor strata — same-seed confound cannot move it |
-| 10 | hint result (generalizes) | `h2a_hint_arm.json`, `h2a_rerun_stability.json`, `h2a_validation_struct.json`, `h5_deepseek_fourarm.json` | Qwen **13/68** (11 hint-only/0, p = 4.9e-4, r ≈ 0.19); DeepSeek **9/76** (8/0, p = 0.0039, r ≈ 0.12); all rerun-stable; ≥ 0.16 AST-novel; timeout-class enriched | both families, medium strata, **complete-strategy-grade** hints (dose-response unmeasured — J2 ceiling 123/125 COMPLETE) | same-seed B1 control suppressed → contrast **conservative**; **P2 pending** = distinct-seed measured control ([PHASE_6.md]) |
+| 10 | hint result (generalizes) | `h2a_hint_arm.json`, `h2a_rerun_stability.json`, `h2a_validation_struct.json`, `h5_deepseek_fourarm.json`, `h6_p2_distinct_seed_b1.json` | Qwen **13/68** (11 hint-only/0, p = 4.9e-4, r ≈ 0.19); DeepSeek **9/76** (8/0, p = 0.0039, r ≈ 0.12); all rerun-stable; ≥ 0.16 AST-novel; timeout-class enriched | both families, medium strata, **complete-strategy-grade** hints (dose-response unmeasured — J2 ceiling 123/125 COMPLETE) | same-seed B1 control suppressed → contrast conservative; **P2 measured it: distinct-seed fresh B1 = 2** (overlap 0.27 vs ~0.50) — the 13-vs-2 contrast stands on a measured control ([PHASE_6.md] P2) |
 | 11 | Qwen pathology / double dissociation (scoped-to-1.5B) | `h1_cross_family.json`, `h2_manip_check.json`, `h2_manip_check_deepseek.json`, `h5_7b_pathology.json` | Qwen code −0.095, language −0.096; DeepSeek +0.107 / +0.088 (double dissociation); Qwen-7B blends, harm vanishes (Δ −0.018 ns) | Qwen2.5-Coder-**1.5B** vs DeepSeek-1.3B (44 code / 20 language); StarCoder2 code-consistent; 7B like other families | 7B language near-saturation (E0 → 0.9); **P1 pending** = measured origin line ([PHASE_6.md]) |
 | 12 | production bottleneck (cross-family + cross-scale) | `h5_selfhint_qwen.json` + `_grades`, `h5_deepseek_selfhint_grades.json`, `h5_7b_selfhint_grades.json` | production-adequate self-hints **0/68** (Qwen-1.5B), **1/76** (DeepSeek-1.3B), **5/101** (Qwen-7B); self-hint arms floor-equivalent all three | 1.3B–7B; switch-on above 7B; cascade is the deployable shape through 7B | 7B arm read under same-seed confound (branch (a) adjudicated on the neutral-draw correction) |
 | 13 | temperature dose-response | `dmeasure_conditioning.json` | T 0.8→1.2 coverage: E0 −0.02 (flat), E1 +0.10, E2 +0.18 (more-anchored ~2×) | Qwen, HumanEval cells, within the law's domain (T ≲ 1.2) | — |
 | 14 | provenance near-irrelevance | `dmeasure_d2a_verb_provenance.json`, `h0a_d2a_ast_followup.json` | provenance ΔPULL ≤ 0.028 (lexical) / ≤ 0.034 (AST) vs verb up to +0.127 (3–4×) | Qwen; holds under lexical and AST | — |
-| 15 | false-zero floor model (4-for-5) | `w0c_stratum_falsezero.json`, `h5_deepseek_floor_fit.json`, `h5_7b_floor_fit.json`, `h5_7b_hard_floor_fit.json`, `scripts/j6_p2_floor_predict.py` | hits 2.01→2, 2.01→2, 0.00→1, hard 2.09→1; miss medium 5.11→1 (harness confound; corrected E 3.02, P(X≤1) ≈ 0.20) | two families, three stratum shapes; π₀ = 0 at 7B-medium (live tail), 0.76 at 7B-hard | the same-seed confound is the miss that found it; distinct-seed now mandatory; **P2 = the 6th test** (committed E 2.01, band [0,4]) |
+| 15 | false-zero floor model (5-for-6) | `w0c_stratum_falsezero.json`, `h5_deepseek_floor_fit.json`, `h5_7b_floor_fit.json`, `h5_7b_hard_floor_fit.json`, `scripts/j6_p2_floor_predict.py`, `h6_p2_distinct_seed_b1.json` | hits 2.01→2, 2.01→2, 0.00→1, hard 2.09→1, **P2 distinct-seed 2.01→2**; miss medium 5.11→1 (harness confound; corrected E 3.02, P(X≤1) ≈ 0.20) | two families, three stratum shapes; π₀ = 0 at 7B-medium (live tail), 0.76 at 7B-hard | the same-seed confound is the miss that found it; distinct-seed now mandatory; **P2 6th test HIT** (distinct-seed B1 = 2 ∈ [0,4]; overlap 0.27 vs ~0.50) |
 
 ### 0.4 Open successors *(named, not chartered — [PHASE_6.md] P3; carried without commitment)*
 
@@ -1093,6 +1105,16 @@ SELFHINT-vs-B1 trend that dissolves under the neutral-draw correction
 ([PHASE_5.md] J5 arms RESULT). Standing rule going forward: **fresh-draw
 control arms use a distinct seed from the screen that defined their stratum.**
 
+**Measured, not computed (2026-07-17, Phase 6 P2 — [PHASE_6.md]).** The survival
+argument above was a computation; for the flagship number it is now a
+measurement. A distinct-seed (41) fresh B1-50 on the Qwen 68-problem medium
+stratum recovered **2** — the committed floor prediction (E 2.01, band [0, 4])
+hit on a genuinely-fresh control whose byte-identical overlap with the screen
+pool was **0.27** (vs the same-seed ~0.50). Same-seed suppression is thereby
+*shown* invisible at this near-zero floor (same-seed and distinct-seed both gave
+2), so the **HINT-13-vs-floor-2** contrast (§9.8) stands on a **measured**
+control. The floor instrument goes **5-for-6**. [artifacts/h6_p2_distinct_seed_b1.json].
+
 Infrastructure: Kaggle then Modal T4 for Phases 0–2 and the diagnostics (~25+
 T4-hours), Modal L4 (vLLM) for Phase M and Phase 3, Daytona sandboxes for Phase-0–2
 execution (12,100 runs; sandbox-fault rates 0.2% / 0.0% / 0.3%, faults scored as
@@ -1675,6 +1697,17 @@ the named successor experiment, explicitly outside this record.
 > reproducing §9.6's 2.01). **P3** (claims-to-evidence tables + the pathology-
 > note revision) is journal work. Results land in [PHASE_6.md]; the Index and
 > §8/§9.9 update as they do.
+>
+> **P2 landed (2026-07-17, Modal): in-band — the flagship floor is measured.**
+> The distinct-seed (41) fresh B1-50 recovered **2** (committed point 2, band
+> [0, 4]); the floor instrument goes **5-for-6**, and its first genuinely-fresh
+> draw (screen overlap 0.27 vs same-seed ~0.50) confirms same-seed suppression
+> is invisible at this near-zero floor — the **HINT-13-vs-floor-2** contrast now
+> stands on a *measured* control (§8 caveat computed → measured; §10 distinct-seed
+> protocol codified; Index rows 10/15). **P1 is on Kaggle** (free re-baseline —
+> the P1 amendment: new stack boundary, so re-baseline not cross-compare; ≤ 3B on
+> T4, 7B stays the Modal endpoint; committed 1.5B stack anchor). qwen3b smoke
+> running; nothing else on Modal.
 
 *(historical, 2026-07-15)*
 
