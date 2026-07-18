@@ -119,10 +119,13 @@ def h1_download():
 @app.function(image=GEN_IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=7200)
 def h1_gen_lcb(model_id: str, items: list, n: int, tag: str,
                temperature: float = 0.8, top_p: float = 1.0, seed: int = 17,
-               revision: str = None):
+               revision: str = None, max_model_len: int = 8192,
+               max_tokens: int = 1536):
     """Frozen R2/p3b fenced-completion scaffold, parametrized by model.
     items: [{qid, context|None}]. `revision` (added Phase 6, no-op default —
-    existing frozen callers omit it) pins the exact HF commit at load time."""
+    existing frozen callers omit it) pins the exact HF commit at load time.
+    `max_model_len`/`max_tokens` (added Phase 8, defaults = frozen values — no-op for
+    existing callers) accommodate short-context models (phi-1: 2048-ctx, C3)."""
     def compute():
         from datasets import load_dataset
         from vllm import LLM, SamplingParams
@@ -138,10 +141,10 @@ def h1_gen_lcb(model_id: str, items: list, n: int, tag: str,
                     "input and writes the answer to standard output:\n\n```python\n")
 
         llm = LLM(model=model_id, dtype="bfloat16", gpu_memory_utilization=0.90,
-                  max_model_len=8192, seed=seed,
+                  max_model_len=max_model_len, seed=seed,
                   **({"revision": revision} if revision else {}))
         sp = SamplingParams(n=n, temperature=temperature, top_p=top_p,
-                            max_tokens=1536, seed=seed, stop=["```", "\nProblem:"])
+                            max_tokens=max_tokens, seed=seed, stop=["```", "\nProblem:"])
         outs = llm.generate([prompt(it) for it in items], sp)
         return [{"qid": it["qid"], "codes": [(o.text.strip() or None) for o in req.outputs]}
                 for it, req in zip(items, outs)]
@@ -1934,7 +1937,8 @@ def j8_d3():
     print("wrote artifacts/h8_d3_perplexity.json")
 
 
-def _matched_cell(model_id, rev, seed, arts, cell, source_label):
+def _matched_cell(model_id, rev, seed, arts, cell, source_label,
+                  max_model_len=8192, max_tokens=1536):
     """Shared C-cell runner: E0 + E1 on `arts`, all-cases judge, sink signature."""
     import random
     import statistics as st
@@ -1944,7 +1948,8 @@ def _matched_cell(model_id, rev, seed, arts, cell, source_label):
     dgen = _load(f"j8_cand_{cell}") or _persist(
         f"j8_cand_{cell}",
         h1_gen_lcb.remote(model_id, items, 8, tag=f"j8_cand_{cell}", seed=seed,
-                          revision=rev))
+                          revision=rev, max_model_len=max_model_len,
+                          max_tokens=max_tokens))
     dres = _load(f"j8_res_{cell}") or _persist(
         f"j8_res_{cell}",
         h1_lcb_exec.remote([g["qid"] for g in dgen], [g["codes"] for g in dgen],
@@ -1996,7 +2001,8 @@ def j8_phi_smoke():
     gen = _load("j8_phi_smoke_cand") or _persist(
         "j8_phi_smoke_cand",
         h1_gen_lcb.remote(PHI1, [{"qid": q, "context": None} for q in qids], 8,
-                          tag="j8_phi_smoke_cand", revision=PHI1_REV))
+                          tag="j8_phi_smoke_cand", revision=PHI1_REV,
+                          max_model_len=2048, max_tokens=700))
     flat = [c for g in gen for c in g["codes"]]
     wf = sum(1 for c in flat if c) / len(flat)
     dg = sum(1 for c in flat if c and len(c) < 20) / max(1, sum(1 for c in flat if c))
@@ -2023,7 +2029,8 @@ def j8_c3_phi():
     e0gen = _load("j8_c3_phi_e0") or _persist(
         "j8_c3_phi_e0",
         h1_gen_lcb.remote(PHI1, [{"qid": q, "context": None} for q in qids], 8,
-                          tag="j8_c3_phi_e0", revision=PHI1_REV))
+                          tag="j8_c3_phi_e0", revision=PHI1_REV,
+                          max_model_len=2048, max_tokens=700))
     e0res = _load("j8_c3_phi_e0res") or _persist(
         "j8_c3_phi_e0res",
         h1_lcb_exec.remote([g["qid"] for g in e0gen], [g["codes"] for g in e0gen],
@@ -2053,4 +2060,5 @@ def j8_c3_phi():
     if len(arts) < 20:
         print(f"WARN: phi coverage {len(arts)} < 20 — scoped/underpowered, recorded")
     _matched_cell(PHI1, PHI1_REV, 17, arts, "C3_phi1_match",
-                  f"phi iid {phi_iid:.3f}; mined donor @ [{lo:.3f},{hi:.3f}] (n={len(arts)})")
+                  f"phi iid {phi_iid:.3f}; mined donor @ [{lo:.3f},{hi:.3f}] (n={len(arts)})",
+                  max_model_len=2048, max_tokens=700)
