@@ -437,3 +437,62 @@ anchor, branches/odds as frozen. Only the **three new checkpoints**
 and 7B (`h5_7b_pathology.json`) cells are the existing Modal results. The Kaggle
 kernel + launch integration stay in the tree (unused) as the recorded
 infrastructure of a measured dead-end.
+
+### P1 RESULT (2026-07-17, Modal L4/bf16) — **the pathology is CODER-STAGE, competence-windowed, and MIXED across channels**
+
+Three new cells landed (all smoke-PASS, wf 1.000: 0.5B 3/64, 3B 26/64, general
+8/64 easy). Joined with the record's 1.5B/7B ([scripts/j6_size_curve.py],
+[artifacts/h6_size_curve.json]):
+
+| checkpoint | tie | code: iid → cond (copy 0.494) | Δ vs iid | below-both? | code class | language Δ | copy-fidelity |
+|---|---|---|---|---|---|---|---|
+| Coder-0.5B | tied | 0.211 → 0.389 | **+0.178** | no | BLEND | +0.018 (flat) | 0.818 |
+| Coder-1.5B | tied | 0.468 → 0.374 | −0.094 | **yes** | **SINK** | **−0.096 (harm)** | 0.570 |
+| Coder-3B | tied | 0.569 → 0.419 | **−0.150** | **yes** | **SINK** | +0.076 (help) | 0.626 |
+| Coder-7B | untied | 0.659 → 0.609 | −0.050 | no | BLEND | −0.018 (flat) | 0.580 |
+| general-1.5B | tied | 0.324 → 0.394 | +0.070 | no | BLEND | **+0.160 (help)** | 0.638 |
+
+**Branch accounting (frozen odds):** code shape — SLOPE 50% ✗, STEP-OPEN 20% ✗,
+**NON-MONOTONE 15% ✓** (0.5B is *not* worse than 1.5B — the trigger), 0.5B-uninformative
+15% ✗ (smoke passed). Recipe — **CODER-STAGE 55% ✓** (the favourite), RECIPE-DEEP
+30% ✗. Cross-channel — **MIXED** (pre-registered: channels disagree → record it,
+don't harmonize). The underdog code branch fired; the favourite recipe branch fired.
+
+**What the battery measured (mechanism, not noise):**
+
+1. **Recipe = CODER-STAGE, clean.** general-1.5B — same architecture, same tie,
+   same scale, *general* Qwen2.5 pretraining instead of the Coder
+   continued-pretraining — is **not pathological**: conditioning *helps* it on code
+   (+0.070 vs iid, a blend toward copy) and strongly on language (+0.160). So the
+   pathology is a property of the **Coder continued-pretraining diet**
+   (synthetic-heavy code data — "the synthetic tax"), **not** the base Qwen2.5
+   recipe and **not** the architecture/tie. The clean control the phase was built
+   to get.
+
+2. **Code sink = a competence WINDOW, not slope/step.** Below-both-nulls at
+   **1.5B and 3B only**. At **0.5B** conditioning *helps* — its i.i.d. frac (0.211)
+   sits *below* the artifact (0.494), so conditioning can only lift; the model is
+   too weak to sink below its own floor. At **7B** it blends up (strong enough to
+   imitate toward its own 0.659 quality). The sink lives where the model's i.i.d.
+   quality straddles the artifact's — good enough to be dragged *down*, not so good
+   it recovers. The harm-vs-iid is in fact **deepest at 3B (−0.150)**, still tied,
+   still Coder.
+
+3. **MIXED across channels — the two-channel disagreement is itself the finding.**
+   The code sink persists to **3B**; the language harm is **1.5B-only** (at 3B,
+   hint-conditioning already *helps*, +0.076; general +0.160). The two conditioning
+   channels have different competence boundaries. Recorded MIXED; not harmonized.
+
+4. **Free rider — fidelity does not track the sink.** 0.5B copies hardest
+   (fidelity 0.818, a weak-model echo) yet does not sink; 7B (0.580) and the sink
+   band (0.570–0.626) sit together. The sink is quality degradation *at matched
+   fidelity*, not a copy effect (consistent with §9.7's "degraded blend").
+
+5. **P0's tie demotion, confirmed by the curve.** Tie tracks nothing: 0.5B and
+   general-1.5B are both **tied yet clean**; the sink (1.5B/3B) and its absence
+   (0.5B/7B/general) are explained by the competence window × Coder diet, with no
+   role for tying. H-tie stays demoted; the data agree.
+
+**Decision-rule origin line (for the Index):** **CODER-STAGE diet, competence-windowed
+(code sink 1.5–3B, absent at 0.5B floor and 7B), MIXED across channels
+(language harm 1.5B-only).** [artifacts/h6_size_curve.json, h6_pathology_origin_*.json].
