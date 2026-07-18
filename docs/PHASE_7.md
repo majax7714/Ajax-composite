@@ -349,3 +349,138 @@ claim the record has held (**a conditioning law with a diet parameter**). Both a
 wins. The loss would be publishing "small-Qwen pathology" while the discriminating
 region sat unsampled one battery away — caught before any reader could, against the
 record's own momentum, which is §10 working exactly as written.
+
+---
+
+## P1 RESULT (2026-07-18, Modal L4/bf16) — **H-Coder-specific fires; and the 7B "clean" was itself a position artifact**
+
+All five cells landed (smoke-PASS, wf 1.000; stack fingerprint confirmed live on
+every artifact: L4/cap-8.9/bf16, vLLM 0.11.0, torch 2.8.0). Each conditioned its
+model on donor artifacts mined to its own match and measured E0 (own i.i.d.) on the
+same problems.
+
+| cell | model | diet | Δ_art (actual) | i.i.d. → cond | Δ vs i.i.d. (CI) | p(below i.i.d.) | matched-sink | n |
+|---|---|---|---|---|---|---|---|---|
+| **M1** | DeepSeek-1.3B | organic | +0.050 | 0.311 → 0.360 | **+0.050** [−0.021, +0.116] | 0.920 | **No** | 39 |
+| **M3** | StarCoder2-3B | organic | +0.033 | 0.328 → 0.336 | **+0.008** [−0.075, +0.088] | 0.578 | **No** | 39 |
+| **M2** | general-1.5B | general | +0.064 | 0.266 → 0.265 | **−0.000** [−0.066, +0.059] | 0.501 | **No** | 28 |
+| **M5** | Coder-0.5B | coder | +0.081 | 0.123 → 0.167 | **+0.044** [−0.005, +0.090] | 0.959 | **No** | 43 |
+| **M4** | Coder-7B | coder | −0.039 | 0.702 → 0.574 | **−0.129** [−0.206, −0.054] | **0.0024** | **YES** | 20 |
+
+Reference rows (already at ≈ match, fixed-0.494): **Coder-1.5B −0.095 (sink)**,
+**Coder-3B −0.150 (sink)**. All five M-cells landed in the straddle band (P0.2
+figure re-run, `h7_relational_assembly.json`).
+
+**Branch accounting (frozen odds).** **H-universal (15%) ✗ REJECTED** — no non-Coder
+model sinks at match. **H-diet-modulated (45%, the favourite) ✗ REJECTED as stated**
+— its premise was *negative pressure everywhere*; the non-Coder models show none
+(DeepSeek **+0.050**, StarCoder2 **+0.008**, general **−0.000** — flat-to-positive,
+not shallow-negative). **H-Coder-specific (30%, the middle branch) ✓ FIRES** — a
+clean dissociation: at match, Coder-diet models sink (1.5B, 3B, and now 7B),
+non-Coder families do not. The favourite lost; the odds were priced honestly and the
+result is recorded as it came.
+
+**What the battery measured (mechanism):**
+
+1. **The sink is Coder-diet-specific — now position-controlled.** For the first time,
+   three non-Coder models were placed in the straddle (Δ_art +0.033 to +0.064), the
+   region the sink was never sampled in off-Coder. **None sink; none even show
+   negative pressure** — DeepSeek is *helped* at its own level (+0.050), general and
+   StarCoder2 sit flat. The Phase-6 origin line (**CODER-STAGE diet**) **survives the
+   confound it was built on**: it is the diet, not position, and not family-general.
+
+2. **The 7B "clean/blend" was ALSO a position artifact — the code sink is NOT
+   scale-bounded above.** Phase 5/6 read Qwen-Coder-7B as friendly ("blends up, harm
+   vanishes"), but 7B had only ever been measured at Δ_art −0.165 (its i.i.d. 0.659
+   far *above* the 0.494 artifact — any model blends there). Restored to its own
+   straddle (Δ_art −0.039, artifact ≈ its level), **7B sinks −0.129 (p 0.0024, below
+   both nulls)**. Holding the model fixed and moving only the artifact level flips
+   friendly → sink. So the Phase-6 "competence window closes at 7B" is **reversed**:
+   the sink persists to 7B; the apparent upper bound was the same position confound
+   the phase was built to catch. *(n = 20, the pre-flagged underpowered cell; per the
+   pre-reg's asymmetric rule a clear sink IS informative, and this one is large and
+   significant. A higher-n confirmation of the 7B matched sink is the named
+   follow-up.)*
+
+3. **The lower "boundary" (0.5B) reopens, it did not resolve.** M5 could **not be
+   placed at its own straddle**: mined to 0.20, the artifacts still sat *above*
+   0.5B's measured i.i.d. on those problems (0.123), so Δ_art landed at **+0.081**
+   (lift arm), and 0.5B lifted (+0.044) as any model does off a better anchor. 0.5B
+   is too weak to be conditioned at its own level by mining. Whether it has a genuine
+   **capability floor** or is merely **un-sample-able at straddle** stays **OPEN** —
+   the Phase-6 "0.5B floor" is neither confirmed nor refuted here (needs a
+   generated-artifact design that can hit 0.5B's band).
+
+4. **The "competence window" dissolves into a relational rule.** Phase 6 framed the
+   sink as a window (1.5B–3B, absent at 0.5B and 7B). Phase 7 replaces it: the
+   Coder-diet sink appears **whenever a Coder model is conditioned at or near its own
+   quality** (straddle), measured now at 1.5B, 3B, and 7B; the 7B "ceiling" was
+   position, the 0.5B "floor" is un-sampled. Not a capability window — a **diet ×
+   relational-position** effect.
+
+**Decision-rule origin line (for the Index):** **CODER-STAGE diet, position-controlled
+and family-specific (non-Coder families — DeepSeek, StarCoder2, general-Qwen — show
+no sink at match); NOT scale-bounded on the code channel — the Coder sink persists to
+7B when the straddle is restored (the Phase-6 "vanishes at 7B" was a position
+artifact); the 0.5B lower bound is OPEN (un-sample-able at straddle by mining).**
+[artifacts/h7_matched_M*.json, h7_relational_assembly.json].
+
+### The phase-close relational figure (all M-cells placed)
+
+```
+  Delta_cond (y)  [+0.20 .. -0.20]     Delta_art (x) [-0.20 .. +0.30]
+  ':' = straddle band edges (-0.08, +0.13)
+              :       |    3  5    :e            g
+  ----------------2------4---------------------------  (2 StarCoder2, 4 general at ~0)
+              :   1   |            :   (3 DeepSeek, 5 Coder-0.5B* just above axis)
+              :B      |  C         :   f   d
+   a=Coder-7B(fixed,over-qual)  B=Coder-3B  C=Coder-1.5B  1=M4 Coder-7B* (all SINK)
+   2=StarCoder2* 3=DeepSeek* 4=general* 5=Coder-0.5B* (all FLAT/LIFT at match)
+   d=DeepSeek e=StarCoder2 f=general g=Coder-0.5B (record, lift arm)
+```
+
+In the straddle band: **every Coder cell sinks (B, C, 1); every non-Coder cell sits
+at its own level (2, 3, 4).** The record's non-Coder points (d, e, f) are off to the
+lift arm — where they were always measured. That gap is the confound; the M-cells close it.
+
+---
+
+## PHASE GATE — CLOSED (2026-07-18)
+
+The six closure conditions, audited:
+
+1. **P0.2 relational figure exists with all M-cells placed** ✓ —
+   `h7_relational_assembly.json` (5/5 matched cells in the straddle).
+2. **The sink's Index rows re-stated on matched evidence** ✓ — rows 8/11: origin
+   **CODER-STAGE, position-controlled + family-specific**; code sink **NOT
+   scale-bounded** (7B sinks at match — Phase-6 "vanishes at 7B" reversed); 0.5B
+   lower bound OPEN.
+3. **Phase-4 dissociation + J5-Q1 rows carry resolved position annotations** ✓ — the
+   P7-PROVISIONAL flags on rows 8/11 resolve to "position-controlled: confirmed
+   Coder-specific; scale-bound reversed."
+4. **Matched-relation rule codified in §10** ✓ (P2, landed with the pre-reg).
+5. **Lineage column + fingerprint hook live** ✓ (P0.3; fingerprint confirmed on all
+   5 artifacts).
+6. **Note gating status reflects P1's branch** ✓ — §0.2 un-suspended and **corrected**
+   (Coder-diet-specific confirmed; the "vanishes at Coder-7B → distinct from
+   Spurious-Rewards-Math-7B" argument is **retracted for the code channel** — the
+   code sink does *not* vanish at 7B).
+
+**Prediction accounting, full phase:** P0.1 StarCoder2 lift-arm ruling correct
+(it stayed a lift-arm point; M3 needed running and came out flat at match). P1 the
+**30% middle branch fired**, not the 45% favourite (H-diet-modulated rejected — no
+universal negative pressure); H-universal (15%) rejected. The unanticipated result —
+**7B sinks at match, reversing Phase 6's scale-bound** — was *produced by* the
+matched design, exactly the confound class the phase existed to expose. No gate was
+passed by tuning. Re-anchor (P0.3c) resolved **moot** by the provenance audit ($3
+saved).
+
+**Cost:** P1 5 cells ~$18 (Modal L4/bf16); re-anchor not run.
+
+**Open (author's, Index in hand):** the extraction decision (the pathology note is
+now Coder-diet-specific **and cross-scale on code** — a cleaner, *larger* claim than
+"small-Qwen 1.5B–3B", but the Spurious-Rewards-7B contrast must be dropped for code);
+the **7B matched-sink confirmation at higher n**; the **0.5B straddle via
+generated artifacts** (resolves the reopened lower bound); the standing successors
+(dose-response hint set; 7B–72B switch-on; TTT/weight-space). **Nothing is running;
+Phase 7 is fully closed.**

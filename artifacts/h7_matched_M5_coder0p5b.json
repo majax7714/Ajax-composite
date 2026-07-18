@@ -1,0 +1,33 @@
+{
+  "_label": "Phase 7 P1 \u2014 matched-artifact code cell, M5_coder0p5b [PHASE_7.md P1]",
+  "cell": "M5_coder0p5b",
+  "model": "Qwen/Qwen2.5-Coder-0.5B",
+  "revision": "8123ea2e9354afb7ffcc6c8641d1b2f5ecf18301",
+  "n_problems": 43,
+  "min_n_met": true,
+  "target_iid": 0.21082,
+  "diet": "coder",
+  "mean_iid_e0": 0.1229,
+  "mean_cond_e1": 0.1672,
+  "mean_copy_null": 0.2043,
+  "delta_cond_minus_iid": 0.0443,
+  "delta_cond_minus_iid_ci95": [
+    -0.0053,
+    0.0896
+  ],
+  "actual_delta_art": 0.0814,
+  "delta_cond_minus_copy": -0.0371,
+  "p_one_sided_cond_below_iid": 0.9591020448977551,
+  "matched_sink_signature": false,
+  "stack": {
+    "gpu_name": "NVIDIA L4",
+    "gpu_capability": "8.9",
+    "dtype": "bfloat16",
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8",
+    "vllm": "0.11.0",
+    "gen_template_hash": "1cbfd4f8f216268a",
+    "d2c_context_hash": "b9323ddf1a9b253d",
+    "judge_hash": "dbd4f9fa650a6a2f"
+  }
+}

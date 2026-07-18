@@ -1,0 +1,33 @@
+{
+  "_label": "Phase 7 P1 \u2014 matched-artifact code cell, M3_starcoder2_3b [PHASE_7.md P1]",
+  "cell": "M3_starcoder2_3b",
+  "model": "bigcode/starcoder2-3b",
+  "revision": "733247c55e3f73af49ce8e9c7949bf14af205928",
+  "n_problems": 39,
+  "min_n_met": true,
+  "target_iid": 0.3585,
+  "diet": "organic",
+  "mean_iid_e0": 0.3281,
+  "mean_cond_e1": 0.3362,
+  "mean_copy_null": 0.3608,
+  "delta_cond_minus_iid": 0.008,
+  "delta_cond_minus_iid_ci95": [
+    -0.0746,
+    0.0879
+  ],
+  "actual_delta_art": 0.0326,
+  "delta_cond_minus_copy": -0.0246,
+  "p_one_sided_cond_below_iid": 0.5783710814459277,
+  "matched_sink_signature": false,
+  "stack": {
+    "gpu_name": "NVIDIA L4",
+    "gpu_capability": "8.9",
+    "dtype": "bfloat16",
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8",
+    "vllm": "0.11.0",
+    "gen_template_hash": "1cbfd4f8f216268a",
+    "d2c_context_hash": "b9323ddf1a9b253d",
+    "judge_hash": "dbd4f9fa650a6a2f"
+  }
+}

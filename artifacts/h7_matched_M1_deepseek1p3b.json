@@ -1,0 +1,33 @@
+{
+  "_label": "Phase 7 P1 \u2014 matched-artifact code cell, M1_deepseek1p3b [PHASE_7.md P1]",
+  "cell": "M1_deepseek1p3b",
+  "model": "deepseek-ai/deepseek-coder-1.3b-base",
+  "revision": "c919139c3a9b4070729c8b2cca4847ab29ca8d94",
+  "n_problems": 39,
+  "min_n_met": true,
+  "target_iid": 0.3618,
+  "diet": "organic",
+  "mean_iid_e0": 0.3109,
+  "mean_cond_e1": 0.3605,
+  "mean_copy_null": 0.3608,
+  "delta_cond_minus_iid": 0.0496,
+  "delta_cond_minus_iid_ci95": [
+    -0.0207,
+    0.1164
+  ],
+  "actual_delta_art": 0.0499,
+  "delta_cond_minus_copy": -0.0002,
+  "p_one_sided_cond_below_iid": 0.92040397980101,
+  "matched_sink_signature": false,
+  "stack": {
+    "gpu_name": "NVIDIA L4",
+    "gpu_capability": "8.9",
+    "dtype": "bfloat16",
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8",
+    "vllm": "0.11.0",
+    "gen_template_hash": "1cbfd4f8f216268a",
+    "d2c_context_hash": "b9323ddf1a9b253d",
+    "judge_hash": "dbd4f9fa650a6a2f"
+  }
+}

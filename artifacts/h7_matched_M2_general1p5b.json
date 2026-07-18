@@ -1,0 +1,33 @@
+{
+  "_label": "Phase 7 P1 \u2014 matched-artifact code cell, M2_general1p5b [PHASE_7.md P1]",
+  "cell": "M2_general1p5b",
+  "model": "Qwen/Qwen2.5-1.5B",
+  "revision": "8faed761d45a263340a0528343f099c05c9a4323",
+  "n_problems": 28,
+  "min_n_met": false,
+  "target_iid": 0.32411,
+  "diet": "general",
+  "mean_iid_e0": 0.2655,
+  "mean_cond_e1": 0.2654,
+  "mean_copy_null": 0.3297,
+  "delta_cond_minus_iid": -0.0001,
+  "delta_cond_minus_iid_ci95": [
+    -0.0657,
+    0.0591
+  ],
+  "actual_delta_art": 0.0642,
+  "delta_cond_minus_copy": -0.0642,
+  "p_one_sided_cond_below_iid": 0.5007749612519374,
+  "matched_sink_signature": false,
+  "stack": {
+    "gpu_name": "NVIDIA L4",
+    "gpu_capability": "8.9",
+    "dtype": "bfloat16",
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8",
+    "vllm": "0.11.0",
+    "gen_template_hash": "1cbfd4f8f216268a",
+    "d2c_context_hash": "b9323ddf1a9b253d",
+    "judge_hash": "dbd4f9fa650a6a2f"
+  }
+}
