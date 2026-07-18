@@ -149,9 +149,26 @@ becomes the record's central pathology figure regardless of P1's branch.
   context, and judge) attaches a `stack` block — GPU arch, capability, dtype,
   torch/CUDA/vLLM versions, template/context/judge SHA-16 — to **every Phase-7
   artifact**. Verified: the three frozen-wording functions parse and hash.
-- **(c) Law re-anchor — FLAGGED, NOT RUN.** The escape-distance law's original
-  HumanEval constants stand on pre-M pools. A ~$3 Modal E0/E1 re-anchor cell is a
-  costed **sign-off decision for the author** — *not run under this handoff*.
+- **(c) Law re-anchor — SIGNED OFF, THEN RESOLVED MOOT BY THE AUDIT (2026-07-18).**
+  The author green-lit the ~$3 E0/E1 re-anchor. But the charter gated it on a
+  *condition* — "**if** the lineage audit shows the law's original HumanEval
+  constants stand on pre-M pools" — and provenance verification (run before any
+  spend) shows the condition is **false**:
+  - The escape-distance law's core evidence, the **D-measure** (60-HumanEval-problem
+    PULL/TAX cell, `dmeasure_conditioning.json`), is **post-Phase-M**: Phase M ported
+    the generator HF/4-bit → vLLM/bf16 *before* Phase 3R, and the mechanism arc is
+    "Phase 3R audits → D-measure → the escape-distance law" (§9, §6). It already
+    stands on the current bf16 stack.
+  - The one genuinely pre-M constant the law leaned on — DIAG-8's **assumed** pairwise
+    anchor 0.396 — was **already re-anchored on the post-M stack** by `w0a_e0_anchor`
+    (measured E0 PULL 0.408/0.491/0.596; **delta_vs_assumed +0.197**, `within_prereg_band:
+    false`), the +0.198 recorded in §9.3.1.
+  - **Ruling: the re-anchor is MOOT — not run, $3 saved.** There is nothing on a
+    pre-M pool to re-anchor; the law's generation-stack-dependent constants are
+    already bf16, and the DIAG-8 assumed value was re-measured long ago. Reporting
+    this straight rather than spending on a cell the audit dissolves is §10 rule 4
+    ("turn the method on ourselves") working. Author can override if they want the
+    number re-confirmed regardless.
 
 ---
 
