@@ -78,13 +78,14 @@ confound all along.
 
 Start with the journal, in its designed order: **§10** (the working method —
 the document's thesis), then **§0** (Claims & Scope Index — what the project
-currently believes, claim by claim, with status and pointers), then **§9.5**
-(live status). Within §0, **§0.3** is the claims-to-evidence layer — each live
-claim mapped to its artifact, test, number, scope line, and stack lineage — so
-that an extraction is *selecting rows, not re-deriving support*. The dated
-**living-record line** at the top of the journal always states the current phase
-and where it stands. Historical section numbering is preserved; the reading
-order 10 → 0 → 1 is intentional.
+currently believes, claim by claim, with status and pointers). For the current
+status, read the dated **living-record line** at the very top of the journal —
+it names the current phase and where it stands (the §9.5 "live status" section
+is an older, phase-3b-era snapshot, kept in place under append-only). Within §0,
+**§0.3** is the claims-to-evidence layer — each live claim mapped to its
+artifact, test, number, scope line, and stack lineage — so that an extraction is
+*selecting rows, not re-deriving support*. Historical section numbering is
+preserved; the reading order 10 → 0 → 1 is intentional.
 
 ## Repository map
 

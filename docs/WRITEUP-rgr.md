@@ -139,7 +139,26 @@ see §0.)*
 > were a portrait of Qwen2.5-Coder; the *mechanism* is family-general.
 > *(2026-07-17, J5 Q1: the sink is also scale-bounded within the family — at
 > Qwen-7B it vanishes into the family-general blend, and the language-channel
-> harm vanishes with it; §9.9 J5 addendum, Index rows 8/11.)*
+> harm vanishes with it; §9.9 J5 addendum, Index rows 8/11.)* **[code channel
+> REVERSED at P7 — see the Phases 6–7 banner below: 7B sinks at match.]**
+>
+> **Origin measured, then position-controlled (2026-07-18, Phases 6–7 —
+> [PHASE_6.md], [PHASE_7.md]).** The SINK's origin was measured, then its scope
+> corrected by the record's own audit. Phase 6 traced it to the **Coder
+> continued-pretraining diet** (general-Qwen-1.5B — same architecture, tie, scale —
+> is clean). Phase 7 then caught that the whole origin picture was
+> **position-confounded**: every family had been conditioned on the *same* fixed
+> 0.494-frac artifacts, so "diet" and the model–artifact quality relation
+> (Δ_art = artifact − own-i.i.d. frac) moved together, and no non-Coder model had
+> ever been measured in the straddle (Δ_art ≈ 0) where the sink lives. Re-measured
+> with artifacts **mined to each model's own quality** (Δ_art ≈ 0): the sink is
+> **Coder-diet-specific** — DeepSeek, StarCoder2, and general-Qwen show *no* sink at
+> match (Δ_cond +0.050 / +0.008 / −0.000) — and, **reversing the J5 line above, NOT
+> scale-bounded on code**: Qwen-Coder-**7B sinks at match** (−0.129, p 0.0024, n=20);
+> its "vanishes at 7B" was an artifact of only ever measuring it far over-quality.
+> The "competence window" becomes a **diet × relational-position** rule; the 0.5B
+> lower bound is open (un-sample-able at its own straddle by mining). §9.9 P7
+> addendum, Index rows 8/11.
 
 We test one claim in isolation: that an explicit internal state vector — a
 *register* — updated across refinement steps and gating generation improves
@@ -437,6 +456,14 @@ currently believes.** Statuses: LIVE / KILLED / RETRACTED / REVERSED / SCOPED.
 - **Hardened judges + ops ledger** (§8) — short-circuit vs all-cases matched to
   the analysis; detach/checkpoint/volume-first persistence; six recorded failure
   modes with fixes.
+- **The relational axis + stack fingerprint** (Phase 7) — re-expressing every
+  conditioning cell on **Δ_art** (artifact frac − own i.i.d.) turned a hidden
+  position confound into a measurable axis and caught it in two consecutive phases
+  ([scripts/j7_relational_assembly.py]); the **matched-relation rule** (§10) is its
+  codification. Paired with a per-artifact **stack-fingerprint** block (GPU/dtype/
+  engine versions + template/judge content hashes) and the §0.3 **stack-lineage
+  column**, so a number's provenance and the relation it was measured at are both on
+  the page.
 
 ### 0.2 Extraction candidates *(papers are extractions from journal state, not the frame)*
 
@@ -1823,6 +1850,22 @@ the named successor experiment, explicitly outside this record.
 > (author's, Index in hand): the extraction decision (pathology note is
 > transcription-ready); §0.4 successors (dose-response set; 3B→7B window-close +
 > 7B–72B switch-on; TTT) — named, not chartered.
+>
+> **PHASE 7 CLOSED (2026-07-18) — the matched-artifact battery.** The Phase-6
+> origin line above was **position-confounded** (every family conditioned on the
+> same fixed 0.494-frac artifacts, so diet and Δ_art moved together). Re-measured
+> with artifacts mined to each model's own match (Δ_art ≈ 0): the sink is
+> **Coder-diet-specific** — DeepSeek/StarCoder2/general-Qwen show **no sink at
+> match** (+0.050 / +0.008 / −0.000; H-Coder-specific, the 30% branch, fired;
+> H-diet-modulated and H-universal rejected). And the **"competence-windowed /
+> absent at 7B" line above is REVERSED**: the code sink is **not scale-bounded** —
+> Qwen-Coder-7B **sinks at match** (−0.129, p 0.0024, n=20); its Phase-6 "clean"
+> was a position artifact. The competence window becomes a **diet × relational
+> position** rule; the 0.5B lower bound reopens (un-sample-able at straddle by
+> mining). P0.3 stack-lineage + fingerprint live; re-anchor resolved moot ($3
+> saved). **Nothing running.** Open (author's): extraction; the 7B matched-sink
+> confirmation at higher n; 0.5B-at-straddle via generated artifacts. §9.9 P7
+> addendum, [PHASE_7.md], Index rows 8/11.
 
 *(historical, 2026-07-15)*
 
