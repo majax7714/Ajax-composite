@@ -347,3 +347,110 @@ gets a **why** (a mechanism with independent evidence lines, provenance-controll
 replicated in a second synthetic family) or **breaks again one level deeper**. The
 only unacceptable exit is an origin line whose confounds were known, named, and cheap
 to close — and left open for momentum.
+
+---
+
+## D3 RESULT (2026-07-18, Modal L4/bf16) — **weak M-OOD lean; RECLASS disfavored**
+
+`h8_d3_perplexity.json`. Mean surprise_ratio (ppl on conditioning artifacts ÷ ppl on
+own E0):
+
+| model | diet | ratio | | model | diet | ratio |
+|---|---|---|---|---|---|---|
+| Coder-1.5B | coder | 0.94 | | DeepSeek (M1) | organic | 1.05 |
+| Coder-3B | coder | 1.14 | | general (M2) | general | 0.97 |
+| Coder-7B (M4) | coder | 1.26 | | StarCoder2 (M3) | organic | 0.95 |
+| Coder-0.5B (M5) | coder | 1.14 | | **mean coder 1.12** | vs | **non-coder 0.99** |
+
+Coder models find their matched artifacts **more surprising** than their own output
+(off-manifold); non-Coder find them neutral. **RECLASS predicted the opposite** (matched
+artifacts should be *unsurprising* — exemplar-credible); the data **disfavor RECLASS**.
+The lean is **weak** (1.12 vs 0.99, just past the 0.10 threshold) and carries a
+**donor-provenance caveat**: the artifacts are Coder-1.5B-base output, so the elevated
+surprise for Coder-3B/7B is partly "a smaller same-family model's output," not purely
+"off-diet-manifold." Perplexity is a blunt exemplar-credibility proxy (pre-declared).
+
+## MECHANISM CALL (final) — **M-OOD-leaning; RECLASS disfavored, not excluded**
+
+Three lines converge: **D1** — the sink is **elaboration**, not faithful copying (sink
+cells fidelity 0.57–0.64 and land *below* the artifact; the clean cell copies at 0.84
+and lands *at* it); artifact-imitation itself is family-general. **D2** — **position-
+gated** (interior trough at Δ_art ≈ −0.09). **D3** — the matched artifact is modestly
+**off-manifold** for Coder models. Synthesis: **matched conditioning lands (modestly)
+off a Coder model's manifold; it cannot reproduce the artifact faithfully, elaborates,
+and the elaboration degrades — worst near match, where no imitation lift offsets it.**
+This is **M-OOD-leaning**; **M-RECLASS is disfavored** (its exemplar-credibility
+prediction failed at D3) **but not excluded** (D3 is weak/blunt with a donor confound,
+and D1 cannot separate the two). **Label: OOD-leaning.**
+
+## C-CELL RESULTS (2026-07-18)
+
+| cell | intended | landed (actual Δ_art) | Δ_cond (CI) | p | sink? | verdict |
+|---|---|---|---|---|---|---|
+| **C4** Coder-7B, n=37, seed 43 | match | −0.101 | **−0.103** [−0.169, −0.036] | 0.0028 | **YES** | **7B sink CONFIRMED** (Δ ≤ −0.08; robust to n & seed) |
+| **C2** DeepSeek below-0, n=29 | Δ_art −0.04 | **+0.035** | +0.044 [−0.034, +0.115] | 0.86 | no | band asymmetry **NOT closed** (iid drift) |
+| **C3** phi-1, n=47 | match | **+0.042** | **−0.033** [−0.075, **+0.002**] | 0.054 | no (sub-thr.) | **sub-threshold negative — leans Coder-like** |
+
+- **C4 — the 7B sink is real.** n=20→37, distinct seed (43 vs 17), Δ −0.103 (p 0.003),
+  and at Δ_art −0.101 (artifact well *below* 7B's level) it still sinks — so the Coder
+  sink extends across the over-quality side, not only exactly at match. Phase-7's 7B
+  reversal is confirmed, not a selection artifact. (Scope: donor-easy 0.60–0.66 band,
+  7B iid 0.749 on it; named.)
+- **C2 — the band asymmetry stays OPEN.** DeepSeek's iid on the mined subset drifted to
+  0.293 (from 0.362 global), so the target-0.322 artifact landed *above* it → actual
+  Δ_art **+0.035**, not −0.04. DeepSeek lifted (+0.044). **No clean model has still been
+  measured at Δ_art ≤ 0**; the sign question is not closed. (It adds a non-Coder
+  near-straddle point at +0.035 that does not sink — weak reinforcement from the +side.)
+- **C3 — phi leans Coder-like, sub-threshold; family-n does not cleanly reach 2.** phi
+  (second synthetic-code family; smoke PASS after the 2048-ctx fix) landed at Δ_art
+  +0.042 (iid drift again) and showed **Δ_cond −0.033, p 0.054, CI [−0.075, +0.002]** —
+  it does **not** cross the committed sink threshold (effect ≤ −0.05 **and** p < 0.05),
+  but its CI **excludes lift**, unlike the organic/general clean models that *lifted* at
+  comparable positions (DeepSeek +0.050, general −0.000, StarCoder +0.008). So phi is
+  the most Coder-like of the non-Qwen-Coder models — **weak support for the
+  synthetic-code-diet attribution** — but the record **cannot claim a second formal
+  sink**. Formal scope stays **"Qwen-Coder-stage-specific"**; phi is suggestive, and the
+  **unlicensed rung ("code diets do this") stays unlicensed** (phi is one code model,
+  sub-threshold).
+
+## Recurring methodological finding — mining controls artifact frac, not Δ_art
+
+Three cells intended for one Δ_art landed elsewhere (Phase-7 M5; C2; C3/phi) because
+**per-subset i.i.d. drifts**: mining fixes the *artifact* frac, but Δ_art = artifact −
+model's-i.i.d.-**on-the-mined-subset**, and the subset of problems with in-band donor
+candidates is systematically harder, depressing the model's i.i.d. there. Placing a
+model at a *target Δ_art* therefore needs **iterative mining** (measure i.i.d. on the
+subset, re-target) or **generated artifacts**, not single-pass mining. This refines the
+§10 matched-relation rule: *matching to a relation requires closing the loop on the
+measured relation, not the proxy you mined to.* (Amended into §10.)
+
+## PHASE GATE — CLOSED (2026-07-18)
+
+1. **Mechanism call recorded** ✓ — **M-OOD-leaning** (D1 elaboration + D2 position-gating
+   + D3 off-manifold; RECLASS disfavored-not-excluded). D1/D2 agree on phenomenology;
+   D3 (elevated to decisive) tilts OOD; recorded with its weakness.
+2. **Provenance (C1) + band asymmetry (C2)** — **both explicitly OPEN/reframed**: C1
+   un-minable (deferred, provenance confound recorded OPEN + sharpened by the
+   Coder-diet donor); C2 failed to reach Δ_art ≤ 0 (iid drift) — the sign question
+   stands OPEN.
+3. **Diet attribution family-n** — **honest fallback to "Qwen-Coder-stage-specific"**;
+   phi is sub-threshold suggestive support, not a clean second family.
+4. **7B sink** — **CONFIRMED at n = 37** (C4), distinct seed; Phase-7 reversal holds.
+5. **Index claim ladder** stated explicitly (below); relational figure carries the new
+   cells; note gating updated.
+
+**Claim-ladder position at close:** rung 1 (Coder sinks at match, cross-scale)
+**CONFIRMED + 7B robust**; rung 2 (Coder-stage attribution) **stands but
+provenance-confounded** (C1 OPEN — sink cells saw diet-matched artifacts); rung 3
+(synthetic-data cause) **weak/suggestive** (phi sub-threshold, not licensed); the
+**"code-diet" rung stays UNLICENSED**. Mechanism: **OOD-leaning** (off-manifold
+elaboration-degradation), not RECLASS.
+
+**Cost:** D3 + C2 + C4 + C3 ≈ $22 (Modal L4/bf16); phi re-run after a $0 config fix.
+
+**Open (author's, Index in hand):** the provenance cell via generated self-artifacts
+(C1); a clean below-zero clean-model cell via iterative/generated targeting (C2's sign
+question); phi at its **true** match (iterative re-target) to convert its sub-threshold
+lean into a decision; 0.5B via generated artifacts (C5); the internals probe (attention
+to artifact tokens — the real RECLASS-vs-OOD instrument, outside this toolchain). All
+named in §0.4. **Nothing is running; Phase 8 is fully closed.**

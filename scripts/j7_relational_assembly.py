@@ -72,12 +72,18 @@ def _collect_matched():
     at Delta_art ~ 0; the point is (actual_delta_art, delta_cond_minus_iid). Placed
     on the same plane so the sink's region is finally sampled off-Coder. Returns []
     until the h7_matched_<cell>.json files exist (pre-P1 the figure shows 7 points)."""
-    order = [("M1_deepseek1p3b", "M1 DeepSeek*"), ("M2_general1p5b", "M2 general*"),
-             ("M3_starcoder2_3b", "M3 StarCoder2*"), ("M4_coder7b", "M4 Coder-7B*"),
-             ("M5_coder0p5b", "M5 Coder-0.5B*")]
+    order = [("h7_matched_M1_deepseek1p3b", "M1 DeepSeek*", "organic"),
+             ("h7_matched_M2_general1p5b", "M2 general*", "general"),
+             ("h7_matched_M3_starcoder2_3b", "M3 StarCoder2*", "organic"),
+             ("h7_matched_M4_coder7b", "M4 Coder-7B*", "coder"),
+             ("h7_matched_M5_coder0p5b", "M5 Coder-0.5B*", "coder"),
+             # Phase-8 confound cells
+             ("h8_matched_C4_coder7b_widerN", "C4 Coder-7B(n37)", "coder"),
+             ("h8_matched_C2_deepseek_below0", "C2 DeepSeek<0", "organic"),
+             ("h8_matched_C3_phi1_match", "C3 phi-1", "coder")]
     rows = []
-    for key, label in order:
-        d = _art(f"artifacts/h7_matched_{key}.json")
+    for key, label, diet0 in order:
+        d = _art(f"artifacts/{key}.json")
         if not d:
             continue
         d_art = d["actual_delta_art"]
@@ -86,7 +92,7 @@ def _collect_matched():
                "OVER-QUALITY" if d_art <= -0.08 else "STRADDLE")
         beh = ("SINK" if d.get("matched_sink_signature") else
                "DRAG" if d_cond <= -0.05 else "LIFT" if d_cond >= 0.05 else "FLAT")
-        rows.append({"label": label, "params_B": None, "diet": d.get("diet"),
+        rows.append({"label": label, "params_B": None, "diet": d.get("diet") or diet0,
                      "iid": round(d["mean_iid_e0"], 4), "cond": round(d["mean_cond_e1"], 4),
                      "copy": round(d["mean_copy_null"], 4),
                      "delta_art": round(d_art, 4), "delta_cond": round(d_cond, 4),

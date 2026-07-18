@@ -1,0 +1,31 @@
+{
+  "_label": "Phase 8 C3_phi1_match [PHASE_8.md]",
+  "cell": "C3_phi1_match",
+  "model": "microsoft/phi-1",
+  "revision": "d4c0adcb065e84e00ca814e35cba3012ea9841ab",
+  "seed": 17,
+  "n_problems": 47,
+  "source": "phi iid 0.134; mined donor @ [0.084,0.184] (n=47)",
+  "mean_iid_e0": 0.09,
+  "mean_cond_e1": 0.0572,
+  "mean_copy_null": 0.1324,
+  "delta_cond_minus_iid": -0.0328,
+  "delta_cond_minus_iid_ci95": [
+    -0.0752,
+    0.0022
+  ],
+  "actual_delta_art": 0.0424,
+  "p_one_sided_cond_below_iid": 0.0535973201339933,
+  "matched_sink_signature": false,
+  "stack": {
+    "gpu_name": "NVIDIA L4",
+    "gpu_capability": "8.9",
+    "dtype": "bfloat16",
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8",
+    "vllm": "0.11.0",
+    "gen_template_hash": "1e43a51cdc2cc3b5",
+    "d2c_context_hash": "b9323ddf1a9b253d",
+    "judge_hash": "dbd4f9fa650a6a2f"
+  }
+}

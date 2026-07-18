@@ -1,0 +1,31 @@
+{
+  "_label": "Phase 8 C4_coder7b_widerN [PHASE_8.md]",
+  "cell": "C4_coder7b_widerN",
+  "model": "Qwen/Qwen2.5-Coder-7B",
+  "revision": "0396a76181e127dfc13e5c5ec48a8cee09938b02",
+  "seed": 43,
+  "n_problems": 37,
+  "source": "mined donor @ [0.559, 0.759] (n=37)",
+  "mean_iid_e0": 0.749,
+  "mean_cond_e1": 0.6457,
+  "mean_copy_null": 0.6483,
+  "delta_cond_minus_iid": -0.1034,
+  "delta_cond_minus_iid_ci95": [
+    -0.1692,
+    -0.036
+  ],
+  "actual_delta_art": -0.1007,
+  "p_one_sided_cond_below_iid": 0.002849857507124644,
+  "matched_sink_signature": true,
+  "stack": {
+    "gpu_name": "NVIDIA L4",
+    "gpu_capability": "8.9",
+    "dtype": "bfloat16",
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8",
+    "vllm": "0.11.0",
+    "gen_template_hash": "1cbfd4f8f216268a",
+    "d2c_context_hash": "b9323ddf1a9b253d",
+    "judge_hash": "dbd4f9fa650a6a2f"
+  }
+}

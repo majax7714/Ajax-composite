@@ -1,0 +1,57 @@
+{
+  "_label": "Phase 8 D3 artifact perplexity [PHASE_8.md D3]",
+  "rows": {
+    "coder1p5b_sink": {
+      "diet": "coder",
+      "model": "Qwen/Qwen2.5-Coder-1.5B",
+      "ppl_artifacts": 0.8985954983667894,
+      "ppl_self": 0.9601090316463149,
+      "surprise_ratio": 0.9359306794833008
+    },
+    "coder3b_sink": {
+      "diet": "coder",
+      "model": "Qwen/Qwen2.5-Coder-3B",
+      "ppl_artifacts": 0.9156011214310472,
+      "ppl_self": 0.8005413501523435,
+      "surprise_ratio": 1.143727455498467
+    },
+    "M4_coder7b_sink": {
+      "diet": "coder",
+      "model": "Qwen/Qwen2.5-Coder-7B",
+      "ppl_artifacts": 0.9771033272147178,
+      "ppl_self": 0.7782722624018789,
+      "surprise_ratio": 1.2554775165688328
+    },
+    "M5_coder0p5b": {
+      "diet": "coder",
+      "model": "Qwen/Qwen2.5-Coder-0.5B",
+      "ppl_artifacts": 0.9888990320438562,
+      "ppl_self": 0.8672458907632634,
+      "surprise_ratio": 1.140275258235615
+    },
+    "M1_deepseek_clean": {
+      "diet": "organic",
+      "model": "deepseek-ai/deepseek-coder-1.3b-base",
+      "ppl_artifacts": 0.8454436850853455,
+      "ppl_self": 0.8042444504342279,
+      "surprise_ratio": 1.051227253888881
+    },
+    "M2_general_clean": {
+      "diet": "general",
+      "model": "Qwen/Qwen2.5-1.5B",
+      "ppl_artifacts": 0.9555239155888557,
+      "ppl_self": 0.9889899057868335,
+      "surprise_ratio": 0.9661614441136763
+    },
+    "M3_starcoder_clean": {
+      "diet": "organic",
+      "model": "bigcode/starcoder2-3b",
+      "ppl_artifacts": 0.9215373564989139,
+      "ppl_self": 0.9702194492117717,
+      "surprise_ratio": 0.9498236272707085
+    }
+  },
+  "mean_ratio_coder": 1.1189,
+  "mean_ratio_noncoder": 0.9891,
+  "d3_call": "D3 => M-OOD-consistent (Coder matched artifacts MORE surprising)"
+}

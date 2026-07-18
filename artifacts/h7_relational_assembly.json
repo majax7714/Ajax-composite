@@ -24,6 +24,21 @@
       "source": "record"
     },
     {
+      "label": "C4 Coder-7B(n37)",
+      "params_B": null,
+      "diet": "coder",
+      "iid": 0.749,
+      "cond": 0.6457,
+      "copy": 0.6483,
+      "delta_art": -0.1007,
+      "delta_cond": -0.1034,
+      "arm": "OVER-QUALITY",
+      "behavior": "SINK",
+      "below_both": true,
+      "source": "matched",
+      "n": 37
+    },
+    {
       "label": "Coder-3B",
       "params_B": 3.0,
       "diet": "coder",
@@ -80,6 +95,36 @@
       "below_both": false,
       "source": "matched",
       "n": 39
+    },
+    {
+      "label": "C2 DeepSeek<0",
+      "params_B": null,
+      "diet": "organic",
+      "iid": 0.2931,
+      "cond": 0.3367,
+      "copy": 0.3277,
+      "delta_art": 0.0346,
+      "delta_cond": 0.0435,
+      "arm": "STRADDLE",
+      "behavior": "FLAT",
+      "below_both": false,
+      "source": "matched",
+      "n": 29
+    },
+    {
+      "label": "C3 phi-1",
+      "params_B": null,
+      "diet": "coder",
+      "iid": 0.09,
+      "cond": 0.0572,
+      "copy": 0.1324,
+      "delta_art": 0.0424,
+      "delta_cond": -0.0328,
+      "arm": "STRADDLE",
+      "behavior": "FLAT",
+      "below_both": false,
+      "source": "matched",
+      "n": 47
     },
     {
       "label": "M1 DeepSeek*",
@@ -183,7 +228,7 @@
       "source": "record"
     }
   ],
-  "n_matched_overlaid": 5,
+  "n_matched_overlaid": 8,
   "confound": {
     "record_non_coder_arms": {
       "general-1.5B": "LIFT-ARM",
@@ -199,10 +244,13 @@
       "M2 general*",
       "M3 StarCoder2*",
       "M4 Coder-7B*",
-      "M5 Coder-0.5B*"
+      "M5 Coder-0.5B*",
+      "C2 DeepSeek<0",
+      "C3 phi-1"
     ],
     "matched_sinks": [
-      "M4 Coder-7B*"
+      "M4 Coder-7B*",
+      "C4 Coder-7B(n37)"
     ],
     "note": "in the record every non-Coder cell is on the lift arm (d_art>=+0.13); the straddle where the sink lives is Coder-only. The matched battery places non-Coder models into the straddle (matched overlay rows, once landed)."
   }
