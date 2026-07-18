@@ -382,7 +382,10 @@ currently believes.** Statuses: LIVE / KILLED / RETRACTED / REVERSED / SCOPED.
   (5.11 → 1, **falsified**) was traced to the same-seed harness confound, not
   the model component (§8 seed-policy caveat) — the falsification that found a
   record-wide bias. Structural discoveries: π₀ = 0 at 7B-medium (live tail),
-  π₀ = 0.76 at 7B-hard. [PHASE_5.md] J5.)*
+  π₀ = 0.76 at 7B-hard. [PHASE_5.md] J5.)* *(2026-07-18, Phase 6 P2 close: now
+  **5-for-6** — the 6th test (first genuinely-fresh, distinct-seed draw on the
+  flagship medium stratum) hit, 2.01 → 2; it converted the §8 same-seed caveat
+  from computed to measured on the record's most positive number. [PHASE_6.md] P2.)*
 - **The reconciliation ledger** (§11) — no external result imported as truth;
   setup/delta/licenses per entry; it has caught *our own* overclaims twice
   (Olausson rung; Codex "replication" framing).
