@@ -30,6 +30,18 @@ REPO = Path(__file__).parents[1]
 BUILD = REPO / "runs" / "kaggle_build"
 DATASET_SLUG = "rgr-code"
 
+# Default kernel pip set (retired HF/4-bit stack). Phase-6 j6 modes override it
+# with the vLLM/bf16 set (PIP_BY_MODE), pinned to the Modal GEN_IMAGE versions so
+# the only stack difference is the GPU ([PHASE_6.md] P1 Kaggle amendment).
+DEFAULT_PIP = ["daytona", "peft", "-U", "bitsandbytes>=0.46.1"]
+J6_PIP = ["vllm==0.11.0", "transformers==4.57.0", "datasets==5.0.0"]
+J6_KAGGLE = {  # short -> (model_id, revision); the 4 T4-feasible P1 points
+    "qwen05b": ("Qwen/Qwen2.5-Coder-0.5B", "8123ea2e9354afb7ffcc6c8641d1b2f5ecf18301"),
+    "qwen15b": ("Qwen/Qwen2.5-Coder-1.5B", "df3ce67c0e24480f20468b6ef2894622d69eb73b"),
+    "qwen3b": ("Qwen/Qwen2.5-Coder-3B", "09d9bc5d376b0cfa0100a0694ea7de7232525803"),
+    "qwen15b_general": ("Qwen/Qwen2.5-1.5B", "8faed761d45a263340a0528343f099c05c9a4323"),
+}
+
 MODES = {
     #  mode       gpu    script args
     "smoke": (False, ["scripts/kaggle_smoke.py"]),
@@ -46,6 +58,16 @@ MODES = {
     "phase2_b2": (True, ["scripts/phase2_register_loop.py", "--b2"]),
 }
 
+# Phase 6 P1 — Kaggle re-baseline modes (vLLM/bf16), one per T4-feasible
+# checkpoint + a --smoke variant each ([PHASE_6.md] P1 Kaggle amendment).
+PIP_BY_MODE = {}
+for _nm, (_mid, _rev) in J6_KAGGLE.items():
+    _argv = ["scripts/j6_kaggle_pathology.py", "--name", _nm, "--model", _mid, "--rev", _rev]
+    MODES[f"j6_{_nm}_smoke"] = (True, _argv + ["--smoke"])
+    MODES[f"j6_{_nm}"] = (True, _argv)
+    PIP_BY_MODE[f"j6_{_nm}_smoke"] = J6_PIP
+    PIP_BY_MODE[f"j6_{_nm}"] = J6_PIP
+
 # Frozen result files each mode needs beyond the committed tree; bundle()
 # copies them into the dataset under artifacts/.
 BUNDLE_EXTRAS = {
@@ -60,6 +82,10 @@ BUNDLE_EXTRAS = {
     "runs/kaggle/phase2_score/runs/phase2/v_scores.json": "artifacts/v_scores.json",
     # produced by phase2_train, then re-bundled for phase2_full:
     "runs/kaggle/phase2_train/runs/phase2/register_modules.pt": "artifacts/register_modules.pt",
+    # Phase 6 P1 Kaggle re-baseline — the frozen R2 pools the D2c cell conditions
+    # on (gitignored, so not in git-archive; carried here to the same paths):
+    "runs/modal/lcb_cand_lcb_r2_base_T08.json": "runs/modal/lcb_cand_lcb_r2_base_T08.json",
+    "runs/modal/lcb_res_lcb_r2_base_T08.json": "runs/modal/lcb_res_lcb_r2_base_T08.json",
 }
 
 RUNNER_TEMPLATE = '''\
@@ -76,8 +102,7 @@ WORK = "/tmp/rgr"  # NOT /kaggle/working: the bundle holds keys, output must not
 shutil.copytree(SRC, WORK)
 os.chdir(WORK)
 
-subprocess.run([sys.executable, "-m", "pip", "install", "-q", "daytona", "peft",
-                "-U", "bitsandbytes>=0.46.1"], check=True)
+subprocess.run([sys.executable, "-m", "pip", "install", "-q"] + {pip_args!r}, check=True)
 
 env = dict(os.environ, PYTHONPATH=os.path.join(WORK, "src"))
 code = subprocess.run([sys.executable] + {script_args!r}, env=env).returncode
@@ -164,6 +189,7 @@ def bundle(kaggle_api) -> None:
 def launch(kaggle_api, mode: str) -> None:
     user = username(kaggle_api)
     gpu, script_args = MODES[mode]
+    pip_args = PIP_BY_MODE.get(mode, DEFAULT_PIP)
     slug = f"rgr-{mode.replace('_', '-')}"
     stage = BUILD / f"kernel-{mode}"
     if stage.exists():
@@ -172,7 +198,7 @@ def launch(kaggle_api, mode: str) -> None:
 
     (stage / "runner.py").write_text(
         RUNNER_TEMPLATE.format(mode=mode, user=user, dataset_slug=DATASET_SLUG,
-                               script_args=script_args)
+                               script_args=script_args, pip_args=pip_args)
     )
     metadata = {
         "id": f"{user}/{slug}",

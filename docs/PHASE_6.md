@@ -320,3 +320,60 @@ Index in front of them.
 
 *(Revision pins in P0.1 are the exact `main` SHAs resolved 2026-07-17; pin these in
 the runner and the repro standard.)*
+
+---
+
+## P1 amendment — Kaggle re-baseline of the battery *(2026-07-17, before any P1 run)*
+
+**Trigger.** Free Kaggle GPU quota (reset). The author chose to move P1's spend
+there; P2 stays on Modal (the flagship number is not worth a stack confound —
+[decision recorded 2026-07-17]). Kaggle is a **new stack boundary**
+(Modal-L4/vLLM → Kaggle-T4/vLLM), and P1 is a comparison against the
+Modal-generated 1.5B/7B reference cells. Per §8/D14 (*"numbers never cross the
+stack boundary"*) and the **Phase-M precedent** (M3 *re-baselined* on the new
+stack rather than cross-comparing), the disciplined move is to re-baseline, not
+to graft Kaggle cells onto a Modal curve.
+
+**What changes:** the *substrate* only. The scientific question, the branches
+(Slope / Step-OPEN / Non-monotone / recipe-locus), the odds, the frozen cell
+inputs (44-artifact triplet, 20-problem hint set — model-independent), the smoke
+gate, and the revision pins are **unchanged**. What moves is where the
+conditioned generations are drawn.
+
+**T4 constraint (measured from `kaggle_launch.py`: `machine_shape` is pinned to a
+single `NvidiaTeslaT4`, 16 GB).** 7B bf16 (15.2 GB weights) does **not** fit a
+single T4 with any KV budget. So the re-baseline covers the **four T4-feasible
+points** — Qwen2.5-Coder **0.5B / 1.5B / 3B** and **Qwen2.5-1.5B (general)** — run
+fresh on Kaggle, forming a self-consistent within-stack sub-curve over exactly the
+range where the slope-vs-step decision lives (0.5 → 3B). The **7B** "friendly
+blend" endpoint (`h5_7b_pathology.json`, cond 0.609) **stays the
+Modal-established result**; it is not re-run.
+
+**Committed stack-comparability anchor (pre-registered here, before the run).**
+The Kaggle **1.5B** cell is the anchor. It passes iff, on the same 44 frozen
+artifacts, seed 17:
+1. the **below-both-nulls signature reproduces** — conditioned mean frac < copy-null
+   (0.494) **and** < own-iid, one-sided MC-Wilcoxon p < 0.05 vs copy (the Modal
+   result was p ≈ 5e-5), matching Modal's qualitative pathology; **and**
+2. the conditioned mean frac lands **within ±0.05 of Modal's 0.374**.
+
+- **Anchor passes** → the Kaggle T4 stack is comparable to the Modal L4 reference;
+  the Kaggle sub-curve is interpretable against the record, and the
+  3B(Kaggle)-vs-7B(Modal) blend comparison is **licensed** (reported with the
+  cross-stack flag). The origin call proceeds on the five-point view.
+- **Anchor fails** (signature flips, or |Δ| > 0.05) → **the stack matters**, which
+  is itself a recorded finding. The Kaggle curve then stands **internally**
+  (0.5/1.5/3B + general, one stack) for the slope-vs-step call, the Modal-7B
+  cross-comparison is **dropped** (not fudged), and the origin line is scoped to
+  "≤ 3B on Kaggle-T4" with the stack sensitivity noted.
+
+**Ops.** New self-contained kernel `scripts/j6_kaggle_pathology.py` (vLLM bf16 gen
++ the `h1_lcb_exec` judge, wording duplicated verbatim from `modal_h1.py` with a
+sync note — the kernel image has no `modal` import); wired into
+`scripts/kaggle_launch.py` (bundle carries the two frozen R2 pools via
+`BUNDLE_EXTRAS`; per-checkpoint MODES; a vLLM install variant). Internet-enabled
+kernel, revision-pinned model download, seed 17 (same config as Modal — only the
+GPU/stack differs). Per-checkpoint smoke gate first (wf ≥ 0.85 / dg ≤ 0.10).
+Outputs `runs/kaggle/<mode>/` → `artifacts/h6_pathology_origin_kaggle_<name>.json`.
+The five-point join + free-rider curves land in a local CPU analysis
+(`j6_size_curve.py`) once cells return.
