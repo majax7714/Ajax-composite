@@ -2141,74 +2141,101 @@ def j9_2x2():
                                tag=f"j9_pool_res_{nm}"))
         pool[nm] = _pool_by_qid(g, r)
 
-    # --- Step 4: bands from measured subset i.i.d. ---
-    band = {"ds": (st.mean(iid_by_qid["ds"].values()) - 0.05,
-                   st.mean(iid_by_qid["ds"].values()) + 0.05),
-            "co": (st.mean(iid_by_qid["co"].values()) - 0.05,
-                   st.mean(iid_by_qid["co"].values()) + 0.05)}
-    # cell -> (conditioned model, generator pool, band)
-    cells = {"G1a": (DS_MODEL, "ds", "ds", "self"),
-             "G1b": (DS_MODEL, "co", "ds", "foreign"),
-             "G1c": (CO_MODEL, "co", "co", "self"),
-             "G1d": (CO_MODEL, "ds", "co", "foreign")}
-    sel = {c: _select_in_band(pool[gen], band[bd], qids)
-           for c, (_, gen, bd, _prov) in cells.items()}
-    # shared subset = problems covered in ALL FOUR cells
-    shared = [q for q in qids if all(q in sel[c] for c in cells)]
-    print(f"shared subset n={len(shared)} / {len(qids)}; "
-          f"ds_iid={st.mean(iid_by_qid['ds'].values()):.3f} "
-          f"co_iid={st.mean(iid_by_qid['co'].values()):.3f}")
+    # --- Step 4: iterative-targeted bands (§10 amendment) + per-model-pair subsets ---
+    # Per-model-pair subsets, NOT one 4-way shared subset (that collapses to n≈2 with
+    # generated bimodal pools — flagged deviation from the charter). Band ±0.08. Each
+    # pair's band is RE-CENTERED on the model's i.i.d. measured on the covered subset
+    # (both pools must cover it), not the global proxy — the drift the §10 amendment
+    # predicts (the covered subset is systematically easier for the model).
+    BAND_HW = 0.08
+
+    def _cov(poolnm, ctr):
+        lo, hi = ctr - BAND_HW, ctr + BAND_HW
+        return set(q for q in qids
+                   if any(lo <= cc["frac"] <= hi for cc in pool[poolnm].get(q, [])))
+
+    def _retarget(nm, othnm):
+        ctr, sub, si, it = st.mean(iid_by_qid[nm].values()), [], 0.0, 0
+        for it in range(3):
+            sub = sorted(_cov(nm, ctr) & _cov(othnm, ctr))
+            if len(sub) < 8:
+                break
+            si = st.mean(iid_by_qid[nm][q] for q in sub)
+            if abs(ctr - si) <= BAND_HW:
+                break
+            ctr = si
+        return round(ctr, 4), sub, round(si, 4), it
+
+    ds_ctr, ds_sub, ds_si, ds_it = _retarget("ds", "co")
+    co_ctr, co_sub, co_si, co_it = _retarget("co", "ds")
+    band = {"ds": (ds_ctr - BAND_HW, ds_ctr + BAND_HW),
+            "co": (co_ctr - BAND_HW, co_ctr + BAND_HW)}
+    print(f"iterative targeting: DeepSeek band@{ds_ctr:.3f} (subset_iid {ds_si:.3f}, "
+          f"n={len(ds_sub)}, {ds_it} re-targets); Coder band@{co_ctr:.3f} "
+          f"(subset_iid {co_si:.3f}, n={len(co_sub)}, {co_it} re-targets)")
+
+    # cell -> (nmk, (model,rev), generator-pool, band-key, subset, provenance)
+    cells = {"G1a": ("ds", DS_MODEL, "ds", "ds", ds_sub, "self"),
+             "G1b": ("ds", DS_MODEL, "co", "ds", ds_sub, "foreign"),
+             "G1c": ("co", CO_MODEL, "co", "co", co_sub, "self"),
+             "G1d": ("co", CO_MODEL, "ds", "co", co_sub, "foreign")}
 
     sets_out = {"_label": "Phase 9 generated 2×2 sets [PHASE_9.md G1]",
-                "ds_iid": round(st.mean(iid_by_qid["ds"].values()), 4),
-                "co_iid": round(st.mean(iid_by_qid["co"].values()), 4),
-                "band_ds": [round(x, 4) for x in band["ds"]],
-                "band_co": [round(x, 4) for x in band["co"]],
-                "shared_n": len(shared), "shared_qids": shared,
-                "dropped": [q for q in qids if q not in shared]}
+                "band_halfwidth": BAND_HW,
+                "ds_global_iid": round(st.mean(iid_by_qid["ds"].values()), 4),
+                "co_global_iid": round(st.mean(iid_by_qid["co"].values()), 4),
+                "ds_band_center": ds_ctr, "ds_subset_iid": ds_si, "ds_retargets": ds_it,
+                "co_band_center": co_ctr, "co_subset_iid": co_si, "co_retargets": co_it,
+                "ds_pair_n": len(ds_sub), "co_pair_n": len(co_sub),
+                "ds_pair_qids": ds_sub, "co_pair_qids": co_sub,
+                "note": "per-model-pair subsets (4-way shared collapses to n~2); bands "
+                        "iterative-retargeted to the covered-subset i.i.d. (§10 amendment)"}
 
-    # --- Step 5/6: condition + sink signature per cell on the shared subset ---
-    results = {}
-    for c, ((mid, rev), gen, bd, prov) in cells.items():
-        nmk = "ds" if mid == DS_MODEL else "co"
-        arts = [dict(qid=q, **sel[c][q]) for q in shared]
-        items = [{"qid": q, "context": _d2c_context(sel[c][q])} for q in shared]
-        e1g = _load(f"j9_cond_cand_{c}") or _persist(
-            f"j9_cond_cand_{c}",
-            h1_gen_lcb.remote(mid, items, 8, tag=f"j9_cond_cand_{c}", seed=17, revision=rev))
-        e1r = _load(f"j9_cond_res_{c}") or _persist(
-            f"j9_cond_res_{c}",
+    # --- Step 5/6: condition + sink signature per cell ---
+    results, sel_by_cell = {}, {}
+    for c, (nmk, (mid, rev), genp, bd, subset, prov) in cells.items():
+        sel = _select_in_band(pool[genp], band[bd], subset)
+        aq = [q for q in subset if q in sel]
+        sel_by_cell[c] = (sel, aq)
+        items = [{"qid": q, "context": _d2c_context(sel[q])} for q in aq]
+        e1g = _load(f"j9_cond_cand_{c}_v2") or _persist(
+            f"j9_cond_cand_{c}_v2",
+            h1_gen_lcb.remote(mid, items, 8, tag=f"j9_cond_cand_{c}_v2", seed=17, revision=rev))
+        e1r = _load(f"j9_cond_res_{c}_v2") or _persist(
+            f"j9_cond_res_{c}_v2",
             h1_lcb_exec.remote([x["qid"] for x in e1g], [x["codes"] for x in e1g],
-                               tag=f"j9_cond_res_{c}"))
-        e0 = [st.mean(x["frac"] for x in iid_res[nmk][q]) for q in shared]
+                               tag=f"j9_cond_res_{c}_v2"))
+        e0 = [st.mean(x["frac"] for x in iid_res[nmk][q]) for q in aq]
         e1 = [st.mean(x["frac"] for x in row) for row in e1r]
-        copy = [sel[c][q]["frac"] for q in shared]
+        copy = [sel[q]["frac"] for q in aq]
         d = [b - a for a, b in zip(e0, e1)]
         p = _wilcoxon_mc_one_sided([-x for x in d])
         me0, me1, mc = st.mean(e0), st.mean(e1), st.mean(copy)
         eff = me1 - me0
         sink = bool(me1 < me0 and p < 0.05 and eff <= -0.05)
         dart = mc - me0
-        results[c] = {"model": mid, "provenance": prov, "generator": gen,
-                      "n": len(shared), "mean_iid_e0": round(me0, 4),
+        results[c] = {"model": mid, "conditioned": nmk, "provenance": prov,
+                      "generator": genp, "n": len(aq), "mean_iid_e0": round(me0, 4),
                       "mean_cond_e1": round(me1, 4), "mean_artifact": round(mc, 4),
                       "delta_cond_minus_iid": round(eff, 4),
                       "achieved_delta_art": round(dart, 4),
                       "p_one_sided_cond_below_iid": p, "matched_sink_signature": sink,
                       "on_target": abs(dart) <= 0.08}
-        out = {"_label": f"Phase 9 {c} [PHASE_9.md G1]", "cell": c, **results[c],
-               "stack": _stack_block()}
-        (REPO / f"artifacts/h9_2x2_{c}.json").write_text(json.dumps(out, indent=2))
-        print(f"{c} ({prov:7s} {nmk} on {gen}-gen): iid {me0:.3f}→cond {me1:.3f} "
-              f"(art {mc:.3f}) Δiid {eff:+.3f} Δart {dart:+.3f} p {p:.4f} "
-              f"SINK {sink}{'' if abs(dart)<=0.08 else '  OFF-TARGET(|Δart|>0.08)'}")
+        (REPO / f"artifacts/h9_2x2_{c}.json").write_text(json.dumps(
+            {"_label": f"Phase 9 {c} [PHASE_9.md G1]", "cell": c, **results[c],
+             "stack": _stack_block()}, indent=2))
+        print(f"{c} ({prov:7s} {nmk}-model on {genp}-gen): iid {me0:.3f}→cond {me1:.3f} "
+              f"(art {mc:.3f}) Δiid {eff:+.3f} Δart {dart:+.3f} p {p:.4f} n={len(aq)} "
+              f"SINK {sink}{'' if abs(dart)<=0.08 else '  OFF-TARGET'}")
     sets_out["cells"] = {c: {k: results[c][k] for k in
-                             ("provenance", "achieved_delta_art", "delta_cond_minus_iid",
-                              "matched_sink_signature", "on_target")} for c in cells}
+                             ("provenance", "conditioned", "n", "achieved_delta_art",
+                              "delta_cond_minus_iid", "matched_sink_signature", "on_target")}
+                         for c in cells}
     (REPO / "artifacts/h9_2x2_generated_sets.json").write_text(json.dumps(sets_out, indent=2))
 
-    # --- factorial read ---
+    # --- factorial read (only over on-target cells) ---
     sk = {c: results[c]["matched_sink_signature"] for c in cells}
+    off = [c for c in cells if not results[c]["on_target"]]
     if sk["G1c"] and sk["G1d"] and not sk["G1a"] and not sk["G1b"]:
         branch = "DIET main effect (Coder sinks self+foreign; DeepSeek clean both) → H-DIET"
     elif sk["G1a"] and sk["G1c"] and not sk["G1b"] and not sk["G1d"]:
@@ -2216,25 +2243,28 @@ def j9_2x2():
     elif sk["G1c"] and not any(sk[c] for c in ("G1a", "G1b", "G1d")):
         branch = "INTERACTION (only self×Coder sinks) → sink needs both"
     else:
-        branch = f"UGLY/MIXED (sink pattern {sk}) → generation variable / re-examine"
+        branch = f"UGLY/MIXED (sink pattern {sk})"
+    if off:
+        branch += f"  [CAUTION: off-target cells {off} — read guarded]"
     print(f"\n2×2 BRANCH: {branch}")
 
-    # --- D3 sweep: each model's ppl on self set, foreign set, own E0 ---
-    def codes(cellkey):
-        return [sel[cellkey][q]["code"] for q in shared]
-
+    # --- D3 sweep: each model's ppl on self set, foreign set, own E0 (pair subset) ---
     d3 = {}
-    for nm, (mid, rev), selfcell, foreigncell in [
-            ("ds", DS_MODEL, "G1a", "G1b"), ("co", CO_MODEL, "G1c", "G1d")]:
+    for nm, (mid, rev), sc, fc, subset in [
+            ("ds", DS_MODEL, "G1a", "G1b", ds_sub),
+            ("co", CO_MODEL, "G1c", "G1d", co_sub)]:
+        sself = sel_by_cell[sc][0]
+        sforeign = sel_by_cell[fc][0]
         iid_cand = {x["qid"]: x["codes"] for x in _load(f"j9_iid_cand_{nm}")}
-        e0c = [c for q in shared for c in iid_cand[q] if c]
-        r = _load(f"j9_d3_{nm}") or _persist(
-            f"j9_d3_{nm}",
-            j8_ppl.remote(mid, rev, {"self": codes(selfcell), "foreign": codes(foreigncell),
-                                     "own_e0": e0c}, tag=f"j9_d3_{nm}"))
+        e0c = [cc for q in subset for cc in iid_cand[q] if cc]
+        r = _load(f"j9_d3_{nm}_v2") or _persist(
+            f"j9_d3_{nm}_v2",
+            j8_ppl.remote(mid, rev, {"self": [sself[q]["code"] for q in subset if q in sself],
+                                     "foreign": [sforeign[q]["code"] for q in subset if q in sforeign],
+                                     "own_e0": e0c}, tag=f"j9_d3_{nm}_v2"))
         d3[nm] = r
-        print(f"D3 {nm}: self {r['self']['mean_nll']:.3f} foreign "
-              f"{r['foreign']['mean_nll']:.3f} own_e0 {r['own_e0']['mean_nll']:.3f}")
+        print(f"D3 {nm}: self {r['self']['mean_nll']} foreign {r['foreign']['mean_nll']} "
+              f"own_e0 {r['own_e0']['mean_nll']}")
     (REPO / "artifacts/h9_d3_sweep.json").write_text(
         json.dumps({"_label": "Phase 9 D3 sweep [PHASE_9.md G1]", "rows": d3,
                     "branch": branch}, indent=2))

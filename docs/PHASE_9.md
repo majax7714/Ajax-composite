@@ -179,3 +179,32 @@ survives it survives everything and the origin line stands on unshiftable ground
 H-SELF fires, the pathology thread and the refinement thread collapse into one
 phenomenon — making five phases of conditioning nulls not a detour from the original
 refinement question but its answer, from the direction nobody registered.
+
+---
+
+## G1 run 1 — INVALID (recorded straight; re-run with fixes)
+
+The first launch produced garbage and is discarded, for three named reasons — two bugs
+and one design infeasibility the run itself exposed:
+1. **nmk type bug** (mine): the E0-baseline key was computed as `mid == DS_MODEL`,
+   comparing a *string* to a *tuple* → always False → every cell used **Coder's** i.i.d.
+   as its E0 baseline (wrong for the DeepSeek cells) and was mislabeled.
+2. **4-way shared subset collapses to n = 2.** Requiring one problem set covered by all
+   four cells is infeasible with generated **bimodal** pools (most candidates are 0.0 or
+   1.0). **Fix (flagged deviation from the charter's "one shared subset"):** per-model-pair
+   subsets — the DeepSeek pair (G1a/G1b) on problems both pools cover at DeepSeek's band;
+   the Coder pair (G1c/G1d) at Coder's band. The within-model provenance contrast (the
+   actual read) is preserved; only the cross-pair sharing is dropped.
+3. **i.i.d. drift, exactly as the §10 amendment predicts.** The Coder pair's covered
+   subset is systematically *easier* for Coder (subset i.i.d. 0.645 vs global 0.485), so
+   a band set from the global proxy lands the artifacts at Δ_art −0.16 (off-target).
+   **Fix:** the pre-registered **iterative-targeting loop** — re-center each pair's band
+   on the model's i.i.d. *measured on the covered subset*. Converges: DeepSeek band 0.336
+   (0 re-targets, n = 19, Δ_art ≈ −0.065); Coder band 0.645 (1 re-target, n = 10,
+   Δ_art ≈ −0.038) — both on-target (±0.08).
+
+The expensive step (both high-T pools + i.i.d. measurement) is **cached and correct**;
+the re-run reuses it and re-does only selection + conditioning + the D3 sweep (fresh
+`_v2` tags so the broken n = 2 volume cache is not hit). ~$3–5. **Coverage note carried
+into the read:** Coder pair n = 10 is thin (a clear sink shows at that n — cf. C4 n = 20,
+p = 0.003 — but a null is under-powered); DeepSeek pair n = 19. Reported per cell.
