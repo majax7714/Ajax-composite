@@ -55,9 +55,10 @@ comes from. That pathology's origin was then measured — a
 continued-pretraining-diet effect inside a narrow competence window — and
 immediately turned on itself: the origin line was found to rest on a confound
 (every family had been compared at a different model–artifact quality relation),
-so the current phase re-measures the sink with each model matched to its own
-quality, to decide whether the claim narrows to one diet or widens into a
-conditioning law.
+so the next phase re-measured the sink with each model matched to its own quality
+— confirming the effect is diet-specific (non-Coder families do not sink at match)
+while catching that its apparent disappearance at larger scale had been the same
+confound all along.
 
 ## Map of the composite
 
@@ -71,7 +72,7 @@ conditioning law.
 | 4 | [PHASE_4.md](docs/PHASE_4.md) | Claim hardening: cross-family battery (DeepSeek, StarCoder2), F1/SINK retracted as one-family-scoped, oracle hints cross the competence boundary |
 | 5 | [PHASE_5.md](docs/PHASE_5.md) | The journal turn (the record becomes the primary artifact) + where direction comes from: models execute direction they cannot manufacture |
 | 6 | [PHASE_6.md](docs/PHASE_6.md) | Where the pathology comes from + extraction-readiness: origin measured (a Coder-continued-pretraining diet × a competence window, MIXED across code/language channels; the tie hypothesis demoted); the flagship floor verified on a distinct-seed control (instrument 5-for-6); the claims-to-evidence layer (§0.3) built |
-| 7 | [PHASE_7.md](docs/PHASE_7.md) | *(open)* Is the sink Qwen's, the diet's, or everyone's? Phase 6's origin line was position-confounded — friendly non-Coder models were only ever measured at a different model–artifact quality relation, never in the region where the sink lives. The matched-artifact battery mines artifacts to each model's own quality and samples that region off-Coder for the first time |
+| 7 | [PHASE_7.md](docs/PHASE_7.md) | Is the sink Qwen's, the diet's, or everyone's? The matched-artifact battery mined artifacts to each model's own quality and sampled the sink's region off-Coder for the first time: the sink is **Coder-diet-specific** (non-Coder families flat at match) — and the battery **reversed** Phase 6's "vanishes at 7B", which was itself a position artifact (7B sinks at match). The "competence window" becomes a diet × relational-position rule |
 
 ## How to read
 
