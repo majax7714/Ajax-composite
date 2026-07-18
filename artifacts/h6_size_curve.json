@@ -1,0 +1,106 @@
+{
+  "_label": "Phase 6 P1 size curve + origin branch [PHASE_6.md P1]",
+  "points": {
+    "qwen05b": {
+      "cond": 0.3889280858030858,
+      "iid": 0.21082298383434747,
+      "copy": 0.49448897062533426,
+      "p_below_copy": 4.999750012499375e-05,
+      "p_below_iid": 1.0,
+      "sink_margin": -0.10556088482224846,
+      "delta_iid": 0.17810510196873833,
+      "below_both": false,
+      "sink_sig": false,
+      "klass": "BLEND",
+      "lang_e0": 0.16,
+      "lang_hint": 0.178,
+      "lang_uplift": 0.018000000000000002,
+      "fidelity": 0.8184070606102107
+    },
+    "qwen15b": {
+      "cond": 0.37376428811087903,
+      "iid": 0.46847140233503864,
+      "copy": 0.4944889706253343,
+      "p_below_copy": 4.999750012499375e-05,
+      "p_below_iid": 0.0017999100044997496,
+      "sink_margin": -0.12072468251445528,
+      "delta_iid": -0.09470711422415962,
+      "below_both": true,
+      "sink_sig": true,
+      "klass": "SINK",
+      "lang_e0": 0.54,
+      "lang_hint": 0.444,
+      "lang_uplift": -0.096,
+      "fidelity": 0.5697705853393846
+    },
+    "qwen3b": {
+      "cond": 0.41869735378258105,
+      "iid": 0.5689294606908243,
+      "copy": 0.49448897062533426,
+      "p_below_copy": 4.999750012499375e-05,
+      "p_below_iid": 0.00014999250037498125,
+      "sink_margin": -0.0757916168427532,
+      "delta_iid": -0.15023210690824323,
+      "below_both": true,
+      "sink_sig": true,
+      "klass": "SINK",
+      "lang_e0": 0.706,
+      "lang_hint": 0.782,
+      "lang_uplift": 0.076,
+      "fidelity": 0.6255150225280608
+    },
+    "qwen7b": {
+      "cond": 0.6090259487986761,
+      "iid": 0.6590240725183907,
+      "copy": 0.49448897062533426,
+      "p_below_copy": 0.999850007499625,
+      "p_below_iid": 0.07474626268686566,
+      "sink_margin": 0.11453697817334185,
+      "delta_iid": -0.04999812371971457,
+      "below_both": false,
+      "sink_sig": false,
+      "klass": "BLEND",
+      "lang_e0": 0.842,
+      "lang_hint": 0.824,
+      "lang_uplift": -0.017999999999999995,
+      "fidelity": 0.5804999387812224
+    },
+    "qwen15b_general": {
+      "cond": 0.3939567219396765,
+      "iid": 0.32411277169799896,
+      "copy": 0.49448897062533426,
+      "p_below_copy": 4.999750012499375e-05,
+      "p_below_iid": 0.9886005699715015,
+      "sink_margin": -0.10053224868565774,
+      "delta_iid": 0.06984395024167755,
+      "below_both": false,
+      "sink_sig": false,
+      "klass": "BLEND",
+      "lang_e0": 0.324,
+      "lang_hint": 0.484,
+      "lang_uplift": 0.16,
+      "fidelity": 0.6378086976935219
+    }
+  },
+  "verdict": {
+    "code_branch": "NON-MONOTONE (checkpoint-specific)",
+    "coder_sink_margins_0.5_1.5_3_7": [
+      -0.1056,
+      -0.1207,
+      -0.0758,
+      0.1145
+    ],
+    "coder_classes": [
+      "BLEND",
+      "SINK",
+      "SINK",
+      "BLEND"
+    ],
+    "recipe_branch": "CODER-STAGE (general-1.5B blends; the Coder diet did it)",
+    "general_vs_coder_1.5B_class": [
+      "BLEND",
+      "SINK"
+    ],
+    "note_channels": "code SINK at 2 coder pts; language harm (<-0.05) at ['qwen15b'] \u2014 inspect for MIXED if they disagree on the boundary"
+  }
+}

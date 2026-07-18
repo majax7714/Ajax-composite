@@ -1,0 +1,21 @@
+{
+  "_label": "Phase 6 P1 \u2014 pathology origin cell, qwen05b [PHASE_6.md P1]",
+  "model": "Qwen/Qwen2.5-Coder-0.5B",
+  "revision": "8123ea2e9354afb7ffcc6c8641d1b2f5ecf18301",
+  "q1a_d2c": {
+    "e0_mean_frac_iid": 0.21082298383434747,
+    "e1_mean_frac_cond": 0.3889280858030858,
+    "copy_null_mean": 0.49448897062533426,
+    "delta_cond_minus_iid": 0.17810510196873833,
+    "delta_cond_minus_copy": -0.10556088482224846,
+    "p_one_sided_cond_below_iid": 1.0,
+    "p_one_sided_cond_below_copy": 4.999750012499375e-05
+  },
+  "q1b_language": {
+    "e0_mean_pass": 0.16,
+    "hint_mean_pass": 0.178,
+    "mean_uplift": 0.018000000000000002,
+    "p_one_sided_uplift": 0.22263886805659716,
+    "saturation_caveat": false
+  }
+}
