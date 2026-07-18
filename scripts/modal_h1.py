@@ -46,6 +46,23 @@ J6_MODELS = {
 # Phase 6 P2 — distinct-seed verification of the flagship floor number.
 QWEN_BASE_REV = "df3ce67c0e24480f20468b6ef2894622d69eb73b"  # 1.5B-Coder base @ main
 P2_SEED = 41  # DISTINCT from the record's seed 17 (mandatory distinct-seed protocol)
+
+# Phase 7 P1 — matched-artifact battery ([PHASE_7.md] P1). Each model is
+# conditioned at its OWN quality match (Delta_art ~ 0) on artifacts mined from the
+# fixed donor pool (scripts/j7_match_artifacts.py). Revisions reuse the Phase 6
+# P0.1 pins (organic pins from that table). (cell -> (model_id, revision)).
+J7_MODELS = {
+    "M5_coder0p5b":     ("Qwen/Qwen2.5-Coder-0.5B",
+                         "8123ea2e9354afb7ffcc6c8641d1b2f5ecf18301"),
+    "M2_general1p5b":   ("Qwen/Qwen2.5-1.5B",
+                         "8faed761d45a263340a0528343f099c05c9a4323"),
+    "M3_starcoder2_3b": ("bigcode/starcoder2-3b",
+                         "733247c55e3f73af49ce8e9c7949bf14af205928"),
+    "M1_deepseek1p3b":  ("deepseek-ai/deepseek-coder-1.3b-base",
+                         "c919139c3a9b4070729c8b2cca4847ab29ca8d94"),
+    "M4_coder7b":       ("Qwen/Qwen2.5-Coder-7B",
+                         "0396a76181e127dfc13e5c5ec48a8cee09938b02"),
+}
 LCB_DATASET = "livecodebench/code_generation"
 BCB_DATASET = "bigcode/bigcodebench"
 
@@ -1634,3 +1651,148 @@ def j6_p2_distinct_seed():
     print(f"=== P2 distinct-seed B1-50 (seed {P2_SEED}): {n_rec} recoveries — "
           f"committed band [0,4], >=5 falsifies → {verdict} "
           f"(identical-to-screen {ident}) ===")
+
+
+# ========================================================================
+# Phase 7 P1 — the matched-artifact battery ([PHASE_7.md] P1) + the P0.3
+# stack-fingerprint hook. Each cell conditions ONE model on artifacts MINED to
+# its own quality match (Delta_art ~ 0; scripts/j7_match_artifacts.py) plus its
+# own iid (E0) on the SAME problems. Code channel only (the relational axis is
+# defined on frac; no language analogue). Additive: frozen j5_*/j6_* untouched.
+# ========================================================================
+
+def _j7_model(cell):
+    if cell not in J7_MODELS:
+        raise SystemExit(f"unknown cell '{cell}'; choose from {list(J7_MODELS)}")
+    return J7_MODELS[cell]
+
+
+def _stack_hashes():
+    """P0.3(b) local half of the stack fingerprint: content hashes of the frozen
+    generation template, the D2c context wording, and the judge — so a silent
+    change to any is detectable in every Phase-7 artifact. Read from the module
+    source via ast (robust to the @app.function decorators)."""
+    import ast
+    import hashlib
+    src = Path(__file__).read_text()
+    tree = ast.parse(src)
+    segs = {n.name: ast.get_source_segment(src, n)
+            for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)}
+
+    def h(name):
+        return hashlib.sha256(segs[name].encode()).hexdigest()[:16]
+
+    return {"gen_template_hash": h("h1_gen_lcb"),
+            "d2c_context_hash": h("_d2c_context"),
+            "judge_hash": h("h1_lcb_exec")}
+
+
+@app.function(image=GEN_IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=600)
+def j7_fingerprint():
+    """P0.3(b) remote half: the runtime stack the gen cells actually ran on."""
+    import torch
+    import vllm
+    p = torch.cuda.get_device_properties(0)
+    return {"gpu_name": p.name, "gpu_capability": f"{p.major}.{p.minor}",
+            "dtype": "bfloat16", "torch": torch.__version__,
+            "cuda": torch.version.cuda, "vllm": vllm.__version__}
+
+
+def _stack_block():
+    """Full stack fingerprint (remote versions + local content hashes), cached."""
+    fp = _load("j7_stack_fp") or _persist("j7_stack_fp", j7_fingerprint.remote())
+    return {**fp, **_stack_hashes()}
+
+
+@app.local_entrypoint()
+def j7_prefetch(cell: str = "M1_deepseek1p3b"):
+    """Fetch + revision-pin one matched-battery model to the volume cache."""
+    model_id, rev = _j7_model(cell)
+    print(j6_download.remote(model_id, rev))
+
+
+@app.local_entrypoint()
+def j7_smoke(cell: str = "M1_deepseek1p3b"):
+    """Per-cell smoke gate (charter): 8 LCB-easy x 8, wf>=0.85 dg<=0.10."""
+    model_id, rev = _j7_model(cell)
+    qids = _lcb_easy_qids()[:8]
+    gen = _load(f"j7_smoke_cand_{cell}") or _persist(
+        f"j7_smoke_cand_{cell}",
+        h1_gen_lcb.remote(model_id, [{"qid": q, "context": None} for q in qids], 8,
+                          tag=f"j7_smoke_cand_{cell}", revision=rev))
+    codes = [g["codes"] for g in gen]
+    flat = [c for row in codes for c in row]
+    wf = sum(1 for c in flat if c) / len(flat)
+    dg = sum(1 for c in flat if c and len(c) < 20) / max(1, sum(1 for c in flat if c))
+    res = _load(f"j7_smoke_res_{cell}") or _persist(
+        f"j7_smoke_res_{cell}",
+        h1_lcb_exec.remote([g["qid"] for g in gen], codes,
+                           tag=f"j7_smoke_res_{cell}", short_circuit=True))
+    npass = sum(1 for row in res for r in row if r["passed"])
+    ok = wf >= 0.85 and dg <= 0.10
+    print(f"=== j7 smoke ({cell} = {model_id} @ {rev[:12]}): wf {wf:.3f} dg {dg:.3f} "
+          f"passed {npass}/{len(flat)} → {'PASS' if ok else 'FAIL'} ===")
+    print("sample:\n" + next((c for c in flat if c), "")[:300])
+
+
+@app.local_entrypoint()
+def j7_matched(cell: str = "M1_deepseek1p3b"):
+    """P1 matched-artifact code cell (run j7_smoke first). Condition <model> on
+    its MINED matched artifacts (Delta_art ~ 0) x8, all-cases judge, vs its own
+    iid (E0) on the SAME problems. Matched-sink signature (pre-registered):
+    cond mean frac < own iid, one-sided MC-Wilcoxon p < 0.05, AND effect <= -0.05
+    (the depth threshold that keeps 'sink' distinct from imitation drag). Copy-null
+    (artifact frac) reported for the record but the two nulls converge at match.
+    Writes artifacts/h7_matched_<cell>.json with the stack fingerprint block."""
+    import statistics as st
+    model_id, rev = _j7_model(cell)
+    matched = json.loads((REPO / "artifacts/h7_matched_artifacts.json").read_text())
+    cinfo = matched["cells"][cell]
+    arts = cinfo["artifacts"]
+    n = len(arts)
+    if n == 0:
+        raise SystemExit(f"cell {cell} has no mined artifacts")
+
+    items = ([{"qid": a["qid"], "context": None} for a in arts]
+             + [{"qid": a["qid"], "context": _d2c_context(a)} for a in arts])
+    dgen = _load(f"j7_cand_{cell}") or _persist(
+        f"j7_cand_{cell}",
+        h1_gen_lcb.remote(model_id, items, 8, tag=f"j7_cand_{cell}", revision=rev))
+    dres = _load(f"j7_res_{cell}") or _persist(
+        f"j7_res_{cell}",
+        h1_lcb_exec.remote([g["qid"] for g in dgen], [g["codes"] for g in dgen],
+                           tag=f"j7_res_{cell}"))
+    e0_frac = [st.mean(x["frac"] for x in row) for row in dres[:n]]
+    e1_frac = [st.mean(x["frac"] for x in row) for row in dres[n:]]
+    copy_null = [a["frac"] for a in arts]
+    d_iid = [b - a for a, b in zip(e0_frac, e1_frac)]
+    d_copy = [b - a for a, b in zip(copy_null, e1_frac)]
+    p_sink_iid = _wilcoxon_mc_one_sided([-x for x in d_iid])
+    mean_e0, mean_e1, mean_copy = st.mean(e0_frac), st.mean(e1_frac), st.mean(copy_null)
+    effect = mean_e1 - mean_e0
+    # bootstrap 95% CI on the paired cond-minus-iid effect (deterministic seed)
+    import random
+    rng = random.Random(17)
+    boot = sorted(st.mean(rng.choice(d_iid) for _ in d_iid) for _ in range(2000))
+    ci = [round(boot[49], 4), round(boot[1949], 4)]
+    matched_sink = bool(mean_e1 < mean_e0 and p_sink_iid < 0.05 and effect <= -0.05)
+
+    out = {"_label": f"Phase 7 P1 — matched-artifact code cell, {cell} [PHASE_7.md P1]",
+           "cell": cell, "model": model_id, "revision": rev,
+           "n_problems": n, "min_n_met": cinfo["min_n_met"],
+           "target_iid": cinfo["target_iid"], "diet": cinfo["diet"],
+           "mean_iid_e0": round(mean_e0, 4), "mean_cond_e1": round(mean_e1, 4),
+           "mean_copy_null": round(mean_copy, 4),
+           "delta_cond_minus_iid": round(effect, 4),
+           "delta_cond_minus_iid_ci95": ci,
+           "actual_delta_art": round(mean_copy - mean_e0, 4),
+           "delta_cond_minus_copy": round(mean_e1 - mean_copy, 4),
+           "p_one_sided_cond_below_iid": p_sink_iid,
+           "matched_sink_signature": matched_sink,
+           "stack": _stack_block()}
+    (REPO / f"artifacts/h7_matched_{cell}.json").write_text(json.dumps(out, indent=2))
+    print(f"=== j7 matched ({cell}): iid {mean_e0:.3f} → cond {mean_e1:.3f} "
+          f"(copy {mean_copy:.3f}) | Δvs_iid {effect:+.3f} CI {ci} "
+          f"| actual Δart {mean_copy-mean_e0:+.3f} | p_below_iid {p_sink_iid:.4f} "
+          f"| MATCHED-SINK {matched_sink} (n={n}"
+          f"{'' if cinfo['min_n_met'] else ' <MIN_N — underpowered'}) ===")

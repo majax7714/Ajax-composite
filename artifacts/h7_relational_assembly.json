@@ -1,0 +1,116 @@
+{
+  "_label": "Phase 7 P0.2 relational assembly [PHASE_7.md P0.2]",
+  "axes": {
+    "x": "delta_art = copy_null - own_iid",
+    "y": "delta_cond = conditioned - own_iid"
+  },
+  "straddle_band": [
+    -0.08,
+    0.13
+  ],
+  "rows": [
+    {
+      "label": "Coder-7B",
+      "params_B": 7.0,
+      "diet": "coder",
+      "iid": 0.659,
+      "cond": 0.609,
+      "copy": 0.4945,
+      "delta_art": -0.1645,
+      "delta_cond": -0.05,
+      "arm": "OVER-QUALITY",
+      "behavior": "FLAT",
+      "below_both": false
+    },
+    {
+      "label": "Coder-3B",
+      "params_B": 3.0,
+      "diet": "coder",
+      "iid": 0.5689,
+      "cond": 0.4187,
+      "copy": 0.4945,
+      "delta_art": -0.0744,
+      "delta_cond": -0.1502,
+      "arm": "STRADDLE",
+      "behavior": "SINK",
+      "below_both": true
+    },
+    {
+      "label": "Coder-1.5B",
+      "params_B": 1.5,
+      "diet": "coder",
+      "iid": 0.4685,
+      "cond": 0.3738,
+      "copy": 0.4945,
+      "delta_art": 0.026,
+      "delta_cond": -0.0947,
+      "arm": "STRADDLE",
+      "behavior": "SINK",
+      "below_both": true
+    },
+    {
+      "label": "DeepSeek-1.3B",
+      "params_B": 1.3,
+      "diet": "organic",
+      "iid": 0.3618,
+      "cond": 0.4684,
+      "copy": 0.4945,
+      "delta_art": 0.1327,
+      "delta_cond": 0.1066,
+      "arm": "LIFT-ARM",
+      "behavior": "LIFT",
+      "below_both": false
+    },
+    {
+      "label": "StarCoder2-3B",
+      "params_B": 3.0,
+      "diet": "organic",
+      "iid": 0.3585,
+      "cond": 0.4047,
+      "copy": 0.4945,
+      "delta_art": 0.136,
+      "delta_cond": 0.0462,
+      "arm": "LIFT-ARM",
+      "behavior": "FLAT",
+      "below_both": false
+    },
+    {
+      "label": "general-1.5B",
+      "params_B": 1.5,
+      "diet": "general",
+      "iid": 0.3241,
+      "cond": 0.394,
+      "copy": 0.4945,
+      "delta_art": 0.1704,
+      "delta_cond": 0.0698,
+      "arm": "LIFT-ARM",
+      "behavior": "LIFT",
+      "below_both": false
+    },
+    {
+      "label": "Coder-0.5B",
+      "params_B": 0.5,
+      "diet": "coder",
+      "iid": 0.2108,
+      "cond": 0.3889,
+      "copy": 0.4945,
+      "delta_art": 0.2837,
+      "delta_cond": 0.1781,
+      "arm": "LIFT-ARM",
+      "behavior": "LIFT",
+      "below_both": false
+    }
+  ],
+  "confound": {
+    "non_coder_arms": {
+      "DeepSeek-1.3B": "LIFT-ARM",
+      "StarCoder2-3B": "LIFT-ARM",
+      "general-1.5B": "LIFT-ARM"
+    },
+    "straddle_occupants": [
+      "Coder-3B",
+      "Coder-1.5B"
+    ],
+    "note": "every non-Coder cell is on the lift arm (d_art>=+0.13); the straddle where the sink lives is Coder-only. The matched battery places non-Coder models into the straddle."
+  }
+}

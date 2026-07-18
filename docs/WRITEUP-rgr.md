@@ -24,7 +24,19 @@ cross-family audit that retracted our platform negatives as one family's
 pathology — and finally an existence proof that approach-level direction crosses
 the competence boundary, moving the open question to where direction comes from.*
 
-*Living record — last updated 2026-07-18 (**PHASE 6 CLOSED — where the pathology
+*Living record — last updated 2026-07-18 (**PHASE 7 OPEN — is the sink Qwen's, the
+diet's, or everyone's?, [PHASE_7.md]**: Phase 6's Coder-stage origin line is
+**position-confounded** — every friendly non-Coder cell was measured on the lift arm
+(Δ_art = artifact − own-i.i.d. frac ≥ +0.13); the below-both sink was never sampled
+off-Coder at match (Δ_art ≈ 0). P0 landed: StarCoder2 is a **lift-arm** point
+(+0.136), not a straddle datum, so the space stays open; the relational figure
+(P0.2) and stack-lineage/fingerprint infra (P0.3) are committed. The
+**matched-artifact battery** (P1, artifacts mined to each model's own match) is
+**frozen and priced** — H-diet-modulated 45% / H-Coder-specific 30% / H-universal
+15% / ugly 10% — **awaiting sign-off** for the ~$15–25 Modal run. Index rows 8/11
+carry a P7-PROVISIONAL position-confound flag; the pathology-note transcription
+status is **suspended** (§0.2); the matched-relation rule is codified (§10).
+Previously **PHASE 6 CLOSED — where the pathology
 comes from + extraction-readiness, [PHASE_6.md]**: the small-Qwen conditioning
 pathology's origin is **measured** — a **Coder-continued-pretraining-diet ×
 competence-window** effect (general-1.5B, same arch/tie/scale, is clean; the code
@@ -349,6 +361,26 @@ control. The protocol is recorded operationally in §8; the general lesson is th
 methodological one — a committed prediction, by falsifying, exposed a record-wide
 bias that had sat invisible under every near-zero-floor arm.
 
+**Addendum (2026-07-18, Phase 7 P2 — the matched-relation rule).** When a response
+depends on a **model–stimulus relation**, comparisons must be matched on the
+**relation**, not on the **stimulus**. A fixed-stimulus design silently varies the
+relation whenever the compared models differ in the very property the relation
+involves. The record paid for this twice, the same error class in consecutive
+phases: the conditioning pathology is a function of **Δ_art** = (artifact frac −
+own i.i.d. frac) — *where the stimulus sits relative to the model's own quality* —
+yet **Phase 4** (cross-family) and **Phase 6** (diet control) both held the stimulus
+fixed at the same 0.494-frac artifacts while model quality swept 0.21 → 0.66, so
+every non-Coder model was measured on the lift arm (Δ_art ≥ +0.13) and none in the
+straddle (Δ_art ≈ 0) where the sink lives. "Diet" and "position" were never
+separated because diet *determines* i.i.d. quality, which *determines* position.
+The fix (Phase 7 P1) is to **mine artifacts to each model's own match** so Δ_art ≈ 0
+for all, holding the relation constant while the model varies. The lineage is
+psychophysics: you match to **threshold**, not to **intensity** — a fixed
+luminance is a different stimulus to a dark-adapted and a light-adapted eye. This is
+a standing rule, **checked at every pre-registration**: name the relation the
+response depends on, and confirm the design holds *it* — not the raw stimulus —
+constant across the compared conditions.
+
 ## 0. Claims & Scope Index *(the journal's map — seeded 2026-07-16, Phase 5 J0; maintained at every phase close)*
 
 Every claim this record has ever made, its current status, and the scope the
@@ -364,10 +396,10 @@ currently believes.** Statuses: LIVE / KILLED / RETRACTED / REVERSED / SCOPED.
 | 5 | F2: no code benchmark offers refinement runway at this scale | **RETRACTED twice** (structural reading → R2; family reading → H1) | LCB-easy feasible on Qwen; runway wider off-Qwen (both families > Qwen) | §7.4, §9.2 |
 | 6 | Escape-distance law (coverage monotone in escape distance; conditioning is a coverage effect, D2b) | **LIVE** | form: 3 families + lexical + structural-AST metrics; constants: family parameters; domain T ≲ 1.2, boundary descends with difficulty; in-context channels | §9.3, §9.3.1 |
 | 7 | Elimination argument (undirected ≤ i.i.d.; repulsion inexpressible; direction the sole surviving channel) | **LIVE, completed** — direction now has an existence proof | measured on Qwen-1.5B; in-context channels only; weight-/search-space never enumerated | §9.3.1, §9.8 |
-| 8 | D2c SINK (conditioning on partial-credit code degrades below both nulls) | **SCOPED + INVERTED**; scale-bounded (J5 Q1: vanishes at Qwen-7B); **origin measured (P6): CODER-STAGE diet, competence-windowed** | Qwen2.5-Coder-**1.5B–3B** code sink (deepest vs-iid at 3B); absent at 0.5B (competence floor) and 7B; general-1.5B (non-Coder) *not* pathological → the Coder continued-pretraining diet, not architecture/tie | §9.7 markers, §9.9 J5/P1, [PHASE_4.md] H1, [PHASE_6.md] P1 |
+| 8 | D2c SINK (conditioning on partial-credit code degrades below both nulls) | **SCOPED + INVERTED**; scale-bounded (J5 Q1: vanishes at Qwen-7B); **origin measured (P6): CODER-STAGE diet, competence-windowed**; **P7-PROVISIONAL: origin position-confounded — every friendly non-Coder cell sat on the lift arm (Δ_art ≥ +0.13); the sink was never sampled off-Coder at match — under matched-artifact test ([PHASE_7.md] P1)** | Qwen2.5-Coder-**1.5B–3B** code sink (deepest vs-iid at 3B); absent at 0.5B (competence floor) and 7B; general-1.5B (non-Coder) *not* pathological → the Coder continued-pretraining diet, not architecture/tie | §9.7 markers, §9.9 J5/P1, [PHASE_4.md] H1, [PHASE_6.md] P1 |
 | 9 | R3 null — "1.5B cannot use direction" | **REVERSED-AS-REFINED** | a *trace-channel* null, now **cross-family**: traces sit on the floor on Qwen (1/68) and DeepSeek (2/76) — a content fact, not the Qwen pathology; content, not capacity, was the variable | §9.7, §9.8, §9.9 |
 | 10 | Hint result — approach-level direction crosses the competence boundary (13/68 vs floor 2, p = 4.9e-4) | **LIVE — GENERALIZES** (J4: DeepSeek 9/76, p = 0.0039; **P2: floor distinct-seed verified**) | both families, medium strata, oracle-derived **complete-strategy-grade** hints (J2: dose-response unmeasurable on this set — weaker direction untested); the flagship contrast stands on a measured distinct-seed control (P2, fresh B1 = 2) | §9.8, §9.9, [PHASE_6.md] P2 |
-| 11 | Qwen conditioning pathology (double dissociation: code and language channels degrade Qwen, lift DeepSeek) | **LIVE — SCOPED-TO-1.5B**; **origin measured (P6 P1): CODER-STAGE diet, competence-windowed, MIXED channels** | code sink 1.5B–3B (absent 0.5B/7B); language harm **1.5B-only** (3B hint-conditioning already helps +0.076) → the two channels disagree (MIXED); general-1.5B (non-Coder) clean on both → Coder continued-pretraining, not base recipe/tie | §9.8, §9.9 J5/P1, [PHASE_5.md] J5, [PHASE_6.md] P1 |
+| 11 | Qwen conditioning pathology (double dissociation: code and language channels degrade Qwen, lift DeepSeek) | **LIVE — SCOPED-TO-1.5B**; **origin measured (P6 P1): CODER-STAGE diet, competence-windowed, MIXED channels**; **P7-PROVISIONAL: origin position-confounded — under matched-artifact test ([PHASE_7.md] P1)** | code sink 1.5B–3B (absent 0.5B/7B); language harm **1.5B-only** (3B hint-conditioning already helps +0.076) → the two channels disagree (MIXED); general-1.5B (non-Coder) clean on both → Coder continued-pretraining, not base recipe/tie | §9.8, §9.9 J5/P1, [PHASE_5.md] J5, [PHASE_6.md] P1 |
 | 12 | Production bottleneck — "the model cannot produce hint-grade direction for itself" | **LIVE-MEASURED, cross-family + cross-scale** (J5 Q2 branch (a), the 40% favourite: floor-equivalent self-hint arm at 7B; production-adequate 0/68 Qwen-1.5B, 1/76 DeepSeek, **5/101 Qwen-7B**) | 1.3B–7B; **switch-on lies above 7B** — the cascade is the deployable shape through 7B; the open bracket is 7B–frontier (PlanSearch frame) | §9.9 J5 addendum, [PHASE_5.md] J5 |
 | 13 | Temperature is a dose-responsive anti-anchoring intervention | LIVE | Qwen, HumanEval cells, within the law's domain | §9.3 |
 | 14 | Provenance near-irrelevance (instruction verb ≫ provenance) | LIVE | Qwen; holds under lexical and AST metrics | §9.3, H0a follow-up |
@@ -416,7 +448,15 @@ No commitment implied; the journal decides when an extraction is ripe.
    family). Fastest to publishable, audience primed post-Spurious-Rewards.
    **Extraction-ready.** *(Spec updated 2026-07-18, Phase 6 P3 — the note is now a
    transcription of journal state; no paper is written under this record.)*
-   The transcription-ready spec, with each claim's evidence in §0.3 rows 8/11:
+   **⚠ TRANSCRIPTION-READY STATUS SUSPENDED (2026-07-18, Phase 7 P3).** The spec's
+   §5 origin line ("Coder-stage diet") is **position-confounded** — every friendly
+   non-Coder cell was measured on the lift arm (Δ_art ≥ +0.13); the sink was never
+   sampled off-Coder at match ([PHASE_7.md] §0). Phase 7's matched-artifact battery
+   decides whether the note stays a **Coder-diet** claim (H-Coder-specific / control
+   restored) or **rescopes** to a conditioning law with a diet parameter
+   (H-diet-modulated / H-universal). The spec below is ready for a conclusion that
+   is **now provisional**; do not transcribe §5 until P1 lands.
+   The (pending-P1) spec, with each claim's evidence in §0.3 rows 8/11:
    - **Title/scope:** a **Qwen2.5-Coder-small** conditioning pathology, and
      specifically a **Coder-continued-pretraining-diet** one — *not* a family
      claim, *not* architecture/tie (P0 + P1). general-1.5B (same arch/tie/scale,
@@ -454,27 +494,37 @@ line, and the §8 caveat that attaches. KILLED/RETRACTED rows (1, 2, 4, 5) are
 excluded — their evidence lives in their retraction banners. Rows carrying a
 Phase-6 "pending" gain their line when P1/P2 land.)*
 
-| # | claim (tag) | evidencing artifact(s) | key test + number | scope line | §8 caveat / pending |
-|---|---|---|---|---|---|
-| 3 | register-null localization | `h2_result.json`, `diag2/3/5_*.json` | Δ(FULL−B1) = 0.000, CI [−0.049, +0.055]; W₀ transfer ×1.33→×0.28 (DIAG-5); U starvation: φ passed-AUROC 0.558, KL 0.117 nats directionless, Δpass 0.000 in-domain | that stack (d_r 128, 8 soft tokens, GRU), imitation regime, 1.5B frozen G | retired HF/4-bit stack — numbers never cross the M-boundary |
-| 6 | escape-distance law | `dmeasure_conditioning.json` (`per_sample_D2b`), `h0a_ast_distance.json` | coverage monotone in PULL, Spearman **0.952** under AST = lexical; D2b mean-per-sample-pass flat ~0.20 at every T | form: 3 families + lexical + AST; constants: family params; domain T ≲ 1.2 (descends with difficulty); in-context channels | — |
-| 7 | elimination argument | `dmeasure_e7.json`, `w0a_e0_anchor.json`, `h2a_hint_arm.json` | E7 repulsion loses **15–27 coverage pts** to i.i.d. (0.65/0.75 vs 0.92/0.90); direction existence proof HINT 13 vs floor 2, p = 4.9e-4 | Qwen-1.5B; in-context channels only; weight-/search-space never enumerated | — |
-| 8 | D2c SINK (scoped+inverted, scale-bounded) | `dmeasure_d2c_partial_credit.json`, `h1_cross_family.json`, `h5_7b_pathology.json`, `h6_size_curve.json` | Qwen-1.5B cond **0.374** < copy 0.494 & < iid 0.468 (below-both, p ≈ 5e-5); DeepSeek inverts 0.468 vs iid 0.362 (p ≈ 0.003); **Qwen-7B 0.609 blend**; **P6 size curve: sink at 1.5B (−0.094 vs iid) + 3B (−0.150), absent 0.5B (+0.178) / 7B / general (+0.070)** | Qwen2.5-Coder **1.5B–3B**; origin = Coder-stage diet, competence-windowed (P6) | all-cases judge (frac consumed) |
-| 9 | R3 trace null (reversed-as-refined; content fact) | `r3_conditional_reachability.json`, `h5_deepseek_fourarm.json` | TRACE floor: Qwen **1/68** (p = 0.875 vs B1), DeepSeek **2/76** (p = 0.50); generated at i.i.d. PULL 0.85 | cross-family (both), structural failures, **trace channel** (not "use") | near-zero-floor strata — same-seed confound cannot move it |
-| 10 | hint result (generalizes) | `h2a_hint_arm.json`, `h2a_rerun_stability.json`, `h2a_validation_struct.json`, `h5_deepseek_fourarm.json`, `h6_p2_distinct_seed_b1.json` | Qwen **13/68** (11 hint-only/0, p = 4.9e-4, r ≈ 0.19); DeepSeek **9/76** (8/0, p = 0.0039, r ≈ 0.12); all rerun-stable; ≥ 0.16 AST-novel; timeout-class enriched | both families, medium strata, **complete-strategy-grade** hints (dose-response unmeasured — J2 ceiling 123/125 COMPLETE) | same-seed B1 control suppressed → contrast conservative; **P2 measured it: distinct-seed fresh B1 = 2** (overlap 0.27 vs ~0.50) — the 13-vs-2 contrast stands on a measured control ([PHASE_6.md] P2) |
-| 11 | Qwen pathology / double dissociation (scoped-to-1.5B) | `h1_cross_family.json`, `h2_manip_check.json`, `h2_manip_check_deepseek.json`, `h5_7b_pathology.json`, `h6_size_curve.json` | Qwen code −0.095, language −0.096; DeepSeek +0.107 / +0.088 (double dissociation); Qwen-7B blends, harm vanishes; **P6: general-1.5B (non-Coder) clean — code +0.070, language +0.160 — so Coder-stage diet; language harm 1.5B-only (3B +0.076) = MIXED** | Qwen2.5-Coder **1.5B–3B** vs DeepSeek-1.3B; origin = **Coder-stage diet, competence-windowed, MIXED channels** (P6 P1) | 7B language near-saturation (E0 → 0.9); origin line now **measured** ([PHASE_6.md] P1) |
-| 12 | production bottleneck (cross-family + cross-scale) | `h5_selfhint_qwen.json` + `_grades`, `h5_deepseek_selfhint_grades.json`, `h5_7b_selfhint_grades.json` | production-adequate self-hints **0/68** (Qwen-1.5B), **1/76** (DeepSeek-1.3B), **5/101** (Qwen-7B); self-hint arms floor-equivalent all three | 1.3B–7B; switch-on above 7B; cascade is the deployable shape through 7B | 7B arm read under same-seed confound (branch (a) adjudicated on the neutral-draw correction) |
-| 13 | temperature dose-response | `dmeasure_conditioning.json` | T 0.8→1.2 coverage: E0 −0.02 (flat), E1 +0.10, E2 +0.18 (more-anchored ~2×) | Qwen, HumanEval cells, within the law's domain (T ≲ 1.2) | — |
-| 14 | provenance near-irrelevance | `dmeasure_d2a_verb_provenance.json`, `h0a_d2a_ast_followup.json` | provenance ΔPULL ≤ 0.028 (lexical) / ≤ 0.034 (AST) vs verb up to +0.127 (3–4×) | Qwen; holds under lexical and AST | — |
-| 15 | false-zero floor model (5-for-6) | `w0c_stratum_falsezero.json`, `h5_deepseek_floor_fit.json`, `h5_7b_floor_fit.json`, `h5_7b_hard_floor_fit.json`, `scripts/j6_p2_floor_predict.py`, `h6_p2_distinct_seed_b1.json` | hits 2.01→2, 2.01→2, 0.00→1, hard 2.09→1, **P2 distinct-seed 2.01→2**; miss medium 5.11→1 (harness confound; corrected E 3.02, P(X≤1) ≈ 0.20) | two families, three stratum shapes; π₀ = 0 at 7B-medium (live tail), 0.76 at 7B-hard | the same-seed confound is the miss that found it; distinct-seed now mandatory; **P2 6th test HIT** (distinct-seed B1 = 2 ∈ [0,4]; overlap 0.27 vs ~0.50) |
+*(Stack-lineage column added Phase 7 P0.3: the stack — hardware/dtype/engine/era —
+that generated each row's evidencing pools. Purpose: flag any LIVE/SCOPED row
+standing solely on **pre-Phase-M (Kaggle / Modal-T4 / 4-bit HF)** pools, which never
+cross the M-boundary (§8, D14). Audit result: **only row 3** is pre-M — every other
+live row stands on Modal-L4/vLLM/bf16, the current record stack. Phase-7 cells add a
+per-artifact `stack` fingerprint block, §8.)*
+
+| # | claim (tag) | evidencing artifact(s) | key test + number | scope line | §8 caveat / pending | stack lineage |
+|---|---|---|---|---|---|---|
+| 3 | register-null localization | `h2_result.json`, `diag2/3/5_*.json` | Δ(FULL−B1) = 0.000, CI [−0.049, +0.055]; W₀ transfer ×1.33→×0.28 (DIAG-5); U starvation: φ passed-AUROC 0.558, KL 0.117 nats directionless, Δpass 0.000 in-domain | that stack (d_r 128, 8 soft tokens, GRU), imitation regime, 1.5B frozen G | retired HF/4-bit stack — numbers never cross the M-boundary | **HF-NF4 / 4-bit (pre-M) ⚑** |
+| 6 | escape-distance law | `dmeasure_conditioning.json` (`per_sample_D2b`), `h0a_ast_distance.json` | coverage monotone in PULL, Spearman **0.952** under AST = lexical; D2b mean-per-sample-pass flat ~0.20 at every T | form: 3 families + lexical + AST; constants: family params; domain T ≲ 1.2 (descends with difficulty); in-context channels | — | Modal L4/vLLM/bf16 |
+| 7 | elimination argument | `dmeasure_e7.json`, `w0a_e0_anchor.json`, `h2a_hint_arm.json` | E7 repulsion loses **15–27 coverage pts** to i.i.d. (0.65/0.75 vs 0.92/0.90); direction existence proof HINT 13 vs floor 2, p = 4.9e-4 | Qwen-1.5B; in-context channels only; weight-/search-space never enumerated | — | Modal L4/vLLM/bf16 |
+| 8 | D2c SINK (scoped+inverted, scale-bounded) | `dmeasure_d2c_partial_credit.json`, `h1_cross_family.json`, `h5_7b_pathology.json`, `h6_size_curve.json` | Qwen-1.5B cond **0.374** < copy 0.494 & < iid 0.468 (below-both, p ≈ 5e-5); DeepSeek inverts 0.468 vs iid 0.362 (p ≈ 0.003); **Qwen-7B 0.609 blend**; **P6 size curve: sink at 1.5B (−0.094 vs iid) + 3B (−0.150), absent 0.5B (+0.178) / 7B / general (+0.070)** | Qwen2.5-Coder **1.5B–3B**; origin = Coder-stage diet, competence-windowed (P6); **P7: position-confounded, under matched test** | all-cases judge (frac consumed) | Modal L4/vLLM/bf16 |
+| 9 | R3 trace null (reversed-as-refined; content fact) | `r3_conditional_reachability.json`, `h5_deepseek_fourarm.json` | TRACE floor: Qwen **1/68** (p = 0.875 vs B1), DeepSeek **2/76** (p = 0.50); generated at i.i.d. PULL 0.85 | cross-family (both), structural failures, **trace channel** (not "use") | near-zero-floor strata — same-seed confound cannot move it | Modal L4/vLLM/bf16 |
+| 10 | hint result (generalizes) | `h2a_hint_arm.json`, `h2a_rerun_stability.json`, `h2a_validation_struct.json`, `h5_deepseek_fourarm.json`, `h6_p2_distinct_seed_b1.json` | Qwen **13/68** (11 hint-only/0, p = 4.9e-4, r ≈ 0.19); DeepSeek **9/76** (8/0, p = 0.0039, r ≈ 0.12); all rerun-stable; ≥ 0.16 AST-novel; timeout-class enriched | both families, medium strata, **complete-strategy-grade** hints (dose-response unmeasured — J2 ceiling 123/125 COMPLETE) | same-seed B1 control suppressed → contrast conservative; **P2 measured it: distinct-seed fresh B1 = 2** (overlap 0.27 vs ~0.50) — the 13-vs-2 contrast stands on a measured control ([PHASE_6.md] P2) | Modal L4/vLLM/bf16 |
+| 11 | Qwen pathology / double dissociation (scoped-to-1.5B) | `h1_cross_family.json`, `h2_manip_check.json`, `h2_manip_check_deepseek.json`, `h5_7b_pathology.json`, `h6_size_curve.json` | Qwen code −0.095, language −0.096; DeepSeek +0.107 / +0.088 (double dissociation); Qwen-7B blends, harm vanishes; **P6: general-1.5B (non-Coder) clean — code +0.070, language +0.160 — so Coder-stage diet; language harm 1.5B-only (3B +0.076) = MIXED** | Qwen2.5-Coder **1.5B–3B** vs DeepSeek-1.3B; origin = **Coder-stage diet, competence-windowed, MIXED channels** (P6 P1); **P7: position-confounded, under matched test** | 7B language near-saturation (E0 → 0.9); origin line now **measured** ([PHASE_6.md] P1) | Modal L4/vLLM/bf16 |
+| 12 | production bottleneck (cross-family + cross-scale) | `h5_selfhint_qwen.json` + `_grades`, `h5_deepseek_selfhint_grades.json`, `h5_7b_selfhint_grades.json` | production-adequate self-hints **0/68** (Qwen-1.5B), **1/76** (DeepSeek-1.3B), **5/101** (Qwen-7B); self-hint arms floor-equivalent all three | 1.3B–7B; switch-on above 7B; cascade is the deployable shape through 7B | 7B arm read under same-seed confound (branch (a) adjudicated on the neutral-draw correction) | Modal L4/vLLM/bf16 |
+| 13 | temperature dose-response | `dmeasure_conditioning.json` | T 0.8→1.2 coverage: E0 −0.02 (flat), E1 +0.10, E2 +0.18 (more-anchored ~2×) | Qwen, HumanEval cells, within the law's domain (T ≲ 1.2) | — | Modal L4/vLLM/bf16 |
+| 14 | provenance near-irrelevance | `dmeasure_d2a_verb_provenance.json`, `h0a_d2a_ast_followup.json` | provenance ΔPULL ≤ 0.028 (lexical) / ≤ 0.034 (AST) vs verb up to +0.127 (3–4×) | Qwen; holds under lexical and AST | — | Modal L4/vLLM/bf16 |
+| 15 | false-zero floor model (5-for-6) | `w0c_stratum_falsezero.json`, `h5_deepseek_floor_fit.json`, `h5_7b_floor_fit.json`, `h5_7b_hard_floor_fit.json`, `scripts/j6_p2_floor_predict.py`, `h6_p2_distinct_seed_b1.json` | hits 2.01→2, 2.01→2, 0.00→1, hard 2.09→1, **P2 distinct-seed 2.01→2**; miss medium 5.11→1 (harness confound; corrected E 3.02, P(X≤1) ≈ 0.20) | two families, three stratum shapes; π₀ = 0 at 7B-medium (live tail), 0.76 at 7B-hard | the same-seed confound is the miss that found it; distinct-seed now mandatory; **P2 6th test HIT** (distinct-seed B1 = 2 ∈ [0,4]; overlap 0.27 vs ~0.50) | Modal L4/vLLM/bf16 |
 
 ### 0.4 Open successors *(named, not chartered — [PHASE_6.md] P3; carried without commitment)*
 
 Recorded here so the Index is also the map of what is *deliberately not being run*.
 
-- **Origin of the small-Qwen pathology** — Phase 6 P1's live question (INTERACTION /
-  DISCONTINUITY-OPEN / RECIPE-DEEP / CODER-STAGE); H-tie demoted to an interaction
-  term at P0 (StarCoder2-3B is tied yet friendly).
+- **Origin of the small-Qwen pathology** — Phase 6 P1 measured it CODER-STAGE, but
+  the origin line was **position-confounded** (fixed-0.494 artifacts, so diet and
+  Δ_art moved together). **Now chartered as Phase 7** (the matched-artifact battery):
+  H-Coder-specific / H-diet-modulated / H-universal, tested at Δ_art ≈ 0
+  ([PHASE_7.md]). H-tie demoted to an interaction term at P0 (StarCoder2-3B is tied
+  yet friendly). *(No longer merely "named" — this successor is running.)*
 - **The dose-response hint set** — J2's ceiling (123/125 COMPLETE) left the
   richness threshold unmeasured; a deliberately-varied COMPLETE/degraded/nudge set
   is the instrument. Disclosed wherever the 13/68 result is cited.

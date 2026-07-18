@@ -1,0 +1,334 @@
+# Phase 7 — is the sink Qwen's, the diet's, or everyone's? The matched-artifact battery
+
+*Charter received 2026-07-18. Append-only; every run pre-registered with odds and
+decision rules committed before it launches. This document is the Phase-7
+pre-registration and result log.*
+
+> **DRAFT STATUS (2026-07-18).** P0 is complete and re-prices P1's hypothesis
+> space. P0.1 (StarCoder2 lookup), P0.2 (relational figure), P0.3 (lineage column
+> + fingerprint hook) are landed. The matched-artifact miner has run (free CPU):
+> per-cell coverage is measured, the pre-registered n's are real. **P1's priced
+> odds are frozen below; the paid Modal battery awaits author sign-off** (spend +
+> the M2/M4 shortfall rulings + the law re-anchor decision). Nothing has run on GPU.
+
+## 0. Charter and the confound it attacks
+
+**Charter question (supersedes the Phase-6 origin line's finality).** Is the
+below-both-nulls sink a **Qwen-Coder property**, a **diet-modulated universal**, or
+a **universal property of conditioning at matched model–artifact quality**?
+
+**Why the Phase-6 origin line is provisional.** Every code-channel cell in the
+record conditioned every model on the *same* fixed ~0.494-frac artifacts while
+model quality swept 0.211 → 0.659. Re-expressed on the relational axis
+**Δ_art = (artifact frac − own i.i.d. frac)** — where the stimulus sits relative to
+the model's own quality:
+
+| model | own i.i.d. | Δ_art | Δ_cond | behavior |
+|---|---|---|---|---|
+| Qwen-Coder-0.5B | 0.211 | **+0.284** | +0.178 | lift |
+| general-1.5B | 0.324 | **+0.170** | +0.070 | lift |
+| StarCoder2-3B | 0.358 | **+0.136** | +0.046 | lift (flat) |
+| DeepSeek-1.3B | 0.362 | **+0.133** | +0.107 | lift |
+| Qwen-Coder-1.5B | 0.468 | **+0.026** | −0.094 | **sink** |
+| Qwen-Coder-3B | 0.569 | **−0.075** | −0.150 | **sink** |
+| Qwen-Coder-7B | 0.659 | **−0.165** | −0.050 | drag |
+
+Two confounds follow. **(i)** Every "conditioning-friendly" non-Coder cell was
+measured on the **lift arm** (Δ_art ≥ +0.13); no non-Coder model has ever been
+observed in the **straddle** (Δ_art ≈ 0) where the sink lives — the Phase-4 double
+dissociation compared families at wildly different relational positions. **(ii)**
+Phase 6's cleanest control inherits the same confound: swapping Coder-1.5B →
+general-1.5B changed the diet **and** moved Δ_art from +0.026 to +0.170, because
+diet determines i.i.d. quality, which determines position. CODER-STAGE-vs-position
+is **unresolved**. The same error class fired in two consecutive phases; P2 below
+codifies the rule that prevents a third.
+
+**The honest counterweight (carried into the odds).** Pure relational imitation
+predicts landing *between* the nulls everywhere; it cannot produce below-both. The
+sink is a genuine anomaly on any smooth imitation curve — so H-universal is
+consistent with the existing data **only because the discriminating region was
+never sampled off-Coder**, not because anything yet supports it. This phase samples
+it.
+
+## 1. Standing rules (unchanged, plus one promotion)
+
+- Append, never revise; retractions/amendments dated in place.
+- Pre-register before running: predictions, odds, decision rules committed first;
+  falsified predictions stay on the page.
+- No learned verifier anywhere.
+- Reconciliation-ledger entry (§11) for every external result used in design.
+- §8 operational hardening on all runs (sharded judge where all-cases is required).
+- Distinct-seed protocol for any fresh-draw arm (promoted Phase 6).
+- Claims & Scope Index current at phase close.
+- **(PROMOTED this phase, P2 below) The matched-relation rule:** when a response
+  depends on a model–stimulus relation, comparisons must be **matched on the
+  relation**, not on the stimulus. Codified in §10; checked at every future
+  pre-registration.
+
+---
+
+## P0 — Free lookups and infrastructure *(zero dollars; results re-price P1)*
+
+### P0.1 — The StarCoder2 lookup — **RESULT: lift arm, hypothesis space stays open**
+
+StarCoder2-3B's own i.i.d. frac on the 44-problem D2c cell, pulled from the
+Phase-4 H1 artifact (`h1_cross_family.json`):
+
+| quantity | value |
+|---|---|
+| own i.i.d. frac | 0.3585 |
+| conditioned frac | 0.4047 |
+| artifact (copy-null) frac | 0.4945 |
+| **Δ_art = artifact − own i.i.d.** | **+0.136** |
+| Δ_cond = conditioned − own i.i.d. | +0.046 (n.s.) |
+| p(cond below copy) | 0.855 → **no sink** |
+
+**Committed decision rule, applied:** *"if Δ_art ∈ [−0.08, +0.08] (straddle) and it
+did not sink → a measured non-Coder straddle point with no sink, one observation
+against H-universal; price it in. If Δ_art ≥ +0.13 (lift arm) → the space stays
+fully open."* **Δ_art = +0.136 ≥ +0.13 → LIFT ARM.** StarCoder2 clears the
+threshold by 0.006; it is **not** a straddle observation, provides **no** existing
+non-Coder evidence against H-universal, and **M3 stays in the battery** (StarCoder2
+has never been measured at straddle).
+
+**Boundary observation, priced (not decisive).** StarCoder2 (+0.136) and DeepSeek
+(+0.133) are the two closest non-Coder points to the straddle that exist, and
+**both lift/flat, neither sinks** — mild support that incipient sinking is not
+visible at the lift-arm edge. But +0.13 is still 0.11 in Δ_art from the 1.5B sink
+(+0.026): the discriminating region genuinely remains unsampled off-Coder. Weighted
+into the odds below, not treated as a straddle measurement.
+
+### P0.2 — The relational assembly — **committed before P1**
+
+Every code-channel cell joined onto the (Δ_art, Δ_cond) plane from persisted
+artifacts (`scripts/j7_relational_assembly.py` → `artifacts/h7_relational_assembly.json`).
+Committed **now**, so the battery's M-cells land on a pre-existing plot.
+
+```
+  Delta_cond (y)  [+0.20 top .. -0.20 bottom]   Delta_art (x) [-0.20 .. +0.30]
+  ':' = straddle band edges (-0.08, +0.13);  '+' = origin (matched, Delta_art=0)
+              :       |            :
+              :       |            :              g
+              :       |            :
+              :       |            :
+              :       |            d
+              :       |            :   f
+              :       |            :e
+              :       |            :
+  --------------------+------------------------------
+              :       |            :
+      a       :       |            :
+              :       |            :
+              :       |  C         :
+              :       |            :
+              :B      |            :
+              :       |            :
+              :       |            :
+    a = Coder-7B (over-quality, drag)   b/B = Coder-3B (straddle, SINK)
+    c/C = Coder-1.5B (straddle, SINK)   d = DeepSeek-1.3B (lift)
+    e = StarCoder2-3B (lift, flat)      f = general-1.5B (lift)
+    g = Coder-0.5B (lift)               UPPER = below-both-nulls sink
+```
+
+**What the figure shows and the phase attacks:** the **only** two occupants of the
+straddle band are the two Coder sinks (B, C). All three non-Coder cells (d, e, f)
+sit on the lift arm; Coder-0.5B (g) far lift; Coder-7B (a) over-quality. The
+matched battery places non-Coder models into the straddle for the first time. This
+becomes the record's central pathology figure regardless of P1's branch.
+
+### P0.3 — Stack lineage and fingerprint *(infrastructure, not gating)*
+
+- **(a) Lineage column — LANDED.** §0.3 claims-to-evidence table gains a
+  **stack-lineage** column: one tag per row naming the stack (hardware/dtype/
+  engine/era) that generated its evidencing pools. Pre-Phase-M (Kaggle/4-bit) rows
+  are flagged. (Row 3 register-null is the only LIVE/SCOPED row standing solely on
+  the retired HF/4-bit stack — already banner-flagged "numbers never cross the
+  M-boundary".)
+- **(b) Fingerprint hook — LIVE.** `modal_h1.py::_stack_block()` (=`j7_fingerprint`
+  remote versions + `_stack_hashes` local content hashes of the gen template, D2c
+  context, and judge) attaches a `stack` block — GPU arch, capability, dtype,
+  torch/CUDA/vLLM versions, template/context/judge SHA-16 — to **every Phase-7
+  artifact**. Verified: the three frozen-wording functions parse and hash.
+- **(c) Law re-anchor — FLAGGED, NOT RUN.** The escape-distance law's original
+  HumanEval constants stand on pre-M pools. A ~$3 Modal E0/E1 re-anchor cell is a
+  costed **sign-off decision for the author** — *not run under this handoff*.
+
+---
+
+## P1 — The matched-artifact battery *(the centerpiece; ~$15–25; AWAITS SIGN-OFF)*
+
+**PRE-REGISTRATION (2026-07-18 — odds priced post-P0.1; FROZEN pending sign-off).**
+
+**Question.** Does the sink appear in any model conditioned at its **own quality
+match** (Δ_art ≈ 0), and if so, does its depth depend on **diet**?
+
+**Design (pre-registered).**
+- **Artifacts are mined, not generated.** Per-model matched sets are drawn from the
+  record's persisted partial-credit pool by binning per-problem donor candidates to
+  the target band. **Fixed-donor rule:** all matched sets come from the **one**
+  donor pool — `runs/modal/lcb_cand_lcb_r2_base_T08.json` (Qwen2.5-1.5B-base,
+  LCB-easy, T=0.8), the pool that produced the original 0.494 set — so artifact
+  **source** stays constant while artifact **level** moves. The matched design must
+  not trade the position confound for a source confound.
+- **Target** = the model's own global i.i.d. frac (record value); **band** =
+  target ± 0.05; **one matched artifact per problem** (in-band donor candidate
+  nearest the target, deterministic tie-break by index). Problems with no in-band
+  donor candidate are **dropped and counted** — no donor switch, no band widening.
+  (`scripts/j7_match_artifacts.py` → `artifacts/h7_matched_artifacts.json`.)
+- **Minimum cell size n ≥ 30** problems with in-band coverage (pre-registered).
+- **The sink test simplifies at match.** At Δ_art ≈ 0 the copy-null and own-i.i.d.
+  null converge, so "below both nulls" degenerates. The **committed matched-sink
+  signature** is: conditioned mean frac **< own i.i.d.**, one-sided MC-Wilcoxon
+  **p < 0.05**, **and** effect **≤ −0.05** (the depth threshold keeping "sink"
+  distinct from imitation drag). Δ_cond with bootstrap 95% CI reported per cell
+  regardless of the binary.
+- **Code channel only.** The relational axis is defined on frac; there is no clean
+  language analogue. The language channel's MIXED status (Phase 6) stands untouched.
+
+**Cells and MEASURED coverage** (miner has run; n and expected Δ_art are real):
+
+| cell | model | diet | band (±0.05) | **n** | mean art | E[Δ_art] | what it answers |
+|---|---|---|---|---|---|---|---|
+| **M1** | DeepSeek-Coder-1.3B | organic | [0.312, 0.412] | **39** | 0.361 | +0.00 | most discriminating: non-Coder organic at straddle |
+| **M2** | Qwen2.5-1.5B (general) | general | [0.274, 0.374] | **28** | 0.330 | +0.01 | repairs the P6 control — same fam/arch/scale/tie, at straddle |
+| **M3** | StarCoder2-3B | organic | [0.308, 0.408] | **39** | 0.361 | +0.00 | second organic family at straddle (not skipped — P0.1 lift-arm) |
+| **M4** | Qwen2.5-Coder-7B | coder | [0.609, 0.709] | **20** | 0.663 | +0.00 | does the Coder sink reappear at scale when straddle restored |
+| **M5** | Qwen2.5-Coder-0.5B | coder | [0.161, 0.261] | **43** | 0.204 | −0.01 | Coder weak end at match: position artifact or capability floor |
+
+Existing **Coder-1.5B** (Δ_cond −0.094) and **Coder-3B** (−0.150) cells sit at ≈
+match already and are the **sink-positive reference rows**.
+
+**Coverage rulings (pre-registered defaults; author confirms at sign-off).**
+- **M1, M3, M5 clear n ≥ 30** — run as designed.
+- **M2 = 28 (2 below floor).** **Run it.** It is within rounding of the floor, the
+  matching is tight (mean 0.330 vs target 0.324), and it is the single cell that
+  repairs the Phase-6 confound (general-1.5B at straddle — same arch/scale/tie as
+  the pathological checkpoint). Dropping it would gut the phase. Shortfall recorded;
+  cell flagged `min_n_met: false`.
+- **M4 = 20 (the pre-flagged risk case).** **Run it at n = 20, flagged
+  underpowered, interpreted asymmetrically:** a clear matched sink at n=20 *is*
+  informative (the Coder sink reappears at scale when straddle is restored — the
+  confound named in the Phase-6 review); a **null is inconclusive** (cannot separate
+  "no sink at 7B match" from low power) and **defers M4 to a generated-artifact
+  design** with its own pre-reg. Author may instead defer M4 entirely at sign-off.
+
+**The source side cell — DEFERRED-BY-COVERAGE (measured, before spend).** The
+priced side cell (one model's own-pool artifacts vs the donor-matched set at
+identical Δ_art, to price the source variable) is **not runnable**: single-model
+self-pools are too bimodal in the mid-band to sustain a matched self set —
+DeepSeek 4/80 in-band (paired 3), StarCoder2 5/80 (paired 4). This is the *same*
+bimodality that **motivates** the fixed-donor rule. The source variable stays
+**unpriced**; the path is a future **generated-artifact** design (artifacts
+synthesized to the target band, not mined). Recorded in
+`artifacts/h7_matched_artifacts.json::side_cell_source`.
+
+**Pre-registered branches + odds (priced post-P0.1).** P0.1 left the space fully
+open (StarCoder2 was lift-arm, not a straddle datum); the boundary observation
+(nearest non-Coder points lift, don't sink) is mild support for Coder-specificity,
+weighed against the escape-distance law's prediction that matched conditioning
+should cost independence broadly.
+
+- **H-diet-modulated (the author's proposed law) — 45%.** Negative pressure at
+  match **everywhere**, depth **ordered by diet**: Coder deep (≤ −0.09,
+  M5 and the 1.5B/3B references), organic/general shallow (M1/M2/M3 between −0.05
+  and 0, i.e. real negative pressure but sub-sink-threshold). A universal
+  conditioning curve with a **diet parameter**. Favored: the escape-distance law
+  (LIVE, cross-family) predicts matched artifacts give zero escape benefit while
+  costing sample diversity → negative pressure broadly; the observed Coder depth
+  says diet sets the magnitude. The note reframes around the curve + parameter.
+- **H-Coder-specific — 30%.** M1/M2/M3 **flat-or-positive** at match (Δ_cond > −0.05,
+  no negative pressure at all); M4 and/or M5 sink → the Phase-6 origin line
+  **survives, now unconfounded**, CODER-STAGE gains its missing control, the note's
+  story stabilizes. Supported by P0.1's boundary observation.
+- **H-universal — 15%.** The matched-sink signature (≤ −0.05, p < 0.05) fires
+  across M1–M3 at **Coder-comparable depth**, no diet ordering → family was never
+  the variable; the Index **rescopes** the pathology from "Qwen-Coder" to
+  "conditioning at matched quality," the Phase-4 double dissociation is
+  reinterpreted as a **position artifact** (retraction-grade amendment to rows
+  8/11), and the extraction becomes a substantially larger claim.
+- **Ugly branches — 10%, priced not discovered.** No sink anywhere at match
+  including the Coder references' bands → the original 0.494 set carried a property
+  **beyond its frac** (artifact-set-specific; the deferred source cell becomes the
+  lead diagnostic). Mixed/uninterpretable (cells disagree without diet ordering) →
+  recorded **MIXED**, not harmonized. M4 coverage-null dominates → scoped gap, M4
+  deferred to generated-artifact design.
+
+**M5 sub-question (Coder weak end at match).** In the fixed-0.494 design 0.5B sat
+at Δ_art +0.284 and *helped* ("competence floor — too weak to sink below its own
+floor"). Matched to 0.21, **if 0.5B sinks** → the "competence window" dissolves into
+pure **position** for the Coder line (0.5B was simply never at its own straddle);
+**if it stays flat/positive** → a genuine **capability floor** survives. Either way
+the Phase-6 competence-window story is sharpened or corrected.
+
+**Decision rule for the record.** Index rows **8/11** are re-stated on matched
+evidence — the origin line either **survives with "position-controlled" appended**,
+or **rescopes** per the fired branch. The **Phase-4 dissociation rows** and the
+**J5-Q1 scale row** each get an explicit **position-confound annotation** resolved
+by this battery. The P0.2 relational figure gains the M-cells and becomes canonical.
+
+**Artifacts (planned):** `h7_matched_{M1..M5}.json` (per cell, with `stack` block);
+the re-run `h7_relational_assembly.json` with M-cells placed. **Writeup:** §9.9 P1
+addendum; Index rows 8/11 matched origin line; the P3 note-gating update.
+
+**Ops / sequencing for the cells (post-sign-off).** Each cell behind its smoke gate
+(`j7_smoke`, wf ≥ 0.85 / dg ≤ 0.10), revision-pinned, all-cases judge,
+fingerprinted. Order: **M1, M2 first** (they carry the hypothesis decision) →
+**M3, M5** → **M4 last** (underpowered). All L4/bf16 — the exact record stack, no
+re-baseline (7B fits L4 unlike the Kaggle T4).
+
+---
+
+## P2 — §10 addendum: the matched-relation rule *(writing; lands with this pre-reg)*
+
+Codify the lesson the last two phases paid for. When a response depends on a
+model–stimulus **relation**, comparisons must be matched on the **relation**, not
+on the **stimulus**. Fixed-stimulus designs silently vary the relation whenever the
+compared models differ in the very property the relation involves (here: diet →
+i.i.d. quality → Δ_art). Worked examples in the record: **Phase-4** cross-family at
+fixed 0.494; **Phase-6** diet control at fixed 0.494. Psychophysics lineage:
+matching to **threshold**, not to **intensity**. A §10 rule going forward, checked
+at every pre-registration. **Lands in WRITEUP §10 alongside this pre-reg** (not
+after), so the rule is on the page before the battery it governs runs.
+
+---
+
+## P3 — Carried journal work
+
+- **Note revision gated on P1's branch (not Phase 6's).** Do **not** revise the note
+  under this handoff — the origin section it needs does not exist until the battery
+  lands. §0.2's Phase-6 "transcription-ready" status is **suspended pending P1**
+  (the spec was ready for a conclusion that is now provisional).
+- **Successors, named-not-chartered (unchanged):** dose-response hint set;
+  3B→7B window-close bracket and 7B–72B switch-on; TTT/weight-space. **Nothing runs.**
+
+---
+
+## Sequencing and phase gate
+
+**Order:** P0.1 ✓ → P0.2 ✓ → P0.3 ✓ → **P1 pre-registration frozen with odds
+priced (this file)** → **P2 lands in §10 alongside** → **[SIGN-OFF GATE]** → P1
+cells (M1/M2 → M3/M5 → M4) → Index/figure updates → close.
+
+**[SIGN-OFF GATE — author decisions before any GPU spend]:**
+1. **Go / no-go on the ~$15–25 Modal battery.**
+2. **M2 (n=28) — run at 2-below-floor?** (default: yes.)
+3. **M4 (n=20) — run underpowered with asymmetric interpretation, or defer?**
+   (default: run.)
+4. **Law re-anchor (P0.3c) — sign off the ~$3 E0/E1 re-anchor cell, or leave flagged?**
+   (default: leave flagged.)
+
+**Phase gate — Phase 7 closes when:** the P0.2 relational figure exists with all
+M-cells placed; the sink's Index rows are re-stated on matched evidence (or honestly
+MIXED/OPEN); the Phase-4 dissociation and J5-Q1 rows carry resolved position
+annotations; the matched-relation rule is codified in §10; the lineage column and
+fingerprint hook are live (✓); and the note's gating status reflects P1's branch.
+The extraction decision remains the author's, Index in hand.
+
+## What this phase protects
+
+The journal's claims have narrowed every phase; this one decides whether the
+narrowing continues (**Coder-specific, now controlled**) or reverses into the widest
+claim the record has held (**a conditioning law with a diet parameter**). Both are
+wins. The loss would be publishing "small-Qwen pathology" while the discriminating
+region sat unsampled one battery away — caught before any reader could, against the
+record's own momentum, which is §10 working exactly as written.
