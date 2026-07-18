@@ -1,6 +1,8 @@
 {
   "_label": "Phase 8 D1 inherited-error [PHASE_8.md D1]",
   "metric": "excess = |G\u2229A| - |G|*|A|/n; paired one-sided E1>E0 across problems",
+  "d1_note": "as-pre-registered excess metric is INCONCLUSIVE (control M1 not at null \u2014 inheritance is family-general imitation)",
+  "prime_metric": "induced(t)=P(E1 fails t)-P(E0 fails t); contrast = mean induced on artifact-failing tests minus non-artifact tests",
   "cells": [
     {
       "cell": "coder1p5b_sink",
@@ -16,7 +18,12 @@
       "n_problems_e1_gt_e0": "40/44",
       "elaboration_ratio_mean": 0.5889,
       "elaboration_n": 312,
-      "verdict": "RECLASS-consistent (E1 excess > E0, p<0.05)"
+      "verdict": "RECLASS-consistent (E1 excess > E0, p<0.05)",
+      "prime_n": 44,
+      "prime_mean_contrast": 0.3738,
+      "prime_p_one_sided": 0.0,
+      "prime_n_pos": "40/44",
+      "prime_verdict": "RECLASS (induced failures enriched on artifact's tests, p<0.05)"
     },
     {
       "cell": "qwen3b_sink",
@@ -32,7 +39,12 @@
       "n_problems_e1_gt_e0": "43/44",
       "elaboration_ratio_mean": 0.6382,
       "elaboration_n": 305,
-      "verdict": "RECLASS-consistent (E1 excess > E0, p<0.05)"
+      "verdict": "RECLASS-consistent (E1 excess > E0, p<0.05)",
+      "prime_n": 44,
+      "prime_mean_contrast": 0.4476,
+      "prime_p_one_sided": 0.0,
+      "prime_n_pos": "43/44",
+      "prime_verdict": "RECLASS (induced failures enriched on artifact's tests, p<0.05)"
     },
     {
       "cell": "M4_coder7b",
@@ -44,11 +56,16 @@
       "delta_e1_minus_e0": 0.472,
       "mean_e1_jaccard": 0.3667,
       "mean_e0_jaccard": 0.1874,
-      "p_one_sided_e1_gt_e0": 0.0018,
+      "p_one_sided_e1_gt_e0": 0.0016,
       "n_problems_e1_gt_e0": "17/20",
       "elaboration_ratio_mean": 0.6119,
       "elaboration_n": 101,
-      "verdict": "RECLASS-consistent (E1 excess > E0, p<0.05)"
+      "verdict": "RECLASS-consistent (E1 excess > E0, p<0.05)",
+      "prime_n": 20,
+      "prime_mean_contrast": 0.1526,
+      "prime_p_one_sided": 0.0014,
+      "prime_n_pos": "17/20",
+      "prime_verdict": "RECLASS (induced failures enriched on artifact's tests, p<0.05)"
     },
     {
       "cell": "M1_deepseek1p3b",
@@ -64,8 +81,13 @@
       "n_problems_e1_gt_e0": "36/38",
       "elaboration_ratio_mean": 0.8397,
       "elaboration_n": 287,
-      "verdict": "RECLASS-consistent (E1 excess > E0, p<0.05)"
+      "verdict": "RECLASS-consistent (E1 excess > E0, p<0.05)",
+      "prime_n": 38,
+      "prime_mean_contrast": 0.7129,
+      "prime_p_one_sided": 0.0,
+      "prime_n_pos": "36/38",
+      "prime_verdict": "RECLASS (induced failures enriched on artifact's tests, p<0.05)"
     }
   ],
-  "d1_call": "D1 => M-OOD or MIXED (see per-cell)"
+  "d1_prime_call": "D1'/D1 => INCONCLUSIVE for RECLASS-vs-OOD. Artifact-imitation is FAMILY-GENERAL: the clean control M1 shows the STRONGEST inheritance (excess +2.23) AND artifact-specificity (contrast +0.713) of all cells \u2014 it copies the above-its-level artifact (fidelity 0.84) and lands AT it (lift). The only SINK-SPECIFIC signal is fidelity: sink cells ELABORATE (fidelity 0.59/0.64/0.61) and land BELOW the artifact; the clean cell COPIES and lands at it. D1 leans 'elaboration-degrades' but cannot assign RECLASS vs OOD."
 }

@@ -181,6 +181,51 @@ mean induced on non-A tests**. Paired one-sided (contrast > 0) across problems.
 - **Control M1:** ≈ 0 (it lifts; little induced failure to distribute) — under D1′ the
   control is *expected* near-null by construction, repairing D1's flaw.
 
+### D1′ RESULT (2026-07-18) — **still INCONCLUSIVE; the discriminator is swamped by family-general imitation**
+
+Contrast (induced on artifact-tests − non-artifact tests): Coder-1.5B +0.374, Coder-3B
++0.448, M4 +0.153 — all p < 0.05, all RECLASS-*shaped*. **But the clean control M1 is
++0.713 — the LARGEST.** The correction did not repair the flaw: any model that imitates
+the artifact concentrates its induced failures on the artifact's failing tests
+(inheriting its bugs) while sparing its passing tests — whether it copies *up* (M1,
+fidelity 0.84, lift) or elaborates *down* (Coder, fidelity 0.57–0.64, sink). Artifact-
+imitation is **family-general**; D1 cannot assign RECLASS vs OOD. **The one sink-specific
+signal is fidelity/elaboration:** sink cells elaborate (0.57–0.64) and land *below* the
+artifact; the clean cell copies (0.84) and lands *at* it. The sink is **downward
+elaboration of a matched artifact** — but that phenomenology is shared by RECLASS
+(trusts+extends an exemplar) and OOD (off-manifold degradation). **D1 verdict:
+INCONCLUSIVE, leans "elaboration-degrades," does not decide RECLASS/OOD.**
+
+### D2 RESULT (2026-07-18) — **POSITION-GATED** *(`h8_d2_response_curves.json`)*
+
+The Coder curve Δ_cond = f(Δ_art) is **non-monotone with an interior trough**: quadratic
+R² = 0.835, convex, vertex at Δ_art ≈ **−0.092**; the deepest point (−0.150) is at an
+**interior** Δ_art (−0.074), not an endpoint; LOO trough stays in [−0.12, −0.03]. The
+non-Coder curve is **monotone-increasing** (linear slope +0.49, quadratic R² only 0.50)
+— pure imitation pull, no trough. The **penalty** (Coder − non-Coder) in the *measured*
+overlap [+0.033, +0.170] is ≈ **−0.05 to −0.08**; below Δ_art +0.033 it is
+**extrapolated** and unreliable (the non-Coder fit turns the penalty positive at −0.15
+— an extrapolation artifact, flagged; **C2 measures this region directly**). **D2 branch:
+POSITION-GATED** — the diet penalty peaks near match and shrinks toward both arms,
+consistent with RECLASS's ambiguity-at-match story (and with OOD-at-match, where pull is
+zero and only degradation remains). *(6 points/group — a shape read, not a parameter
+estimate.)*
+
+### MECHANISM CALL (D-rule: D1 + D2, D3 corroborating) — **phenomenology characterized; RECLASS-vs-OOD OPEN, D3-pending**
+
+D1 and D2 **agree on the phenomenology**: the sink is a **position-gated,
+downward-elaboration** effect — a Coder model conditioned near its own quality (straddle)
+elaborates the matched artifact and lands below it, deepest near Δ_art ≈ −0.09, shrinking
+toward both arms. **But they do not resolve RECLASS vs OOD:** D1's discriminating
+prediction (artifact-*specific* bug inheritance) was **swamped by family-general
+imitation** (the clean control inherits most strongly), and D2's position-gating is
+consistent with *both* candidates. **The RECLASS/OOD label is OPEN.** D3 (perplexity —
+does a Coder model find its matched artifact **unsurprising**, i.e. exemplar-credible →
+RECLASS, or **elevated-surprise**, off-manifold → OOD?) is now the **decisive** remaining
+discriminator, not merely corroborating. It is pre-registered above and awaits the GPU
+sign-off. **Recorded call: phenomenology = position-gated elaboration-degradation;
+mechanism label = OPEN (D3-pending).**
+
 ---
 
 ## C — Confound closures *(pre-registered here; each ~$4–10; AWAIT SIGN-OFF)*

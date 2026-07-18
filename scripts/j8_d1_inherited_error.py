@@ -87,7 +87,7 @@ def _cell_rows(cell, arts, e1_rows, e0_rows, donor_rb, e1_codes, art_codes):
     """Return per-problem (e1_excess, e0_excess, e1_jacc, e0_jacc), + elaboration ratios.
     e0_rows: list aligned to arts of lists-of-gen-results (each with failing,n_tests);
              for the 1.5B cell E0 is the donor base gens (artifact cand excluded)."""
-    out, dropped = [], 0
+    out, dropped, contrasts = [], 0, []
     elab = []  # (ratio, gen_fails_artifact_test)
     for i, a in enumerate(arts):
         qid, ci, n = a["qid"], a["cand_idx"], a["n_tests"]
@@ -104,6 +104,18 @@ def _cell_rows(cell, arts, e1_rows, e0_rows, donor_rb, e1_codes, art_codes):
         e1j = sum(_jacc(g["failing"], A) for g in e1) / len(e1)
         e0j = sum(_jacc(g["failing"], A) for g in e0) / len(e0)
         out.append((e1x, e0x, e1j, e0j))
+        # D1' induced-failure enrichment: per test t, P(E1 fails t) - P(E0 fails t);
+        # contrast = mean induced on artifact's failing tests A minus mean on non-A.
+        Aset = set(A)
+        e1f = [set(g["failing"]) for g in e1]
+        e0f = [set(g["failing"]) for g in e0]
+        def _induced(t):
+            return (sum(t in s for s in e1f) / len(e1f)
+                    - sum(t in s for s in e0f) / len(e0f))
+        indA = [_induced(t) for t in range(n) if t in Aset]
+        indN = [_induced(t) for t in range(n) if t not in Aset]
+        if indA and indN:
+            contrasts.append(sum(indA) / len(indA) - sum(indN) / len(indN))
         # elaboration: among E1 gens failing >=1 of the artifact's tests
         acode = art_codes[i]
         for j, g in enumerate(e1):
@@ -111,7 +123,7 @@ def _cell_rows(cell, arts, e1_rows, e0_rows, donor_rb, e1_codes, art_codes):
                 gc = e1_codes[i][j]
                 if gc and acode:
                     elab.append(difflib.SequenceMatcher(None, gc, acode).ratio())
-    return out, dropped, elab
+    return out, dropped, elab, contrasts
 
 
 def _run_cell(name, kind):
@@ -149,8 +161,8 @@ def _run_cell(name, kind):
         e0_rows, e1_rows = res[:n], res[n:]
         e1_codes = [cand[n + i]["codes"] for i in range(n)]
 
-    rows, dropped, elab = _cell_rows(name, arts, e1_rows, e0_rows, donor_rb,
-                                     e1_codes, art_codes)
+    rows, dropped, elab, contrasts = _cell_rows(name, arts, e1_rows, e0_rows, donor_rb,
+                                                e1_codes, art_codes)
     if not rows:
         return {"cell": name, "n": 0, "note": "all problems dropped (n_tests mismatch)"}
     e1x = [r[0] for r in rows]
@@ -161,6 +173,13 @@ def _run_cell(name, kind):
     n_pos = sum(1 for d in diffs if d > 1e-9)
     verdict = ("RECLASS-consistent (E1 excess > E0, p<0.05)" if p < 0.05 and mean_e1 > mean_e0
                else "OOD-consistent (E1 ~ E0)")
+    # D1' induced-failure enrichment
+    mean_c = sum(contrasts) / len(contrasts) if contrasts else None
+    p_c = _perm_p_one_sided(contrasts) if contrasts else None
+    n_pos_c = sum(1 for c in contrasts if c > 1e-9)
+    prime_verdict = ("RECLASS (induced failures enriched on artifact's tests, p<0.05)"
+                     if p_c is not None and p_c < 0.05 and mean_c > 0
+                     else "OOD (induced failures uniform)")
     return {"cell": name, "kind": kind, "n_problems": len(rows), "dropped": dropped,
             "mean_e1_excess": round(mean_e1, 4), "mean_e0_excess": round(mean_e0, 4),
             "delta_e1_minus_e0": round(mean_e1 - mean_e0, 4),
@@ -169,7 +188,12 @@ def _run_cell(name, kind):
             "p_one_sided_e1_gt_e0": round(p, 4),
             "n_problems_e1_gt_e0": f"{n_pos}/{len(diffs)}",
             "elaboration_ratio_mean": round(sum(elab) / len(elab), 4) if elab else None,
-            "elaboration_n": len(elab), "verdict": verdict}
+            "elaboration_n": len(elab), "verdict": verdict,
+            "prime_n": len(contrasts),
+            "prime_mean_contrast": round(mean_c, 4) if mean_c is not None else None,
+            "prime_p_one_sided": round(p_c, 4) if p_c is not None else None,
+            "prime_n_pos": f"{n_pos_c}/{len(contrasts)}" if contrasts else None,
+            "prime_verdict": prime_verdict}
 
 
 def main():
@@ -191,16 +215,40 @@ def main():
         else:
             print(f"{name:22s}  {r.get('note')}")
 
+    print(f"\n=== D1' induced-failure enrichment (sink-specific) ===")
+    print(f"{'cell':22s} {'n':>4s} {'contrast':>9s} {'p':>7s} {'>0':>7s}  verdict")
+    print("-" * 80)
+    for r in results:
+        if r.get("prime_mean_contrast") is not None:
+            print(f"{r['cell']:22s} {r['prime_n']:4d} {r['prime_mean_contrast']:+9.4f} "
+                  f"{r['prime_p_one_sided']:7.4f} {r['prime_n_pos']:>7s}  {r['prime_verdict']}")
+
     sinks = [r for r in results if r["cell"] != "M1_deepseek1p3b" and r.get("n_problems")]
-    sink_reclass = all("RECLASS" in r["verdict"] for r in sinks)
     ctrl = next(r for r in results if r["cell"] == "M1_deepseek1p3b")
-    call = ("D1 => M-RECLASS (all sink cells show E1 excess > E0; control at null)"
-            if sink_reclass and "OOD" in ctrl.get("verdict", "")
-            else "D1 => M-OOD or MIXED (see per-cell)")
+    ctrl_c = ctrl["prime_mean_contrast"]
+    # Clean discrimination would require the sink cells to EXCEED the clean control.
+    sinks_exceed_ctrl = all(r["prime_mean_contrast"] > ctrl_c for r in sinks)
+    sink_fid = "/".join(f"{r['elaboration_ratio_mean']:.2f}" for r in sinks)
+    if sinks_exceed_ctrl:
+        call = "D1' => M-RECLASS (sink cells exceed the clean control on artifact-specific induced failures)"
+    else:
+        call = ("D1'/D1 => INCONCLUSIVE for RECLASS-vs-OOD. Artifact-imitation is "
+                f"FAMILY-GENERAL: the clean control M1 shows the STRONGEST inheritance "
+                f"(excess {ctrl['delta_e1_minus_e0']:+.2f}) AND artifact-specificity "
+                f"(contrast {ctrl_c:+.3f}) of all cells — it copies the above-its-level "
+                f"artifact (fidelity {ctrl['elaboration_ratio_mean']:.2f}) and lands AT "
+                f"it (lift). The only SINK-SPECIFIC signal is fidelity: sink cells "
+                f"ELABORATE (fidelity {sink_fid}) and land BELOW the artifact; the clean "
+                f"cell COPIES and lands at it. D1 leans 'elaboration-degrades' but "
+                f"cannot assign RECLASS vs OOD.")
     print("\nD1 CALL:", call)
     out = {"_label": "Phase 8 D1 inherited-error [PHASE_8.md D1]",
            "metric": "excess = |G∩A| - |G|*|A|/n; paired one-sided E1>E0 across problems",
-           "cells": results, "d1_call": call}
+           "d1_note": "as-pre-registered excess metric is INCONCLUSIVE (control M1 not "
+                      "at null — inheritance is family-general imitation)",
+           "prime_metric": "induced(t)=P(E1 fails t)-P(E0 fails t); contrast = mean "
+                           "induced on artifact-failing tests minus non-artifact tests",
+           "cells": results, "d1_prime_call": call}
     (REPO / "artifacts/h8_d1_inherited_error.json").write_text(json.dumps(out, indent=2))
     print("wrote artifacts/h8_d1_inherited_error.json")
 

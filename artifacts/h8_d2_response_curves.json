@@ -1,0 +1,106 @@
+{
+  "_label": "Phase 8 D2 per-diet response curves [PHASE_8.md D2]",
+  "coder_points": [
+    [
+      -0.1645,
+      -0.05,
+      "Coder-7B"
+    ],
+    [
+      -0.0744,
+      -0.1502,
+      "Coder-3B"
+    ],
+    [
+      -0.0393,
+      -0.1286,
+      "M4 Coder-7B*"
+    ],
+    [
+      0.026,
+      -0.0947,
+      "Coder-1.5B"
+    ],
+    [
+      0.0814,
+      0.0443,
+      "M5 Coder-0.5B*"
+    ],
+    [
+      0.2837,
+      0.1781,
+      "Coder-0.5B"
+    ]
+  ],
+  "noncoder_points": [
+    [
+      0.0326,
+      0.008,
+      "M3 StarCoder2*"
+    ],
+    [
+      0.0499,
+      0.0496,
+      "M1 DeepSeek*"
+    ],
+    [
+      0.0642,
+      -0.0001,
+      "M2 general*"
+    ],
+    [
+      0.1327,
+      0.1066,
+      "DeepSeek-1.3B"
+    ],
+    [
+      0.136,
+      0.0462,
+      "StarCoder2-3B"
+    ],
+    [
+      0.1704,
+      0.0698,
+      "general-1.5B"
+    ]
+  ],
+  "coder_quad": [
+    2.08647,
+    0.38534,
+    -0.08317
+  ],
+  "coder_quad_r2": 0.835,
+  "coder_linear_slope": 0.667,
+  "noncoder_quad": [
+    -2.99908,
+    1.09108,
+    -0.02345
+  ],
+  "noncoder_quad_r2": 0.503,
+  "noncoder_linear_slope": 0.4932,
+  "coder_trough_dart": -0.0923,
+  "coder_deepest": {
+    "dart": -0.0744,
+    "dcond": -0.1502,
+    "interior": true
+  },
+  "penalty_curve": {
+    "-0.15": 0.1606,
+    "-0.1": 0.0617,
+    "-0.05": -0.0117,
+    "0.0": -0.0597,
+    "0.05": -0.0823,
+    "0.1": -0.0794,
+    "0.15": -0.0512
+  },
+  "noncoder_measured_min_dart": 0.0326,
+  "loo_trough_dart": [
+    null,
+    -0.084,
+    -0.102,
+    -0.117,
+    -0.025,
+    -0.061
+  ],
+  "shape_branch": "POSITION-GATED (penalty peaks near match, shrinks toward both arms) \u2014 consistent with RECLASS's ambiguity-at-match story"
+}
