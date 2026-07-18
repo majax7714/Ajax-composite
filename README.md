@@ -58,7 +58,10 @@ immediately turned on itself: the origin line was found to rest on a confound
 so the next phase re-measured the sink with each model matched to its own quality
 — confirming the effect is diet-specific (non-Coder families do not sink at match)
 while catching that its apparent disappearance at larger scale had been the same
-confound all along.
+confound all along — and then a mechanism phase gave it a *why* (matched
+conditioning lands off a code model's manifold, so it elaborates the artifact
+rather than copying it, and degrades), confirmed the large-scale sink, and left the
+remaining confounds honestly open rather than papering a clean story over them.
 
 ## Map of the composite
 
@@ -73,6 +76,7 @@ confound all along.
 | 5 | [PHASE_5.md](docs/PHASE_5.md) | The journal turn (the record becomes the primary artifact) + where direction comes from: models execute direction they cannot manufacture |
 | 6 | [PHASE_6.md](docs/PHASE_6.md) | Where the pathology comes from + extraction-readiness: origin measured (a Coder-continued-pretraining diet × a competence window, MIXED across code/language channels; the tie hypothesis demoted); the flagship floor verified on a distinct-seed control (instrument 5-for-6); the claims-to-evidence layer (§0.3) built |
 | 7 | [PHASE_7.md](docs/PHASE_7.md) | Is the sink Qwen's, the diet's, or everyone's? The matched-artifact battery mined artifacts to each model's own quality and sampled the sink's region off-Coder for the first time: the sink is **Coder-diet-specific** (non-Coder families flat at match) — and the battery **reversed** Phase 6's "vanishes at 7B", which was itself a position artifact (7B sinks at match). The "competence window" becomes a diet × relational-position rule |
+| 8 | [PHASE_8.md](docs/PHASE_8.md) | The mechanism of the sink + closing the confounds. Mechanism = **off-manifold elaboration-degradation** (matched conditioning lands off a Coder model's manifold, so it elaborates rather than copies the artifact and degrades — position-gated; RECLASS disfavored, not excluded). The **7B sink is confirmed** (n=37). Three confounds stay honestly **open** (provenance, the sign/below-zero question, and a second synthetic-code family — phi-1 leaned Coder-like but sub-threshold, so "code-diet phenomenon" stays **unlicensed**) — each cheap, each named, none papered over |
 
 ## How to read
 
