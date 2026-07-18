@@ -67,6 +67,35 @@ def _collect():
     return rows
 
 
+def _collect_matched():
+    """Overlay: the Phase-7 matched cells, once landed. Each conditions its model
+    at Delta_art ~ 0; the point is (actual_delta_art, delta_cond_minus_iid). Placed
+    on the same plane so the sink's region is finally sampled off-Coder. Returns []
+    until the h7_matched_<cell>.json files exist (pre-P1 the figure shows 7 points)."""
+    order = [("M1_deepseek1p3b", "M1 DeepSeek*"), ("M2_general1p5b", "M2 general*"),
+             ("M3_starcoder2_3b", "M3 StarCoder2*"), ("M4_coder7b", "M4 Coder-7B*"),
+             ("M5_coder0p5b", "M5 Coder-0.5B*")]
+    rows = []
+    for key, label in order:
+        d = _art(f"artifacts/h7_matched_{key}.json")
+        if not d:
+            continue
+        d_art = d["actual_delta_art"]
+        d_cond = d["delta_cond_minus_iid"]
+        arm = ("LIFT-ARM" if d_art >= 0.13 else
+               "OVER-QUALITY" if d_art <= -0.08 else "STRADDLE")
+        beh = ("SINK" if d.get("matched_sink_signature") else
+               "DRAG" if d_cond <= -0.05 else "LIFT" if d_cond >= 0.05 else "FLAT")
+        rows.append({"label": label, "params_B": None, "diet": d.get("diet"),
+                     "iid": round(d["mean_iid_e0"], 4), "cond": round(d["mean_cond_e1"], 4),
+                     "copy": round(d["mean_copy_null"], 4),
+                     "delta_art": round(d_art, 4), "delta_cond": round(d_cond, 4),
+                     "arm": arm, "behavior": beh,
+                     "below_both": bool(d.get("matched_sink_signature")),
+                     "source": "matched", "n": d.get("n_problems")})
+    return rows
+
+
 def _row(label, pb, diet, iid, cond, copy, below_both, sink_sig):
     d_art = copy - iid
     d_cond = cond - iid
@@ -87,7 +116,7 @@ def _row(label, pb, diet, iid, cond, copy, below_both, sink_sig):
     return {"label": label, "params_B": pb, "diet": diet,
             "iid": round(iid, 4), "cond": round(cond, 4), "copy": round(copy, 4),
             "delta_art": round(d_art, 4), "delta_cond": round(d_cond, 4),
-            "arm": arm, "behavior": beh, "below_both": below_both}
+            "arm": arm, "behavior": beh, "below_both": below_both, "source": "record"}
 
 
 def _ascii_scatter(rows):
@@ -117,13 +146,20 @@ def _ascii_scatter(rows):
         for i in range(H):
             if grid[i][c] == " ":
                 grid[i][c] = ":"
-    # points (letter markers)
+    # points: record cells = letters (UPPER if below-both); matched overlay = digits
     marks = []
-    for idx, r in enumerate(rows):
-        ch = chr(ord("a") + idx)
+    li = di = 0
+    for r in rows:
+        if r.get("source") == "matched":
+            di += 1
+            ch = str(di)
+        else:
+            ch = chr(ord("a") + li)
+            li += 1
         i, j = cy(r["delta_cond"]), cx(r["delta_art"])
-        grid[i][j] = ch.upper() if r["below_both"] else ch
-        marks.append((ch, r))
+        cell = (ch.upper() if r["below_both"] and ch.isalpha() else ch)
+        grid[i][j] = cell
+        marks.append((cell, r))
     lines = ["".join(row) for row in grid]
     out = []
     out.append(f"  Delta_cond (y)  [+{yhi:.2f} top .. {ylo:.2f} bottom]   "
@@ -140,28 +176,43 @@ def _ascii_scatter(rows):
 
 
 def main():
-    rows = _collect()
-    rows.sort(key=lambda r: r["delta_art"])
+    base = _collect()
+    matched = _collect_matched()
+    rows = sorted(base + matched, key=lambda r: r["delta_art"])
+    if matched:
+        print(f"[overlay: {len(matched)} matched M-cell(s) placed — the sink region "
+              f"sampled off-Coder]\n")
     print(f"{'label':16s} {'B':>4s} {'diet':>8s} {'iid':>6s} {'cond':>6s} "
           f"{'copy':>6s} {'d_art':>7s} {'d_cond':>7s} {'arm':>12s} {'beh':>5s}")
     print("-" * 92)
     for r in rows:
-        print(f"{r['label']:16s} {r['params_B']:4.1f} {r['diet']:>8s} "
+        pb = f"{r['params_B']:4.1f}" if r.get("params_B") is not None else "   ·"
+        print(f"{r['label']:16s} {pb} {(r['diet'] or '—'):>8s} "
               f"{r['iid']:6.3f} {r['cond']:6.3f} {r['copy']:6.3f} "
               f"{r['delta_art']:+7.3f} {r['delta_cond']:+7.3f} {r['arm']:>12s} "
               f"{r['behavior']:>5s}")
 
-    # the confound, stated numerically
-    non_coder_lift = [r for r in rows if r["diet"] in ("organic", "general")]
-    straddle = [r for r in rows if r["arm"] == "STRADDLE"]
-    print("\n=== THE CONFOUND (why the origin line is provisional) ===")
-    print("  non-Coder cells (organic/general), and their arm:")
-    for r in non_coder_lift:
+    # the confound, stated numerically — over the RECORD (fixed-0.494) cells
+    rec_non_coder = [r for r in base if r["diet"] in ("organic", "general")]
+    rec_straddle = [r for r in base if r["arm"] == "STRADDLE"]
+    print("\n=== THE CONFOUND (record cells, fixed-0.494 artifacts) ===")
+    print("  non-Coder record cells (organic/general), and their arm:")
+    for r in rec_non_coder:
         print(f"    {r['label']:14s} d_art {r['delta_art']:+.3f}  -> {r['arm']}")
-    print(f"  straddle-region cells (d_art in (-0.08,+0.13)): "
-          f"{[r['label'] for r in straddle]}")
-    print("  -> every non-Coder cell sits on the LIFT ARM; the straddle (where the "
-          "sink lives)\n     is occupied ONLY by Coder-diet models. P1 samples it off-Coder.")
+    print(f"  record straddle-region cells: {[r['label'] for r in rec_straddle]}")
+    print("  -> in the record, every non-Coder cell sits on the LIFT ARM; the straddle "
+          "(where the\n     sink lives) is occupied ONLY by Coder-diet models.")
+    # the matched overlay, once landed — the region finally sampled off-Coder
+    if matched:
+        m_straddle = [r for r in matched if r["arm"] == "STRADDLE"]
+        m_sinks = [r for r in matched if r["below_both"]]
+        print("\n=== MATCHED OVERLAY (Delta_art ~ 0, sink region sampled off-Coder) ===")
+        for r in matched:
+            print(f"    {r['label']:16s} d_art {r['delta_art']:+.3f}  d_cond "
+                  f"{r['delta_cond']:+.3f}  {r['arm']:>10s}/{r['behavior']:<5s}"
+                  f"{'  <-- MATCHED SINK' if r['below_both'] else ''}")
+        print(f"  -> {len(m_straddle)}/{len(matched)} matched cells landed in the "
+              f"straddle; matched sinks: {[r['label'] for r in m_sinks] or 'none'}")
 
     print("\n=== RELATIONAL PLANE (P0.2 figure) ===")
     print(_ascii_scatter(rows))
@@ -172,12 +223,17 @@ def main():
                  "y": "delta_cond = conditioned - own_iid"},
         "straddle_band": [-0.08, 0.13],
         "rows": rows,
+        "n_matched_overlaid": len(matched),
         "confound": {
-            "non_coder_arms": {r["label"]: r["arm"] for r in non_coder_lift},
-            "straddle_occupants": [r["label"] for r in straddle],
-            "note": ("every non-Coder cell is on the lift arm (d_art>=+0.13); the "
-                     "straddle where the sink lives is Coder-only. The matched "
-                     "battery places non-Coder models into the straddle."),
+            "record_non_coder_arms": {r["label"]: r["arm"] for r in rec_non_coder},
+            "record_straddle_occupants": [r["label"] for r in rec_straddle],
+            "matched_straddle_occupants": [r["label"] for r in matched
+                                           if r["arm"] == "STRADDLE"],
+            "matched_sinks": [r["label"] for r in matched if r["below_both"]],
+            "note": ("in the record every non-Coder cell is on the lift arm "
+                     "(d_art>=+0.13); the straddle where the sink lives is Coder-only. "
+                     "The matched battery places non-Coder models into the straddle "
+                     "(matched overlay rows, once landed)."),
         },
     }
     (REPO / "artifacts/h7_relational_assembly.json").write_text(

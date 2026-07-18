@@ -20,7 +20,8 @@
       "delta_cond": -0.05,
       "arm": "OVER-QUALITY",
       "behavior": "FLAT",
-      "below_both": false
+      "below_both": false,
+      "source": "record"
     },
     {
       "label": "Coder-3B",
@@ -33,7 +34,8 @@
       "delta_cond": -0.1502,
       "arm": "STRADDLE",
       "behavior": "SINK",
-      "below_both": true
+      "below_both": true,
+      "source": "record"
     },
     {
       "label": "Coder-1.5B",
@@ -46,7 +48,8 @@
       "delta_cond": -0.0947,
       "arm": "STRADDLE",
       "behavior": "SINK",
-      "below_both": true
+      "below_both": true,
+      "source": "record"
     },
     {
       "label": "DeepSeek-1.3B",
@@ -59,7 +62,8 @@
       "delta_cond": 0.1066,
       "arm": "LIFT-ARM",
       "behavior": "LIFT",
-      "below_both": false
+      "below_both": false,
+      "source": "record"
     },
     {
       "label": "StarCoder2-3B",
@@ -72,7 +76,8 @@
       "delta_cond": 0.0462,
       "arm": "LIFT-ARM",
       "behavior": "FLAT",
-      "below_both": false
+      "below_both": false,
+      "source": "record"
     },
     {
       "label": "general-1.5B",
@@ -85,7 +90,8 @@
       "delta_cond": 0.0698,
       "arm": "LIFT-ARM",
       "behavior": "LIFT",
-      "below_both": false
+      "below_both": false,
+      "source": "record"
     },
     {
       "label": "Coder-0.5B",
@@ -98,19 +104,23 @@
       "delta_cond": 0.1781,
       "arm": "LIFT-ARM",
       "behavior": "LIFT",
-      "below_both": false
+      "below_both": false,
+      "source": "record"
     }
   ],
+  "n_matched_overlaid": 0,
   "confound": {
-    "non_coder_arms": {
+    "record_non_coder_arms": {
+      "general-1.5B": "LIFT-ARM",
       "DeepSeek-1.3B": "LIFT-ARM",
-      "StarCoder2-3B": "LIFT-ARM",
-      "general-1.5B": "LIFT-ARM"
+      "StarCoder2-3B": "LIFT-ARM"
     },
-    "straddle_occupants": [
-      "Coder-3B",
-      "Coder-1.5B"
+    "record_straddle_occupants": [
+      "Coder-1.5B",
+      "Coder-3B"
     ],
-    "note": "every non-Coder cell is on the lift arm (d_art>=+0.13); the straddle where the sink lives is Coder-only. The matched battery places non-Coder models into the straddle."
+    "matched_straddle_occupants": [],
+    "matched_sinks": [],
+    "note": "in the record every non-Coder cell is on the lift arm (d_art>=+0.13); the straddle where the sink lives is Coder-only. The matched battery places non-Coder models into the straddle (matched overlay rows, once landed)."
   }
 }
