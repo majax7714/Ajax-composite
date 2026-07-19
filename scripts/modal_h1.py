@@ -2269,3 +2269,82 @@ def j9_2x2():
         json.dumps({"_label": "Phase 9 D3 sweep [PHASE_9.md G1]", "rows": d3,
                     "branch": branch}, indent=2))
     print("wrote h9_2x2_*.json, h9_2x2_generated_sets.json, h9_d3_sweep.json")
+
+
+@app.local_entrypoint()
+def j9_g2_phi():
+    """G2 (fired by the DIET branch) — phi-1 at its TRUE match, iterative-targeted
+    ([PHASE_9.md] G2). Phase-8 C3 left phi off-target at Δ_art +0.042 (sub-threshold
+    −0.033); here the donor band is re-centered on phi's i.i.d. measured on the covered
+    subset (§10 amendment) until Δ_art ≈ 0. A phi sink → synthetic-code-diet family-n=2;
+    clean → attribution stays 'Qwen-Coder-stage'. Reuses the cached phi E0."""
+    import statistics as st
+    qids = [a["qid"] for a in _d2c_artifacts()]
+    e0res = _load("j8_c3_phi_e0res")  # phi E0 on the 44 problems (Phase 8, cached)
+    phi_iid = {q: st.mean(x["frac"] for x in row) for q, row in zip(qids, e0res)}
+    e0_by_qid = dict(zip(qids, e0res))
+
+    dres = json.loads((REPO / "runs/modal/lcb_res_lcb_r2_base_T08.json").read_text())
+    dcand = json.loads((REPO / "runs/modal/lcb_cand_lcb_r2_base_T08.json").read_text())
+    cb = dict(zip(dres["question_ids"], dcand["codes"]))
+    rb = dict(zip(dres["question_ids"], dres["results"]))
+    HW = 0.06  # phi is weak (i.i.d.~0.13); the low-frac donor region is dense
+
+    def cov(ctr):
+        lo, hi = ctr - HW, ctr + HW
+        return set(q for q in qids
+                   if any(lo <= r["frac"] <= hi and cb[q][i]
+                          for i, r in enumerate(rb[q])))
+
+    # iterative targeting: re-center the band on phi's covered-subset i.i.d.
+    ctr, sub, si, it = st.mean(phi_iid.values()), [], 0.0, 0
+    for it in range(4):
+        sub = sorted(cov(ctr))
+        if len(sub) < 8:
+            break
+        si = st.mean(phi_iid[q] for q in sub)
+        if abs(ctr - si) <= HW:
+            break
+        ctr = si
+    lo, hi = ctr - HW, ctr + HW
+    tgt = si  # select nearest the SUBSET i.i.d. → Δ_art ≈ 0 (true match), not band center
+    arts = []
+    for q in sub:
+        inb = [(i, r) for i, r in enumerate(rb[q]) if lo <= r["frac"] <= hi and cb[q][i]]
+        if inb:
+            i, r = min(inb, key=lambda ir: (abs(ir[1]["frac"] - tgt), ir[0]))
+            arts.append({"qid": q, "cand_idx": i, "code": cb[q][i], "frac": r["frac"],
+                         "n_tests": r["n_tests"], "n_failed": r["n_tests"] - r["n_passed"]})
+    aq = [a["qid"] for a in arts]
+    print(f"phi iterative-target: band@{ctr:.3f} (subset_iid {si:.3f}, {it} re-targets); "
+          f"n={len(aq)}")
+
+    items = [{"qid": a["qid"], "context": _d2c_context(a)} for a in arts]
+    e1g = _load("j9_g2phi_cand") or _persist(
+        "j9_g2phi_cand",
+        h1_gen_lcb.remote(PHI1, items, 8, tag="j9_g2phi_cand", seed=17,
+                          revision=PHI1_REV, max_model_len=2048, max_tokens=700))
+    e1r = _load("j9_g2phi_res") or _persist(
+        "j9_g2phi_res",
+        h1_lcb_exec.remote([g["qid"] for g in e1g], [g["codes"] for g in e1g],
+                           tag="j9_g2phi_res"))
+    e0 = [st.mean(x["frac"] for x in e0_by_qid[q]) for q in aq]
+    e1 = [st.mean(x["frac"] for x in row) for row in e1r]
+    copy = [a["frac"] for a in arts]
+    d = [b - a for a, b in zip(e0, e1)]
+    p = _wilcoxon_mc_one_sided([-x for x in d])
+    me0, me1, mc = st.mean(e0), st.mean(e1), st.mean(copy)
+    eff, dart = me1 - me0, mc - st.mean(e0)
+    sink = bool(me1 < me0 and p < 0.05 and eff <= -0.05)
+    out = {"_label": "Phase 9 G2 — phi-1 true match [PHASE_9.md G2]",
+           "cell": "G2_phi_truematch", "model": PHI1, "revision": PHI1_REV, "seed": 17,
+           "n_problems": len(aq), "band_center": round(ctr, 4), "retargets": it,
+           "mean_iid_e0": round(me0, 4), "mean_cond_e1": round(me1, 4),
+           "mean_artifact": round(mc, 4), "delta_cond_minus_iid": round(eff, 4),
+           "achieved_delta_art": round(dart, 4), "on_target": abs(dart) <= 0.08,
+           "p_one_sided_cond_below_iid": p, "matched_sink_signature": sink,
+           "source": "mined donor, iterative-targeted", "stack": _stack_block()}
+    (REPO / "artifacts/h9_g2_phi.json").write_text(json.dumps(out, indent=2))
+    print(f"=== G2 phi true-match: iid {me0:.3f}→cond {me1:.3f} (art {mc:.3f}) "
+          f"Δiid {eff:+.3f} Δart {dart:+.3f} p {p:.4f} n={len(aq)} SINK {sink}"
+          f"{'' if abs(dart)<=0.08 else '  OFF-TARGET'} ===")
