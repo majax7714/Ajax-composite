@@ -192,6 +192,26 @@ see §0.)*
 > The "competence window" becomes a **diet × relational-position** rule; the 0.5B
 > lower bound is open (un-sample-able at its own straddle by mining). §9.9 P7
 > addendum, Index rows 8/11.
+>
+> **Mechanism, and the last confound closed (2026-07-18, Phases 8–9 — [PHASE_8.md],
+> [PHASE_9.md]).** Phase 8 sought the *why* and confirmed the 7B sink at higher n
+> (n = 37), but its mechanism read (OOD-leaning) **over-reached — caught by the
+> record's own ledger**: the one provenance-clean data point (a Coder model sinking
+> on its *own unsurprising* output) contradicted it, and was promoted from a caveat
+> to a rival hypothesis — **H-SELF** (models sink on their own near-quality output,
+> not from any diet), which every prior cell had confounded with diet. Phase 9's
+> **generated 2×2** (model × self/foreign provenance, generation held flat,
+> iterative-targeted) broke the confound: **the Coder model sinks on foreign
+> (DeepSeek-generated) code too (−0.238), and DeepSeek sinks on neither its own nor
+> foreign code → DIET, provenance-controlled; H-SELF refuted.** The origin line now
+> stands on ground no remaining confound can shift: **a Qwen2.5-Coder
+> continued-pretraining-diet conditioning sink, cross-scale, provenance-independent,
+> position-gated.** The mechanism is corrected in the same motion — the sink is
+> **decoupled from surprise**, so "off-manifold" (OOD) is disfavored and
+> self-exemplar imitation is excluded; *why* the diet does it is **open** (the
+> internals probe is the last instrument). The synthetic-data sub-claim is a
+> **replicated but sub-threshold lean** (phi-1 ×2, family-n = 1) — not licensed.
+> §9.9 P8/P9 addenda, Index rows 8/11.
 
 We test one claim in isolation: that an explicit internal state vector — a
 *register* — updated across refinement steps and gating generation improves
@@ -608,7 +628,7 @@ per-artifact `stack` fingerprint block, §8.)*
 | 3 | register-null localization | `h2_result.json`, `diag2/3/5_*.json` | Δ(FULL−B1) = 0.000, CI [−0.049, +0.055]; W₀ transfer ×1.33→×0.28 (DIAG-5); U starvation: φ passed-AUROC 0.558, KL 0.117 nats directionless, Δpass 0.000 in-domain | that stack (d_r 128, 8 soft tokens, GRU), imitation regime, 1.5B frozen G | retired HF/4-bit stack — numbers never cross the M-boundary | **HF-NF4 / 4-bit (pre-M) ⚑** |
 | 6 | escape-distance law | `dmeasure_conditioning.json` (`per_sample_D2b`), `h0a_ast_distance.json` | coverage monotone in PULL, Spearman **0.952** under AST = lexical; D2b mean-per-sample-pass flat ~0.20 at every T | form: 3 families + lexical + AST; constants: family params; domain T ≲ 1.2 (descends with difficulty); in-context channels | — | Modal L4/vLLM/bf16 |
 | 7 | elimination argument | `dmeasure_e7.json`, `w0a_e0_anchor.json`, `h2a_hint_arm.json` | E7 repulsion loses **15–27 coverage pts** to i.i.d. (0.65/0.75 vs 0.92/0.90); direction existence proof HINT 13 vs floor 2, p = 4.9e-4 | Qwen-1.5B; in-context channels only; weight-/search-space never enumerated | — | Modal L4/vLLM/bf16 |
-| 8 | D2c SINK (scoped+inverted; Coder-diet, cross-scale on code) | `dmeasure_d2c_partial_credit.json`, `h1_cross_family.json`, `h5_7b_pathology.json`, `h6_size_curve.json`, `h7_matched_M*.json`, `h7_relational_assembly.json` | Qwen-1.5B cond **0.374** < copy 0.494 & < iid 0.468 (below-both, p ≈ 5e-5); DeepSeek inverts 0.468 vs iid 0.362; **P6 (fixed-0.494): sink 1.5B/3B, apparent-absent 0.5B/7B**; **P7 matched (Δ_art≈0): non-Coder NO sink (DeepSeek +0.050, StarCoder2 +0.008, general −0.000); Coder-7B SINKS −0.129 (p 0.0024, n=20) — the 7B "blend" was a position artifact** | Qwen2.5-Coder code sink **cross-scale at match (1.5B–7B)**; origin = Coder-stage diet, **position-controlled** (P7); non-Coder families no sink at match; 0.5B OPEN | all-cases judge (frac); **M4 (7B) n=20 underpowered — 7B matched sink flagged for higher-n confirm** | Modal L4/vLLM/bf16 |
+| 8 | D2c SINK (scoped+inverted; Coder-diet, cross-scale, provenance-controlled) | `dmeasure_d2c_partial_credit.json`, `h1_cross_family.json`, `h5_7b_pathology.json`, `h6_size_curve.json`, `h7_matched_M*.json`, `h8_matched_C*.json`, `h8_d*.json`, `h9_2x2_G1*.json`, `h9_g2_phi.json`, `h7_relational_assembly.json` | Qwen-1.5B cond **0.374** < copy 0.494 & < iid 0.468 (below-both, p ≈ 5e-5); **P7 matched: non-Coder NO sink (DeepSeek +0.050, StarCoder2 +0.008, general −0.000); Coder-7B SINKS −0.129**; **P8: 7B CONFIRMED n=37 (−0.103); mechanism read then amended OPEN**; **P9 generated 2×2: Coder sinks on self AND foreign artifacts (−0.200/−0.238, p≤0.005), DeepSeek on neither → DIET, H-SELF refuted; D3-sweep: sink decoupled from surprise → OOD disfavored** | Qwen2.5-Coder code sink **cross-scale (1.5B–7B), provenance-controlled** (P9); origin = **Coder continued-pretraining diet** (not self-conditioning, not surprise); mechanism OPEN; synthetic-data sub-claim unlicensed (phi ×2 sub-thr) | all-cases judge; generated-artifact scope on P9 absolute Δ_cond (C5); phi/0.5B floor-capped | Modal L4/vLLM/bf16 |
 | 9 | R3 trace null (reversed-as-refined; content fact) | `r3_conditional_reachability.json`, `h5_deepseek_fourarm.json` | TRACE floor: Qwen **1/68** (p = 0.875 vs B1), DeepSeek **2/76** (p = 0.50); generated at i.i.d. PULL 0.85 | cross-family (both), structural failures, **trace channel** (not "use") | near-zero-floor strata — same-seed confound cannot move it | Modal L4/vLLM/bf16 |
 | 10 | hint result (generalizes) | `h2a_hint_arm.json`, `h2a_rerun_stability.json`, `h2a_validation_struct.json`, `h5_deepseek_fourarm.json`, `h6_p2_distinct_seed_b1.json` | Qwen **13/68** (11 hint-only/0, p = 4.9e-4, r ≈ 0.19); DeepSeek **9/76** (8/0, p = 0.0039, r ≈ 0.12); all rerun-stable; ≥ 0.16 AST-novel; timeout-class enriched | both families, medium strata, **complete-strategy-grade** hints (dose-response unmeasured — J2 ceiling 123/125 COMPLETE) | same-seed B1 control suppressed → contrast conservative; **P2 measured it: distinct-seed fresh B1 = 2** (overlap 0.27 vs ~0.50) — the 13-vs-2 contrast stands on a measured control ([PHASE_6.md] P2) | Modal L4/vLLM/bf16 |
 | 11 | Qwen pathology / double dissociation (Coder-diet-specific, cross-scale on code) | `h1_cross_family.json`, `h2_manip_check.json`, `h2_manip_check_deepseek.json`, `h5_7b_pathology.json`, `h6_size_curve.json`, `h7_matched_M*.json` | Qwen code −0.095, language −0.096; DeepSeek +0.107 / +0.088 (double dissociation); **P6: general-1.5B (non-Coder) clean → Coder-stage diet; language harm 1.5B-only (3B +0.076) = MIXED**; **P7 matched: non-Coder families NO code sink at match (DeepSeek +0.050, StarCoder2 +0.008, general −0.000); code sink NOT scale-bounded — 7B sinks −0.129 at match (the "blend" was position)** | **code** sink Coder-diet **cross-scale at match (1.5B–7B)** vs non-Coder (no sink); **language** MIXED (1.5B-only); origin = Coder-stage diet, **position-controlled** (P7) | code-channel 7B **re-tested at match (sinks)**; language-channel 7B not re-tested (P1 code-only); 7B language near-saturation (E0 → 0.9) | Modal L4/vLLM/bf16 |
