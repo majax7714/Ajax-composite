@@ -58,10 +58,13 @@ immediately turned on itself: the origin line was found to rest on a confound
 so the next phase re-measured the sink with each model matched to its own quality
 — confirming the effect is diet-specific (non-Coder families do not sink at match)
 while catching that its apparent disappearance at larger scale had been the same
-confound all along — and then a mechanism phase gave it a *why* (matched
-conditioning lands off a code model's manifold, so it elaborates the artifact
-rather than copying it, and degrades), confirmed the large-scale sink, and left the
-remaining confounds honestly open rather than papering a clean story over them.
+confound all along — and then two more phases pressed on the *why*: a mechanism phase that
+characterized the sink and, crucially, caught its own over-reach when the one
+provenance-clean data point contradicted the tidy story; and a factorial phase
+that drew the 2×2 nobody had drawn and found the effect follows the training diet,
+not the provenance of the code being conditioned on — the origin line standing, at
+last, on ground no remaining confound can shift, with the deeper question of *why*
+that diet does it left honestly open.
 
 ## Map of the composite
 
@@ -76,7 +79,8 @@ remaining confounds honestly open rather than papering a clean story over them.
 | 5 | [PHASE_5.md](docs/PHASE_5.md) | The journal turn (the record becomes the primary artifact) + where direction comes from: models execute direction they cannot manufacture |
 | 6 | [PHASE_6.md](docs/PHASE_6.md) | Where the pathology comes from + extraction-readiness: origin measured (a Coder-continued-pretraining diet × a competence window, MIXED across code/language channels; the tie hypothesis demoted); the flagship floor verified on a distinct-seed control (instrument 5-for-6); the claims-to-evidence layer (§0.3) built |
 | 7 | [PHASE_7.md](docs/PHASE_7.md) | Is the sink Qwen's, the diet's, or everyone's? The matched-artifact battery mined artifacts to each model's own quality and sampled the sink's region off-Coder for the first time: the sink is **Coder-diet-specific** (non-Coder families flat at match) — and the battery **reversed** Phase 6's "vanishes at 7B", which was itself a position artifact (7B sinks at match). The "competence window" becomes a diet × relational-position rule |
-| 8 | [PHASE_8.md](docs/PHASE_8.md) | The mechanism of the sink + closing the confounds. Mechanism = **off-manifold elaboration-degradation** (matched conditioning lands off a Coder model's manifold, so it elaborates rather than copies the artifact and degrades — position-gated; RECLASS disfavored, not excluded). The **7B sink is confirmed** (n=37). Three confounds stay honestly **open** (provenance, the sign/below-zero question, and a second synthetic-code family — phi-1 leaned Coder-like but sub-threshold, so "code-diet phenomenon" stays **unlicensed**) — each cheap, each named, none papered over |
+| 8 | [PHASE_8.md](docs/PHASE_8.md) | The mechanism of the sink + closing the confounds. Mechanism read (later amended): matched conditioning lands off a Coder model's manifold, so it elaborates rather than copies the artifact and degrades — position-gated. The **7B sink is confirmed** (n=37). Three confounds left honestly **open** (provenance, the sign/below-zero question, a second synthetic-code family) — each cheap, each named, none papered over |
+| 9 | [PHASE_9.md](docs/PHASE_9.md) | Diet or provenance? A Phase-8 data point sitting in a caveat (a Coder model sinking on its *own unsurprising* output) was promoted to a rival hypothesis: maybe models sink on their own near-quality output, not because of any diet. The **generated 2×2** (model × self/foreign provenance, generation held flat) settled it: **the Coder model sinks on foreign code too, the non-Coder model on neither → the diet causes it, provenance-controlled; the self-conditioning hypothesis is refuted.** The mechanism read is corrected in the same motion — the sink is decoupled from surprise, so the earlier "off-manifold" story is disfavored; *why* the diet does it stays open |
 
 ## How to read
 
