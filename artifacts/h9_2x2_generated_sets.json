@@ -1,0 +1,86 @@
+{
+  "_label": "Phase 9 generated 2\u00d72 sets [PHASE_9.md G1]",
+  "band_halfwidth": 0.08,
+  "ds_global_iid": 0.3363,
+  "co_global_iid": 0.4849,
+  "ds_band_center": 0.3363,
+  "ds_subset_iid": 0.4032,
+  "ds_retargets": 0,
+  "co_band_center": 0.6446,
+  "co_subset_iid": 0.6821,
+  "co_retargets": 1,
+  "ds_pair_n": 19,
+  "co_pair_n": 10,
+  "ds_pair_qids": [
+    "abc301_a",
+    "abc303_a",
+    "abc304_b",
+    "abc309_a",
+    "abc310_a",
+    "abc313_a",
+    "abc321_a",
+    "abc321_b",
+    "abc322_b",
+    "abc323_a",
+    "abc324_a",
+    "abc326_a",
+    "abc327_b",
+    "abc329_b",
+    "abc337_a",
+    "abc337_b",
+    "abc338_b",
+    "abc339_a",
+    "abc340_a"
+  ],
+  "co_pair_qids": [
+    "1873_A",
+    "abc301_a",
+    "abc303_a",
+    "abc309_a",
+    "abc312_a",
+    "abc324_a",
+    "abc326_a",
+    "abc327_a",
+    "abc337_a",
+    "abc338_b"
+  ],
+  "note": "per-model-pair subsets (4-way shared collapses to n~2); bands iterative-retargeted to the covered-subset i.i.d. (\u00a710 amendment)",
+  "cells": {
+    "G1a": {
+      "provenance": "self",
+      "conditioned": "ds",
+      "n": 19,
+      "achieved_delta_art": -0.0652,
+      "delta_cond_minus_iid": -0.0621,
+      "matched_sink_signature": false,
+      "on_target": true
+    },
+    "G1b": {
+      "provenance": "foreign",
+      "conditioned": "ds",
+      "n": 19,
+      "achieved_delta_art": -0.0564,
+      "delta_cond_minus_iid": -0.0607,
+      "matched_sink_signature": false,
+      "on_target": true
+    },
+    "G1c": {
+      "provenance": "self",
+      "conditioned": "co",
+      "n": 10,
+      "achieved_delta_art": -0.0444,
+      "delta_cond_minus_iid": -0.1999,
+      "matched_sink_signature": true,
+      "on_target": true
+    },
+    "G1d": {
+      "provenance": "foreign",
+      "conditioned": "co",
+      "n": 10,
+      "achieved_delta_art": -0.0449,
+      "delta_cond_minus_iid": -0.2381,
+      "matched_sink_signature": true,
+      "on_target": true
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "_label": "Phase 9 D3 sweep [PHASE_9.md G1]",
+  "rows": {
+    "ds": {
+      "self": {
+        "mean_nll": 1.3277473575190495,
+        "n_seqs": 19
+      },
+      "foreign": {
+        "mean_nll": 1.0893252491950989,
+        "n_seqs": 19
+      },
+      "own_e0": {
+        "mean_nll": 0.7784773077031499,
+        "n_seqs": 152
+      }
+    },
+    "co": {
+      "self": {
+        "mean_nll": 1.0842771768569945,
+        "n_seqs": 10
+      },
+      "foreign": {
+        "mean_nll": 1.4491903364658356,
+        "n_seqs": 10
+      },
+      "own_e0": {
+        "mean_nll": 0.7404045511037112,
+        "n_seqs": 80
+      }
+    }
+  },
+  "branch": "DIET main effect (Coder sinks self+foreign; DeepSeek clean both) \u2192 H-DIET"
+}

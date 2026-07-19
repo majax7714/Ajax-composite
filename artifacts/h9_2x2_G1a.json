@@ -1,0 +1,28 @@
+{
+  "_label": "Phase 9 G1a [PHASE_9.md G1]",
+  "cell": "G1a",
+  "model": "deepseek-ai/deepseek-coder-1.3b-base",
+  "conditioned": "ds",
+  "provenance": "self",
+  "generator": "ds",
+  "n": 19,
+  "mean_iid_e0": 0.4032,
+  "mean_cond_e1": 0.3411,
+  "mean_artifact": 0.338,
+  "delta_cond_minus_iid": -0.0621,
+  "achieved_delta_art": -0.0652,
+  "p_one_sided_cond_below_iid": 0.11124443777811109,
+  "matched_sink_signature": false,
+  "on_target": true,
+  "stack": {
+    "gpu_name": "NVIDIA L4",
+    "gpu_capability": "8.9",
+    "dtype": "bfloat16",
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8",
+    "vllm": "0.11.0",
+    "gen_template_hash": "1e43a51cdc2cc3b5",
+    "d2c_context_hash": "b9323ddf1a9b253d",
+    "judge_hash": "dbd4f9fa650a6a2f"
+  }
+}

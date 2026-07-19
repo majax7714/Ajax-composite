@@ -1,0 +1,28 @@
+{
+  "_label": "Phase 9 G1d [PHASE_9.md G1]",
+  "cell": "G1d",
+  "model": "Qwen/Qwen2.5-Coder-1.5B",
+  "conditioned": "co",
+  "provenance": "foreign",
+  "generator": "ds",
+  "n": 10,
+  "mean_iid_e0": 0.6821,
+  "mean_cond_e1": 0.444,
+  "mean_artifact": 0.6372,
+  "delta_cond_minus_iid": -0.2381,
+  "achieved_delta_art": -0.0449,
+  "p_one_sided_cond_below_iid": 0.0024998750062496873,
+  "matched_sink_signature": true,
+  "on_target": true,
+  "stack": {
+    "gpu_name": "NVIDIA L4",
+    "gpu_capability": "8.9",
+    "dtype": "bfloat16",
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8",
+    "vllm": "0.11.0",
+    "gen_template_hash": "1e43a51cdc2cc3b5",
+    "d2c_context_hash": "b9323ddf1a9b253d",
+    "judge_hash": "dbd4f9fa650a6a2f"
+  }
+}

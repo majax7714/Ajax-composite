@@ -208,3 +208,63 @@ the re-run reuses it and re-does only selection + conditioning + the D3 sweep (f
 `_v2` tags so the broken n = 2 volume cache is not hit). ~$3–5. **Coverage note carried
 into the read:** Coder pair n = 10 is thin (a clear sink shows at that n — cf. C4 n = 20,
 p = 0.003 — but a null is under-powered); DeepSeek pair n = 19. Reported per cell.
+
+---
+
+## G1 RESULT (2026-07-18, Modal L4/bf16) — **DIET main effect; H-SELF refuted; H-DIET survives its final named confound**
+
+Iterative targeting converged (DeepSeek band 0.336, n=19, 0 re-targets, Δ_art −0.065;
+Coder band 0.645, n=10, 1 re-target, Δ_art −0.044/−0.045 — both on-target).
+
+| cell | conditioned model | provenance | i.i.d.→cond | Δ vs i.i.d. | p | n | **sink** |
+|---|---|---|---|---|---|---|---|
+| **G1a** | DeepSeek-1.3B | **self** (DS-gen) | 0.403→0.341 | −0.062 | 0.111 | 19 | **No** |
+| **G1b** | DeepSeek-1.3B | foreign (Coder-gen) | 0.403→0.342 | −0.061 | 0.145 | 19 | **No** |
+| **G1c** | Qwen-Coder-1.5B | **self** (Coder-gen) | 0.682→0.482 | **−0.200** | 0.005 | 10 | **YES** |
+| **G1d** | Qwen-Coder-1.5B | foreign (DS-gen) | 0.682→0.444 | **−0.238** | 0.002 | 10 | **YES** |
+
+**BRANCH: DIET main effect → H-DIET** (the 38% pre-registered favourite). Coder sinks on
+**both** self and foreign artifacts — the crux cell **G1d (Coder on DeepSeek-generated
+foreign output) sinks *hardest* (−0.238, p 0.002)**; DeepSeek sinks on **neither** (mild
+−0.06, n.s., on both). **H-SELF is refuted**: it predicted G1a-sink + G1d-clean; the
+exact opposite fired. **The provenance confound closes — the Coder-stage attribution
+(ladder rung 2) is now provenance-controlled.** The P0.1 self-conditioning anomaly
+resolves: Coder-1.5B sank on its own output because it is **Coder (diet)**, not because
+the output was self. The journal's pathology and refinement threads stay **distinct** —
+the H-SELF unification branch does not fire (the P0.3 cross-references do **not**
+activate; recorded, not deleted).
+
+**The provenance-clean D3-sweep read — OOD refuted.** Surprise (mean NLL) does **not**
+track the sink: **DeepSeek's *self* artifacts are the most surprising of all
+(1.33 vs own-E0 0.78, ratio 1.71) yet DeepSeek does not sink**; Coder sinks on both its
+self (1.08) and foreign (1.45) artifacts. The sink is **diet-gated and decoupled from
+surprise** — the OOD story loses its remaining ground (as P0.1 already showed on the one
+clean point; now shown across the grid). *(Caveat: the D3 sweep is confounded by
+generation temperature — all four artifact sets are T=1.2, so surprise ratios are
+inflated vs own-E0; the qualitative decoupling read is robust, the magnitudes are not.)*
+
+**Scope carried on the read (honest):** the Coder pair is **n=10** (thin) but the sinks
+are deep and highly significant (−0.20/−0.24, p ≤ 0.005) — robust despite n; a *null*
+would have been under-powered, a clear sink is not. Absolute Δ_cond values are on
+**generated** artifacts (C5 scope — deeper than the mined −0.095; not numerically
+comparable to mined-cell history); the **within-phase factorial contrast** is the
+result. DeepSeek's mild −0.06 (n.s.) on both is weakly consistent with the P0
+shallow-universal-pressure variant (still OPEN-at-this-n), not a sink.
+
+**Mechanism update:** OOD is now **firmly disfavored** (provenance-clean, grid-wide:
+surprise decoupled from sink); RECLASS-as-self-exemplar-trust is **excluded** (Coder
+sinks on foreign output it never produced). What survives: a **Coder-diet-intrinsic
+conditioning fragility** — the diet makes the model degrade *any* near-quality
+partial-credit artifact under "improve this," independent of provenance and surprise.
+The positive mechanism (why the diet does this) remains **OPEN** — the named internals
+probe (self-vs-foreign attention) is the instrument.
+
+**Post-2×2 claim ladder:** rung 1 (Coder sinks at match, cross-scale) confirmed; **rung 2
+(Coder-stage attribution) now PROVENANCE-CONTROLLED — the confound closes, H-DIET stands
+on its strongest ground**; rung 3 (synthetic-data) still weak (phi sub-threshold — the G2
+question); "code-diet" still UNLICENSED; mechanism OPEN (OOD disfavored, self-exemplar
+excluded). **[Artifacts: h9_2x2_G1{a,b,c,d}.json, h9_2x2_generated_sets.json,
+h9_d3_sweep.json.]**
+
+**G2 (per the DIET branch): phi-1 at its true match** — the family-n=2 question, now the
+last open attribution rung. **Awaiting the second sign-off** (author chose to pause here).
