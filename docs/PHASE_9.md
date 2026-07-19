@@ -268,3 +268,63 @@ h9_d3_sweep.json.]**
 
 **G2 (per the DIET branch): phi-1 at its true match** — the family-n=2 question, now the
 last open attribution rung. **Awaiting the second sign-off** (author chose to pause here).
+
+---
+
+## G2 RESULT (2026-07-18) — **phi sub-threshold again (replicated); family-n stays 1**
+
+phi-1 iterative-targeted to its true match (band 0.134, subset i.i.d. 0.101, artifacts
+selected nearest the subset i.i.d.; **achieved Δ_art +0.032**, on-target, n=24):
+
+| | i.i.d.→cond | Δ vs i.i.d. | p | sink (p<0.05 **and** ≤−0.05)? |
+|---|---|---|---|---|
+| **G2 phi-1 true-match** | 0.101→0.059 | **−0.042** | **0.0513** | **No** (both criteria missed by a hair) |
+
+**phi does NOT cross the committed sink threshold** — but it is **negative**, and the
+result is **remarkably consistent** with Phase-8 C3 (−0.033, p 0.054): two independent
+measurements, both **sub-threshold negative at p ≈ 0.05**. phi shows more negative
+pressure than the organic/general clean models (which *lift* at comparable positions:
+DeepSeek +0.050, general −0.000, StarCoder +0.008) — its response is **distinctly
+Coder-like** — but it never formally sinks. **Verdict: family-n stays 1** (Qwen-Coder
+only); the **synthetic-code-diet attribution (rung 3) is a replicated, robust *lean*,
+still sub-threshold and UNLICENSED.** *(Scope, honest: phi's i.i.d. (~0.10) sits near
+the LCB-easy floor, so it cannot be conditioned at the over-quality side where the sink
+is deepest — a position limitation like 0.5B's; phi's true response *at* or *below*
+match is unreachable with non-degenerate artifacts. Its consistent sub-threshold lean is
+the most the record can say.)*
+
+## PHASE GATE — CLOSED (2026-07-18)
+
+1. **P0 amendments landed** ✓ (mechanism → OPEN; self-conditioning fact indexed; BSF/D2c
+   cross-references placed).
+2. **The 2×2's branch recorded with achieved Δ_art per cell** ✓ — **DIET main effect →
+   H-DIET**; H-SELF refuted; all four cells on-target (run 1 discarded as invalid).
+3. **Mechanism line carries the provenance-clean D3 reading** ✓ — sink decoupled from
+   surprise → **OOD firmly disfavored**; self-exemplar RECLASS excluded (Coder sinks on
+   foreign); mechanism narrowed to **Coder-diet-intrinsic conditioning fragility**,
+   positive mechanism OPEN (internals probe).
+4. **G2 resolved** ✓ — phi sub-threshold (replicated); family-n = 1; rung-3 unlicensed.
+5. **Claim ladder stated** ✓ (below); relational figure gains the G-cells; note gating
+   updated.
+
+**Post-phase claim ladder:** **rung 1** (Coder sinks at match, cross-scale) CONFIRMED +
+7B robust; **rung 2** (Coder-stage attribution) **PROVENANCE-CONTROLLED — the confound
+closes; H-DIET stands on its strongest ground** (Coder sinks on foreign artifacts too;
+non-Coder don't sink on anything); **rung 3** (synthetic-data cause) **replicated lean,
+sub-threshold, UNLICENSED** (phi ×2); **"code-diet" UNLICENSED**; **mechanism OPEN**
+(OOD disfavored, self-exemplar excluded).
+
+**Prediction accounting:** the **38% favourite (DIET) fired**; H-SELF (30%) refuted;
+interaction (20%) and ugly (12%) did not. No gate passed by tuning; run 1's invalidity
+(two bugs + coverage) recorded straight, re-run clean.
+
+**Cost:** G1 ~$22 (incl. the cached-and-reused pools) + G2 ~$4; run-1 re-do $0 extra
+(cached pools). 
+
+**Open (author's, Index in hand):** the **internals probe** (self-vs-foreign attention
+— now the *only* instrument left for the positive mechanism, and the 2×2 sharpened it);
+0.5B / phi at true over-quality match via generated-degraded artifacts (both floor-capped
+by weakness); the standing successors (dose-response hints; 7B–72B switch-on;
+TTT/weight-space). **The note's phenomenon + Coder-diet cause are now transcription-ready
+(provenance-controlled); the synthetic-data sub-claim and the positive mechanism stay
+gated.** Nothing is running; Phase 9 is fully closed.

@@ -53,6 +53,66 @@
       "source": "record"
     },
     {
+      "label": "G1a DS\u00d7self~",
+      "params_B": null,
+      "diet": "organic",
+      "iid": 0.4032,
+      "cond": 0.3411,
+      "copy": 0.338,
+      "delta_art": -0.0652,
+      "delta_cond": -0.0621,
+      "arm": "STRADDLE",
+      "behavior": "DRAG",
+      "below_both": false,
+      "source": "generated",
+      "n": 19
+    },
+    {
+      "label": "G1b DS\u00d7foreign~",
+      "params_B": null,
+      "diet": "organic",
+      "iid": 0.4032,
+      "cond": 0.3425,
+      "copy": 0.3468,
+      "delta_art": -0.0564,
+      "delta_cond": -0.0607,
+      "arm": "STRADDLE",
+      "behavior": "DRAG",
+      "below_both": false,
+      "source": "generated",
+      "n": 19
+    },
+    {
+      "label": "G1d Coder\u00d7foreign~",
+      "params_B": null,
+      "diet": "coder",
+      "iid": 0.6821,
+      "cond": 0.444,
+      "copy": 0.6372,
+      "delta_art": -0.0449,
+      "delta_cond": -0.2381,
+      "arm": "STRADDLE",
+      "behavior": "SINK",
+      "below_both": true,
+      "source": "generated",
+      "n": 10
+    },
+    {
+      "label": "G1c Coder\u00d7self~",
+      "params_B": null,
+      "diet": "coder",
+      "iid": 0.6821,
+      "cond": 0.4822,
+      "copy": 0.6377,
+      "delta_art": -0.0444,
+      "delta_cond": -0.1999,
+      "arm": "STRADDLE",
+      "behavior": "SINK",
+      "below_both": true,
+      "source": "generated",
+      "n": 10
+    },
+    {
       "label": "M4 Coder-7B*",
       "params_B": null,
       "diet": "coder",
@@ -80,6 +140,21 @@
       "behavior": "SINK",
       "below_both": true,
       "source": "record"
+    },
+    {
+      "label": "G2 phi~",
+      "params_B": null,
+      "diet": "coder",
+      "iid": 0.101,
+      "cond": 0.0593,
+      "copy": 0.1325,
+      "delta_art": 0.0315,
+      "delta_cond": -0.0417,
+      "arm": "STRADDLE",
+      "behavior": "FLAT",
+      "below_both": false,
+      "source": "generated",
+      "n": 24
     },
     {
       "label": "M3 StarCoder2*",
@@ -228,7 +303,7 @@
       "source": "record"
     }
   ],
-  "n_matched_overlaid": 8,
+  "n_matched_overlaid": 13,
   "confound": {
     "record_non_coder_arms": {
       "general-1.5B": "LIFT-ARM",
@@ -246,11 +321,18 @@
       "M4 Coder-7B*",
       "M5 Coder-0.5B*",
       "C2 DeepSeek<0",
-      "C3 phi-1"
+      "C3 phi-1",
+      "G1a DS\u00d7self~",
+      "G1b DS\u00d7foreign~",
+      "G1c Coder\u00d7self~",
+      "G1d Coder\u00d7foreign~",
+      "G2 phi~"
     ],
     "matched_sinks": [
       "M4 Coder-7B*",
-      "C4 Coder-7B(n37)"
+      "C4 Coder-7B(n37)",
+      "G1c Coder\u00d7self~",
+      "G1d Coder\u00d7foreign~"
     ],
     "note": "in the record every non-Coder cell is on the lift arm (d_art>=+0.13); the straddle where the sink lives is Coder-only. The matched battery places non-Coder models into the straddle (matched overlay rows, once landed)."
   }

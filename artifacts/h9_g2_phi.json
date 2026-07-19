@@ -1,0 +1,30 @@
+{
+  "_label": "Phase 9 G2 \u2014 phi-1 true match [PHASE_9.md G2]",
+  "cell": "G2_phi_truematch",
+  "model": "microsoft/phi-1",
+  "revision": "d4c0adcb065e84e00ca814e35cba3012ea9841ab",
+  "seed": 17,
+  "n_problems": 24,
+  "band_center": 0.1344,
+  "retargets": 0,
+  "mean_iid_e0": 0.101,
+  "mean_cond_e1": 0.0593,
+  "mean_artifact": 0.1325,
+  "delta_cond_minus_iid": -0.0417,
+  "achieved_delta_art": 0.0315,
+  "on_target": true,
+  "p_one_sided_cond_below_iid": 0.051297435128243585,
+  "matched_sink_signature": false,
+  "source": "mined donor, iterative-targeted",
+  "stack": {
+    "gpu_name": "NVIDIA L4",
+    "gpu_capability": "8.9",
+    "dtype": "bfloat16",
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8",
+    "vllm": "0.11.0",
+    "gen_template_hash": "1e43a51cdc2cc3b5",
+    "d2c_context_hash": "b9323ddf1a9b253d",
+    "judge_hash": "dbd4f9fa650a6a2f"
+  }
+}

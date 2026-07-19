@@ -80,25 +80,35 @@ def _collect_matched():
              # Phase-8 confound cells
              ("h8_matched_C4_coder7b_widerN", "C4 Coder-7B(n37)", "coder"),
              ("h8_matched_C2_deepseek_below0", "C2 DeepSeek<0", "organic"),
-             ("h8_matched_C3_phi1_match", "C3 phi-1", "coder")]
+             ("h8_matched_C3_phi1_match", "C3 phi-1", "coder"),
+             # Phase-9 GENERATED-artifact 2×2 + phi (C5 scope: absolute Δ_cond not
+             # comparable to mined cells; the within-phase provenance contrast is the read)
+             ("h9_2x2_G1a", "G1a DS×self~", "organic"),
+             ("h9_2x2_G1b", "G1b DS×foreign~", "organic"),
+             ("h9_2x2_G1c", "G1c Coder×self~", "coder"),
+             ("h9_2x2_G1d", "G1d Coder×foreign~", "coder"),
+             ("h9_g2_phi", "G2 phi~", "coder")]
     rows = []
     for key, label, diet0 in order:
         d = _art(f"artifacts/{key}.json")
         if not d:
             continue
-        d_art = d["actual_delta_art"]
+        gen = key.startswith("h9_")  # generated-artifact point (C5 scope)
+        d_art = d.get("actual_delta_art", d.get("achieved_delta_art"))
         d_cond = d["delta_cond_minus_iid"]
+        copy = d.get("mean_copy_null", d.get("mean_artifact"))
         arm = ("LIFT-ARM" if d_art >= 0.13 else
                "OVER-QUALITY" if d_art <= -0.08 else "STRADDLE")
         beh = ("SINK" if d.get("matched_sink_signature") else
                "DRAG" if d_cond <= -0.05 else "LIFT" if d_cond >= 0.05 else "FLAT")
         rows.append({"label": label, "params_B": None, "diet": d.get("diet") or diet0,
                      "iid": round(d["mean_iid_e0"], 4), "cond": round(d["mean_cond_e1"], 4),
-                     "copy": round(d["mean_copy_null"], 4),
+                     "copy": round(copy, 4),
                      "delta_art": round(d_art, 4), "delta_cond": round(d_cond, 4),
                      "arm": arm, "behavior": beh,
                      "below_both": bool(d.get("matched_sink_signature")),
-                     "source": "matched", "n": d.get("n_problems")})
+                     "source": "generated" if gen else "matched",
+                     "n": d.get("n_problems") or d.get("n")})
     return rows
 
 

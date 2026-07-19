@@ -24,7 +24,25 @@ cross-family audit that retracted our platform negatives as one family's
 pathology — and finally an existence proof that approach-level direction crosses
 the competence boundary, moving the open question to where direction comes from.*
 
-*Living record — last updated 2026-07-18 (**PHASE 8 CLOSED — the mechanism of the sink
+*Living record — last updated 2026-07-18 (**PHASE 9 CLOSED — diet or provenance? the
+generated 2×2, [PHASE_9.md]**: the sink's final confound is closed. P0 first turned the
+ledger on ourselves — the one provenance-clean Phase-8 D3 point (Coder-1.5B on its own
+unsurprising output) *sinks*, so the OOD label was amended to **OPEN** and
+**self-conditioning (H-SELF)** became a live rival to the Coder-diet story. The
+**generated 2×2** (each model × self/foreign provenance, generation held flat,
+iterative-targeted) resolved it: **Qwen-Coder-1.5B sinks on BOTH its own AND foreign
+(DeepSeek-generated) artifacts** (−0.200/−0.238, p≤0.005); **DeepSeek sinks on neither**.
+**DIET main effect → H-DIET; H-SELF refuted; the provenance confound CLOSES** — the
+Coder-stage attribution (rung 2) is now **provenance-controlled**, the origin line's
+strongest ground. **Mechanism:** the provenance-clean D3 sweep shows the sink is
+**decoupled from surprise** (DeepSeek's self artifacts are the most surprising yet it
+does not sink) → **OOD firmly disfavored**, self-exemplar RECLASS **excluded**; what
+survives is a **Coder-diet-intrinsic conditioning fragility**, positive mechanism OPEN
+(the internals probe is the instrument). **phi** at true match is sub-threshold **again**
+(−0.042, p 0.051; replicated) → **family-n stays 1, "synthetic-diet" a lean not
+licensed, "code-diet" UNLICENSED**. (Run 1 was invalid — 2 bugs + coverage — recorded
+and re-run clean.) §9.9 P9 addendum, Index rows 8/11. Previously **PHASE 8 CLOSED — the
+mechanism of the sink
 + closing the confounds, [PHASE_8.md]**: the Coder sink now has a **mechanism**
 (M-OOD-leaning — matched conditioning lands modestly off a Coder model's manifold, so
 it elaborates rather than copies the artifact and degrades, worst near match; three
@@ -449,7 +467,7 @@ currently believes.** Statuses: LIVE / KILLED / RETRACTED / REVERSED / SCOPED.
 | 8 | D2c SINK (conditioning on partial-credit code degrades below both nulls) | **SCOPED + INVERTED**; ~~scale-bounded (J5 Q1: vanishes at Qwen-7B)~~ **[REVERSED P7]**; **origin measured (P6): CODER-STAGE diet**; **P7 RESOLVED (matched-artifact battery): position-controlled + Coder-diet-specific — non-Coder families (DeepSeek/StarCoder2/general-Qwen) show NO sink at match; NOT scale-bounded on code — 7B SINKS at match (−0.129, p 0.0024, n=20 — confirmation named; J5's "7B-clean" was measured far over-quality, a position artifact); 0.5B lower bound OPEN (un-sample-able at straddle) ([PHASE_7.md] P1); **P8: 7B sink CONFIRMED at n=37 (C4, seed 43, Δ−0.103); provenance confound OPEN (donor is Coder-diet — sink cells saw diet-matched artifacts, C1 un-minable); synthetic-data attribution suggestive-not-licensed (phi-1 sub-threshold −0.033) ([PHASE_8.md]); mechanism read OOD-leaning then **AMENDED to OPEN (P9 P0.1)** — the one provenance-clean D3 point (Coder-1.5B on its OWN base output, ratio 0.94/unsurprising) SINKS, contradicting OOD; also a provenance-clean SELF-CONDITIONING sink, live since P7, on trial in Phase 9's 2×2; **P9 G1 RESOLVED: DIET main effect — Coder sinks on BOTH self AND foreign (DeepSeek-generated) artifacts (−0.200/−0.238, p≤0.005); DeepSeek sinks on neither → H-SELF REFUTED, provenance confound CLOSED, Coder-stage attribution PROVENANCE-CONTROLLED; D3-sweep shows the sink is decoupled from surprise → OOD firmly disfavored ([PHASE_9.md] G1)*** | Qwen2.5-Coder code sink **across 1.5B–7B at match** (deepest vs-iid at 3B −0.150; 7B −0.129 when straddle restored); non-Coder families *not* pathological at match → the Coder continued-pretraining diet, **not architecture/tie, not scale** | §9.7 markers, §9.9 J5/P1/**P7**, [PHASE_4.md] H1, [PHASE_6.md] P1, [PHASE_7.md] P1 |
 | 9 | R3 null — "1.5B cannot use direction" | **REVERSED-AS-REFINED** | a *trace-channel* null, now **cross-family**: traces sit on the floor on Qwen (1/68) and DeepSeek (2/76) — a content fact, not the Qwen pathology; content, not capacity, was the variable | §9.7, §9.8, §9.9 |
 | 10 | Hint result — approach-level direction crosses the competence boundary (13/68 vs floor 2, p = 4.9e-4) | **LIVE — GENERALIZES** (J4: DeepSeek 9/76, p = 0.0039; **P2: floor distinct-seed verified**) | both families, medium strata, oracle-derived **complete-strategy-grade** hints (J2: dose-response unmeasurable on this set — weaker direction untested); the flagship contrast stands on a measured distinct-seed control (P2, fresh B1 = 2) | §9.8, §9.9, [PHASE_6.md] P2 |
-| 11 | Qwen conditioning pathology (double dissociation: code and language channels degrade Qwen, lift DeepSeek) | **LIVE — CODER-DIET-SPECIFIC** (was SCOPED-TO-1.5B; ~~code sink absent at 7B~~ **[REVERSED P7]**); **origin measured (P6 P1): CODER-STAGE diet, MIXED channels**; **P7 RESOLVED: position-controlled — non-Coder families (DeepSeek/StarCoder2/general) show NO code sink at match; the code sink is NOT scale-bounded (7B sinks −0.129 at match, n=20) ([PHASE_7.md] P1); **P8: 7B sink CONFIRMED n=37 (C4); mechanism **OPEN** (P8 read OOD-leaning, **amended P9 P0.1** — the provenance-clean D3 point dissents); provenance/sign/family-n confounds OPEN — attribution holds at "Qwen-Coder-stage," phi-1 sub-threshold, "code-diet" UNLICENSED; **self-conditioning (H-SELF) newly live, on trial in Phase 9** ([PHASE_8.md]); **P9 G1: H-SELF REFUTED (Coder sinks on foreign artifacts too), provenance confound CLOSED — Coder-diet, provenance-controlled; mechanism OOD firmly disfavored; family-n=2 (phi) the last open rung** ([PHASE_9.md])** | **code** sink Coder-diet across **1.5B–7B at match** (non-Coder families flat at match); **language** harm **1.5B-only** (3B helps +0.076) = MIXED (language 7B not re-tested — near-saturation); general-1.5B (non-Coder) clean on both → Coder continued-pretraining, not base recipe/tie/scale | §9.8, §9.9 J5/P1/**P7**, [PHASE_5.md] J5, [PHASE_6.md] P1, [PHASE_7.md] P1 |
+| 11 | Qwen conditioning pathology (double dissociation: code and language channels degrade Qwen, lift DeepSeek) | **LIVE — CODER-DIET-SPECIFIC** (was SCOPED-TO-1.5B; ~~code sink absent at 7B~~ **[REVERSED P7]**); **origin measured (P6 P1): CODER-STAGE diet, MIXED channels**; **P7 RESOLVED: position-controlled — non-Coder families (DeepSeek/StarCoder2/general) show NO code sink at match; the code sink is NOT scale-bounded (7B sinks −0.129 at match, n=20) ([PHASE_7.md] P1); **P8: 7B sink CONFIRMED n=37 (C4); mechanism **OPEN** (P8 read OOD-leaning, **amended P9 P0.1** — the provenance-clean D3 point dissents); provenance/sign/family-n confounds OPEN — attribution holds at "Qwen-Coder-stage," phi-1 sub-threshold, "code-diet" UNLICENSED; **self-conditioning (H-SELF) newly live, on trial in Phase 9** ([PHASE_8.md]); **P9 G1: H-SELF REFUTED (Coder sinks on foreign artifacts too), provenance confound CLOSED — Coder-diet, provenance-controlled; mechanism OOD firmly disfavored (positive mechanism OPEN); family-n stays 1 (phi-1 true-match G2 replicated sub-threshold −0.042 p 0.051 — lean not licensed)** ([PHASE_9.md])** | **code** sink Coder-diet across **1.5B–7B at match** (non-Coder families flat at match); **language** harm **1.5B-only** (3B helps +0.076) = MIXED (language 7B not re-tested — near-saturation); general-1.5B (non-Coder) clean on both → Coder continued-pretraining, not base recipe/tie/scale | §9.8, §9.9 J5/P1/**P7**, [PHASE_5.md] J5, [PHASE_6.md] P1, [PHASE_7.md] P1 |
 | 12 | Production bottleneck — "the model cannot produce hint-grade direction for itself" | **LIVE-MEASURED, cross-family + cross-scale** (J5 Q2 branch (a), the 40% favourite: floor-equivalent self-hint arm at 7B; production-adequate 0/68 Qwen-1.5B, 1/76 DeepSeek, **5/101 Qwen-7B**) | 1.3B–7B; **switch-on lies above 7B** — the cascade is the deployable shape through 7B; the open bracket is 7B–frontier (PlanSearch frame) | §9.9 J5 addendum, [PHASE_5.md] J5 |
 | 13 | Temperature is a dose-responsive anti-anchoring intervention | LIVE | Qwen, HumanEval cells, within the law's domain | §9.3 |
 | 14 | Provenance near-irrelevance (instruction verb ≫ provenance) | LIVE | Qwen; holds under lexical and AST metrics | §9.3, H0a follow-up |
@@ -517,18 +535,18 @@ No commitment implied; the journal decides when an extraction is ripe.
    note is transcription-ready again, **larger and cleaner** than before — a
    Coder-diet, *cross-scale* conditioning pathology. ([PHASE_7.md] P1.)
    **⚠ MECHANISM SECTION RE-GATED (2026-07-18, Phase 8).** The *phenomenon* (rung 1)
-   is transcription-ready and 7B-confirmed. But a note that states a **mechanism** or a
-   **synthetic-data** cause is **not** ready: the mechanism is **OPEN** (Phase 8 read
-   OOD-leaning; **amended P9 P0.1** — the one provenance-clean D3 point dissents); the
-   **provenance confound is OPEN** and now a live **rival hypothesis, H-SELF**
-   (self-conditioning, not diet — a model may sink on its own near-quality output; on
-   trial in Phase 9's 2×2); and the **synthetic-data attribution is sub-threshold**
-   (phi-1 −0.033) — so **"synthetic code pedagogy causes it," "code-diet phenomenon,"
-   and even "Coder-diet causes it" must not be written** until the 2×2 assigns
-   diet-vs-provenance. Transcribe rung 1 (the phenomenon) freely; gate rungs 2–3
-   (mechanism/cause) until the provenance + true-match-phi cells resolve — extracting a
-   cause now would repeat the exact confound the matched-relation rule was written from.
-   ([PHASE_8.md].)
+   is transcription-ready and 7B-confirmed. **UPDATED (2026-07-18, Phase 9 close):**
+   the generated 2×2 assigned diet-vs-provenance → **DIET** (Coder sinks on foreign
+   artifacts too; DeepSeek on neither; **H-SELF refuted**). So **"the Coder
+   continued-pretraining stage causes it" is now transcription-ready — provenance-
+   controlled, rung 2 solid.** What still must **not** be written: **"synthetic code
+   pedagogy / synthetic data causes it"** (rung 3 — phi is a replicated *lean* but
+   sub-threshold, family-n = 1) and **"code-diet phenomenon"** (unlicensed — two of
+   three clean models are code models); and no **positive mechanism** ("because the
+   diet does X to attention/representation") — the mechanism is **OPEN** (OOD
+   disfavored, self-exemplar excluded; the internals probe is the instrument). So:
+   transcribe rungs 1–2 (the phenomenon + the Coder-stage cause) freely; gate rung 3
+   (synthetic-data) and the positive mechanism. ([PHASE_8.md], [PHASE_9.md].)
    The spec, with each claim's evidence in §0.3 rows 8/11:
    - **Title/scope:** a **Qwen2.5-Coder-small** conditioning pathology, and
      specifically a **Coder-continued-pretraining-diet** one — *not* a family
@@ -617,30 +635,23 @@ self-conditioning hazard** — scope pre-declared here, no conclusion drawn.)*
 
 Recorded here so the Index is also the map of what is *deliberately not being run*.
 
-- **Origin — diet or provenance? (Phase 9, [PHASE_9.md]).** Coder-diet-specific under
-  the *fixed-donor* design (Phase 7), but that design confounded **diet with
-  provenance** (Coder cells saw self/family artifacts, clean cells foreign) — so
-  **H-SELF** (a model sinks on its own near-quality output, regardless of diet) is now a
-  live rival to **H-DIET**, sharpened by the P0.1 anomaly (Coder-1.5B sinks on its own
-  unsurprising output). Phase 9's **generated 2×2** (model × self/foreign provenance,
-  generation held flat) assigns it. 7B sink **confirmed** (C4, n=37); mechanism
-  **OPEN** (Phase-8 OOD-lean amended P9 P0.1). The mechanism (off-manifold
-  elaboration-degradation) has
-  three converging lines with **RECLASS disfavored-not-excluded**. The confounds Phase 8
-  left OPEN, each a named successor:
-  - **Provenance cell (C1) via generated self-artifacts** — DeepSeek on its *own*-diet
-    artifacts; un-minable (self-pool 4/80), needs generation. Closes whether the sink
-    is diet-intrinsic or diet-match (donor is Coder-diet).
-  - **A clean model below Δ_art 0** — the sign/band question; C2 drifted to +0.035.
-    Needs iterative-target or generated artifacts (mining can't reach ≤ 0 for clean
-    models — the per-subset i.i.d.-drift limitation, §10).
-  - **phi-1 at its *true* match** — it showed sub-threshold negative (−0.033) off its
-    target (drifted to Δ_art +0.042); an iterative re-target converts the lean into a
-    decision on the synthetic-code-diet attribution (family-n → 2 or not).
-  - **0.5B at its own straddle via generated artifacts** — the reopened lower bound
-    (capability floor vs artifact), still OPEN.
-  - **The internals probe** — attention to artifact tokens in sink vs clean cells; the
-    real RECLASS-vs-OOD instrument, outside this phase's toolchain and budget.
+- **Origin — RESOLVED to the Coder diet, provenance-controlled (Phase 9, [PHASE_9.md]).**
+  The Phase-7 fixed-donor design confounded diet with provenance; the generated 2×2
+  (model × self/foreign, generation held flat, iterative-targeted) broke it: **Coder-1.5B
+  sinks on BOTH its own and foreign (DeepSeek-generated) artifacts; DeepSeek on neither →
+  DIET main effect, H-SELF refuted, provenance confound CLOSED.** The Coder-stage
+  attribution stands provenance-controlled. What remains OPEN, each a named successor:
+  - **The internals probe** — self-vs-foreign attention to artifact tokens in sink vs
+    clean cells. Now the **only** instrument left for the **positive mechanism** (OOD
+    firmly disfavored, self-exemplar excluded, but *why* the diet degrades conditioning
+    is unmeasured); the 2×2 sharpened it (look at how a Coder model attends to foreign
+    vs own artifacts it both sinks on). Outside this record's toolchain/budget.
+  - **The synthetic-data sub-claim (rung 3)** — phi-1 is a **replicated sub-threshold
+    lean** (−0.033, −0.042 across two measurements) but never crosses; family-n = 1.
+    A second *non-phi* synthetic-code family, or phi at a below-floor position via
+    generated-degraded artifacts, would decide it. Unlicensed until then.
+  - **A clean model below Δ_art 0** (the sign/band question) and **0.5B / phi at true
+    over-quality match** — all floor/drift-capped; need generated-degraded artifacts.
 - **The dose-response hint set** — J2's ceiling (123/125 COMPLETE) left the
   richness threshold unmeasured; a deliberately-varied COMPLETE/degraded/nudge set
   is the instrument. Disclosed wherever the 13/68 result is cited.
@@ -1952,6 +1963,23 @@ the named successor experiment, explicitly outside this record.
 > suggestive. Method: mining fixes frac not Δ_art (§10 amended). **Nothing running.**
 > Open (author's): the provenance/sign/0.5B cells via generated or iterative-target
 > artifacts; phi at true match; the internals probe. §9.9 P8 addendum, [PHASE_8.md].
+>
+> **PHASE 9 CLOSED (2026-07-18) — diet or provenance? The generated 2×2.** P0 amended
+> the P8 OOD-lean to **OPEN** (the one provenance-clean D3 point — Coder-1.5B on its own
+> unsurprising output — sinks), making **self-conditioning (H-SELF)** a live rival to
+> H-DIET. The generated 2×2 (model × self/foreign, generation held flat,
+> iterative-targeted) resolved it: **Coder-1.5B sinks on BOTH self AND foreign
+> (DeepSeek-gen) artifacts** (−0.200/−0.238, p≤0.005); **DeepSeek on neither**. **DIET
+> main effect → H-DIET; H-SELF REFUTED; provenance confound CLOSED** — rung-2
+> attribution now **provenance-controlled** (the origin line's strongest ground).
+> Mechanism: D3 sweep shows sink **decoupled from surprise** → **OOD firmly disfavored**,
+> self-exemplar excluded; survives as **Coder-diet-intrinsic conditioning fragility**,
+> positive mechanism OPEN. **phi** true-match sub-threshold **again** (−0.042, p 0.051,
+> replicated) → **family-n = 1**, synthetic-diet a lean not licensed. Run 1 invalid (2
+> bugs + coverage), re-run clean. Ladder: rung-1 confirmed, **rung-2
+> provenance-controlled**, rung-3 replicated-lean-unlicensed, mechanism OPEN.
+> **Nothing running.** Open: the **internals probe** (self-vs-foreign attention — the
+> last instrument for the positive mechanism). §9.9 P9 addendum, [PHASE_9.md].
 
 *(historical, 2026-07-15)*
 
@@ -2468,6 +2496,51 @@ rung 2 (Coder-stage) **stands, provenance-confounded**; rung 3 (synthetic-data)
 **suggestive not licensed** (phi sub-threshold); "code-diet" **unlicensed**. Mechanism:
 **OOD-leaning**. [artifacts/h8_d1_inherited_error.json, h8_d2_response_curves.json,
 h8_d3_perplexity.json, h8_matched_C*.json].
+
+**P9 addendum (2026-07-18) — diet or provenance? The generated 2×2 closes the last
+confound ([PHASE_9.md]).** P0 first turned the ledger on ourselves: the Phase-8
+OOD-lean rode on the smaller-sibling-donor cells; the **one provenance-clean D3 point**
+(Coder-1.5B on its own base output, ratio 0.94/unsurprising) **sinks anyway** — so the
+mechanism label was amended **OOD-leaning → OPEN**, and an **unlabeled self-conditioning
+sink**, live since Phase 7, surfaced as a live rival hypothesis (H-SELF): maybe models
+sink on their *own* near-quality output, and the clean models were clean only because
+the fixed-donor rule fed them *foreign* code.
+
+**The generated 2×2 resolved it.** Four cells, all on generated artifacts (one
+transform, so generation cancels in the within-model contrasts), iterative-targeted to
+a measured Δ_art (§10):
+- **DeepSeek** conditioned on its **own** output (G1a) and on **foreign** (Coder) output
+  (G1b): **clean on both** (−0.06, n.s.).
+- **Qwen-Coder-1.5B** on its **own** output (G1c) and on **foreign** (DeepSeek) output
+  (G1d): **sinks on both** (−0.200 / −0.238, p ≤ 0.005) — hardest on the *foreign* cell.
+
+**DIET main effect → H-DIET; H-SELF refuted** (it predicted the opposite — DeepSeek-self
+sink, Coder-foreign clean). **The provenance confound closes: the Coder-stage
+attribution (rung 2) is provenance-controlled** — Coder sinks on code it has no family
+relationship to. The P0.1 anomaly resolves: Coder-1.5B sank on its own output because it
+is **Coder**, not because self. The refinement-thread-unification branch does **not**
+fire (the pathology and refinement threads stay distinct).
+
+**Mechanism (provenance-clean D3 sweep):** surprise is **decoupled from the sink** —
+DeepSeek's *self* artifacts are the most surprising of all (ratio 1.71) yet it does not
+sink; Coder sinks on both. **OOD firmly disfavored**; self-exemplar RECLASS **excluded**
+(Coder sinks on foreign output). What survives is a **Coder-diet-intrinsic conditioning
+fragility** — the diet degrades the model on *any* near-quality partial-credit artifact
+under "improve this," independent of provenance and surprise. The positive mechanism
+stays **OPEN** (the internals probe — self-vs-foreign attention — is the instrument).
+
+**G2 — phi at true match:** sub-threshold again (−0.042, p 0.051; Phase-8 −0.033, p 0.054)
+— a **replicated, robust lean** toward the synthetic-code diet (more negative than the
+organic/general models that lift), but it **never crosses the sink threshold**.
+**Family-n stays 1**; rung 3 (synthetic-data) is a lean, **not licensed**. (phi's
+i.i.d. ~0.10 floor-caps how close to match it reaches — a position limit like 0.5B's.)
+
+**Method:** run 1 was **invalid** (an nmk type-bug + a 4-way-shared-subset coverage
+collapse to n=2 + i.i.d.-drift), recorded straight and re-run clean; the fixes were
+per-model-pair subsets + the §10 iterative-targeting loop (which converged). **Post-2×2
+ladder:** rung 1 confirmed; **rung 2 PROVENANCE-CONTROLLED** (H-DIET on its strongest
+ground); rung 3 replicated-lean-unlicensed; mechanism OPEN (OOD disfavored). [artifacts/
+h9_2x2_G1*.json, h9_2x2_generated_sets.json, h9_d3_sweep.json, h9_g2_phi.json].
 
 ---
 
