@@ -3229,6 +3229,105 @@ def j13_s2():
     print("wrote artifacts/h13_s2_ablation.json")
 
 
+# --- Phase 14: ablation dose-response ([PHASE_14.md]) ---
+P14_KS = [1, 2, 4, 8]
+
+
+@app.local_entrypoint()
+def j14_dose():
+    """Phase 14 — TOP-K vs RND-K dose-response in (capability, sink) space.
+    Pre-registered [PHASE_14.md] at commit 980091a, BEFORE this ran."""
+    import random as _rnd
+    import statistics as st
+    mid, rev, _ = P12_MODELS["coder1p5b"]
+    s1 = json.loads((REPO / "artifacts/h13_s1_heads.json").read_text())
+    top16 = [[t[0], t[1]] for t in s1["s2_targets_coder1p5b"]][:16]
+    L, H = s1["models"]["coder1p5b"]["n_layers"], s1["models"]["coder1p5b"]["n_heads"]
+    topset = {(a, b) for a, b in top16}
+    pool = [(li, hi) for li in range(L) for hi in range(H) if (li, hi) not in topset]
+    rnd16 = list(map(list, _rnd.Random(P13_SEED).sample(pool, 16)))  # same draw as P13
+
+    arts, _g = _p12_cells()["coder1p5b"]
+    qd = _load("j12_questions")
+    qtext = {k: v["question_content"] for k, v in qd["questions"].items()}
+    cond_items = [{"qid": a["qid"],
+                   "prompt": _p12_prompt(qtext[a["qid"]], _d2c_context(a))}
+                  for a in arts if a["qid"] in qtext]
+    art_frac = {a["qid"]: a["frac"] for a in arts}
+
+    def run(name, heads):
+        g = _load(f"j14_{name}_cand") or _persist(
+            f"j14_{name}_cand",
+            j13_ablate_gen.remote(mid, rev, cond_items, 8, P13_SEED, heads,
+                                  tag=f"j14_{name}_cand"))
+        r = _load(f"j14_{name}_res") or _persist(
+            f"j14_{name}_res",
+            h1_lcb_exec.remote([x["qid"] for x in g], [x["codes"] for x in g],
+                               tag=f"j14_{name}_res"))
+        return {x["qid"]: st.mean(c["frac"] for c in row) for x, row in zip(g, r)}
+
+    # K=0 anchors from Phase 13 (cached, free)
+    b1 = _load("j13_B1_cond_res"); b1g = _load("j13_B1_cond_cand")
+    anchor0 = {x["qid"]: st.mean(c["frac"] for c in row) for x, row in zip(b1g, b1)}
+    qs = sorted(anchor0)
+    art = st.mean(art_frac[q] for q in qs)
+
+    curves = {"TOP": [], "RND": []}
+    for arm, full in (("TOP", top16), ("RND", rnd16)):
+        m0 = st.mean(anchor0[q] for q in qs)
+        curves[arm].append({"K": 0, "perf": round(m0, 4), "sink": round(m0 - art, 4)})
+        for K in P14_KS:
+            per = run(f"{arm}{K}", full[:K])
+            m = st.mean(per[q] for q in qs if q in per)
+            curves[arm].append({"K": K, "perf": round(m, 4), "sink": round(m - art, 4)})
+            print(f"  {arm}-{K:<2d} perf {m:.4f}  sink {m-art:+.4f}")
+
+    def interp(xs, ys, x):
+        pts = sorted(zip(xs, ys))
+        if x < pts[0][0] or x > pts[-1][0]:
+            return None
+        for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
+            if x0 <= x <= x1:
+                return y0 if x1 == x0 else y0 + (y1 - y0) * (x - x0) / (x1 - x0)
+        return None
+
+    rp = [p["perf"] for p in curves["RND"]]
+    rs = [p["sink"] for p in curves["RND"]]
+    deltas = []
+    for p in curves["TOP"]:
+        if p["K"] == 0 or p["perf"] < 0.05:
+            continue
+        y = interp(rp, rs, p["perf"])
+        if y is None:
+            continue
+        deltas.append({"K": p["K"], "perf": p["perf"], "sink_top": p["sink"],
+                       "sink_rnd_interp": round(y, 4), "delta": round(p["sink"] - y, 4)})
+    for d in deltas:
+        print(f"  K={d['K']:<2d} perf {d['perf']:.4f}  TOP {d['sink_top']:+.4f} vs "
+              f"RND(interp) {d['sink_rnd_interp']:+.4f}  Δ {d['delta']:+.4f}")
+    if len(deltas) < 2:
+        branch = f"C — only {len(deltas)} interpolable point(s); no overlap"
+    else:
+        md = st.mean(d["delta"] for d in deltas)
+        same = all(d["delta"] > 0 for d in deltas) or all(d["delta"] < 0 for d in deltas)
+        if md >= 0.02 and same:
+            branch = "A — TOP-K above RND at matched capability (targeted effect)"
+        elif md <= -0.02 and same:
+            branch = "A' — TOP-K below RND at matched capability (heads protect)"
+        else:
+            branch = "B — curves indistinguishable; ablation acts only via capability"
+        print(f"\n  mean Δ {md:+.4f}  consistent sign: {same}")
+    print(f"P14 BRANCH: {branch}")
+    (REPO / "artifacts/h14_dose_response.json").write_text(json.dumps(
+        {"_label": "Phase 14 — ablation dose-response [PHASE_14.md]",
+         "prereg_commit": "980091a", "model": mid, "n_problems": len(qs),
+         "mean_artifact": round(art, 4), "ks": P14_KS,
+         "top_heads_full": top16, "rnd_heads_full": rnd16,
+         "curves": curves, "matched_capability_deltas": deltas,
+         "branch": branch}, indent=2))
+    print("wrote artifacts/h14_dose_response.json")
+
+
 @app.local_entrypoint()
 def j9_g2_phi():
     """G2 (fired by the DIET branch) — phi-1 at its TRUE match, iterative-targeted
