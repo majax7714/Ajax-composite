@@ -143,3 +143,104 @@ phase: **$5.22**; month-to-date **$83.26** against the Amendment-3 envelope of $
 ---
 
 *(Results append below.)*
+
+---
+
+## RESULT (2026-07-25) — **BRANCH C: the SINK is FRAMING-INVARIANT. Phase 16's near-miss does not survive powering.** *(`h17_verb_powered.json`)*
+
+Four arms, k = 24, seed 239, n = 44 / 39. **Both CI-referenced validity gates passed.**
+
+| model | verb | cond | vs artifact | vs i.i.d. | below both nulls | coverage@24 |
+|---|---|---|---|---|---|---|
+| **Coder-1.5B** | A `Improve it…` | 0.3960 | −0.0629 | **−0.0744** ✓ in CI | **yes** | 0.455 |
+| **Coder-1.5B** | B `Write a correct program…` | 0.3963 | −0.0625 | −0.0741 | **yes** | 0.455 |
+| DeepSeek-1.3B | A `Improve it…` | 0.3618 | +0.0011 | **+0.0509** ✓ in CI | no | 0.205 |
+| DeepSeek-1.3B | B `Write a correct program…` | 0.3652 | +0.0045 | +0.0543 | no | 0.205 |
+
+| quantity | estimate | SE | 95% CI | p |
+|---|---|---|---|---|
+| **ΔC** (Coder verb effect) | **+0.0004** | 0.0096 | **[−0.0184, +0.0191]** | **0.970** |
+| ΔD (DeepSeek) — *bound only, not tested* | +0.0034 | 0.0037 | [−0.0039, +0.0107] | — |
+| **ΔC − ΔD** (family difference) | **−0.0030** | 0.0102 | [−0.0231, +0.0170] | **0.766** |
+
+### This is a powered null, not another ambiguous result
+
+The achieved SE (0.0096) **beat** the projected 0.0113, so an effect of Phase 16's size
+would have registered at |t| ≈ 3.5. It did not. **ΔC's 95% CI excludes Phase 16's point
+estimate of −0.0336** — the powered measurement does not merely fail to confirm the
+near-miss, it rules out an effect of that magnitude. DeepSeek's bound is tighter still and
+also excludes it.
+
+The verb moves **nothing**: not mean frac (ΔC = +0.0004), not coverage (0.455 vs 0.455 on
+Coder, 0.205 vs 0.205 on DeepSeek), and not the below-both-nulls classification, which was
+already verb-invariant in Phase 16 and remains so at four times the precision. And the two
+families do not differ in their (non-)response, p 0.77.
+
+### The finding
+
+**The instruction verb — the largest single anchoring lever this record has measured, worth
+up to 0.127 of PULL in the D-measure frame against ≤0.028 for provenance — is inert on the
+SINK.** Substituting an independent framing (`write a correct program`) for the
+continuation framing (`improve it`) that produced every sink number in this journal changes
+the conditioned arm by 0.0004 ± 0.0096.
+
+That is a **dissociation between claim 6 and claim 8**. The escape-distance law is an
+anchoring phenomenon whose dominant lever is the instruction verb; the SINK is not moved by
+that lever at all. They are mechanically distinct objects, and the record can now say so
+from a powered measurement rather than from the observation that they were studied on
+different benchmarks.
+
+It also closes off the cheapest remaining deflationary explanation of the sink. "The Coder
+models are just over-responding to an *improve* instruction" was a live, plausible,
+never-tested story — the outside charter's §1.3 identified precisely this gap — and it is
+now **excluded** to within ±0.019.
+
+### Scope, stated tightly
+
+**One** verb contrast (`improve` → `write-correct`, mirroring D2a's own E1-vs-E1p),
+at **one** relational position (Δ_art ≈ 0), on **two** models, with provenance framing and
+every other prompt element held byte-identical. This does **not** license "the sink is
+invariant to all framings" — a framing that removed the artifact, changed its presentation,
+or altered the pass-count sentence is untested. What is licensed is that the specific lever
+the record had already calibrated as its largest does nothing here.
+
+### Phase 16 in retrospect
+
+| | Phase 16 (k=8, seed 233) | **Phase 17 (k=24, seed 239)** |
+|---|---|---|
+| ΔC | −0.0336 ± 0.0176, p 0.056 | **+0.0004 ± 0.0096, p 0.970** |
+| ΔD | +0.0071 ± 0.0067, p 0.286 | +0.0034 ± 0.0037 |
+| validity | **failed** (−0.0296 vs a round −0.03) | **passed** (CI-referenced, both cells) |
+
+Phase 16's −0.0336 was one draw from a wide distribution, and priced as such: A and C were
+deliberately set level at 35% rather than betting on the near-miss. **Had Phase 16's gate
+passed by 0.0004 instead of failing by it, this record would now contain a marginal framing
+effect that does not exist.** The gate that cost a phase also prevented a false positive —
+which is the argument for honouring thresholds that fire inconveniently, made concrete.
+
+## PHASE GATE — CLOSED (2026-07-25)
+
+1. **P0 landed free, including its own error** — the analytic variance decomposition was
+   wrong (it assumed independent arms; the arithmetic said 123%/347%), was discarded, and
+   was replaced by a direct empirical measurement of the k-scaling. Both are on the page. ✓
+2. **Power derived from measurement**, and it held: projected SE 0.0113, achieved 0.0096. ✓
+3. **No significance test was run on ΔD**, exactly as pre-registered; it is reported as a
+   bound. ✓
+4. **Both validity gates were CI-referenced and both passed** — the §8 entry 9 fix working
+   as intended on its first application. ✓
+5. **Branch recorded as frozen; verb question CLOSED.** ✓
+
+**Prediction accounting.** **C (35%) HIT.** A (35%), B (20%) and D (10%) did not fire.
+A and C were priced level on the stated reasoning — that a p = 0.056 estimate is one draw
+and regression to the mean is the record's most repeated lesson (M4, the Phase-10 gain
+law) — and that reasoning was correct.
+
+**Cost.** Phase 17 **$0.551** (`modal billing report`, queried 2026-07-25 19:47 EDT;
+month-to-date aggregate delta $83.26 → $83.81) against a $0.40–0.90 estimate — **inside the
+band**, the seventh consecutive calibrated generation estimate. Loop total **$5.77**;
+month-to-date **$83.81** against $100 report / $120 hard stop.
+
+**What is open.** The verb question is **closed**. What P0.2 opened in Phase 16 is not:
+the sink's **dominant channel is coverage** (Coder-1.5B −0.432 pass@8, Coder-7B 0.000), and
+**no phase has yet manipulated coverage directly**. That is the strongest live pointer in
+the record. **Nothing is running; Phase 17 is closed.**
