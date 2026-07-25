@@ -200,3 +200,99 @@ launch.
 ---
 
 *(Results append below. R1 first — free — then R2 conditional on it.)*
+
+---
+
+## R1 RESULT (2026-07-24) — **the reframe is DROPPED: 1/4 predictions hit, the 70% favourite MISSED** *(`h10_gain_reanalysis.json`, `scripts/j10_gain_reanalysis.py`)*
+
+14 cells harvested (6 Coder, 6 non-Coder, 2 synthetic), every conditioning cell in
+the record carrying an i.i.d., a conditioned mean, and a copy null.
+
+| cell | family | diet | n | Δ_art | Δ_cond | **residual** | gain |
+|---|---|---|---|---|---|---|---|
+| C4_coder7b_widerN | Qwen-Coder-7B | coder | 37 | −0.101 | −0.103 | **−0.003** | 1.03 |
+| G1d | Qwen-Coder-1.5B | coder | 10 | −0.045 | −0.238 | **−0.193** | 5.30 |
+| G1c | Qwen-Coder-1.5B | coder | 10 | −0.044 | −0.200 | **−0.155** | 4.50 |
+| M4_coder7b | Qwen-Coder-7B | coder | 20 | −0.039 | −0.129 | **−0.089** | 3.27 |
+| D2c_original | Qwen-Coder-1.5B | coder | 44 | +0.026 | −0.095 | **−0.121** | — |
+| M5_coder0p5b | Qwen-Coder-0.5B | coder | 43 | +0.081 | +0.044 | **−0.037** | 0.54 |
+| G1a | DeepSeek | non-coder | 19 | −0.065 | −0.062 | **+0.003** | 0.95 |
+| G1b | DeepSeek | non-coder | 19 | −0.056 | −0.061 | **−0.004** | 1.08 |
+| M3_starcoder2_3b | StarCoder2 | non-coder | 39 | +0.033 | +0.008 | **−0.025** | 0.25 |
+| C2_deepseek_below0 | DeepSeek | non-coder | 29 | +0.035 | +0.043 | **+0.009** | 1.26 |
+| M1_deepseek1p3b | DeepSeek | non-coder | 39 | +0.050 | +0.050 | **−0.000** | 0.99 |
+| M2_general1p5b | Qwen-general | non-coder | 28 | +0.064 | −0.000 | **−0.064** | −0.00 |
+| G2_phi_truematch | phi-1 | synthetic | 24 | +0.032 | −0.042 | **−0.073** | — |
+| C3_phi1_match | phi-1 | synthetic | 47 | +0.042 | −0.033 | **−0.075** | — |
+
+**Prediction accounting:**
+
+| # | prediction | odds | result |
+|---|---|---|---|
+| 1 | Coder/non-Coder separate on residual, no overlap | 70% | **MISS** — ranges overlap heavily: Coder [−0.193, −0.003], non-Coder [−0.064, +0.009]; gap **−0.062** |
+| 2 | non-Coder cluster at 0 ± 0.03 across ≥ 3 families | 55% | **MISS** — `M2_general1p5b` at −0.064 |
+| 3 | Coder residual varies with Δ_art (range ≥ 0.05) | 60% | **HIT** — range 0.191 |
+| 4 | phi between the clusters | 45% | **MISS** — phi (−0.073, −0.075) sits *inside* the Coder range; the clusters overlap, so "between" is undefined |
+
+**Verdict: the residual reframe is DROPPED, per the pre-committed decision rule
+("if it fails the reframe is dropped, not rescued").** The gain-of-≈1 pattern that
+motivated it is real for DeepSeek across three cells but is **not diet-diagnostic**:
+a Coder cell (C4, gain 1.03) sits inside the clean cluster and a non-Coder cell
+(M2 general-Qwen, −0.064) sits inside the Coder range. "Non-Coder models track the
+artifact with gain ≈ 1" is **false as a family claim**.
+
+This is the failure mode §10 names as *treading into our own water* — a law
+derived post-hoc from five hand-picked cells, dying on the full set of fourteen.
+It is recorded as a negative and not rescued. Prediction 3's hit is noted but
+carries no weight on its own: position-dependence of the Coder residual is already
+the Phase-8 D2 finding on a different axis.
+
+### R1's real result — **P0.2's criterion drift, instantiated on the record's flagship 7B confirmation**
+
+The one thing the re-analysis found is not the reframe; it is the cell that broke
+it. **`C4_coder7b_widerN` is the record's "7B sink CONFIRMED at n = 37."**
+
+```
+iid 0.7490   artifact 0.6483   cond 0.6457
+Δ_art  −0.1007        Δ_cond  −0.1033        cond − artifact  −0.0026
+```
+
+The artifact was **0.10 below the model's own level**, and the model produced
+output **0.003 below that artifact** — it tracked the artifact essentially
+exactly. Under the **original D2c SINK definition (below *both* nulls, §9.7,
+claim 8)** C4 **does not sink**: it is not below the copy null. It scored
+`matched_sink_signature = True` only because the Phase-7+ signature tests
+`cond < iid`, which at Δ_art = −0.101 is near-automatic for any faithful imitator
+(P0.2, pre-registered before this analysis ran).
+
+**How it happened, from the record's own text.** [PHASE_8.md] C4 was chartered as
+"Coder-7B **at match**" (target i.i.d. 0.659). Reaching n = 37 required widening
+the band to **±0.10**, and the widening carried the achieved position out of the
+straddle onto the below-zero arm — [PHASE_8.md]'s result table records
+`Δ_art −0.101` in a row whose position column still reads "match." This is the
+**matched-relation rule (§10) failing on its own amendment**: the band was widened
+for power, and the *relation* moved while the label did not.
+
+**Scope of the correction, stated precisely — the phenomenon is not refuted:**
+
+- **M4** (Coder-7B, n = 20, Δ_art **−0.039**, residual **−0.089**, p 0.0024)
+  satisfies below-both-nulls and **stands**. The 7B sink is real.
+- **C4 does not confirm M4.** It measured a *different position* (−0.101 vs
+  −0.039) and, on the stricter criterion, found no excess degradation there.
+  "CONFIRMED at n = 37, robust to n and seed" is not supported by this cell;
+  the 7B sink rests on **n = 20**, as it did before Phase 8.
+- The affected cell is **C4 alone**. Every other below-zero cell (G1c −0.155,
+  G1d −0.193, M4 −0.089) shows genuine excess degradation and is unaffected.
+- Read forward, C4 is still *informative*: Coder-7B at Δ_art −0.101 shows **no
+  excess degradation**, which is evidence about the far side of the position
+  curve — the trough shrinking toward the arms, consistent with D2's shape.
+
+**Author adjudication required — the loop halts here.** This contradicts a
+specific committed sub-claim ("7B sink CONFIRMED at n = 37, C4") that is carried
+in the abstract's Phases 8–9 banner, §0 Index rows 8 and 11, §0.3 row 8, and
+[PHASE_8.md]'s gate item 4, and it touches the extraction gating ("the phenomenon
+is transcription-ready and 7B-confirmed"). Under [AUTONOMOUS_LOOP.md] §3.1/§3.5
+the loop does not revise claim status or abstract banners on its own authority.
+**No Index, abstract, or PHASE_8 text has been edited.** R2 is **not authorized**
+(its gate was R1 prediction 1, which missed) and **nothing was spent**.
+

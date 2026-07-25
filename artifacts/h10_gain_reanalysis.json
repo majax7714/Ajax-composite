@@ -1,0 +1,292 @@
+{
+  "_label": "Phase 10 R1 \u2014 gain re-analysis [PHASE_10.md R1]",
+  "prereg_commit": "08870fe",
+  "clean_band": 0.03,
+  "cells": [
+    {
+      "source": "h7_matched_M1_deepseek1p3b.json",
+      "cell": "M1_deepseek1p3b",
+      "model": "deepseek-ai/deepseek-coder-1.3b-base",
+      "family": "DeepSeek",
+      "diet": "noncoder",
+      "n": 39,
+      "mean_iid": 0.3109,
+      "mean_cond": 0.3605,
+      "mean_artifact": 0.3608,
+      "delta_art": 0.0499,
+      "delta_cond": 0.0496,
+      "residual": -0.0003,
+      "gain": 0.994,
+      "sink_flag": false
+    },
+    {
+      "source": "h7_matched_M2_general1p5b.json",
+      "cell": "M2_general1p5b",
+      "model": "Qwen/Qwen2.5-1.5B",
+      "family": "Qwen-general",
+      "diet": "noncoder",
+      "n": 28,
+      "mean_iid": 0.2655,
+      "mean_cond": 0.2654,
+      "mean_artifact": 0.3297,
+      "delta_art": 0.0642,
+      "delta_cond": -0.0001,
+      "residual": -0.0643,
+      "gain": -0.002,
+      "sink_flag": false
+    },
+    {
+      "source": "h7_matched_M3_starcoder2_3b.json",
+      "cell": "M3_starcoder2_3b",
+      "model": "bigcode/starcoder2-3b",
+      "family": "StarCoder2",
+      "diet": "noncoder",
+      "n": 39,
+      "mean_iid": 0.3281,
+      "mean_cond": 0.3362,
+      "mean_artifact": 0.3608,
+      "delta_art": 0.0326,
+      "delta_cond": 0.008,
+      "residual": -0.0246,
+      "gain": 0.248,
+      "sink_flag": false
+    },
+    {
+      "source": "h7_matched_M4_coder7b.json",
+      "cell": "M4_coder7b",
+      "model": "Qwen/Qwen2.5-Coder-7B",
+      "family": "Qwen-Coder-7B",
+      "diet": "coder",
+      "n": 20,
+      "mean_iid": 0.7023,
+      "mean_cond": 0.5738,
+      "mean_artifact": 0.6631,
+      "delta_art": -0.0393,
+      "delta_cond": -0.1286,
+      "residual": -0.0893,
+      "gain": 3.27,
+      "sink_flag": true
+    },
+    {
+      "source": "h7_matched_M5_coder0p5b.json",
+      "cell": "M5_coder0p5b",
+      "model": "Qwen/Qwen2.5-Coder-0.5B",
+      "family": "Qwen-Coder-0.5B",
+      "diet": "coder",
+      "n": 43,
+      "mean_iid": 0.1229,
+      "mean_cond": 0.1672,
+      "mean_artifact": 0.2043,
+      "delta_art": 0.0814,
+      "delta_cond": 0.0443,
+      "residual": -0.0371,
+      "gain": 0.544,
+      "sink_flag": false
+    },
+    {
+      "source": "h8_matched_C2_deepseek_below0.json",
+      "cell": "C2_deepseek_below0",
+      "model": "deepseek-ai/deepseek-coder-1.3b-base",
+      "family": "DeepSeek",
+      "diet": "noncoder",
+      "n": 29,
+      "mean_iid": 0.2931,
+      "mean_cond": 0.3367,
+      "mean_artifact": 0.3277,
+      "delta_art": 0.0346,
+      "delta_cond": 0.0435,
+      "residual": 0.009,
+      "gain": 1.26,
+      "sink_flag": false
+    },
+    {
+      "source": "h8_matched_C3_phi1_match.json",
+      "cell": "C3_phi1_match",
+      "model": "microsoft/phi-1",
+      "family": "phi-1",
+      "diet": "synthetic",
+      "n": 47,
+      "mean_iid": 0.09,
+      "mean_cond": 0.0572,
+      "mean_artifact": 0.1324,
+      "delta_art": 0.0424,
+      "delta_cond": -0.0328,
+      "residual": -0.0752,
+      "gain": -0.774,
+      "sink_flag": false
+    },
+    {
+      "source": "h8_matched_C4_coder7b_widerN.json",
+      "cell": "C4_coder7b_widerN",
+      "model": "Qwen/Qwen2.5-Coder-7B",
+      "family": "Qwen-Coder-7B",
+      "diet": "coder",
+      "n": 37,
+      "mean_iid": 0.749,
+      "mean_cond": 0.6457,
+      "mean_artifact": 0.6483,
+      "delta_art": -0.1007,
+      "delta_cond": -0.1034,
+      "residual": -0.0026,
+      "gain": 1.026,
+      "sink_flag": true
+    },
+    {
+      "source": "h9_2x2_G1a.json",
+      "cell": "G1a",
+      "model": "deepseek-ai/deepseek-coder-1.3b-base",
+      "family": "DeepSeek",
+      "diet": "noncoder",
+      "n": 19,
+      "mean_iid": 0.4032,
+      "mean_cond": 0.3411,
+      "mean_artifact": 0.338,
+      "delta_art": -0.0652,
+      "delta_cond": -0.0621,
+      "residual": 0.0031,
+      "gain": 0.952,
+      "sink_flag": false
+    },
+    {
+      "source": "h9_2x2_G1b.json",
+      "cell": "G1b",
+      "model": "deepseek-ai/deepseek-coder-1.3b-base",
+      "family": "DeepSeek",
+      "diet": "noncoder",
+      "n": 19,
+      "mean_iid": 0.4032,
+      "mean_cond": 0.3425,
+      "mean_artifact": 0.3468,
+      "delta_art": -0.0564,
+      "delta_cond": -0.0607,
+      "residual": -0.0043,
+      "gain": 1.076,
+      "sink_flag": false
+    },
+    {
+      "source": "h9_2x2_G1c.json",
+      "cell": "G1c",
+      "model": "Qwen/Qwen2.5-Coder-1.5B",
+      "family": "Qwen-Coder-1.5B",
+      "diet": "coder",
+      "n": 10,
+      "mean_iid": 0.6821,
+      "mean_cond": 0.4822,
+      "mean_artifact": 0.6377,
+      "delta_art": -0.0444,
+      "delta_cond": -0.1999,
+      "residual": -0.1555,
+      "gain": 4.502,
+      "sink_flag": true
+    },
+    {
+      "source": "h9_2x2_G1d.json",
+      "cell": "G1d",
+      "model": "Qwen/Qwen2.5-Coder-1.5B",
+      "family": "Qwen-Coder-1.5B",
+      "diet": "coder",
+      "n": 10,
+      "mean_iid": 0.6821,
+      "mean_cond": 0.444,
+      "mean_artifact": 0.6372,
+      "delta_art": -0.0449,
+      "delta_cond": -0.2381,
+      "residual": -0.1932,
+      "gain": 5.303,
+      "sink_flag": true
+    },
+    {
+      "source": "h9_g2_phi.json",
+      "cell": "G2_phi_truematch",
+      "model": "microsoft/phi-1",
+      "family": "phi-1",
+      "diet": "synthetic",
+      "n": 24,
+      "mean_iid": 0.101,
+      "mean_cond": 0.0593,
+      "mean_artifact": 0.1325,
+      "delta_art": 0.0315,
+      "delta_cond": -0.0417,
+      "residual": -0.0732,
+      "gain": -1.324,
+      "sink_flag": false
+    },
+    {
+      "source": "dmeasure_d2c_partial_credit.json",
+      "cell": "D2c_original",
+      "model": "Qwen2.5-Coder-1.5B",
+      "family": "Qwen-Coder-1.5B",
+      "diet": "coder",
+      "n": 44,
+      "mean_iid": 0.4685,
+      "mean_cond": 0.3738,
+      "mean_artifact": 0.4945,
+      "delta_art": 0.026,
+      "delta_cond": -0.0947,
+      "residual": -0.1207,
+      "gain": -3.64,
+      "sink_flag": true
+    }
+  ],
+  "summary": {
+    "coder_residuals": {
+      "min": -0.1932,
+      "max": -0.0026,
+      "median": -0.10500000000000001,
+      "n": 6
+    },
+    "noncoder_residuals": {
+      "min": -0.0643,
+      "max": 0.009,
+      "median": -0.0023,
+      "n": 6,
+      "families": [
+        "DeepSeek",
+        "Qwen-general",
+        "StarCoder2"
+      ]
+    },
+    "synthetic_residuals": [
+      -0.0752,
+      -0.0732
+    ],
+    "separation_gap": -0.0617
+  },
+  "predictions": {
+    "p1_no_overlap": {
+      "odds": 0.7,
+      "hit": false,
+      "gap": -0.0617
+    },
+    "p2_clean_cluster_at_zero": {
+      "odds": 0.55,
+      "hit": false,
+      "outside": [
+        [
+          "M2_general1p5b",
+          -0.0643
+        ]
+      ],
+      "families": [
+        "DeepSeek",
+        "Qwen-general",
+        "StarCoder2"
+      ]
+    },
+    "p3_coder_varies_with_dart": {
+      "odds": 0.6,
+      "hit": true,
+      "range": 0.1906
+    },
+    "p4_phi_between": {
+      "odds": 0.45,
+      "hit": false,
+      "phi_residuals": [
+        -0.0752,
+        -0.0732
+      ]
+    }
+  },
+  "hits": 1,
+  "decision": "DROP the reframe (decision rule: not rescued) \u2014 report the negative"
+}
