@@ -199,3 +199,136 @@ close. Loop spend before this phase: **$4.73** of the $90/$110 envelope; month-t
 ---
 
 *(Results append below.)*
+
+---
+
+## RESULT (2026-07-25) — **BRANCH B: concentration is architecture-linked, not sink-linked. S1's cross-model reading is retired.** *(`h15_concentration.json`)*
+
+| model | sink status | dims | n | top-5% share | Gini | Gini boot CI95 |
+|---|---|---|---|---|---|---|
+| Coder-1.5B | **SINKS** −0.052 | 28L × 12H | 29 | 0.2153 | 0.5619 | [0.5521, 0.5702] |
+| **general-Qwen-1.5B** | **clean** −0.0001 | **28L × 12H** | 28 | **0.2221** | **0.5658** | [0.5573, 0.5752] |
+| Coder-3B | **SINKS** −0.051 | 36L × 16H | 30 | 0.2135 | 0.5506 | [0.5450, 0.5565] |
+| DeepSeek-Coder-1.3B | clean +0.050 | 24L × 16H | 29 | 0.2013 | 0.5012 | [0.4577, 0.5511] |
+| StarCoder2-3B | clean +0.008 | 30L × 24H | 29 | 0.1783 | 0.4183 | [0.3673, 0.4737] |
+| Coder-7B | clean −0.008 | 28L × 28H | 29 | 0.1833 | 0.4983 | [0.4905, 0.5070] |
+
+**Instrument validated first.** All four S1 cells reproduced their published statistics to
+**exactly 0.00000** on both metrics — the probe is deterministic on committed text, so
+everything below is an absence rather than a failure to measure. The architecture-twin
+claim was **verified from the run's own reported dimensions**, not assumed: general-1.5B
+and Coder-1.5B are both 28L × 12H.
+
+### The decisive pair
+
+| pair | Δ top-5% | CI95 | Δ Gini | CI95 | tracks? |
+|---|---|---|---|---|---|
+| P1 *(S1)* 1.5B vs 1.3B | +0.01402 | [−0.00957, +0.03567] | +0.06078 | [+0.00589, +0.10722] | yes |
+| P2 *(S1)* 3B vs 7B | +0.03020 | [+0.02169, +0.03861] | +0.05227 | [+0.04193, +0.06239] | yes |
+| **P3 Coder-1.5B vs general-1.5B** | **−0.00685** | **[−0.01906, +0.00497]** | **−0.00388** | **[−0.01760, +0.00844]** | **NO** |
+| P4 Coder-3B vs StarCoder2-3B | +0.03519 | [+0.01546, +0.05392] | +0.13232 | [+0.07720, +0.18431] | yes |
+
+**P3 is a null, not a reversal.** Both deltas are tiny and both CIs straddle zero: a model
+that sinks and its architecturally identical twin that does not are **indistinguishable in
+concentration**. And the direction of the point estimates matters for the logic —
+**general-Qwen-1.5B carries the highest concentration in the entire record (0.5658) while
+being clean.** So high concentration is **not sufficient** for the sink, which no
+arrangement of the other three pairs can rescue.
+
+**Branch B fires.** Under the mapping frozen before the run, P3 failing is B regardless of
+P4 — and P4 tracked strongly, which is exactly the trap: three of four pairs track, and the
+one pair that holds architecture fixed does not.
+
+### What went wrong with S1, precisely
+
+S1's both-pairs rule was designed to defeat a **size** confound, and it does — DeepSeek-1.3B
+is the smallest model of the original four and sits low, which is why "concentration tracks
+size" was already excluded. It was never able to defeat an **architecture** confound,
+because all four original cells differed in architecture *and* sink status at once.
+
+The pattern the six cells actually show is architectural. Within the Qwen family,
+concentration falls monotonically with heads per layer — 12H **0.5619 / 0.5658**, 16H
+**0.5506**, 28H **0.4983** — and the two 12H models sit together at the top *regardless of
+whether they sink*. Across families it is not a clean function of head count either
+(DeepSeek 16H 0.5012 vs Coder-3B 16H 0.5506; StarCoder2 24H 0.4183 vs Coder-7B 28H 0.4983),
+which is consistent with Phase 12's finding that layer profile is a **family** signature.
+Concentration varies with architecture and family in ways that have nothing to do with the
+sink, and S1's four cells happened to line those up with sink status.
+
+**The first error bars this finding has ever had also deflate its original evidence.** S1
+published four point estimates with no uncertainty. With bootstrap CIs, **P1's top-5% share
+delta includes zero** (+0.014, CI [−0.010, +0.036]) — half of S1's small-pair evidence was
+never significant, and the both-metrics rule passed it on a point estimate alone.
+
+### On this phase's own P0 — a control that was correct and insufficient
+
+Six hours earlier, P0 discharged S1's head-count caveat for $0, and that analysis was
+right: subsampling to a common head count leaves the deltas essentially unchanged, so the
+statistic is not biased by *how many heads it counts*. What subsampling **cannot** test is
+whether the underlying attention geometry differs by architecture — it resamples within a
+model and therefore holds architecture fixed by construction. The twin cell tests exactly
+that, and finds it. *Recorded because the P0 result reads, in isolation, like a
+vindication of S1, and it is not: ruling out a statistical artifact of counting is not
+ruling out a real architectural property.*
+
+### What this does to the ablation thread
+
+Phases 13 S2 and 14 ablated the **top artifact-attention heads** of Coder-1.5B. The entire
+rationale for choosing *those* heads was S1's concentration finding. **That rationale is
+now gone.** The corrected design named in [PHASE_14.md] (ablate the i.i.d. arm so
+`sink(K) = cond_ablated(K) − iid_ablated(K)`) remains methodologically sound and is *still
+the right way to run an ablation* — but it no longer has a motivated target set, and
+running it would now be a lottery over 336 heads. **Not chartered.** *(This is the payoff
+of the ordering argued in §2: the $2 was not spent on an intervention whose premise
+dissolved for $0.03.)*
+
+### Where the mechanism now stands
+
+| account | status |
+|---|---|
+| OOD / surprise | firmly disfavored (P9 — the sink is decoupled from surprise) |
+| self-exemplar (H-SELF) | **refuted** (P9 — Coder sinks on foreign artifacts too) |
+| attention *magnitude* to the artifact | **excluded** (P12 — all models ≈10%, pairs disagree) |
+| attention *concentration* across heads | **excluded** (P15 — architecture-linked; clean twin is the most concentrated model in the record) |
+| **positive mechanism** | **OPEN** |
+
+Every attention-allocation account this record can measure has now been excluded. That is
+a real narrowing and it is the cumulative product of P12, P13 S1 and P15 — but it is
+entirely eliminative, and the record should be plain that after four phases of internals
+work the **positive** mechanism is exactly where Phase 9 left it.
+
+## PHASE GATE — CLOSED (2026-07-25)
+
+1. **P0 landed free and its limits stated** — head-count caveat discharged, and the
+   discharge explicitly not over-read once the twin cell contradicted the finding. ✓
+2. **Instrument validated before adjudication** — all four S1 cells reproduce to 0.00000;
+   architecture-twin status verified from reported dims, not assumed. ✓
+3. **Branch recorded under the mapping frozen before the run** — P3 fails → B, despite
+   three of four pairs tracking. ✓
+4. **First uncertainty quantification on the finding**, which also deflated P1. ✓
+5. **No LIVE claim moved** — S1 was deliberately never promoted to the §0 Index
+   ([PHASE_13.md] S1 close), so a finding could be retired without a retraction banner.
+   The charter anticipated this branch would pressure no live claim, and it did not. ✓
+6. **Decision rule was reachability-checked before freezing** (§10 addendum adopted
+   today); both A and B were live on real data, and B fired. ✓
+
+**Prediction accounting.** **B (35%) HIT** — priced level with A, and the reasoning given
+for that pricing held up: "P3 is a strictly harder test than anything S1 faced." A (35%),
+C (20%) and D (10%) did not fire. Across Phases 10–15 the loop's substantive priors remain
+mediocre, but this is the second phase running where the *methodological* prediction was
+right.
+
+**Cost.** Phase 15 **$0.034** (`modal billing report`, queried 2026-07-25 16:33 EDT, as a
+month-to-date aggregate delta $82.77 → $82.80; per-app lines lag) against a $0.05–0.20
+estimate — **below the band**, so the forward-pass estimator is *still* biased high, though
+by ~1.5× rather than P12's 20–50×. Recorded as a third calibration point: forward-pass work
+on cached models costs cents. Loop total **$4.76** of the $90/$110 envelope; month-to-date
+**$82.80** of $200.
+
+**What is open.** The **positive mechanism**, unchanged and now with its most promising
+internal lead retired. The instruments that remain unused on it: the *within-artifact*
+distribution of attention (still needs line-level bug labels the artifacts lack) and
+representation-level probes (never chartered, and a genuinely new toolchain). The
+**3B→7B boundary** and the **0.5B rung** (§0.4) remain open scale questions and are now,
+by elimination, the cheapest live questions in the record. **Nothing is running; Phase 15
+is closed.**

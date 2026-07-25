@@ -617,7 +617,24 @@ currently believes.** Statuses: LIVE / KILLED / RETRACTED / REVERSED / SCOPED.
   it resolves a monotone size effect (problem attention 0.398 → 0.436 → 0.452 across
   Coder 1.5B/3B/7B) and a family effect (layer-profile peak depth ≈57% Qwen vs ≈37%
   DeepSeek), so a null on the contrast of interest is an absence rather than a failure
-  to look. First non-vLLM measurement instrument in the record.
+  to look. First non-vLLM measurement instrument in the record. *(Phase 15 extended it to
+  **six** committed cells with **per-problem retention**, adding bootstrap CIs over
+  problems and an exact-reproduction gate: re-run on Phase 13 S1's four cells it returned
+  their published statistics to **0.00000**, so the probe is deterministic on committed
+  text and its nulls are absences. [scripts/modal_h1.py] `j15_heads`,
+  `h15_concentration.json`.)*
+- **The architecture-twin control** (Phase 15) — a general-purpose lesson the record paid
+  twice to learn. Phase 13 S1's "concentration tracks sink status" survived a size control
+  (the 2×2 design) **and** a head-count control (Phase 15 P0, free, subsampling to common
+  head counts), then died to a single cell that holds **architecture** fixed:
+  `Qwen2.5-1.5B` vs `Qwen2.5-Coder-1.5B` — same base, same 28L × 12H, differing only in
+  the Coder continued-pretraining stage, one clean and one sinking, and **indistinguishable
+  in concentration**. *Practice:* when a cross-model internal quantity is claimed to track
+  a behavioural property, the load-bearing control is a **pair that differs only in the
+  variable named by the claim**; statistical controls over the *statistic* (subsampling,
+  normalisation) cannot substitute for it, because they hold the confound fixed by
+  construction. The record already had the twin cell committed from Phase 7 and had not
+  looked at it.
 - **The head-ablation harness** (Phase 13 S2 / Phase 14) — a forward pre-hook on
   `self_attn.o_proj` zeroing a head's slice of the projection input
   (`[h·d_head : (h+1)·d_head]`), architecture-agnostic across the llama-style blocks both
@@ -817,6 +834,24 @@ Recorded here so the Index is also the map of what is *deliberately not being ru
     CONCENTRATED in sinking models (top-5% head share +0.014/+0.030; Gini
     +0.061/+0.052, both pairs, same sign — the 30% underdog). Correlational; four
     models, one per cell; head-count caveat partly controlled by the 16H-vs-16H pair.]**
+    **[RETIRED 2026-07-25, Phase 15 ([PHASE_15.md]) — the concentration effect is
+    ARCHITECTURE-linked, not sink-linked. S1's head-count caveat was discharged for $0
+    (P0: deltas hold at common total heads and common heads-per-layer), but that control
+    could only exclude a statistical artifact of counting, not a real architectural
+    property. The decisive cell was already committed and had never been probed:
+    **general-Qwen-1.5B** — same base, same size, verified same 28L × 12H as
+    Qwen2.5-Coder-1.5B, differing only in the Coder continued-pretraining stage, and
+    measured **clean**. It carries the **highest concentration in the record**
+    (Gini 0.5658 vs Coder-1.5B's 0.5619; Δ −0.0039, CI [−0.0176, +0.0084] — a null, not a
+    reversal). **High concentration is therefore not sufficient for the sink.** Three of
+    the four pairs still track; the one that holds architecture fixed does not. Bootstrap
+    CIs — the first this finding ever had — also deflate S1's original small pair, whose
+    top-5% delta includes zero (+0.014, CI [−0.010, +0.036]). Within the Qwen family
+    concentration falls monotonically with heads-per-layer (12H 0.5619/0.5658, 16H 0.5506,
+    28H 0.4983) irrespective of sink status. All four S1 cells reproduced to 0.00000, so
+    this is an absence, not an instrument failure. **Consequence: the ablation thread's
+    target-selection rationale is gone** — [PHASE_14.md]'s corrected design stays sound as
+    a method but has no motivated target set and is NOT chartered.]**
     **[ABLATION — RUN TWICE, BOTH UNINFORMATIVE ABOUT THE SINK. Phase 13 S2: K=16
     destroyed the model (branch C, instrument miss). Phase 14: the dose-response at
     K ∈ {1,2,4,8} ran cleanly but its **adjudication statistic was degenerate** —
