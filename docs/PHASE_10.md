@@ -492,3 +492,85 @@ first pre-registration the exact bias it had corrected in the record hours earli
 instrument miss with the diagnostic as its product. The at-match 7B question is
 **re-opened and unanswered**, and the loop halts for author direction: item 1 above is
 a prerequisite for anything further in this line.
+
+---
+
+## R4 — the powered instrument, and does M4 replicate? *(pre-registered 2026-07-25, BEFORE spend)*
+
+*First phase step taken under [AUTONOMOUS_LOOP.md] **Amendment 1** (loop takes its own
+recommended option and documents the fork). The fork is recorded below before the
+result exists.*
+
+### Documented fork
+
+Three options were live at R3's close:
+
+1. **Build the powered targeting instrument, then discriminate** — recommended, and
+   taken. Without it no cell can be placed to ±0.03, so every further matched result
+   inherits R3's defect.
+2. Go straight to the discriminator at 8 candidates/problem — rejected: it would very
+   likely miss again for exactly the measured reason (tolerance ≈ 1 SE).
+3. Pivot to the re-priced internals probe — deferred to Phase 11, not abandoned; the
+   7B leg is load-bearing for claims 8/11 and should not be left in its current state.
+
+**A second fork, inside option 1.** The R3 write-up named the discriminator as "one
+cell holding *absolute level* fixed at M4's." A free feasibility scan then showed the
+**two-level contrast is not constructible**: at Δ_art ≈ −0.039 the donor pool supports
+artifact levels only in **0.64–0.67** at n ≥ 25 (widest separation **0.030**), because a
+high-level cell (artifact ≈ 0.708, R3's) would require a subset i.i.d. ≈ 0.747 that the
+pool cannot supply at that size. **R3's own configuration was reached by measurement
+noise, not by design, and cannot be deliberately re-created.** The contrast is therefore
+dropped — *not* weakened to a 0.030 separation, which would be a difference smaller than
+the positional uncertainty it is meant to resolve.
+
+**What is run instead: a powered replication of M4's configuration.** It is feasible,
+and it is the load-bearing question — the 7B leg of claims 8/11 now rests on M4 alone.
+
+### The powered instrument
+
+From R3's free diagnostic: the sd of the *difference* between two independent
+8-candidate estimates is 0.1516, so a single 8-candidate per-problem estimate has
+sd ≈ 0.1516/√2 = **0.1072**. Sampling sd scales as 1/√k, so at **k = 24**:
+
+> per-problem sd ≈ 0.1072 × √(8/24) = **0.0619** → SE of a 30-problem subset mean
+> ≈ 0.0619/√30 = **0.0113**
+
+Built by **augmentation, not replacement**: 16 further candidates at **seed 91**, pooled
+with the committed 8 at seed 71, giving **k = 24** per problem over all 80 pool problems.
+Pooling independent draws is the same estimator at higher k; it reuses committed
+compute rather than discarding it.
+
+### Design
+
+- **Selection + reported position** from the powered k=24 map (SE ≈ 0.011).
+- **Target:** artifact level ≈ **0.663** (M4's) with Δ_art ≈ **−0.039** (M4's), chosen by
+  the frozen miner rule, maximising n subject to |predicted Δ_art + 0.039| ≤ 0.010.
+- **The cell:** `_matched_cell` at **seed 107** (distinct from 17/43/71/89/91), E0 and E1
+  measured fresh in one batch — preserving the record's within-batch paired comparison.
+- **Δ_art reported twice:** primary from the powered map; secondary from the cell's own
+  k=8 E0, for continuity with Phases 7–9.
+- **Minimum n = 30** (vs M4's 20). **On-target:** |Δ_art(powered) + 0.039| ≤ **0.020**.
+- **Criterion:** the original **below-both-nulls** (cond < iid ∧ cond < artifact ∧
+  one-sided p < 0.05 on cond-vs-artifact ∧ cond − artifact ≤ −0.05). The legacy
+  signature is reported, not adjudicative.
+- **A miss is reported as a miss and NOT re-run to fit.**
+
+### Pre-registered predictions
+
+| # | branch | reading | odds |
+|---|---|---|---|
+| **A** | **M4 REPLICATES** — below both nulls at n ≥ 30 | the 7B sink is real at this configuration; R3's null must then be explained by level or subset, making **level-dependence** the live question — itself a challenge to the matched-artifact program's assumption that Δ_art is sufficient | **45%** |
+| **B** | **M4 DOES NOT REPLICATE** — cond − artifact > −0.03 | M4 was noise or subset-specific; with C4 already withdrawn, **the 7B leg of claims 8/11 falls**. Close enough to a 1:1 refutation of "7B sinks at match" that the loop **halts and reports** under §3.1 | **35%** |
+| **C** | intermediate (−0.05 < cond − artifact ≤ −0.03, or ≤ −0.05 at p ≥ 0.05) | ambiguous; 7B leg stays weak and unresolved, a larger-n design is named | **15%** |
+| **D** | off-target or infeasible | instrument miss, no adjudication | **5%** |
+
+**Methodological prediction, re-committed with the powered instrument:** achieved
+Δ_art lands within **±0.02** of predicted. R3's equivalent prediction failed at ±0.03
+with SE 0.028; at SE 0.011 the tolerance is ~1.8 SE. **75%.**
+
+**Cost estimate: $0.30–0.60.** Calibrated from R3's *measured* rate (≈1,120
+generations for ≈$0.27) rather than from a guess: augmentation sweep 16 × 80 = 1,280
+generations, cell ≈ 2 × 32 × 8 ≈ 512, total ≈ 1,800. Per [AUTONOMOUS_LOOP.md]
+Amendment 2 this estimate is reconciled against the bill at phase close.
+Month-to-date before this run: **$78.31 of the $200 cap**; cumulative loop spend
+**≈$0.27 of the $90/$110 envelope**.
