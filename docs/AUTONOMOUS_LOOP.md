@@ -106,3 +106,55 @@ carry the headline verdict. No separate reporting channel.
 **Sign-off (2026-07-24).** Loop, rules, halt conditions, and the $90/$110
 envelope approved by the author; first iteration is Phase 10. Commit authority
 granted, push authority retained by the author.
+
+---
+
+## Amendment 1 (2026-07-25) — **decision authority: take the recommendation and document**
+
+*Author instruction, verbatim: "when presented with a decision again go for the
+recommended approach and document."*
+
+**What changes.** Where the loop previously stopped to present options and wait, it
+now **takes its own recommended option and proceeds**, recording in the phase document
+(a) the options that were live, (b) which was taken, (c) why it was recommended, and
+(d) what would have been done otherwise. The decision is a *documented* step, not a
+silent one — a reader must be able to see the fork and disagree with it after the fact.
+
+**What does NOT change — the halt list in §3 stands unaltered.** This amendment covers
+*choices between approaches*; it does not dissolve the conditions under which the loop
+stops regardless of having a recommendation. Specifically still halting:
+
+1. a result that **directly refutes a LIVE claim 1:1** (the author's separate and
+   explicit carve-out, 2026-07-24);
+2. cumulative spend at **$90** (report) / **$110** (hard stop);
+3. auth failure; two consecutive invalid runs on one cell; anything requiring
+   *revision* rather than appending; new toolchain or a >15 GB download.
+
+The distinction is between *"which of these should we do?"* — now the loop's call — and
+*"the record's public claims may be wrong"* or *"this spends real money past the
+envelope"* — still the author's.
+
+**Failure mode this creates, named so it can be caught.** Self-recommendation plus
+self-execution removes the one external check that was catching over-reach at the fork.
+The counter-pressure is that recommendations must be written *before* the outcome is
+known and left standing: a documented fork whose stated rationale is later falsified
+stays on the page next to what happened, exactly as a pre-registered prediction does.
+Phase 10's own record is the calibration data — on its first day the loop's 70% and 65%
+favourites both missed and a 5%-priced branch fired, which is the reason this amendment
+carries a visible accounting requirement rather than a promise of good judgement.
+
+## Amendment 2 (2026-07-25) — **cost figures are read, and their provenance is labelled**
+
+Following §8 ledger entry 7 (the inferred-$31 correction), and its immediate
+recurrence: Phase 10 R3 was estimated at **$2–5** and cost **≈$0.27** — the loop
+reproduced, in its own first pre-registration, the ~5–10× over-estimation it had just
+corrected in the record. Practice, now binding on the loop:
+
+- Every cost stated in the record is **read from `modal billing report`** with its query
+  date, or explicitly labelled **estimate** / **aggregate delta** / **inferred**.
+- Modal's per-app daily lines lag by more than a day. A run's cost may only be
+  available as a **month-to-date aggregate delta** at write-up time; that is a legitimate
+  figure and is labelled as such, never silently promoted to a line item.
+- **Forward cost estimates are recorded and then reconciled against the bill at phase
+  close**, so the estimator's bias is measured rather than assumed. The record's
+  estimates have run high every time they have been checked.

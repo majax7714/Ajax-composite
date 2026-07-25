@@ -479,9 +479,14 @@ named below.
    fixed at M4's (artifact ≈ 0.663) with n ≥ 30 and the powered instrument decides
    between readings (a) and (b) — and, with it, whether the 7B sink survives.
 
-**Cost:** R3 ran to completion, exit 0, app `ap-oeWV3hCy9soeQW5amTPZ3F`; Modal's daily
-billing had not posted at write-up time (recorded as pending, to be filled from
-`modal billing report` — **not** inferred from wall-time, per §8 entry 7).
+**Cost:** R3 ran to completion, exit 0, app `ap-oeWV3hCy9soeQW5amTPZ3F`. *(Filled
+2026-07-25: **≈ $0.27**, from the month-to-date aggregate rising $78.04 → $78.31 across
+the run. Modal's per-app daily line still had not posted, so this is an **aggregate
+delta, not a line item**, and is labelled as such per §8 entry 7.)* **The estimate was
+$2–5; the bill was ≈$0.27 — the loop over-estimated by ~10×, reproducing in its own
+first pre-registration the exact bias it had corrected in the record hours earlier
+(P0.1).** Recorded, and the reconciliation practice is codified as
+[AUTONOMOUS_LOOP.md] Amendment 2.
 
 **Phase 10 does not close here.** R1 is closed (reframe dropped). R3 is closed as an
 instrument miss with the diagnostic as its product. The at-match 7B question is
