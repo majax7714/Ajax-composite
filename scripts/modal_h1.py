@@ -2745,6 +2745,214 @@ def j11_ladder(cell: str = "coder1p5b"):
           f"    VERDICT: {verdict} ===")
 
 
+# --- Phase 12: the internals probe ([PHASE_12.md]) ---
+P12_MODELS = {
+    "coder1p5b":  ("Qwen/Qwen2.5-Coder-1.5B", "df3ce67c0e24480f20468b6ef2894622d69eb73b", "SINKS"),
+    "coder3b":    ("Qwen/Qwen2.5-Coder-3B",   "09d9bc5d376b0cfa0100a0694ea7de7232525803", "SINKS"),
+    "coder7b":    ("Qwen/Qwen2.5-Coder-7B",   "0396a76181e127dfc13e5c5ec48a8cee09938b02", "CLEAN"),
+    "deepseek1p3b": ("deepseek-ai/deepseek-coder-1.3b-base",
+                     "c919139c3a9b4070729c8b2cca4847ab29ca8d94", "CLEAN"),
+}
+P12_MAX_LEN = 1536
+P12_MAX_PROBLEMS = 30
+
+
+@app.function(image=PPL_IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=5400)
+def j12_attn(model_id: str, revision: str, seqs: list, tag: str):
+    """Attention-mass split for teacher-forced [prompt+generation] sequences.
+
+    seqs: [{qid, prompt, gen, art_start, art_end}] — char offsets of the artifact
+    code inside `prompt`. Returns per-sequence and aggregate fractions of attention
+    mass (from generated-token positions) landing on artifact / problem / generated
+    spans, plus a per-layer profile. Forward passes only; no sampling."""
+    def compute():
+        import torch
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        tok = AutoTokenizer.from_pretrained(model_id, revision=revision)
+        model = AutoModelForCausalLM.from_pretrained(
+            model_id, revision=revision, torch_dtype=torch.bfloat16,
+            attn_implementation="eager").to("cuda").eval()
+        rows, skipped = [], {"too_long": 0, "no_span": 0, "no_gen": 0}
+        for s in seqs:
+            full = s["prompt"] + (s["gen"] or "")
+            if not s["gen"]:
+                skipped["no_gen"] += 1
+                continue
+            enc = tok(full, return_offsets_mapping=True, return_tensors="pt")
+            ids = enc.input_ids
+            offs = enc.offset_mapping[0].tolist()
+            if ids.shape[1] > P12_MAX_LEN or ids.shape[1] < 8:
+                skipped["too_long"] += 1
+                continue
+            plen = len(tok(s["prompt"]).input_ids)
+            if plen >= ids.shape[1] - 1:
+                skipped["no_gen"] += 1
+                continue
+            a0, a1 = s["art_start"], s["art_end"]
+            art = [i for i, (b, e) in enumerate(offs) if b >= a0 and e <= a1 and e > b]
+            prob = [i for i, (b, e) in enumerate(offs)
+                    if e <= a0 and e > b and i < plen]
+            if not art:
+                skipped["no_span"] += 1
+                continue
+            with torch.no_grad():
+                out = model(ids.to("cuda"), output_attentions=True)
+            att = out.attentions           # tuple(L) of (1, H, S, S)
+            gen_idx = list(range(plen, ids.shape[1]))
+            per_layer = []
+            for a in att:
+                m = a[0].float()           # (H, S, S)
+                g = m[:, gen_idx, :]       # attention FROM generated positions
+                tot = g.sum(-1).clamp(min=1e-9)
+                fa = (g[:, :, art].sum(-1) / tot).mean().item()
+                fp = (g[:, :, prob].sum(-1) / tot).mean().item() if prob else 0.0
+                per_layer.append((fa, fp))
+            del att, out
+            torch.cuda.empty_cache()
+            rows.append({"qid": s["qid"], "n_tok": int(ids.shape[1]),
+                         "n_art_tok": len(art), "n_prob_tok": len(prob),
+                         "n_gen_tok": len(gen_idx),
+                         "artifact_frac": sum(x[0] for x in per_layer) / len(per_layer),
+                         "problem_frac": sum(x[1] for x in per_layer) / len(per_layer),
+                         "per_layer_artifact": [round(x[0], 5) for x in per_layer]})
+        if not rows:
+            return {"model": model_id, "n": 0, "skipped": skipped}
+        n = len(rows)
+        mean_a = sum(r["artifact_frac"] for r in rows) / n
+        mean_p = sum(r["problem_frac"] for r in rows) / n
+        var = sum((r["artifact_frac"] - mean_a) ** 2 for r in rows) / max(n - 1, 1)
+        L = len(rows[0]["per_layer_artifact"])
+        prof = [sum(r["per_layer_artifact"][i] for r in rows) / n for i in range(L)]
+        return {"model": model_id, "n": n, "skipped": skipped,
+                "mean_artifact_frac": round(mean_a, 5),
+                "mean_problem_frac": round(mean_p, 5),
+                "sd_artifact_frac": round(var ** 0.5, 5),
+                "n_layers": L,
+                "per_layer_artifact_profile": [round(x, 5) for x in prof],
+                "mean_art_tok": sum(r["n_art_tok"] for r in rows) / n,
+                "mean_gen_tok": sum(r["n_gen_tok"] for r in rows) / n,
+                "rows": rows}
+    return _cache_or(tag, compute)
+
+
+def _p12_prompt(question, context):
+    head = "Problem:\n" + question.strip()
+    if context:
+        head += "\n\n" + context.rstrip()
+    return (head + "\n\nA complete Python 3 program that reads from standard "
+            "input and writes the answer to standard output:\n\n```python\n")
+
+
+def _p12_cells():
+    """(artifacts, conditioned generations) per model, from COMMITTED cells only."""
+    import statistics as st
+    qids, pool = _r3_donor_pool()
+    out = {}
+
+    def from_powered(rung, sweep_tag, targ_file, gen_tag):
+        g = _load(f"j11_sweep_cand_{sweep_tag}"); r = _load(f"j11_sweep_res_{sweep_tag}")
+        assert g and r, f"missing powered sweep caches for {sweep_tag}"
+        powered = {x["qid"]: st.mean(c["frac"] for c in row) for x, row in zip(g, r)}
+        ch = json.loads((REPO / f"artifacts/{targ_file}").read_text())["chosen"]
+        sel = _r3_select(pool, qids, powered, ch["target"], ch["hw"])
+        arts = [{"qid": q, "code": c[2], "frac": c[1], "n_tests": c[3],
+                 "n_failed": c[3] - c[4]} for q, c in sorted(sel.items())]
+        cand = _load(gen_tag)
+        n = len(arts)
+        gens = {x["qid"]: next((c for c in x["codes"] if c), None)
+                for x in cand[n:]}
+        out[rung] = (arts, gens)
+
+    from_powered("coder1p5b", "coder1p5b",
+                 "h11_targeting_coder1p5b.json", "j8_cand_P11_coder1p5b")
+    from_powered("coder3b", "coder3b",
+                 "h11_targeting_coder3b.json", "j8_cand_P11_coder3b")
+
+    # 7B: powered map is the pooled seed-71 + seed-91 sweep (Phase 10)
+    powered, _ = _r4_powered_map()
+    ch = json.loads((REPO / "artifacts/h10_r5_targeting.json").read_text())["chosen"]
+    sel = _r3_select(pool, qids, powered, ch["target"], ch["hw"])
+    arts = [{"qid": q, "code": c[2], "frac": c[1], "n_tests": c[3],
+             "n_failed": c[3] - c[4]} for q, c in sorted(sel.items())]
+    cand = _load("j8_cand_R5_coder7b_truematch0")
+    n = len(arts)
+    out["coder7b"] = (arts, {x["qid"]: next((c for c in x["codes"] if c), None)
+                             for x in cand[n:]})
+
+    # DeepSeek: the Phase-7 M1 matched cell
+    m1 = json.loads((REPO / "artifacts/h7_matched_artifacts.json").read_text())
+    arts = m1["cells"]["M1_deepseek1p3b"]["artifacts"]
+    cand = _load("j7_cand_M1_deepseek1p3b")
+    n = len(arts)
+    out["deepseek1p3b"] = (arts, {x["qid"]: next((c for c in x["codes"] if c), None)
+                                  for x in cand[n:]})
+    return out
+
+
+@app.local_entrypoint()
+def j12_probe():
+    """Phase 12 — the internals probe. Pre-registered [PHASE_12.md] at 69767f3,
+    BEFORE this ran. Forward passes only over committed cells."""
+    cells = _p12_cells()
+    all_q = sorted({a["qid"] for arts, _ in cells.values() for a in arts})
+    qd = _load("j12_questions") or _persist(
+        "j12_questions", h1_dump_questions.remote(all_q))
+    qtext = {k: v["question_content"] for k, v in qd["questions"].items()}
+    print(f"assembled {len(cells)} models over {len(all_q)} distinct problems")
+
+    results = {}
+    for rung, (arts, gens) in cells.items():
+        mid, rev, status = P12_MODELS[rung]
+        seqs = []
+        for a in arts[:P12_MAX_PROBLEMS]:
+            q = qtext.get(a["qid"])
+            if not q:
+                continue
+            ctx = _d2c_context(a)
+            prompt = _p12_prompt(q, ctx)
+            code = (a.get("code") or "")[:3000]
+            i = prompt.find(code)
+            if i < 0 or not code:
+                continue
+            seqs.append({"qid": a["qid"], "prompt": prompt, "gen": gens.get(a["qid"]),
+                         "art_start": i, "art_end": i + len(code)})
+        print(f"  {rung:13s} ({status}): {len(seqs)} sequences")
+        results[rung] = j12_attn.remote(mid, rev, seqs, tag=f"j12_attn_{rung}")
+        r = results[rung]
+        print(f"    -> n={r['n']}  artifact_frac {r.get('mean_artifact_frac')}  "
+              f"problem_frac {r.get('mean_problem_frac')}  "
+              f"sd {r.get('sd_artifact_frac')}  skipped {r.get('skipped')}")
+
+    # --- pre-registered adjudication: must track sink status across BOTH pairs ---
+    f = {k: results[k].get("mean_artifact_frac") for k in results}
+    pairs = {"small (1.5B sink vs 1.3B clean)": (f.get("coder1p5b"), f.get("deepseek1p3b")),
+             "large (3B sink vs 7B clean)": (f.get("coder3b"), f.get("coder7b"))}
+    signs = []
+    for lab, (s, c) in pairs.items():
+        d = None if (s is None or c is None) else round(s - c, 5)
+        signs.append(d)
+        print(f"  {lab}: sink {s} vs clean {c}  Δ {d}")
+    if any(d is None for d in signs):
+        branch = "D — technical failure / missing cell"
+    elif all(d < 0 for d in signs):
+        branch = "A — sinking models allocate LESS artifact attention (both pairs)"
+    elif all(d > 0 for d in signs):
+        branch = "B — sinking models allocate MORE artifact attention (both pairs)"
+    else:
+        branch = ("C — no consistent sink-tracking difference (pairs disagree) → "
+                  "simplest attention-allocation accounts EXCLUDED")
+    print(f"\nBRANCH: {branch}")
+    (REPO / "artifacts/h12_internals_probe.json").write_text(json.dumps(
+        {"_label": "Phase 12 internals probe [PHASE_12.md]", "prereg_commit": "69767f3",
+         "models": {k: {kk: vv for kk, vv in v.items() if kk != "rows"}
+                    for k, v in results.items()},
+         "per_model_rows": {k: v.get("rows", []) for k, v in results.items()},
+         "pair_deltas": {k: (None if v[0] is None or v[1] is None
+                             else round(v[0] - v[1], 5)) for k, v in pairs.items()},
+         "branch": branch}, indent=2))
+    print("wrote artifacts/h12_internals_probe.json")
+
+
 @app.local_entrypoint()
 def j9_g2_phi():
     """G2 (fired by the DIET branch) — phi-1 at its TRUE match, iterative-targeted

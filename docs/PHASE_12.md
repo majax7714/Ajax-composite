@@ -100,3 +100,109 @@ $90/$110 envelope; month-to-date **$79.42** of the $200 cap.
 ---
 
 *(Results append below.)*
+
+---
+
+## RUN 1 — INVALID (recorded, not silently redone)
+
+The first launch died **locally during cell assembly**, before any `.remote()` call:
+`_p12_cells` looked up the powered-sweep caches as `j11_sweep_{rung}_cand` while
+`j11_ladder` had persisted them as `j11_sweep_cand_{rung}`, so `_load` returned `None`
+and the dict comprehension raised `TypeError`. **No GPU ran; $0 spent** beyond app
+creation. Recorded per the Phase-9 run-1 precedent. Two changes followed: an `assert`
+on the cache loads so a missing input fails with a named tag, and a **local dry-run of
+the whole assembly before re-spending** — which is what verified the fix, returning
+per-model artifact means of 0.4589 / 0.6096 / 0.7264 / 0.3608, matching the committed
+`mean_copy_null` of the P11 1.5B, P11 3B, R5 7B and P7 M1 cells exactly.
+
+## RESULT (2026-07-25) — **BRANCH C: artifact attention does not track sink status** *(`h12_internals_probe.json`)*
+
+| model | status | n | **artifact frac** | sd | SE | problem frac | layers |
+|---|---|---|---|---|---|---|---|
+| Coder-1.5B | **SINKS** | 29 | **0.1078** | 0.0287 | 0.0053 | 0.398 | 28 |
+| Coder-3B | **SINKS** | 30 | **0.1046** | 0.0256 | 0.0047 | 0.436 | 36 |
+| Coder-7B | clean | 29 | **0.0981** | 0.0341 | 0.0063 | 0.452 | 28 |
+| DeepSeek-1.3B | clean | 29 | **0.1131** | 0.0429 | 0.0080 | 0.316 | 24 |
+
+**The two pairs disagree in sign and both differences are inside noise:**
+
+| pair | sink | clean | Δ | SE of Δ | Δ in SE |
+|---|---|---|---|---|---|
+| small — 1.5B (sink) vs 1.3B (clean) | 0.1078 | 0.1131 | **−0.0053** | 0.0096 | **0.55** |
+| large — 3B (sink) vs 7B (clean) | 0.1046 | 0.0981 | **+0.0065** | 0.0079 | **0.82** |
+
+Under the pre-registered decision rule an effect must **track sink status across both
+size pairs**. It does not: the signs oppose, and neither magnitude reaches 1 SE. All
+four models allocate ≈ 10% of generation-time attention mass to the artifact,
+regardless of whether conditioning on it degrades them.
+
+**Branch C — the 35% favourite, and the one deliberately priced highest.** The simplest
+attention-allocation accounts of the sink are **excluded**: it is not that sinking
+models look at the artifact too little (they don't), nor too much (they don't). Whatever
+the Coder diet does to conditioning, it is not visible in *how much* the model attends
+to the code it was given.
+
+### Why this is a strong null rather than a blind instrument
+
+The probe **does** resolve systematic between-model structure — it simply isn't
+sink-related. Two effects show up cleanly, and both are of the kind the design was built
+to exclude:
+
+- **Problem-statement attention tracks *size*, monotonically, within the Coder family:**
+  1.5B **0.398** → 3B **0.436** → 7B **0.452**. Larger models spend more of their
+  attention on the problem. Sink status is dissociated from size here by construction,
+  so this cannot be the mechanism — and its presence shows the measurement is sensitive
+  enough to see a real ~0.05 effect, five to ten times the sink-status deltas.
+- **The per-layer profile tracks *family/architecture*:** all three Qwen models peak at
+  ≈ 57% relative depth (L16/28, L21/36, L16/28) while DeepSeek peaks at ≈ 37% (L9/24).
+  Coder-7B is clean yet shares the sinking models' profile, so layer shape is a family
+  signature, not a sink signature.
+
+An instrument that detects a size effect and a family effect but no sink effect, on the
+same sequences, is reporting an absence rather than failing to look.
+
+*(Both bullets are exploratory per §10 and per this phase's own secondary clause — they
+are described, not adjudicated, and no claim is built on them.)*
+
+### What is now excluded, and what is not
+
+**Excluded:** artifact-attention *magnitude* as the mechanism of the Coder sink.
+
+**Not excluded, and explicitly not touched:** *where within* the artifact attention
+lands (the probe measures mass on the whole span, not its distribution over buggy vs
+sound regions — the artifacts carry test-level pass counts but no line-level labels);
+head-level structure (this averages over heads, and a small number of specialised heads
+could differ while the mean does not); anything at the representation level; and
+anything causal — as stated before the run, attention is correlational and this phase
+was never able to license a causal claim.
+
+**The positive mechanism remains OPEN**, but the space is smaller than it was this
+morning: OOD disfavored (P9), self-exemplar excluded (P9), and now attention-allocation
+magnitude excluded (P12).
+
+## PHASE GATE — CLOSED (2026-07-25)
+
+1. **Probe built and run** on the 2×2 where sink status is not collinear with size. ✓
+2. **Branch recorded with its decision rule applied as frozen** — pairs disagreed, so C,
+   not a single-pair claim. ✓
+3. **Run 1's invalidity recorded**, cause named, guard added. ✓
+4. **Causal over-reading pre-empted** in the charter and honoured in the result. ✓
+
+**Prediction accounting.** **C (35%) HIT** — the branch priced highest, and priced that
+way for the stated reason: a sink that lands below *both* nulls is not naturally
+explained by more or less attention. A 30% and a 25% branch did not fire; D (10%) did
+not fire.
+
+**Cost.** Phase 12 **≈ $0.02** (month-to-date $79.42 → $79.44; aggregate delta, per-app
+lines lag and this may rise). Estimate was **$0.40–1.00** — over by ~20–50×. Amendment 2
+fixed the estimator for *generation* workloads (R4/R5/P11 all accurate) but it is still
+badly calibrated for **forward-pass-only** workloads, where model load dominates and
+total GPU time is minutes. Recorded as a second calibration lesson rather than a
+repeat of the first.
+
+**Loop total $1.40** of the $90/$110 envelope; month-to-date $79.44 of $200.
+
+**What is open.** The within-artifact *distribution* of attention (needs line-level
+bug labels, which the current artifacts lack); **head-level** analysis; and the causal
+step (**head ablation**), which would be the first intervention this record has ever
+run and needs its own charter. **Nothing is running; Phase 12 is closed.**
