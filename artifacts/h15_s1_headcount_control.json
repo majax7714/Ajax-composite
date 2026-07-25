@@ -1,0 +1,47 @@
+{
+  "_label": "P0 free \u2014 head-count control on Phase 13 S1 concentration [PHASE_15.md]",
+  "_source": "artifacts/h13_s1_heads.json (committed per-head matrices)",
+  "seed": 211,
+  "n_subsamples": 2000,
+  "results": {
+    "published": {
+      "top5pct_share": {
+        "small": 0.014,
+        "large": 0.0302,
+        "tracks": true
+      },
+      "gini": {
+        "small": 0.0608,
+        "large": 0.0523,
+        "tracks": true
+      }
+    },
+    "control_a_common_total": {
+      "n_heads": 336,
+      "top5pct_share": {
+        "small": 0.0105,
+        "large": 0.0288,
+        "tracks": true
+      },
+      "gini": {
+        "small": 0.0608,
+        "large": 0.0521,
+        "tracks": true
+      }
+    },
+    "control_b_common_per_layer": {
+      "heads_per_layer": 12,
+      "top5pct_share": {
+        "small": 0.0171,
+        "large": 0.0301,
+        "tracks": true
+      },
+      "gini": {
+        "small": 0.0613,
+        "large": 0.0528,
+        "tracks": true
+      }
+    },
+    "headcount_monotone_gini": false
+  }
+}
