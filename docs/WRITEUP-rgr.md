@@ -581,6 +581,15 @@ currently believes.** Statuses: LIVE / KILLED / RETRACTED / REVERSED / SCOPED.
 - **Hardened judges + ops ledger** (§8) — short-circuit vs all-cases matched to
   the analysis; detach/checkpoint/volume-first persistence; six recorded failure
   modes with fixes.
+- **The attention-split probe** (Phase 12) — teacher-forces a model over
+  `[conditioned prompt] + [its own committed generation]` and splits generation-time
+  attention mass across the artifact / problem / generated spans, with a per-layer
+  profile ([scripts/modal_h1.py] `j12_attn`, `h12_internals_probe.json`). Its value as
+  an instrument is that it carries **its own positive controls**: on the same sequences
+  it resolves a monotone size effect (problem attention 0.398 → 0.436 → 0.452 across
+  Coder 1.5B/3B/7B) and a family effect (layer-profile peak depth ≈57% Qwen vs ≈37%
+  DeepSeek), so a null on the contrast of interest is an absence rather than a failure
+  to look. First non-vLLM measurement instrument in the record.
 - **The powered targeting instrument** (Phase 10) — the record's matched cells were
   aimed at a Δ_art target using an i.i.d. estimate whose own SE was **0.028** at 8
   candidates/problem, so "on-target" bands of ±0.05–0.08 were 2–3 SE wide and no cell's
@@ -708,7 +717,7 @@ per-artifact `stack` fingerprint block, §8.)*
 | 3 | register-null localization | `h2_result.json`, `diag2/3/5_*.json` | Δ(FULL−B1) = 0.000, CI [−0.049, +0.055]; W₀ transfer ×1.33→×0.28 (DIAG-5); U starvation: φ passed-AUROC 0.558, KL 0.117 nats directionless, Δpass 0.000 in-domain | that stack (d_r 128, 8 soft tokens, GRU), imitation regime, 1.5B frozen G | retired HF/4-bit stack — numbers never cross the M-boundary | **HF-NF4 / 4-bit (pre-M) ⚑** |
 | 6 | escape-distance law | `dmeasure_conditioning.json` (`per_sample_D2b`), `h0a_ast_distance.json` | coverage monotone in PULL, Spearman **0.952** under AST = lexical; D2b mean-per-sample-pass flat ~0.20 at every T | form: 3 families + lexical + AST; constants: family params; domain T ≲ 1.2 (descends with difficulty); in-context channels | — | Modal L4/vLLM/bf16 |
 | 7 | elimination argument | `dmeasure_e7.json`, `w0a_e0_anchor.json`, `h2a_hint_arm.json` | E7 repulsion loses **15–27 coverage pts** to i.i.d. (0.65/0.75 vs 0.92/0.90); direction existence proof HINT 13 vs floor 2, p = 4.9e-4 | Qwen-1.5B; in-context channels only; weight-/search-space never enumerated | — | Modal L4/vLLM/bf16 |
-| 8 | D2c SINK (scoped+inverted; Coder-diet, cross-scale, provenance-controlled) | `dmeasure_d2c_partial_credit.json`, `h1_cross_family.json`, `h5_7b_pathology.json`, `h6_size_curve.json`, `h7_matched_M*.json`, `h8_matched_C*.json`, `h8_d*.json`, `h9_2x2_G1*.json`, `h9_g2_phi.json`, `h7_relational_assembly.json`, `h10_gain_reanalysis.json`, `h10_r4_coder7b_m4replication.json`, `h10_r5_coder7b_truematch0.json`, `h10_r6_d2_refit.json`, `h11_coder1p5b.json`, `h11_coder3b.json` | Qwen-1.5B cond **0.374** < copy 0.494 & < iid 0.468 (below-both, p ≈ 5e-5); **P7 matched: non-Coder NO sink (DeepSeek +0.050, StarCoder2 +0.008, general −0.000); ~~Coder-7B SINKS −0.129~~ [RETRACTED P10 R4 — M4 non-replicating on its own inputs, cond−artifact −0.089 → +0.003; 7B leg unsupported, true match unmeasured]**; **P8: ~~7B CONFIRMED n=37 (−0.103)~~ → WITHDRAWN P10 R1 (C4 at Δ_art −0.101, cond−artifact −0.003 → not below both nulls; 7B sink stands on M4 n=20, cond−artifact −0.089); mechanism read then amended OPEN**; **P9 generated 2×2: Coder sinks on self AND foreign artifacts (−0.200/−0.238, p≤0.005), DeepSeek on neither → DIET, H-SELF refuted; D3-sweep: sink decoupled from surprise → OOD disfavored** | Qwen2.5-Coder code sink **cross-scale (1.5B–7B), provenance-controlled** (P9); origin = **Coder continued-pretraining diet** (not self-conditioning, not surprise); mechanism OPEN; synthetic-data sub-claim unlicensed (phi ×2 sub-thr) | all-cases judge; generated-artifact scope on P9 absolute Δ_cond (C5); phi/0.5B floor-capped | Modal L4/vLLM/bf16 |
+| 8 | D2c SINK (scoped+inverted; Coder-diet, cross-scale, provenance-controlled) | `dmeasure_d2c_partial_credit.json`, `h1_cross_family.json`, `h5_7b_pathology.json`, `h6_size_curve.json`, `h7_matched_M*.json`, `h8_matched_C*.json`, `h8_d*.json`, `h9_2x2_G1*.json`, `h9_g2_phi.json`, `h7_relational_assembly.json`, `h10_gain_reanalysis.json`, `h10_r4_coder7b_m4replication.json`, `h10_r5_coder7b_truematch0.json`, `h10_r6_d2_refit.json`, `h11_coder1p5b.json`, `h11_coder3b.json`, `h12_internals_probe.json` | Qwen-1.5B cond **0.374** < copy 0.494 & < iid 0.468 (below-both, p ≈ 5e-5); **P7 matched: non-Coder NO sink (DeepSeek +0.050, StarCoder2 +0.008, general −0.000); ~~Coder-7B SINKS −0.129~~ [RETRACTED P10 R4 — M4 non-replicating on its own inputs, cond−artifact −0.089 → +0.003; 7B leg unsupported, true match unmeasured]**; **P8: ~~7B CONFIRMED n=37 (−0.103)~~ → WITHDRAWN P10 R1 (C4 at Δ_art −0.101, cond−artifact −0.003 → not below both nulls; 7B sink stands on M4 n=20, cond−artifact −0.089); mechanism read then amended OPEN**; **P9 generated 2×2: Coder sinks on self AND foreign artifacts (−0.200/−0.238, p≤0.005), DeepSeek on neither → DIET, H-SELF refuted; D3-sweep: sink decoupled from surprise → OOD disfavored** | Qwen2.5-Coder code sink **cross-scale (1.5B–7B), provenance-controlled** (P9); origin = **Coder continued-pretraining diet** (not self-conditioning, not surprise); mechanism OPEN; synthetic-data sub-claim unlicensed (phi ×2 sub-thr) | all-cases judge; generated-artifact scope on P9 absolute Δ_cond (C5); phi/0.5B floor-capped | Modal L4/vLLM/bf16 |
 | 9 | R3 trace null (reversed-as-refined; content fact) | `r3_conditional_reachability.json`, `h5_deepseek_fourarm.json` | TRACE floor: Qwen **1/68** (p = 0.875 vs B1), DeepSeek **2/76** (p = 0.50); generated at i.i.d. PULL 0.85 | cross-family (both), structural failures, **trace channel** (not "use") | near-zero-floor strata — same-seed confound cannot move it | Modal L4/vLLM/bf16 |
 | 10 | hint result (generalizes) | `h2a_hint_arm.json`, `h2a_rerun_stability.json`, `h2a_validation_struct.json`, `h5_deepseek_fourarm.json`, `h6_p2_distinct_seed_b1.json` | Qwen **13/68** (11 hint-only/0, p = 4.9e-4, r ≈ 0.19); DeepSeek **9/76** (8/0, p = 0.0039, r ≈ 0.12); all rerun-stable; ≥ 0.16 AST-novel; timeout-class enriched | both families, medium strata, **complete-strategy-grade** hints (dose-response unmeasured — J2 ceiling 123/125 COMPLETE) | same-seed B1 control suppressed → contrast conservative; **P2 measured it: distinct-seed fresh B1 = 2** (overlap 0.27 vs ~0.50) — the 13-vs-2 contrast stands on a measured control ([PHASE_6.md] P2) | Modal L4/vLLM/bf16 |
 | 11 | Qwen pathology / double dissociation (Coder-diet-specific, cross-scale on code) | `h1_cross_family.json`, `h2_manip_check.json`, `h2_manip_check_deepseek.json`, `h5_7b_pathology.json`, `h6_size_curve.json`, `h7_matched_M*.json` | Qwen code −0.095, language −0.096; DeepSeek +0.107 / +0.088 (double dissociation); **P6: general-1.5B (non-Coder) clean → Coder-stage diet; language harm 1.5B-only (3B +0.076) = MIXED**; **P7 matched: non-Coder families NO code sink at match (DeepSeek +0.050, StarCoder2 +0.008, general −0.000); code sink NOT scale-bounded — 7B sinks −0.129 at match (the "blend" was position)** | **code** sink Coder-diet **cross-scale at match (1.5B–7B)** vs non-Coder (no sink); **language** MIXED (1.5B-only); origin = Coder-stage diet, **position-controlled** (P7) | code-channel 7B **re-tested at match (sinks)**; language-channel 7B not re-tested (P1 code-only); 7B language near-saturation (E0 → 0.9) | Modal L4/vLLM/bf16 |
@@ -741,11 +750,27 @@ Recorded here so the Index is also the map of what is *deliberately not being ru
   sinks on BOTH its own and foreign (DeepSeek-generated) artifacts; DeepSeek on neither →
   DIET main effect, H-SELF refuted, provenance confound CLOSED.** The Coder-stage
   attribution stands provenance-controlled. What remains OPEN, each a named successor:
-  - **The internals probe** — self-vs-foreign attention to artifact tokens in sink vs
+  - ~~**The internals probe** — self-vs-foreign attention to artifact tokens in sink vs
     clean cells. Now the **only** instrument left for the **positive mechanism** (OOD
     firmly disfavored, self-exemplar excluded, but *why* the diet degrades conditioning
     is unmeasured); the 2×2 sharpened it (look at how a Coder model attends to foreign
-    vs own artifacts it both sinks on). Outside this record's toolchain/budget.
+    vs own artifacts it both sinks on). Outside this record's toolchain/budget.~~
+    **[RUN — Phase 12, [PHASE_12.md]. Both stated barriers were false: the budget one
+    was the phantom $31 (P10 P0.1), and the toolchain one nearly so (`j8_ppl` already
+    ran HF-transformers forward passes on these models). The self-vs-foreign framing was
+    obsolete — P9 showed the Coder model sinks on both — so it was run on the stronger
+    2×2 P11 made available, in which sink status is NOT collinear with size (1.3B clean
+    vs 1.5B sink; 3B sink vs 7B clean). RESULT: all four models allocate ≈10% of
+    generation-time attention to the artifact; the two pairs disagree in sign and both
+    deltas are <1 SE (−0.0053, +0.0065). **Artifact-attention MAGNITUDE is excluded as
+    the mechanism.** Strong null, not a blind one: the same measurement resolves a
+    monotone SIZE effect on problem attention (0.398→0.436→0.452 across Coder
+    1.5B/3B/7B, 5–10× the sink deltas) and a FAMILY effect on layer profile (Qwen peak
+    ≈57% depth, DeepSeek ≈37%) — both of the kind the design excludes by construction.]**
+    **Still open, and now the named successors:** the *within-artifact distribution* of
+    attention (needs line-level bug labels the artifacts lack); **head-level** structure
+    (P12 averages over heads); and **head ablation** — the causal step, which would be
+    this record's first intervention and needs its own charter.
   - **The synthetic-data sub-claim (rung 3)** — phi-1 is a **replicated sub-threshold
     lean** (−0.033, −0.042 across two measurements) but never crosses; family-n = 1.
     A second *non-phi* synthetic-code family, or phi at a below-floor position via
