@@ -1,0 +1,116 @@
+{
+  "_label": "P0.1 free \u2014 vertex audit on Coder <=3B only [PHASE_16.md P0.1]",
+  "_note": "R6's -0.1428 vertex pools 7B (no sink at any measured position) with the sinking scales. This refits <=3B alone and bootstraps the vertex.",
+  "seed": 229,
+  "n_bootstrap": 4000,
+  "points": [
+    {
+      "delta_art": -0.0744,
+      "delta_cond": -0.1502,
+      "label": "Coder-3B (D2, Phase 8)",
+      "n": null,
+      "source": "h8_d2_response_curves"
+    },
+    {
+      "delta_art": -0.0449,
+      "delta_cond": -0.2381,
+      "label": "G1d Coder-1.5B foreign",
+      "n": 10,
+      "source": "h9_2x2_G1d"
+    },
+    {
+      "delta_art": -0.0444,
+      "delta_cond": -0.1999,
+      "label": "G1c Coder-1.5B self",
+      "n": 10,
+      "source": "h9_2x2_G1c"
+    },
+    {
+      "delta_art": -0.0005,
+      "delta_cond": -0.084,
+      "label": "P11 Coder-3B (powered)",
+      "n": 39,
+      "source": "h11_coder3b"
+    },
+    {
+      "delta_art": 0.0016,
+      "delta_cond": -0.0638,
+      "label": "P11 Coder-1.5B (powered)",
+      "n": 44,
+      "source": "h11_coder1p5b"
+    },
+    {
+      "delta_art": 0.026,
+      "delta_cond": -0.0947,
+      "label": "Coder-1.5B (D2, Phase 8)",
+      "n": null,
+      "source": "h8_d2_response_curves"
+    },
+    {
+      "delta_art": 0.0814,
+      "delta_cond": 0.0443,
+      "label": "M5 Coder-0.5B",
+      "n": 43,
+      "source": "h7_matched_M5_coder0p5b"
+    },
+    {
+      "delta_art": 0.2837,
+      "delta_cond": 0.1781,
+      "label": "Coder-0.5B (D2, Phase 8)",
+      "n": null,
+      "source": "h8_d2_response_curves"
+    }
+  ],
+  "fits": {
+    "all_le3b": {
+      "vertex": 0.4147,
+      "r2": 0.8891,
+      "convex": false,
+      "interior": false,
+      "n": 8,
+      "boot_ci95": [
+        -1.526,
+        2.0302
+      ],
+      "covers_zero": true,
+      "x_range": [
+        -0.0744,
+        0.2837
+      ]
+    },
+    "le3b_no_n10": {
+      "vertex": 0.8432,
+      "r2": 0.9477,
+      "convex": false,
+      "interior": false,
+      "n": 6,
+      "boot_ci95": [
+        -1.0945,
+        2.1093
+      ],
+      "covers_zero": true,
+      "x_range": [
+        -0.0744,
+        0.2837
+      ]
+    },
+    "le3b_powered_only": null
+  },
+  "r6_pooled_for_contrast": {
+    "quad": [
+      1.5115,
+      0.4317,
+      -0.0561
+    ],
+    "r2": 0.8174,
+    "vertex_dart": -0.1428,
+    "vertex_interior": true,
+    "convex": true,
+    "linear_slope": 0.6325,
+    "n_points": 9,
+    "x_range": [
+      -0.1645,
+      0.2837
+    ]
+  }
+}

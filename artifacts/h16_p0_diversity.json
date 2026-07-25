@@ -1,0 +1,94 @@
+{
+  "_label": "P0.2 free \u2014 sink cells decomposed on quality vs diversity [PHASE_16.md P0.2]",
+  "_canon": "python ast.dump(annotate_fields=True, include_attributes=False)",
+  "cells": {
+    "Coder-1.5B (P11)": {
+      "status": "SINKS",
+      "iid": {
+        "n": 44,
+        "mean_frac": 0.4704299724896316,
+        "coverage": 0.6363636363636364,
+        "distinct_mean": 7.704545454545454,
+        "max_cluster_share": 0.15625,
+        "parse_rate": 0.9886363636363636
+      },
+      "cond": {
+        "n": 44,
+        "mean_frac": 0.406651350543396,
+        "coverage": 0.20454545454545456,
+        "distinct_mean": 6.5227272727272725,
+        "max_cluster_share": 0.30113636363636365,
+        "parse_rate": 0.9914772727272727
+      },
+      "delta_distinct": -1.1818,
+      "delta_coverage": -0.4318,
+      "delta_mean_frac": -0.0638
+    },
+    "Coder-3B (P11)": {
+      "status": "SINKS",
+      "iid": {
+        "n": 39,
+        "mean_frac": 0.6429756141294602,
+        "coverage": 0.7948717948717948,
+        "distinct_mean": 7.948717948717949,
+        "max_cluster_share": 0.13141025641025642,
+        "parse_rate": 0.9903846153846154
+      },
+      "cond": {
+        "n": 39,
+        "mean_frac": 0.5589597368443522,
+        "coverage": 0.38461538461538464,
+        "distinct_mean": 5.923076923076923,
+        "max_cluster_share": 0.3557692307692308,
+        "parse_rate": 1.0
+      },
+      "delta_distinct": -2.0256,
+      "delta_coverage": -0.4103,
+      "delta_mean_frac": -0.084
+    },
+    "Coder-7B (R5 true match)": {
+      "status": "clean",
+      "iid": {
+        "n": 29,
+        "mean_frac": 0.7526485726916762,
+        "coverage": 0.7931034482758621,
+        "distinct_mean": 7.689655172413793,
+        "max_cluster_share": 0.15517241379310345,
+        "parse_rate": 1.0
+      },
+      "cond": {
+        "n": 29,
+        "mean_frac": 0.7183930293844087,
+        "coverage": 0.7931034482758621,
+        "distinct_mean": 7,
+        "max_cluster_share": 0.23706896551724138,
+        "parse_rate": 1.0
+      },
+      "delta_distinct": -0.6897,
+      "delta_coverage": 0.0,
+      "delta_mean_frac": -0.0343
+    },
+    "DeepSeek-1.3B (P7 M1)": {
+      "status": "clean",
+      "iid": {
+        "n": 39,
+        "mean_frac": 0.31092619986850756,
+        "coverage": 0.38461538461538464,
+        "distinct_mean": 7.948717948717949,
+        "max_cluster_share": 0.13141025641025642,
+        "parse_rate": 0.9839743589743589
+      },
+      "cond": {
+        "n": 39,
+        "mean_frac": 0.3605426891484584,
+        "coverage": 0.1794871794871795,
+        "distinct_mean": 4.384615384615385,
+        "max_cluster_share": 0.5641025641025641,
+        "parse_rate": 1.0
+      },
+      "delta_distinct": -3.5641,
+      "delta_coverage": -0.2051,
+      "delta_mean_frac": 0.0496
+    }
+  }
+}
