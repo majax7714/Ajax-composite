@@ -2271,6 +2271,140 @@ def j9_2x2():
     print("wrote h9_2x2_*.json, h9_2x2_generated_sets.json, h9_d3_sweep.json")
 
 
+# --- Phase 10 R3: the honest 7B confirmation at true match ([PHASE_10.md] R3) ---
+R3_MODEL = ("Qwen/Qwen2.5-Coder-7B", "0396a76181e127dfc13e5c5ec48a8cee09938b02")
+R3_SEL_SEED = 71      # selection sweep — independent of the measurement draw
+R3_MEAS_SEED = 89     # the cell itself
+R3_MAX_ABS_PRED_DART = 0.01
+R3_MIN_N = 20
+
+
+def _r3_donor_pool():
+    """The fixed Phase-7 donor pool, as {qid: [(idx, frac, code, n_tests, n_passed)]}."""
+    cand = json.loads((REPO / "runs/modal/lcb_cand_lcb_r2_base_T08.json").read_text())
+    res = json.loads((REPO / "runs/modal/lcb_res_lcb_r2_base_T08.json").read_text())
+    qids = res["question_ids"]
+    codes = dict(zip(qids, cand["codes"]))
+    rows = dict(zip(qids, res["results"]))
+    pool = {}
+    for q in qids:
+        pool[q] = [(i, r["frac"], codes[q][i], r["n_tests"], r["n_passed"])
+                   for i, r in enumerate(rows[q]) if codes[q][i]]
+    return qids, pool
+
+
+def _r3_select(pool, qids, iid_by_qid, ctr, hw):
+    """Frozen Phase-7 miner rule: in-band candidate nearest target, tie-break by index."""
+    sel = {}
+    for q in qids:
+        if q not in iid_by_qid:
+            continue
+        inb = [c for c in pool[q] if ctr - hw <= c[1] <= ctr + hw]
+        if inb:
+            sel[q] = min(inb, key=lambda c: (abs(c[1] - ctr), c[0]))
+    return sel
+
+
+@app.local_entrypoint()
+def j10_r3():
+    """Phase 10 R3 — Coder-7B at TRUE match, below-both-nulls criterion.
+
+    Step 1: i.i.d. selection sweep over all 80 donor-pool problems (seed 71).
+    Step 2: offline targeting on that map — maximise n s.t. |predicted Δ_art| <= 0.01.
+    Step 3: the cell at seed 89, E0+E1 fresh in one batch (_matched_cell).
+    Pre-registered [PHASE_10.md] R3 at commit 4112bb0, BEFORE this ran."""
+    import statistics as st
+    mid, rev = R3_MODEL
+    qids, pool = _r3_donor_pool()
+
+    # --- Step 1: selection sweep (independent draw) ---
+    g = _load("j10_r3_selsweep_cand") or _persist(
+        "j10_r3_selsweep_cand",
+        h1_gen_lcb.remote(mid, [{"qid": q, "context": None} for q in qids], 8,
+                          tag="j10_r3_selsweep_cand", seed=R3_SEL_SEED, revision=rev))
+    r = _load("j10_r3_selsweep_res") or _persist(
+        "j10_r3_selsweep_res",
+        h1_lcb_exec.remote([x["qid"] for x in g], [x["codes"] for x in g],
+                           tag="j10_r3_selsweep_res"))
+    sel_iid = {x["qid"]: st.mean(c["frac"] for c in row) for x, row in zip(g, r)}
+    print(f"step 1: selection-sweep i.i.d. on {len(sel_iid)} problems, "
+          f"mean {st.mean(sel_iid.values()):.4f} (seed {R3_SEL_SEED})")
+
+    # --- Step 2: offline targeting (free) ---
+    grid = []
+    for i in range(46):
+        ctr = 0.60 + 0.01 * i
+        for hw in (0.05, 0.06, 0.07, 0.08, 0.09):
+            s = _r3_select(pool, qids, sel_iid, ctr, hw)
+            if len(s) < R3_MIN_N:
+                continue
+            ma = st.mean(c[1] for c in s.values())
+            si = st.mean(sel_iid[q] for q in s)
+            grid.append({"target": round(ctr, 3), "hw": hw, "n": len(s),
+                         "mean_art": round(ma, 4), "subset_iid": round(si, 4),
+                         "pred_dart": round(ma - si, 4)})
+    ok = [x for x in grid if abs(x["pred_dart"]) <= R3_MAX_ABS_PRED_DART]
+    if not ok:
+        print(f"NO (target, band) meets |pred Δart| <= {R3_MAX_ABS_PRED_DART} "
+              f"at n >= {R3_MIN_N} — reporting branch D (instrument miss).")
+        (REPO / "artifacts/h10_r3_targeting.json").write_text(json.dumps(
+            {"_label": "Phase 10 R3 targeting [PHASE_10.md R3]", "grid": grid,
+             "chosen": None, "branch": "D — no on-target cell available"}, indent=2))
+        return
+    # frozen rule: maximise n, tie-break by smaller |pred Δart|, then smaller band
+    ch = sorted(ok, key=lambda x: (-x["n"], abs(x["pred_dart"]), x["hw"]))[0]
+    print(f"step 2: chosen target {ch['target']} ±{ch['hw']}  n={ch['n']}  "
+          f"art {ch['mean_art']:.4f}  sel-sweep subset i.i.d. {ch['subset_iid']:.4f}  "
+          f"pred Δart {ch['pred_dart']:+.4f}")
+    (REPO / "artifacts/h10_r3_targeting.json").write_text(json.dumps(
+        {"_label": "Phase 10 R3 targeting [PHASE_10.md R3]",
+         "selection_seed": R3_SEL_SEED, "measurement_seed": R3_MEAS_SEED,
+         "rule": "maximise n s.t. |pred Δart| <= 0.01; tie-break |pred Δart|, then band",
+         "grid": grid, "chosen": ch}, indent=2))
+
+    sel = _r3_select(pool, qids, sel_iid, ch["target"], ch["hw"])
+    arts = [{"qid": q, "cand_idx": c[0], "code": c[2], "frac": c[1],
+             "n_tests": c[3], "n_failed": c[3] - c[4]} for q, c in sorted(sel.items())]
+
+    # --- Step 3: the cell (independent measurement draw) ---
+    out = _matched_cell(mid, rev, R3_MEAS_SEED, arts, "R3_coder7b_truematch",
+                        f"donor pool @ {ch['target']} ±{ch['hw']} "
+                        f"(selected on seed {R3_SEL_SEED}, measured on seed {R3_MEAS_SEED})")
+
+    # --- below-both-nulls adjudication (the ORIGINAL criterion; P0.2) ---
+    me0, me1, mc = out["mean_iid_e0"], out["mean_cond_e1"], out["mean_copy_null"]
+    resid = round(me1 - mc, 4)
+    n = out["n_problems"]
+    dres = _load(f"j8_res_R3_coder7b_truematch")
+    e1 = [st.mean(x["frac"] for x in row) for row in dres[n:]]
+    d_copy = [a - b["frac"] for a, b in zip(e1, arts)]
+    p_copy = _wilcoxon_mc_one_sided([-x for x in d_copy])
+    below_both = bool(me1 < me0 and me1 < mc and p_copy < 0.05 and resid <= -0.05)
+    dart = out["actual_delta_art"]
+    on_target = abs(dart) <= 0.03
+    branch = ("A — SINK CONFIRMED at match (below both nulls)" if below_both and on_target
+              else "C — NO SINK at match" if on_target and resid > -0.02
+              else "B — SUB-THRESHOLD" if on_target
+              else "D — off-target / underpowered")
+    if n < R3_MIN_N:
+        branch = f"D — underpowered (n={n} < {R3_MIN_N})"
+    adj = {"_label": "Phase 10 R3 result [PHASE_10.md R3]",
+           "prereg_commit": "4112bb0", "cell": out, "n": n,
+           "achieved_delta_art": dart, "predicted_delta_art": ch["pred_dart"],
+           "dart_prediction_hit": bool(abs(dart - ch["pred_dart"]) <= 0.03),
+           "residual_cond_minus_artifact": resid,
+           "p_one_sided_cond_below_artifact": p_copy,
+           "below_both_nulls": below_both,
+           "matched_sink_signature_legacy": out["matched_sink_signature"],
+           "on_target": on_target, "branch": branch, "targeting": ch}
+    (REPO / "artifacts/h10_r3_coder7b_truematch.json").write_text(json.dumps(adj, indent=2))
+    print(f"\n=== R3: n={n}  Δart {dart:+.4f} (pred {ch['pred_dart']:+.4f})  "
+          f"iid {me0:.4f} → cond {me1:.4f}  artifact {mc:.4f}\n"
+          f"    cond-artifact {resid:+.4f}  p(cond<artifact) {p_copy:.4f}  "
+          f"BELOW-BOTH-NULLS {below_both}  (legacy signature {out['matched_sink_signature']})\n"
+          f"    BRANCH: {branch} ===")
+
+
 @app.local_entrypoint()
 def j9_g2_phi():
     """G2 (fired by the DIET branch) — phi-1 at its TRUE match, iterative-targeted

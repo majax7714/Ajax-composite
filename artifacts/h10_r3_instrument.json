@@ -1,0 +1,48 @@
+{
+  "_label": "Phase 10 R3 instrument diagnostic [PHASE_10.md R3]",
+  "kind": "exploratory diagnostic \u2014 separated from the confirmatory gate",
+  "n_problems": 30,
+  "candidates_per_problem": 8,
+  "iid_seed71_mean": 0.7157,
+  "iid_seed89_mean": 0.7471,
+  "subset_mean_shift": 0.0313,
+  "per_problem_abs_diff_mean": 0.1158,
+  "per_problem_abs_diff_max": 0.375,
+  "per_problem_diff_sd": 0.1516,
+  "se_of_subset_mean": 0.0277,
+  "on_target_tolerance_used": 0.03,
+  "tolerance_in_SE": 1.08,
+  "predicted_delta_art": -0.0082,
+  "achieved_delta_art": -0.0396,
+  "targeting_miss": 0.0314,
+  "finding": "The i.i.d. estimate at 8 candidates/problem carries a per-problem sd of 0.152, so the subset mean has SE ~0.0277. The on-target tolerance (0.03) was therefore ~1 SE of the very quantity being targeted, and the observed miss (0.0314) is ~1 SE. The independent selection/measurement split is still correct \u2014 it removes selection-on-noise \u2014 but it cannot remove sampling noise in the measurement itself. Hitting a \u0394_art target to +/-0.03 requires more candidates per problem for the i.i.d. estimate, not a different seed scheme.",
+  "record_wide_implication": "Every matched cell's relational position (Phases 7-10) is known only to about +/-0.03 at 8 candidates/problem. 'On-target' bands used in the record (+/-0.05 in Phase 7/8, +/-0.08 in Phase 9) are 2-3 SE wide, so differences in \u0394_art below ~0.06 between cells are not resolvable, and the D2 trough location (-0.092, LOO [-0.12,-0.03]) is fit on points each carrying this positional uncertainty.",
+  "post_hoc_observation_NOT_a_result": {
+    "note": "R3 landed at \u0394_art -0.0396, near-identical to M4's -0.0393, but R3 was pre-registered to test \u0394_art ~ 0 and is OFF-TARGET (branch D). The comparison below is a POINTER requiring its own pre-registered test; it is not an adjudication and no claim is drawn from it.",
+    "M4": {
+      "n": 20,
+      "seed": 17,
+      "delta_art": -0.0393,
+      "iid": 0.7023,
+      "artifact": 0.6631,
+      "cond": 0.5738,
+      "cond_minus_artifact": -0.0893,
+      "p_below_iid": 0.0023998800059997
+    },
+    "R3": {
+      "n": 30,
+      "seed": 89,
+      "delta_art": -0.0396,
+      "iid": 0.7471,
+      "artifact": 0.7075,
+      "cond": 0.6978,
+      "cond_minus_artifact": -0.0097,
+      "p_below_artifact": 0.3778311084445778
+    },
+    "confounds_preventing_adjudication": [
+      "different problem subsets",
+      "different absolute levels (M4 artifact 0.663 vs R3 0.708)",
+      "R3 off its own pre-registered target"
+    ]
+  }
+}

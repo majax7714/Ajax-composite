@@ -368,3 +368,122 @@ pulling the measured i.i.d. down and Δ_art positive. **65%.**
 generations on 7B, plus judging; donor pool reused, no artifact generation).
 Month-to-date workspace spend checked before launch: **$78.04 of the $200 cap**,
 leaving ample headroom; cumulative loop spend before this run: **$0**.
+
+---
+
+## R3 RESULT (2026-07-24) — **BRANCH D: OFF-TARGET.** The at-match question is not answered, and the reason is the instrument *(`h10_r3_coder7b_truematch.json`, `h10_r3_targeting.json`, `h10_r3_instrument.json`)*
+
+**Step 1** (seed 71, all 80 donor-pool problems): Coder-7B i.i.d. **0.6574** — well below
+the 0.7490 that C4's 37-problem subset showed, independently confirming that C4's
+band-widening had selected a systematically *easier* subset.
+
+**Step 2** (offline targeting): chose **target 0.72 ±0.09, n = 30**, artifact mean
+0.7075 against a selection-sweep subset i.i.d. of 0.7157 → **predicted Δ_art −0.0082**,
+inside the ≤ 0.01 constraint, with n = 30 > M4's 20.
+
+**Step 3** (seed 89, the cell):
+
+| | n | Δ_art | i.i.d. | artifact | cond | **cond − artifact** | p(cond<artifact) |
+|---|---|---|---|---|---|---|---|
+| **R3** | 30 | **−0.0396** | 0.7471 | 0.7075 | 0.6978 | **−0.0097** | 0.378 |
+
+**Achieved Δ_art −0.0396 against a predicted −0.0082 — a miss of 0.0314, outside the
+frozen ±0.03 on-target tolerance. Branch D fired. The cell does not adjudicate the
+at-match question, and per the pre-registration it is NOT re-run to fit.**
+
+### Prediction accounting — a bad day for the priors, recorded as such
+
+| prediction | odds | outcome |
+|---|---|---|
+| R1 #1 — residual separates the diets | **70%** | **MISS** |
+| R1 #2 — clean cluster at 0 ± 0.03 | 55% | MISS |
+| R1 #3 — Coder residual varies with Δ_art | 60% | HIT |
+| R1 #4 — phi between clusters | 45% | MISS |
+| R3 branch | A 55 / B 25 / C 15 / **D 5** | **D — the 5% branch fired** |
+| R3 methodological — achieved Δ_art within ±0.03 of predicted | **65%** | **MISS** (0.0314) |
+
+Two favourites at 70% and 65% both fell, and the 5% branch fired. Recorded without
+softening; the odds stay on the page.
+
+### Why it missed — the fix was right and insufficient
+
+The selection/measurement split did what it was designed to do: it removed
+selection-on-noise. It cannot remove sampling noise in the *measurement*. Both draws
+cover the same 30 problems, so the noise is directly measurable — and free:
+
+| quantity | value |
+|---|---|
+| per-problem i.i.d. difference between seeds, sd | **0.1516** |
+| per-problem mean \|difference\| | 0.1158 (max 0.375) |
+| **SE of the 30-problem subset mean** | **0.0277** |
+| on-target tolerance used | 0.03 = **1.08 SE** |
+| observed miss | 0.0314 ≈ **1.1 SE** |
+
+**The tolerance was set at one standard error of the very quantity being targeted.**
+No targeting procedure, however clean, could hit it reliably. The miss is not
+regression to the mean and not a design flaw in the seed split — it is the i.i.d.
+estimator at 8 candidates/problem being too noisy for the job. Hitting Δ_art to ±0.03
+requires **more candidates per problem for the i.i.d. estimate**, not a different seed
+scheme.
+
+### The record-wide implication *(the phase's real product)*
+
+Every matched cell's relational position, Phases 7–10, is known only to about
+**±0.03** at 8 candidates/problem. The "on-target" bands the record has used —
+±0.05 (Phases 7/8), ±0.08 (Phase 9) — are **2–3 SE wide**. Consequences, stated
+without exaggeration:
+
+- Differences in Δ_art **below ~0.06** between two cells are **not resolvable**.
+  Cells described as sitting at different positions may not be.
+- The **D2 trough** (vertex −0.092, LOO [−0.12, −0.03]) is a quadratic fit over six
+  points each carrying ±0.03 of *horizontal* uncertainty, which the fit does not model.
+  The trough's *existence* is not challenged here; its *location* is softer than the
+  three-decimal figure suggests.
+- Phase 8's "recurring methodological finding" attributed Δ_art drift to **subset
+  composition**. That is real, but it is not the only cause: **plain sampling noise in
+  the i.i.d. estimate contributes ~±0.03 on its own**, and it does not go away by
+  iterating the targeting.
+
+### Post-hoc observation — flagged as a pointer, **not a result**
+
+R3 landed at Δ_art **−0.0396**; M4 sits at **−0.0393**. Near-identical relational
+position, R3 with higher n and a distinct seed:
+
+| | n | seed | Δ_art | i.i.d. | artifact | cond | cond − artifact | p |
+|---|---|---|---|---|---|---|---|---|
+| **M4** (Phase 7) | 20 | 17 | −0.0393 | 0.7023 | 0.6631 | 0.5738 | **−0.0893** | 0.0024 |
+| **R3** | 30 | 89 | −0.0396 | 0.7471 | 0.7075 | 0.6978 | **−0.0097** | 0.378 |
+
+**R3 does not reproduce M4's effect.** This is recorded because it bears on a LIVE
+claim, and it is **explicitly not adjudicated**, for three reasons: R3 is off its own
+pre-registered target (branch D); the subsets differ; and the absolute levels differ
+(M4's artifacts at 0.663, R3's at 0.708), so "same Δ_art" does not mean "same
+stimulus." Two readings survive and this cell cannot separate them — (a) the 7B effect
+at this position is not robust, or (b) the response depends on absolute level as well
+as relational position, which the whole matched-artifact program assumes it does not.
+
+**Standing of the 7B sink after today, stated plainly.** The C4 confirmation was
+withdrawn this morning (criterion drift); the leg now rests on **M4, n = 20, alone**;
+and the one higher-n cell near that position did not reproduce it. **No claim is
+retracted on this basis** — R3 was off-target and cannot carry a retraction. But the
+7B leg is weaker than the record currently states, and the discriminating test is
+named below.
+
+### What this phase licenses next *(named, not run)*
+
+1. **A powered targeting instrument.** Raise the i.i.d. estimate to ≥ 24
+   candidates/problem (SE ≈ 0.016) before any further matched cell. Without it, no
+   cell can be placed to ±0.03, and the position-gating story cannot be read finer
+   than ~0.06.
+2. **The M4-vs-R3 discriminator.** One pre-registered cell holding *absolute level*
+   fixed at M4's (artifact ≈ 0.663) with n ≥ 30 and the powered instrument decides
+   between readings (a) and (b) — and, with it, whether the 7B sink survives.
+
+**Cost:** R3 ran to completion, exit 0, app `ap-oeWV3hCy9soeQW5amTPZ3F`; Modal's daily
+billing had not posted at write-up time (recorded as pending, to be filled from
+`modal billing report` — **not** inferred from wall-time, per §8 entry 7).
+
+**Phase 10 does not close here.** R1 is closed (reframe dropped). R3 is closed as an
+instrument miss with the diagnostic as its product. The at-match 7B question is
+**re-opened and unanswered**, and the loop halts for author direction: item 1 above is
+a prerequisite for anything further in this line.
