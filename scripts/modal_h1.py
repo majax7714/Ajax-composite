@@ -2953,6 +2953,282 @@ def j12_probe():
     print("wrote artifacts/h12_internals_probe.json")
 
 
+# --- Phase 13 S1: per-head artifact attention ([PHASE_13.md] S1) ---
+@app.function(image=PPL_IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=5400)
+def j13_heads(model_id: str, revision: str, seqs: list, tag: str):
+    """Per-(layer, head) artifact-attention matrix, same sequences as P12."""
+    def compute():
+        import torch
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        tok = AutoTokenizer.from_pretrained(model_id, revision=revision)
+        model = AutoModelForCausalLM.from_pretrained(
+            model_id, revision=revision, torch_dtype=torch.bfloat16,
+            attn_implementation="eager").to("cuda").eval()
+        acc, n_ok = None, 0
+        for s in seqs:
+            if not s["gen"]:
+                continue
+            enc = tok(s["prompt"] + s["gen"], return_offsets_mapping=True,
+                      return_tensors="pt")
+            ids = enc.input_ids
+            offs = enc.offset_mapping[0].tolist()
+            if ids.shape[1] > P12_MAX_LEN or ids.shape[1] < 8:
+                continue
+            plen = len(tok(s["prompt"]).input_ids)
+            if plen >= ids.shape[1] - 1:
+                continue
+            a0, a1 = s["art_start"], s["art_end"]
+            art = [i for i, (b, e) in enumerate(offs) if b >= a0 and e <= a1 and e > b]
+            if not art:
+                continue
+            with torch.no_grad():
+                out = model(ids.to("cuda"), output_attentions=True)
+            gen_idx = list(range(plen, ids.shape[1]))
+            mat = []
+            for a in out.attentions:
+                m = a[0].float()[:, gen_idx, :]        # (H, G, S)
+                tot = m.sum(-1).clamp(min=1e-9)
+                mat.append((m[:, :, art].sum(-1) / tot).mean(-1).tolist())  # (H,)
+            del out
+            torch.cuda.empty_cache()
+            acc = mat if acc is None else [[x + y for x, y in zip(r0, r1)]
+                                           for r0, r1 in zip(acc, mat)]
+            n_ok += 1
+        if not n_ok:
+            return {"model": model_id, "n": 0}
+        mat = [[v / n_ok for v in row] for row in acc]
+        flat = sorted((v for row in mat for v in row), reverse=True)
+        tot = sum(flat) or 1e-9
+        k5 = max(1, int(round(0.05 * len(flat))))
+        top5 = sum(flat[:k5]) / tot
+        asc = sorted(flat)
+        nn = len(asc)
+        gini = (2 * sum((i + 1) * v for i, v in enumerate(asc)) / (nn * sum(asc))
+                - (nn + 1) / nn) if sum(asc) > 0 else 0.0
+        ranked = sorted(((li, hi, v) for li, row in enumerate(mat)
+                         for hi, v in enumerate(row)), key=lambda t: -t[2])
+        return {"model": model_id, "n": n_ok,
+                "n_layers": len(mat), "n_heads": len(mat[0]),
+                "top5pct_share": round(top5, 5), "gini": round(gini, 5),
+                "mean_head_artifact": round(sum(flat) / len(flat), 5),
+                "max_head_artifact": round(flat[0], 5),
+                "top_heads": [[li, hi, round(v, 5)] for li, hi, v in ranked[:32]],
+                "matrix": [[round(v, 5) for v in row] for row in mat]}
+    return _cache_or(tag, compute)
+
+
+def _p12_seqs():
+    """Build the P12 sequence set per model (shared by P12 and P13 S1)."""
+    cells = _p12_cells()
+    all_q = sorted({a["qid"] for arts, _ in cells.values() for a in arts})
+    qd = _load("j12_questions") or _persist(
+        "j12_questions", h1_dump_questions.remote(all_q))
+    qtext = {k: v["question_content"] for k, v in qd["questions"].items()}
+    out = {}
+    for rung, (arts, gens) in cells.items():
+        seqs = []
+        for a in arts[:P12_MAX_PROBLEMS]:
+            q = qtext.get(a["qid"])
+            if not q:
+                continue
+            prompt = _p12_prompt(q, _d2c_context(a))
+            code = (a.get("code") or "")[:3000]
+            i = prompt.find(code)
+            if i < 0 or not code:
+                continue
+            seqs.append({"qid": a["qid"], "prompt": prompt, "gen": gens.get(a["qid"]),
+                         "art_start": i, "art_end": i + len(code)})
+        out[rung] = seqs
+    return out
+
+
+@app.local_entrypoint()
+def j13_s1():
+    """S1 — per-head structure + ablation-target selection.
+    Pre-registered [PHASE_13.md] S1 at commit 9889cc7, BEFORE this ran."""
+    seqs = _p12_seqs()
+    res = {}
+    for rung, sq in seqs.items():
+        mid, rev, status = P12_MODELS[rung]
+        r = j13_heads.remote(mid, rev, sq, tag=f"j13_heads_{rung}")
+        res[rung] = r
+        print(f"  {rung:13s} ({status:5s}) n={r['n']:2d} {r['n_layers']}L x "
+              f"{r['n_heads']}H  top5%share {r['top5pct_share']:.4f}  "
+              f"gini {r['gini']:.4f}  max-head {r['max_head_artifact']:.4f}")
+    pairs = {"small (1.5B sink vs 1.3B clean)": ("coder1p5b", "deepseek1p3b"),
+             "large (3B sink vs 7B clean)": ("coder3b", "coder7b")}
+    verdicts = {}
+    for metric in ("top5pct_share", "gini"):
+        ds = []
+        for lab, (s, c) in pairs.items():
+            d = round(res[s][metric] - res[c][metric], 5)
+            ds.append(d)
+            print(f"  [{metric}] {lab}: sink {res[s][metric]:.4f} vs "
+                  f"clean {res[c][metric]:.4f}  Δ {d:+.5f}")
+        verdicts[metric] = ("tracks (both same sign)"
+                            if all(x < 0 for x in ds) or all(x > 0 for x in ds)
+                            else "does NOT track (pairs disagree)")
+    branch = ("1 — concentration tracks sink status"
+              if all(v.startswith("tracks") for v in verdicts.values())
+              else "2 — no consistent concentration difference")
+    print(f"\nS1 BRANCH: {branch}")
+    targets = res["coder1p5b"]["top_heads"][:16]
+    print(f"S2 target set (top-16 artifact heads, Coder-1.5B): "
+          f"{[(t[0], t[1]) for t in targets]}")
+    (REPO / "artifacts/h13_s1_heads.json").write_text(json.dumps(
+        {"_label": "Phase 13 S1 — per-head artifact attention [PHASE_13.md S1]",
+         "prereg_commit": "9889cc7",
+         "models": {k: {kk: vv for kk, vv in v.items() if kk != "matrix"}
+                    for k, v in res.items()},
+         "matrices": {k: v.get("matrix") for k, v in res.items()},
+         "pair_verdicts": verdicts, "branch": branch,
+         "s2_targets_coder1p5b": targets}, indent=2))
+    print("wrote artifacts/h13_s1_heads.json")
+
+
+# --- Phase 13 S2: head ablation ([PHASE_13.md] S2) ---
+P13_K = 16
+P13_SEED = 191
+P13_MAX_NEW = 1024
+
+
+@app.function(image=PPL_IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=10800)
+def j13_ablate_gen(model_id: str, revision: str, items: list, n: int, seed: int,
+                   ablate: list, tag: str, max_new: int = P13_MAX_NEW):
+    """HF generate with optional attention-head ablation.
+    ablate: [[layer, head], ...] — zeroed at the o_proj input slice."""
+    def compute():
+        import torch
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        tok = AutoTokenizer.from_pretrained(model_id, revision=revision)
+        if tok.pad_token is None:
+            tok.pad_token = tok.eos_token
+        model = AutoModelForCausalLM.from_pretrained(
+            model_id, revision=revision, torch_dtype=torch.bfloat16).to("cuda").eval()
+        cfg = model.config
+        hd = cfg.hidden_size // cfg.num_attention_heads
+        by_layer = {}
+        for li, hi in ablate:
+            by_layer.setdefault(int(li), []).append(int(hi))
+        handles = []
+
+        def mk(heads):
+            def pre(mod, args):
+                x = args[0].clone()
+                for h in heads:
+                    x[..., h * hd:(h + 1) * hd] = 0
+                return (x,) + args[1:]
+            return pre
+        for li, heads in by_layer.items():
+            handles.append(
+                model.model.layers[li].self_attn.o_proj.register_forward_pre_hook(mk(heads)))
+        print(f"[{tag}] ablating {len(ablate)} heads across {len(by_layer)} layers, "
+              f"head_dim={hd}")
+
+        out = []
+        for it in items:
+            torch.manual_seed(seed)
+            enc = tok(it["prompt"], return_tensors="pt").to("cuda")
+            with torch.no_grad():
+                g = model.generate(**enc, do_sample=True, temperature=0.8, top_p=1.0,
+                                   num_return_sequences=n, max_new_tokens=max_new,
+                                   pad_token_id=tok.pad_token_id)
+            codes = []
+            for row in g:
+                txt = tok.decode(row[enc.input_ids.shape[1]:], skip_special_tokens=True)
+                for stop in ("```", "\nProblem:"):
+                    i = txt.find(stop)
+                    if i >= 0:
+                        txt = txt[:i]
+                codes.append(txt.strip() or None)
+            out.append({"qid": it["qid"], "codes": codes})
+        for h in handles:
+            h.remove()
+        return out
+    return _cache_or(tag, compute)
+
+
+@app.local_entrypoint()
+def j13_s2():
+    """S2 — the intervention. Pre-registered [PHASE_13.md] S2 at 9889cc7."""
+    import random as _rnd
+    import statistics as st
+    mid, rev, _ = P12_MODELS["coder1p5b"]
+    s1 = json.loads((REPO / "artifacts/h13_s1_heads.json").read_text())
+    top = [[t[0], t[1]] for t in s1["s2_targets_coder1p5b"]][:P13_K]
+    L, H = s1["models"]["coder1p5b"]["n_layers"], s1["models"]["coder1p5b"]["n_heads"]
+    topset = {(a, b) for a, b in top}
+    pool_heads = [(li, hi) for li in range(L) for hi in range(H) if (li, hi) not in topset]
+    rnd = list(map(list, _rnd.Random(P13_SEED).sample(pool_heads, P13_K)))
+    print(f"top-{P13_K}: {[tuple(t) for t in top]}")
+    print(f"rnd-{P13_K}: {[tuple(t) for t in rnd]} (disjoint from top, seed {P13_SEED})")
+
+    arts, _g = _p12_cells()["coder1p5b"]
+    all_q = [a["qid"] for a in arts]
+    qd = _load("j12_questions") or _persist(
+        "j12_questions", h1_dump_questions.remote(all_q))
+    qtext = {k: v["question_content"] for k, v in qd["questions"].items()}
+    iid_items = [{"qid": a["qid"], "prompt": _p12_prompt(qtext[a["qid"]], None)}
+                 for a in arts if a["qid"] in qtext]
+    cond_items = [{"qid": a["qid"],
+                   "prompt": _p12_prompt(qtext[a["qid"]], _d2c_context(a))}
+                  for a in arts if a["qid"] in qtext]
+    art_frac = {a["qid"]: a["frac"] for a in arts}
+    print(f"n problems = {len(cond_items)}")
+
+    arms = {"B0_iid": (iid_items, []), "B1_cond": (cond_items, []),
+            "B2_topK": (cond_items, top), "B3_rndK": (cond_items, rnd)}
+    res = {}
+    for name, (items, ab) in arms.items():
+        g = _load(f"j13_{name}_cand") or _persist(
+            f"j13_{name}_cand",
+            j13_ablate_gen.remote(mid, rev, items, 8, P13_SEED, ab, tag=f"j13_{name}_cand"))
+        r = _load(f"j13_{name}_res") or _persist(
+            f"j13_{name}_res",
+            h1_lcb_exec.remote([x["qid"] for x in g], [x["codes"] for x in g],
+                               tag=f"j13_{name}_res"))
+        per = {x["qid"]: st.mean(c["frac"] for c in row) for x, row in zip(g, r)}
+        res[name] = per
+        print(f"  {name:9s} mean frac {st.mean(per.values()):.4f}  n={len(per)}")
+
+    qs = sorted(set.intersection(*[set(v) for v in res.values()]))
+    art = st.mean(art_frac[q] for q in qs)
+    means = {k: st.mean(res[k][q] for q in qs) for k in res}
+    sink = {k: round(means[k] - art, 4) for k in ("B1_cond", "B2_topK", "B3_rndK")}
+    print(f"\n  n={len(qs)}  artifact {art:.4f}  iid(B0) {means['B0_iid']:.4f}")
+    for k in ("B1_cond", "B2_topK", "B3_rndK"):
+        print(f"  {k:9s} cond {means[k]:.4f}  sink(cond-artifact) {sink[k]:+.4f}")
+
+    valid = sink["B1_cond"] <= -0.03
+    m2 = abs(sink["B2_topK"]) - abs(sink["B1_cond"])
+    m3 = abs(sink["B3_rndK"]) - abs(sink["B1_cond"])
+    below_iid = (means["B2_topK"] < means["B0_iid"] and means["B3_rndK"] < means["B0_iid"])
+    if not valid:
+        branch = (f"INCONCLUSIVE ON INSTRUMENT — B1 sink {sink['B1_cond']:+.4f} > -0.03; "
+                  "no arm comparison adjudicated")
+    elif below_iid:
+        branch = "C — both ablations fall below the i.i.d. arm; K too large (instrument miss)"
+    elif m2 < m3 - 0.01:
+        branch = "A — top-K ablation reduces the sink MORE than the random control"
+    elif abs(m2 - m3) <= 0.01:
+        branch = "B — top-K and random ablation move the sink indistinguishably"
+    else:
+        branch = "B' — random control moves the sink MORE than top-K (no targeted effect)"
+    print(f"\n  ΔsinkMagnitude vs B1: topK {m2:+.4f}  random {m3:+.4f}")
+    print(f"S2 BRANCH: {branch}")
+    (REPO / "artifacts/h13_s2_ablation.json").write_text(json.dumps(
+        {"_label": "Phase 13 S2 — head ablation [PHASE_13.md S2]",
+         "prereg_commit": "9889cc7", "model": mid, "K": P13_K, "seed": P13_SEED,
+         "max_new_tokens": P13_MAX_NEW, "n_problems": len(qs),
+         "top_heads": top, "random_heads": rnd,
+         "mean_artifact": round(art, 4),
+         "arm_means": {k: round(v, 4) for k, v in means.items()},
+         "sink_by_arm": sink,
+         "delta_sink_magnitude_vs_B1": {"topK": round(m2, 4), "random": round(m3, 4)},
+         "b1_validity_met": bool(valid), "branch": branch}, indent=2))
+    print("wrote artifacts/h13_s2_ablation.json")
+
+
 @app.local_entrypoint()
 def j9_g2_phi():
     """G2 (fired by the DIET branch) — phi-1 at its TRUE match, iterative-targeted

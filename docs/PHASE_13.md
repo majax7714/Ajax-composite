@@ -110,3 +110,99 @@ Loop spend before this phase: **$1.40** of the $90/$110 envelope; month-to-date
 ---
 
 *(Results append below.)*
+
+---
+
+## S1 RESULT (2026-07-25) — **BRANCH 1: artifact attention is more CONCENTRATED in sinking models** *(`h13_s1_heads.json`)*
+
+| model | status | dims | top-5% share | Gini | max head |
+|---|---|---|---|---|---|
+| Coder-1.5B | **sinks** | 28L × 12H | **0.2153** | **0.5619** | 0.634 |
+| Coder-3B | **sinks** | 36L × 16H | **0.2135** | **0.5506** | 0.675 |
+| Coder-7B | clean | 28L × 28H | 0.1833 | 0.4983 | 0.567 |
+| DeepSeek-1.3B | clean | 24L × 16H | 0.2013 | 0.5012 | 0.686 |
+
+| metric | small pair Δ | large pair Δ | tracks? |
+|---|---|---|---|
+| top-5% share | **+0.0140** | **+0.0302** | yes |
+| Gini | **+0.0608** | **+0.0523** | yes |
+
+**Branch 1 — the 30% underdog — fires.** Both metrics, both pairs, same sign. Read
+against Phase 12: the *total* artifact attention is identical across all four models
+(≈10%), but in sinking models that same mass flows through **fewer heads**. Magnitude
+is null; **distribution is not**. This is the first internal quantity in the record to
+track sink status.
+
+**Caveat, stated before the finding is used.** The four architectures differ in
+dimensions (12H / 16H / 28H), and Gini is not obviously invariant to head count. The
+available partial control is **DeepSeek-1.3B vs Coder-3B — both 16 heads per layer**,
+clean vs sinking: 0.5012 vs 0.5506, in the predicted direction. That is one comparison,
+and there remains exactly one model per cell. The pre-registered both-pairs rule is what
+this rests on, not the individual numbers.
+
+## S2 RESULT (2026-07-25) — **BRANCH C: K too large. Instrument miss.** *(`h13_s2_ablation.json`)*
+
+n = 44 problems, Coder-1.5B, K = 16 of 336 heads (4.8%), seed 191.
+
+| arm | ablation | mean frac | sink (cond − artifact) |
+|---|---|---|---|
+| **B0** i.i.d. | — | 0.4723 | — |
+| **B1** conditioned | none | 0.3976 | **−0.0613** |
+| **B2** conditioned | top-16 artifact heads | **0.0219** | −0.4370 |
+| **B3** conditioned | random 16 (disjoint) | **0.1589** | −0.3000 |
+
+Both ablation arms collapse far below the i.i.d. arm — the model is destroyed, not
+perturbed. **Branch C fires: uninformative about the sink.**
+
+**Per the frozen decision rule, K is NOT retuned inside this phase.** The temptation to
+immediately re-run at K = 2 is exactly what the rule was written to prevent; a
+successor phase pre-registers the smaller K. *(Recorded because resisting it is the
+only thing that makes the rule worth having.)*
+
+**What the arms do show, flagged exploratory:** B2 (0.022) destroys capability more than
+B3 (0.159), so the S1 selection did pick functionally load-bearing heads rather than
+noise — but that is about **general capability**, not about the sink, and it is the
+reason the comparison is uninformative: at K = 16 the sink measurement is swamped by
+capability collapse.
+
+### The phase's real yield — **the sink replicates on a second stack**
+
+The validity condition was **met**, and it is worth more than a gate check:
+
+| stack | artifact | cond | **sink** | n |
+|---|---|---|---|---|
+| **vLLM** (P11) | 0.4589 | 0.4067 | **−0.0522** | 44 |
+| **HF transformers** (P13 B1) | 0.4589 | 0.3976 | **−0.0613** | 44 |
+
+Same problems, same artifacts, **different inference stack, different sampler
+implementation**, and the sink reproduces at comparable magnitude. Every sink number in
+this record from Phase M onward has come from vLLM; §8 (D14) retired bit-reproducibility
+for a statistical standard, and the fp16/other-stack replication was listed as an open
+limitation in §0.2's extraction spec. **That limitation is now discharged for the 1.5B
+rung.** It was obtained as a by-product of an intervention that otherwise failed.
+
+## PHASE GATE — CLOSED (2026-07-25)
+
+1. **S1 run; branch recorded** (1 — concentration tracks sink status, both metrics,
+   both pairs), with the head-count caveat and its partial control on the page. ✓
+2. **S2 run; branch recorded** (C — instrument miss), and **K deliberately not retuned
+   in-phase**. ✓
+3. **Cross-stack replication of the sink obtained and recorded.** ✓
+4. **No causal claim made** — the intervention was uninformative, so the "causes"
+   language the charter contemplated is not used. ✓
+
+**Prediction accounting.** S1: branch 1 at **30% — HIT** (the underdog; 55% and 15% did
+not fire). S2: branch **C at 20% — FIRED**; A (35%) and B (40%) did not. Across the
+phase, one underdog hit and one 20% branch fired — the loop's substantive priors remain
+mediocre, which is now a stable enough pattern across Phases 10–13 to be worth stating
+rather than re-explaining each time.
+
+**Cost.** Phase 13 **$1.18** (S1 ≈ $0.05, S2 ≈ $1.13) against a $0.50–2.00 estimate —
+**inside the band**, and the band was deliberately wide because the HF generate path had
+no calibration data. It now does: HF generation costs roughly **4–5× vLLM** for the same
+work. Loop total **$2.58** of the $90/$110 envelope; month-to-date **$80.62** of $200.
+
+**Open.** The ablation at a viable K — a **dose-response** design rather than a single
+point, since the confound S2 exposed is that ablating any important head costs general
+capability, and the two arms must be compared **at matched capability cost**. That is
+Phase 14. **Nothing is running; Phase 13 is closed.**

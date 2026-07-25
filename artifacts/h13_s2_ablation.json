@@ -1,0 +1,159 @@
+{
+  "_label": "Phase 13 S2 \u2014 head ablation [PHASE_13.md S2]",
+  "prereg_commit": "9889cc7",
+  "model": "Qwen/Qwen2.5-Coder-1.5B",
+  "K": 16,
+  "seed": 191,
+  "max_new_tokens": 1024,
+  "n_problems": 44,
+  "top_heads": [
+    [
+      8,
+      3
+    ],
+    [
+      14,
+      3
+    ],
+    [
+      19,
+      3
+    ],
+    [
+      19,
+      1
+    ],
+    [
+      16,
+      0
+    ],
+    [
+      16,
+      2
+    ],
+    [
+      19,
+      4
+    ],
+    [
+      19,
+      5
+    ],
+    [
+      14,
+      2
+    ],
+    [
+      16,
+      11
+    ],
+    [
+      14,
+      6
+    ],
+    [
+      12,
+      1
+    ],
+    [
+      16,
+      4
+    ],
+    [
+      14,
+      0
+    ],
+    [
+      12,
+      6
+    ],
+    [
+      14,
+      4
+    ]
+  ],
+  "random_heads": [
+    [
+      23,
+      10
+    ],
+    [
+      24,
+      11
+    ],
+    [
+      23,
+      2
+    ],
+    [
+      22,
+      9
+    ],
+    [
+      6,
+      2
+    ],
+    [
+      18,
+      2
+    ],
+    [
+      21,
+      9
+    ],
+    [
+      2,
+      5
+    ],
+    [
+      27,
+      7
+    ],
+    [
+      4,
+      10
+    ],
+    [
+      2,
+      0
+    ],
+    [
+      18,
+      3
+    ],
+    [
+      21,
+      11
+    ],
+    [
+      16,
+      6
+    ],
+    [
+      19,
+      2
+    ],
+    [
+      16,
+      7
+    ]
+  ],
+  "mean_artifact": 0.4589,
+  "arm_means": {
+    "B0_iid": 0.4723,
+    "B1_cond": 0.3976,
+    "B2_topK": 0.0219,
+    "B3_rndK": 0.1589
+  },
+  "sink_by_arm": {
+    "B1_cond": -0.0613,
+    "B2_topK": -0.437,
+    "B3_rndK": -0.3
+  },
+  "delta_sink_magnitude_vs_B1": {
+    "topK": 0.3757,
+    "random": 0.2387
+  },
+  "b1_validity_met": true,
+  "branch": "C \u2014 both ablations fall below the i.i.d. arm; K too large (instrument miss)"
+}
