@@ -2643,6 +2643,108 @@ def j10_r5():
           f"    BRANCH: {branch} ===")
 
 
+# --- Phase 11: the Coder ladder at match, powered ([PHASE_11.md]) ---
+P11_MODELS = {
+    "coder1p5b": ("Qwen/Qwen2.5-Coder-1.5B", "df3ce67c0e24480f20468b6ef2894622d69eb73b"),
+    "coder3b":   ("Qwen/Qwen2.5-Coder-3B",   "09d9bc5d376b0cfa0100a0694ea7de7232525803"),
+}
+P11_SWEEP_SEED = 151
+P11_CELL_SEED = 173
+P11_MIN_N = 30
+P11_PRED_TOL = 0.010
+P11_ON_TARGET = 0.020
+
+
+@app.local_entrypoint()
+def j11_ladder(cell: str = "coder1p5b"):
+    """Phase 11 — powered k=24 sweep + at-match cell for a Coder rung.
+    Pre-registered [PHASE_11.md] at commit 3f7f8a8, BEFORE this ran."""
+    import statistics as st
+    if cell not in P11_MODELS:
+        raise SystemExit(f"unknown rung '{cell}'; choose from {list(P11_MODELS)}")
+    mid, rev = P11_MODELS[cell]
+    qids, pool = _r3_donor_pool()
+
+    g = _load(f"j11_sweep_cand_{cell}") or _persist(
+        f"j11_sweep_cand_{cell}",
+        h1_gen_lcb.remote(mid, [{"qid": q, "context": None} for q in qids], 24,
+                          tag=f"j11_sweep_cand_{cell}", seed=P11_SWEEP_SEED, revision=rev))
+    r = _load(f"j11_sweep_res_{cell}") or _persist(
+        f"j11_sweep_res_{cell}",
+        h1_lcb_exec.remote([x["qid"] for x in g], [x["codes"] for x in g],
+                           tag=f"j11_sweep_res_{cell}"))
+    powered = {x["qid"]: st.mean(c["frac"] for c in row) for x, row in zip(g, r)}
+    print(f"[{cell}] powered k=24 sweep: {len(powered)} problems, "
+          f"mean i.i.d. {st.mean(powered.values()):.4f} (seed {P11_SWEEP_SEED})")
+
+    grid = []
+    for i in range(71):
+        ctr = 0.20 + 0.01 * i
+        for hw in (0.05, 0.06, 0.07, 0.08, 0.09, 0.10):
+            s = _r3_select(pool, qids, powered, ctr, hw)
+            if len(s) < P11_MIN_N:
+                continue
+            ma = st.mean(c[1] for c in s.values())
+            si = st.mean(powered[q] for q in s)
+            grid.append({"target": round(ctr, 3), "hw": hw, "n": len(s),
+                         "mean_art": round(ma, 4), "subset_iid": round(si, 4),
+                         "pred_dart": round(ma - si, 4)})
+    ok = [x for x in grid if abs(x["pred_dart"]) <= P11_PRED_TOL]
+    if not ok:
+        near = sorted(grid, key=lambda x: abs(x["pred_dart"]))[:5]
+        print(f"[{cell}] INFEASIBLE at n>={P11_MIN_N}; nearest {near}")
+        (REPO / f"artifacts/h11_targeting_{cell}.json").write_text(json.dumps(
+            {"_label": f"Phase 11 targeting {cell}", "grid": grid, "chosen": None,
+             "nearest": near, "branch": "L4 — infeasible"}, indent=2))
+        return
+    ch = sorted(ok, key=lambda x: (-x["n"], abs(x["pred_dart"]), x["hw"]))[0]
+    print(f"[{cell}] targeting: target {ch['target']} ±{ch['hw']}  n={ch['n']}  "
+          f"art {ch['mean_art']:.4f}  iid {ch['subset_iid']:.4f}  "
+          f"pred Δart {ch['pred_dart']:+.4f}")
+    (REPO / f"artifacts/h11_targeting_{cell}.json").write_text(json.dumps(
+        {"_label": f"Phase 11 targeting {cell} [PHASE_11.md]", "grid": grid,
+         "chosen": ch, "sweep_seed": P11_SWEEP_SEED, "cell_seed": P11_CELL_SEED},
+        indent=2))
+
+    sel = _r3_select(pool, qids, powered, ch["target"], ch["hw"])
+    arts = [{"qid": q, "cand_idx": c[0], "code": c[2], "frac": c[1],
+             "n_tests": c[3], "n_failed": c[3] - c[4]} for q, c in sorted(sel.items())]
+    out = _matched_cell(mid, rev, P11_CELL_SEED, arts, f"P11_{cell}",
+                        f"donor pool @ {ch['target']} ±{ch['hw']}, powered k=24 "
+                        f"(sweep seed {P11_SWEEP_SEED}), cell seed {P11_CELL_SEED}")
+
+    n = out["n_problems"]
+    dres = _load(f"j8_res_P11_{cell}")
+    e1 = [st.mean(x["frac"] for x in row) for row in dres[n:]]
+    d_copy = [a - b["frac"] for a, b in zip(e1, arts)]
+    p_copy = _wilcoxon_mc_one_sided([-x for x in d_copy])
+    me0, me1, mc = out["mean_iid_e0"], out["mean_cond_e1"], out["mean_copy_null"]
+    resid = round(me1 - mc, 4)
+    dart_p = round(mc - ch["subset_iid"], 4)
+    below_both = bool(me1 < me0 and me1 < mc and p_copy < 0.05 and resid <= -0.05)
+    on_target = abs(dart_p) <= P11_ON_TARGET
+    verdict = ("OFF-TARGET/UNDERPOWERED" if (not on_target or n < P11_MIN_N)
+               else "SINK (below both nulls)" if below_both
+               else "NO SINK" if resid > -0.03 else "INTERMEDIATE")
+    adj = {"_label": f"Phase 11 {cell} result [PHASE_11.md]", "prereg_commit": "3f7f8a8",
+           "rung": cell, "cell": out, "n": n,
+           "achieved_delta_art_powered": dart_p,
+           "achieved_delta_art_cell_k8": out["actual_delta_art"],
+           "predicted_delta_art": ch["pred_dart"],
+           "dart_prediction_hit": bool(abs(dart_p) <= P11_ON_TARGET),
+           "residual_cond_minus_artifact": resid,
+           "p_one_sided_cond_below_artifact": p_copy,
+           "below_both_nulls": below_both,
+           "matched_sink_signature_legacy": out["matched_sink_signature"],
+           "on_target": on_target, "verdict": verdict, "targeting": ch}
+    (REPO / f"artifacts/h11_{cell}.json").write_text(json.dumps(adj, indent=2))
+    print(f"\n=== P11 {cell}: n={n}  Δart {dart_p:+.4f} (pred {ch['pred_dart']:+.4f})  "
+          f"iid {me0:.4f} → cond {me1:.4f}  artifact {mc:.4f}\n"
+          f"    cond-artifact {resid:+.4f}  p {p_copy:.4f}  "
+          f"BELOW-BOTH-NULLS {below_both} (legacy {out['matched_sink_signature']})\n"
+          f"    VERDICT: {verdict} ===")
+
+
 @app.local_entrypoint()
 def j9_g2_phi():
     """G2 (fired by the DIET branch) — phi-1 at its TRUE match, iterative-targeted
