@@ -158,3 +158,26 @@ corrected in the record. Practice, now binding on the loop:
 - **Forward cost estimates are recorded and then reconciled against the bill at phase
   close**, so the estimator's bias is measured rather than assumed. The record's
   estimates have run high every time they have been checked.
+
+## Amendment 3 (2026-07-25) — **envelope raised to $100 report / $120 hard stop, on the month-to-date figure**
+
+*Author instruction, verbatim: "were at 82.82 current spend, you can push to 100/120
+since ive checked in."*
+
+**Which number this governs, stated because the two differ by ~17×.** At the time of the
+instruction, **loop** spend since 2026-07-24 was **$4.76** (the figure §4's $90/$110
+governed) while **month-to-date workspace** spend was **$82.82** (the figure the $200 cap
+governs). The author quoted the month-to-date figure, so the new thresholds are applied to
+**month-to-date workspace spend**: **$100 report / $120 hard stop**.
+
+**Why this reading and not the other.** Applied to the *loop* envelope, $120 would put
+month-to-date at ≈$198 against a $200 cap — through §4's standing guard that a phase is
+not launched if its estimate would bring the month within $30 of the cap. Applied to
+month-to-date, $120 leaves the guard intact ($120 + $30 < $200). The conservative reading
+is also the one consistent with the frozen spec, and it costs nothing operationally: it
+leaves ≈$17 before report and ≈$37 before hard stop, which is 8+ phases at the measured
+burn rate (Phases 12–16: $0.02–$2.15 each).
+
+**Unchanged:** §4's within-$30-of-cap launch guard; §3's halt list, including the 1:1
+refutation rule. If the author intended the loop envelope rather than the month-to-date
+figure, that is a one-line re-amendment — it would not change behaviour for many phases.
