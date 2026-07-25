@@ -760,3 +760,113 @@ finding, propagated no further without author sign-off, since it touches a mecha
 claim. If 2 holds, D2 stands with a corrected vertex. If 3, the honest report is that
 the response curve is not estimable at the record's current cell count, and that is
 itself worth knowing before any further mechanism work.
+
+---
+
+## R5 RESULT (2026-07-25) — **BRANCH A: no sink at true match.** The position the claim named, measured at last *(`h10_r5_coder7b_truematch0.json`)*
+
+Targeting on the cached powered map (free): **target 0.74 ±0.10, n = 29**, predicted
+Δ_art **+0.0023**. Achieved: **+0.0023** — exact to four decimals, the second
+consecutive time the powered instrument has hit its target.
+
+| | n | Δ_art | i.i.d. | artifact | cond | **cond − artifact** | p | below both nulls | legacy |
+|---|---|---|---|---|---|---|---|---|---|
+| **R5** | 29 | **+0.0023** | 0.7526 | 0.7264 | 0.7184 | **−0.0080** | 0.409 | **NO** | **False** |
+
+**Both criteria agree here**, as the pre-registration anticipated: at Δ_art ≈ 0 the two
+nulls converge, so this is the one cell in the phase whose verdict cannot be an artifact
+of which definition is used. The legacy signature — the one that manufactured C4's false
+confirmation and would have manufactured another from R4 — returns **False** as well.
+
+### The complete Coder-7B series
+
+| cell | n | Δ_art | cond − artifact |
+|---|---|---|---|
+| **M4** (P7) | 20 | −0.039 | **−0.089** — *retracted, non-replicating* |
+| **C4** (P8) | 37 | −0.101 | −0.003 |
+| **R3** (P10) | 30 | −0.040 | −0.010 |
+| **R4** (P10) | 37 | −0.047 | −0.004 |
+| **R5** (P10) | 29 | **+0.002** | −0.008 |
+
+**Four independent cells, n = 29–37, spanning Δ_art −0.101 → +0.002, all showing
+cond − artifact between −0.010 and −0.003.** Qwen2.5-Coder-7B tracks the artifact it is
+conditioned on across the entire measured range, including at exact match. The
+retraction is no longer merely "the support failed" — **the absence is now positively
+measured at the position the claim named.**
+
+## R6 RESULT (2026-07-25) — **the trough SURVIVES the retraction, with a corrected vertex** *(`h10_r6_d2_refit.json`)*
+
+| fit | n points | vertex | interior | convex | R² |
+|---|---|---|---|---|---|
+| original as published | 6 | −0.0923 | yes | yes | 0.835 |
+| M4 removed | 5 | −0.1021 | yes | yes | 0.831 |
+| **M4 removed + C4/R3/R4/R5** | **9** | **−0.1428** | yes | yes | **0.817** |
+
+| prediction | odds | outcome |
+|---|---|---|
+| 1 — no single Coder trough; D2 was pooling scales | **55%** | **MISS** |
+| 2 — trough survives with a shifted vertex | 30% | **HIT** |
+| 3 — underdetermined | 15% | MISS |
+
+**Phase 8's POSITION-GATED call stands.** It is not scale-confounded in the way
+prediction 1 proposed, and it does not need the flag the decision rule would have
+attached. The vertex moves **−0.092 → −0.143** on a fit with 50% more points and a
+retracted one removed, so D2's *shape* claim is more robustly supported now than when
+published, though its *location* has moved by more than the LOO interval Phase 8
+reported ([−0.12, −0.03]) — that interval should be read as having been optimistic.
+
+**Why prediction 1 missed, stated exactly.** Its criterion had two conjuncts: 7B
+near-match residuals all within ±0.03, **and** ≤3B residuals ≤ −0.05. The second held
+cleanly (−0.076, −0.121). The first failed on **R5 at −0.0366**. Reported as a miss.
+
+*Flagged observation, not a claim:* the residual separation is nonetheless clean and
+non-overlapping — 7B cells span [−0.037, −0.003] and ≤3B cells [−0.121, −0.076]. That
+pattern is consistent with a scale effect the pooled quadratic does not model, but my
+own pre-registered test for it failed, so **it is recorded as a pointer and nothing is
+built on it.** Deciding it needs 7B and ≤3B curves fit separately, which the record
+does not yet have the cells to support.
+
+---
+
+## PHASE GATE — CLOSED (2026-07-25)
+
+1. **The sign/band question** — dissolved, not answered. P0.3 showed the premise stale
+   (Phase 9 had already sampled Δ_art < 0) and P0.2 showed the criterion that would have
+   answered it was broken below zero. ✓
+2. **The gain/residual reframe** — pre-registered, tested, **DROPPED** by its own rule
+   (R1, 1/4). ✓
+3. **The 7B sink** — C4's confirmation withdrawn (criterion drift), M4 shown
+   non-replicating on its own inputs, and absence positively measured at true match.
+   **RETRACTED**, propagated across 9 claim sites with author authorisation. ✓
+4. **The targeting instrument** — the ±0.03 positional uncertainty diagnosed (R3),
+   fixed by augmentation to k = 24 (R4), and validated twice: predicted −0.0467 →
+   achieved −0.0466; predicted +0.0023 → achieved +0.0023. ✓
+5. **D2's trough** — refit without the retracted point and with four new cells;
+   **survives**, vertex corrected. ✓
+
+**Post-phase claim state.** The **1.5B Coder-diet sink is untouched** (D2c −0.121,
+G1c −0.155, G1d −0.193) and remains provenance-controlled (Phase 9). **The 7B leg is
+gone.** The **scale question is OPEN**: the sink is measured at 1.5B–3B and *absent* at
+7B on matched evidence, which resembles the J5/Phase-6 "scale-bounded" reading — but
+that reading is not thereby restored, because Phase 7's critique of its evidence
+(measured only far over-quality) still stands. What the record can now say is narrower
+and better supported than either previous position: **measured at match, the sink is
+present at 1.5B and absent at 7B.**
+
+**Prediction accounting, full phase.** R1 #1 **70% MISS**, #2 55% MISS, #3 60% HIT,
+#4 45% MISS; R3 branch **D at 5% FIRED**, methodological **65% MISS**; R4 **A at 45%
+MISS**, B at 35% fired, methodological **75% HIT**; R5 **A at 60% HIT**; R6 #1 **55%
+MISS**, #2 30% HIT. **Three of eleven favourites hit.** Both methodological predictions
+about the *instrument* behaved as designed once the instrument was fixed; the
+substantive priors were poor, and the phase's product is mostly the correction of
+things the record already believed.
+
+**Cost.** Loop total **$0.70** (R3 ≈$0.27, R4 ≈$0.31, R5 ≈$0.12) against the $90/$110
+envelope; month-to-date **$78.74** of the $200 cap. Estimates were $2–5 (R3, ~10× high),
+$0.30–0.60 (R4, accurate), $0.10–0.25 (R5, accurate) — the calibration correction in
+Amendment 2 took effect immediately and held.
+
+**Nothing is running; Phase 10 is closed.** Open successors carried forward: the 7B/≤3B
+separate-curve question (R6's flagged pointer); a clean model below Δ_art 0 at the
+*powered* instrument; and the re-priced **internals probe**, which P0.1 un-shelved and
+which is now the phase-11 candidate.

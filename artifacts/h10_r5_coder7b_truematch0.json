@@ -1,0 +1,53 @@
+{
+  "_label": "Phase 10 R5 result [PHASE_10.md R5]",
+  "prereg_commit": "f66632d",
+  "cell": {
+    "_label": "Phase 8 R5_coder7b_truematch0 [PHASE_8.md]",
+    "cell": "R5_coder7b_truematch0",
+    "model": "Qwen/Qwen2.5-Coder-7B",
+    "revision": "0396a76181e127dfc13e5c5ec48a8cee09938b02",
+    "seed": 131,
+    "n_problems": 29,
+    "source": "donor pool @ 0.74 \u00b10.1, powered k=24, cell seed 131",
+    "mean_iid_e0": 0.7526,
+    "mean_cond_e1": 0.7184,
+    "mean_copy_null": 0.7264,
+    "delta_cond_minus_iid": -0.0343,
+    "delta_cond_minus_iid_ci95": [
+      -0.1016,
+      0.0373
+    ],
+    "actual_delta_art": -0.0263,
+    "p_one_sided_cond_below_iid": 0.1720413979301035,
+    "matched_sink_signature": false,
+    "stack": {
+      "gpu_name": "NVIDIA L4",
+      "gpu_capability": "8.9",
+      "dtype": "bfloat16",
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "vllm": "0.11.0",
+      "gen_template_hash": "1e43a51cdc2cc3b5",
+      "d2c_context_hash": "b9323ddf1a9b253d",
+      "judge_hash": "dbd4f9fa650a6a2f"
+    }
+  },
+  "n": 29,
+  "achieved_delta_art_powered": 0.0023,
+  "achieved_delta_art_cell_k8": -0.0263,
+  "predicted_delta_art": 0.0023,
+  "residual_cond_minus_artifact": -0.008,
+  "p_one_sided_cond_below_artifact": 0.40932953352332385,
+  "below_both_nulls": false,
+  "matched_sink_signature_legacy": false,
+  "on_target": true,
+  "branch": "A \u2014 NO SINK at true match",
+  "targeting": {
+    "target": 0.74,
+    "hw": 0.1,
+    "n": 29,
+    "mean_art": 0.7264,
+    "subset_iid": 0.7241,
+    "pred_dart": 0.0023
+  }
+}

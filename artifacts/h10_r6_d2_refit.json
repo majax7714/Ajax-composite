@@ -1,0 +1,181 @@
+{
+  "_label": "Phase 10 R6 \u2014 D2 refit after the M4 retraction [PHASE_10.md R6]",
+  "prereg_commit": "f66632d",
+  "retracted_point": [
+    [
+      -0.0393,
+      -0.1286,
+      "M4 Coder-7B*"
+    ]
+  ],
+  "original_points": [
+    [
+      -0.1645,
+      -0.05,
+      "Coder-7B"
+    ],
+    [
+      -0.0744,
+      -0.1502,
+      "Coder-3B"
+    ],
+    [
+      -0.0393,
+      -0.1286,
+      "M4 Coder-7B*"
+    ],
+    [
+      0.026,
+      -0.0947,
+      "Coder-1.5B"
+    ],
+    [
+      0.0814,
+      0.0443,
+      "M5 Coder-0.5B*"
+    ],
+    [
+      0.2837,
+      0.1781,
+      "Coder-0.5B"
+    ]
+  ],
+  "added_points": [
+    [
+      -0.1007,
+      -0.1034,
+      "C4 Coder-7B n=37"
+    ],
+    [
+      -0.0396,
+      -0.0492,
+      "R3 Coder-7B n=30"
+    ],
+    [
+      -0.0466,
+      -0.0566,
+      "R4 Coder-7B n=37"
+    ],
+    [
+      0.0023,
+      -0.0343,
+      "R5 Coder-7B (true match)"
+    ]
+  ],
+  "fits": {
+    "original_as_published": {
+      "quad": [
+        2.0865,
+        0.3853,
+        -0.0832
+      ],
+      "r2": 0.8352,
+      "vertex_dart": -0.0923,
+      "vertex_interior": true,
+      "convex": true,
+      "linear_slope": 0.667,
+      "n_points": 6,
+      "x_range": [
+        -0.1645,
+        0.2837
+      ]
+    },
+    "m4_removed": {
+      "quad": [
+        1.9029,
+        0.3887,
+        -0.0721
+      ],
+      "r2": 0.8305,
+      "vertex_dart": -0.1021,
+      "vertex_interior": true,
+      "convex": true,
+      "linear_slope": 0.6331,
+      "n_points": 5,
+      "x_range": [
+        -0.1645,
+        0.2837
+      ]
+    },
+    "m4_removed_plus_new_7b": {
+      "quad": [
+        1.5115,
+        0.4317,
+        -0.0561
+      ],
+      "r2": 0.8174,
+      "vertex_dart": -0.1428,
+      "vertex_interior": true,
+      "convex": true,
+      "linear_slope": 0.6325,
+      "n_points": 9,
+      "x_range": [
+        -0.1645,
+        0.2837
+      ]
+    }
+  },
+  "residuals_near_match": {
+    "window_dart": [
+      -0.12,
+      0.03
+    ],
+    "coder_7b": [
+      {
+        "label": "C4 Coder-7B n=37",
+        "dart": -0.1007,
+        "resid": -0.0027
+      },
+      {
+        "label": "R3 Coder-7B n=30",
+        "dart": -0.0396,
+        "resid": -0.0096
+      },
+      {
+        "label": "R4 Coder-7B n=37",
+        "dart": -0.0466,
+        "resid": -0.01
+      },
+      {
+        "label": "R5 Coder-7B (true match)",
+        "dart": 0.0023,
+        "resid": -0.0366
+      }
+    ],
+    "coder_le_3b": [
+      {
+        "label": "Coder-3B",
+        "dart": -0.0744,
+        "resid": -0.0758
+      },
+      {
+        "label": "Coder-1.5B",
+        "dart": 0.026,
+        "resid": -0.1207
+      }
+    ]
+  },
+  "predictions": {
+    "p1_scale_pooled": {
+      "odds": 0.55,
+      "hit": false
+    },
+    "p2_trough_survives": {
+      "odds": 0.3,
+      "hit": true
+    },
+    "p3_underdetermined": {
+      "odds": 0.15,
+      "hit": false
+    }
+  },
+  "d2_as_published": {
+    "vertex": -0.0923,
+    "deepest": {
+      "dart": -0.0744,
+      "dcond": -0.1502,
+      "interior": true
+    },
+    "r2": 0.835
+  }
+}

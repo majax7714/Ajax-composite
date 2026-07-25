@@ -2541,6 +2541,108 @@ def j10_r4():
           f"    BRANCH: {branch} ===")
 
 
+# --- Phase 10 R5: Coder-7B at TRUE match ([PHASE_10.md] R5) ---
+R5_CELL_SEED = 131
+R5_MIN_N = 25
+R5_ON_TARGET = 0.020
+R5_PRED_TOL = 0.010
+
+
+def _r4_powered_map():
+    """Rebuild the cached k=24 map (seeds 71 + 91). No GPU."""
+    import statistics as st
+    g71, r71 = _load("j10_r3_selsweep_cand"), _load("j10_r3_selsweep_res")
+    g91, r91 = _load("j10_r4_aug_cand"), _load("j10_r4_aug_res")
+    assert g71 and r71 and g91 and r91, "powered map inputs missing"
+    f71 = {x["qid"]: [c["frac"] for c in row] for x, row in zip(g71, r71)}
+    f91 = {x["qid"]: [c["frac"] for c in row] for x, row in zip(g91, r91)}
+    out, k = {}, {}
+    for q in set(f71) | set(f91):
+        v = f71.get(q, []) + f91.get(q, [])
+        out[q], k[q] = st.mean(v), len(v)
+    return out, min(k.values())
+
+
+@app.local_entrypoint()
+def j10_r5():
+    """R5 — Coder-7B at TRUE match (Δ_art ~ 0). Pre-registered [PHASE_10.md] R5 at
+    commit f66632d, BEFORE this ran. Targeting map is cached (free)."""
+    import statistics as st
+    mid, rev = R3_MODEL
+    qids, pool = _r3_donor_pool()
+    powered, kmin = _r4_powered_map()
+    print(f"powered map (cached): {len(powered)} problems, k={kmin}")
+
+    grid = []
+    for i in range(61):
+        ctr = 0.50 + 0.01 * i
+        for hw in (0.05, 0.06, 0.07, 0.08, 0.09, 0.10):
+            s = _r3_select(pool, qids, powered, ctr, hw)
+            if len(s) < R5_MIN_N:
+                continue
+            ma = st.mean(c[1] for c in s.values())
+            si = st.mean(powered[q] for q in s)
+            grid.append({"target": round(ctr, 3), "hw": hw, "n": len(s),
+                         "mean_art": round(ma, 4), "subset_iid": round(si, 4),
+                         "pred_dart": round(ma - si, 4)})
+    ok = [x for x in grid if abs(x["pred_dart"]) <= R5_PRED_TOL]
+    if not ok:
+        print("INFEASIBLE — branch D")
+        (REPO / "artifacts/h10_r5_targeting.json").write_text(json.dumps(
+            {"_label": "Phase 10 R5 targeting", "grid": grid, "chosen": None,
+             "branch": "D — infeasible"}, indent=2))
+        return
+    ch = sorted(ok, key=lambda x: (-x["n"], abs(x["pred_dart"]), x["hw"]))[0]
+    print(f"targeting: target {ch['target']} ±{ch['hw']}  n={ch['n']}  "
+          f"art {ch['mean_art']:.4f}  iid {ch['subset_iid']:.4f}  "
+          f"pred Δart {ch['pred_dart']:+.4f}")
+    (REPO / "artifacts/h10_r5_targeting.json").write_text(json.dumps(
+        {"_label": "Phase 10 R5 targeting [PHASE_10.md R5]", "powered_k_min": kmin,
+         "cell_seed": R5_CELL_SEED, "grid": grid, "chosen": ch}, indent=2))
+
+    sel = _r3_select(pool, qids, powered, ch["target"], ch["hw"])
+    arts = [{"qid": q, "cand_idx": c[0], "code": c[2], "frac": c[1],
+             "n_tests": c[3], "n_failed": c[3] - c[4]} for q, c in sorted(sel.items())]
+    out = _matched_cell(mid, rev, R5_CELL_SEED, arts, "R5_coder7b_truematch0",
+                        f"donor pool @ {ch['target']} ±{ch['hw']}, powered k={kmin}, "
+                        f"cell seed {R5_CELL_SEED}")
+
+    n = out["n_problems"]
+    dres = _load("j8_res_R5_coder7b_truematch0")
+    e1 = [st.mean(x["frac"] for x in row) for row in dres[n:]]
+    d_copy = [a - b["frac"] for a, b in zip(e1, arts)]
+    p_copy = _wilcoxon_mc_one_sided([-x for x in d_copy])
+    me0, me1, mc = out["mean_iid_e0"], out["mean_cond_e1"], out["mean_copy_null"]
+    resid = round(me1 - mc, 4)
+    dart_p = round(mc - ch["subset_iid"], 4)
+    below_both = bool(me1 < me0 and me1 < mc and p_copy < 0.05 and resid <= -0.05)
+    on_target = abs(dart_p) <= R5_ON_TARGET
+    if not on_target or n < R5_MIN_N:
+        branch = f"D — off-target (Δart {dart_p:+.4f}) or n={n}<{R5_MIN_N}"
+    elif below_both:
+        branch = "B — SINK AT TRUE MATCH"
+    elif resid > -0.03:
+        branch = "A — NO SINK at true match"
+    else:
+        branch = "C — intermediate"
+    adj = {"_label": "Phase 10 R5 result [PHASE_10.md R5]", "prereg_commit": "f66632d",
+           "cell": out, "n": n, "achieved_delta_art_powered": dart_p,
+           "achieved_delta_art_cell_k8": out["actual_delta_art"],
+           "predicted_delta_art": ch["pred_dart"],
+           "residual_cond_minus_artifact": resid,
+           "p_one_sided_cond_below_artifact": p_copy,
+           "below_both_nulls": below_both,
+           "matched_sink_signature_legacy": out["matched_sink_signature"],
+           "on_target": on_target, "branch": branch, "targeting": ch}
+    (REPO / "artifacts/h10_r5_coder7b_truematch0.json").write_text(
+        json.dumps(adj, indent=2))
+    print(f"\n=== R5: n={n}  Δart {dart_p:+.4f} (pred {ch['pred_dart']:+.4f})  "
+          f"iid {me0:.4f} → cond {me1:.4f}  artifact {mc:.4f}\n"
+          f"    cond-artifact {resid:+.4f}  p {p_copy:.4f}  "
+          f"BELOW-BOTH-NULLS {below_both} (legacy {out['matched_sink_signature']})\n"
+          f"    BRANCH: {branch} ===")
+
+
 @app.local_entrypoint()
 def j9_g2_phi():
     """G2 (fired by the DIET branch) — phi-1 at its TRUE match, iterative-targeted
