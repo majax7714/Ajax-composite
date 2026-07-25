@@ -3735,6 +3735,126 @@ def j16_verb():
     print("wrote artifacts/h16_verb_battery.json")
 
 
+# --- Phase 17: the verb question, powered ([PHASE_17.md]) ---
+
+P17_SEED = 239
+P17_K = 24
+# committed CI95 on delta_cond_minus_iid for the cell each arm replicates
+P17_COMMITTED_CI = {"coder1p5b": [-0.1258, -0.0028],
+                    "deepseek1p3b": [-0.0207, 0.1164]}
+
+
+@app.local_entrypoint()
+def j17_verb_powered():
+    """Phase 17 — verb contrast at k=24. Pre-registered [PHASE_17.md] at commit
+    aeda7ae, BEFORE this ran."""
+    import math
+    import statistics as st
+
+    assert _d2c_context_verb({"n_tests": 5, "n_failed": 2, "code": "x"}, P16_VERBS["A"]) \
+        == _d2c_context({"n_tests": 5, "n_failed": 2, "code": "x"}), "VERB-A drifted"
+
+    m7 = json.loads((REPO / "artifacts/h7_matched_artifacts.json").read_text())
+    specs = [("coder1p5b", *P12_MODELS["coder1p5b"][:2],
+              _p12_cells()["coder1p5b"][0],
+              "j8_cand_P11_coder1p5b", "j8_res_P11_coder1p5b", "SINKS"),
+             ("deepseek1p3b", *J7_MODELS["M1_deepseek1p3b"],
+              m7["cells"]["M1_deepseek1p3b"]["artifacts"],
+              "j7_cand_M1_deepseek1p3b", "j7_res_M1_deepseek1p3b", "clean")]
+
+    cells, stats = {}, {}
+    for rung, mid, rev, arts, ctag, rtag, status in specs:
+        n = len(arts)
+        bc, br = _load(ctag), _load(rtag)
+        assert bc and br, f"missing committed pool {ctag}"
+        iid, iid_cov = _p16_arm_stats(bc[:n], br[:n])
+        art = {a["qid"]: a["frac"] for a in arts}
+        qs = sorted(q for q in iid if q in art)
+        mi, ma = st.mean(iid[q] for q in qs), st.mean(art[q] for q in qs)
+        print(f"\n=== {rung} ({status}) n={len(qs)} k={P17_K} | cached i.i.d. {mi:.4f} "
+              f"artifact {ma:.4f} ===")
+
+        per = {}
+        for vk, vtext in P16_VERBS.items():
+            tag = f"j17_{rung}_{vk}"
+            items = [{"qid": a["qid"], "context": _d2c_context_verb(a, vtext)}
+                     for a in arts]
+            g = _load(f"{tag}_cand") or _persist(f"{tag}_cand", h1_gen_lcb.remote(
+                mid, items, P17_K, tag=f"{tag}_cand", seed=P17_SEED, revision=rev,
+                max_model_len=8192, max_tokens=1536))
+            r = _load(f"{tag}_res") or _persist(f"{tag}_res", h1_lcb_exec.remote(
+                [x["qid"] for x in g], [x["codes"] for x in g], tag=f"{tag}_res"))
+            cond, cov = _p16_arm_stats(g, r)
+            mc = st.mean(cond[q] for q in qs)
+            cv = st.mean(cov[q] for q in qs)
+            per[vk] = {"verb": vtext, "mean_cond": round(mc, 4),
+                       "sink_vs_artifact": round(mc - ma, 4),
+                       "sink_vs_iid": round(mc - mi, 4),
+                       "below_both_nulls": bool(mc < mi and mc < ma),
+                       "coverage_cond": round(cv, 4), "_per": cond}
+            print(f"  VERB-{vk} cond {mc:.4f}  vs artifact {mc-ma:+.4f}  "
+                  f"vs iid {mc-mi:+.4f}  below-both {per[vk]['below_both_nulls']}  "
+                  f"coverage {cv:.3f}")
+
+        d = [per["B"]["_per"][q] - per["A"]["_per"][q] for q in qs]
+        dm, dse, dp = _p16_two_sided(d)
+        stats[rung] = {"delta": dm, "se": dse, "p": dp, "n": len(qs)}
+        print(f"  Δ(B−A) {dm:+.4f} ± {dse:.4f}  p {dp:.4g}")
+
+        lo, hi = P17_COMMITTED_CI[rung]
+        va = per["A"]["sink_vs_iid"]
+        ok = lo <= va <= hi
+        print(f"  [validity] VERB-A vs iid {va:+.4f} in committed CI95 "
+              f"[{lo:+.4f},{hi:+.4f}]: {'OK' if ok else 'FAILED — non-replication'}")
+        cells[rung] = {"model": mid, "status": status, "n": len(qs),
+                       "mean_iid": round(mi, 4), "mean_artifact": round(ma, 4),
+                       "verbs": {k: {kk: vv for kk, vv in v.items()
+                                     if not kk.startswith("_")}
+                                 for k, v in per.items()},
+                       "delta_B_minus_A": round(dm, 5), "se": round(dse, 5), "p": dp,
+                       "validity_ci": [lo, hi], "validity_ok": bool(ok)}
+
+    valid = all(c["validity_ok"] for c in cells.values())
+    dC, seC = stats["coder1p5b"]["delta"], stats["coder1p5b"]["se"]
+    dD, seD = stats["deepseek1p3b"]["delta"], stats["deepseek1p3b"]["se"]
+    fam = dC - dD
+    fam_se = math.sqrt(seC ** 2 + seD ** 2)
+    fam_p = math.erfc(abs(fam / fam_se) / math.sqrt(2)) if fam_se else float("nan")
+    halfD = 1.959963985 * seD
+    print(f"\n  ΔC {dC:+.4f} ± {seC:.4f} p {stats['coder1p5b']['p']:.4g}")
+    print(f"  ΔD {dD:+.4f} ± {seD:.4f}  CI95 [{dD-halfD:+.4f},{dD+halfD:+.4f}]  "
+          f"(bound only, NOT significance-tested per charter)")
+    print(f"  family ΔC−ΔD {fam:+.4f} ± {fam_se:.4f}  p {fam_p:.4g}")
+
+    sigC = stats["coder1p5b"]["p"] < 0.05
+    sigF = fam_p < 0.05
+    if not valid:
+        branch = "D — validity failed: an arm fell outside its committed CI95"
+    elif sigC and sigF:
+        branch = "A — verb moves the sinking family AND more than the clean family"
+    elif sigC:
+        branch = "B — verb moves conditioned performance generally, not diet-specific"
+    else:
+        branch = ("C — ΔC not significant: the sink is FRAMING-INVARIANT on a "
+                  "powered test; Phase 16's near-miss does not survive powering")
+    print(f"\nP17 BRANCH: {branch}")
+
+    (REPO / "artifacts/h17_verb_powered.json").write_text(json.dumps(
+        {"_label": "Phase 17 — verb contrast at k=24 [PHASE_17.md]",
+         "prereg_commit": "aeda7ae", "seed": P17_SEED, "k": P17_K,
+         "verbs": P16_VERBS, "cells": cells,
+         "delta_C": round(dC, 5), "se_C": round(seC, 5), "p_C": stats["coder1p5b"]["p"],
+         "delta_D": round(dD, 5), "se_D": round(seD, 5),
+         "delta_D_ci95": [round(dD - halfD, 5), round(dD + halfD, 5)],
+         "delta_D_significance_tested": False,
+         "family_difference": round(fam, 5), "family_se": round(fam_se, 5),
+         "family_p": fam_p, "validity_ok": bool(valid),
+         "phase16_k8_for_contrast": {"delta_C": -0.0336, "se_C": 0.0176, "p_C": 0.0562,
+                                     "delta_D": 0.0071, "se_D": 0.0067},
+         "branch": branch}, indent=2))
+    print("wrote artifacts/h17_verb_powered.json")
+
+
 @app.local_entrypoint()
 def j9_g2_phi():
     """G2 (fired by the DIET branch) — phi-1 at its TRUE match, iterative-targeted
