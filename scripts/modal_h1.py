@@ -3328,6 +3328,266 @@ def j14_dose():
     print("wrote artifacts/h14_dose_response.json")
 
 
+# --- Phase 15: concentration — sink status or architecture? ([PHASE_15.md]) ---
+
+P15_MODELS = dict(P12_MODELS)
+P15_MODELS["general1p5b"] = ("Qwen/Qwen2.5-1.5B",
+                             "8faed761d45a263340a0528343f099c05c9a4323", "CLEAN")
+P15_MODELS["starcoder2_3b"] = ("bigcode/starcoder2-3b",
+                               "733247c55e3f73af49ce8e9c7949bf14af205928", "CLEAN")
+
+P15_BOOT = 2000
+P15_BOOT_SEED = 223
+# sink-minus-clean; P1/P2 are S1's frozen pairs, P3/P4 are new and size-matched
+P15_PAIRS = {
+    "P1 1.5B sink vs 1.3B clean":       ("coder1p5b", "deepseek1p3b"),
+    "P2 3B sink vs 7B clean":           ("coder3b", "coder7b"),
+    "P3 Coder-1.5B vs general-1.5B":    ("coder1p5b", "general1p5b"),
+    "P4 Coder-3B vs StarCoder2-3B":     ("coder3b", "starcoder2_3b"),
+}
+
+
+def _p15_cells():
+    """P12's four committed cells plus the Phase-7 M2/M3 clean cells."""
+    out = _p12_cells()
+    m = json.loads((REPO / "artifacts/h7_matched_artifacts.json").read_text())
+    for rung, cell in (("general1p5b", "M2_general1p5b"),
+                       ("starcoder2_3b", "M3_starcoder2_3b")):
+        arts = m["cells"][cell]["artifacts"]
+        cand = _load(f"j7_cand_{cell}")
+        assert cand, f"missing cache j7_cand_{cell}"
+        n = len(arts)
+        out[rung] = (arts, {x["qid"]: next((c for c in x["codes"] if c), None)
+                            for x in cand[n:]})
+    return out
+
+
+def _p15_seqs():
+    """Same construction as _p12_seqs, over the six-cell set."""
+    cells = _p15_cells()
+    all_q = sorted({a["qid"] for arts, _ in cells.values() for a in arts})
+    qd = _load("j15_questions") or _persist(
+        "j15_questions", h1_dump_questions.remote(all_q))
+    qtext = {k: v["question_content"] for k, v in qd["questions"].items()}
+    out = {}
+    for rung, (arts, gens) in cells.items():
+        seqs = []
+        for a in arts[:P12_MAX_PROBLEMS]:
+            q = qtext.get(a["qid"])
+            if not q:
+                continue
+            prompt = _p12_prompt(q, _d2c_context(a))
+            code = (a.get("code") or "")[:3000]
+            i = prompt.find(code)
+            if i < 0 or not code:
+                continue
+            seqs.append({"qid": a["qid"], "prompt": prompt, "gen": gens.get(a["qid"]),
+                         "art_start": i, "art_end": i + len(code)})
+        out[rung] = seqs
+    return out
+
+
+def _p15_conc(vec):
+    """(top-5% head share, Gini) of a per-head artifact-attention vector."""
+    v = sorted(abs(float(x)) for x in vec)
+    n = len(v)
+    tot = sum(v)
+    if n == 0 or tot <= 0:
+        return 0.0, 0.0
+    g = 2 * sum((i + 1) * x for i, x in enumerate(v)) / (n * tot) - (n + 1) / n
+    k5 = max(1, int(round(0.05 * n)))
+    return sum(v[::-1][:k5]) / tot, g
+
+
+@app.function(image=PPL_IMAGE, gpu="L4", volumes={"/cache": VOL}, timeout=5400)
+def j15_heads(model_id: str, revision: str, seqs: list, tag: str):
+    """Per-(layer, head) artifact attention, RETAINING per-problem resolution.
+
+    Identical measurement to j13_heads (same prompt, spans, dtype, attention impl);
+    the only change is that each problem's matrix is kept instead of accumulated,
+    so the concentration statistics can carry a bootstrap CI over problems."""
+    def compute():
+        import torch
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        tok = AutoTokenizer.from_pretrained(model_id, revision=revision)
+        model = AutoModelForCausalLM.from_pretrained(
+            model_id, revision=revision, torch_dtype=torch.bfloat16,
+            attn_implementation="eager").to("cuda").eval()
+        per_problem, qids = [], []
+        for s in seqs:
+            if not s["gen"]:
+                continue
+            enc = tok(s["prompt"] + s["gen"], return_offsets_mapping=True,
+                      return_tensors="pt")
+            ids = enc.input_ids
+            offs = enc.offset_mapping[0].tolist()
+            if ids.shape[1] > P12_MAX_LEN or ids.shape[1] < 8:
+                continue
+            plen = len(tok(s["prompt"]).input_ids)
+            if plen >= ids.shape[1] - 1:
+                continue
+            a0, a1 = s["art_start"], s["art_end"]
+            art = [i for i, (b, e) in enumerate(offs) if b >= a0 and e <= a1 and e > b]
+            if not art:
+                continue
+            with torch.no_grad():
+                out = model(ids.to("cuda"), output_attentions=True)
+            gen_idx = list(range(plen, ids.shape[1]))
+            mat = []
+            for a in out.attentions:
+                m = a[0].float()[:, gen_idx, :]
+                tot = m.sum(-1).clamp(min=1e-9)
+                mat.append((m[:, :, art].sum(-1) / tot).mean(-1).tolist())
+            del out
+            torch.cuda.empty_cache()
+            per_problem.append([[round(v, 6) for v in row] for row in mat])
+            qids.append(s["qid"])
+        if not per_problem:
+            return {"model": model_id, "n": 0}
+        L, H = len(per_problem[0]), len(per_problem[0][0])
+        n = len(per_problem)
+        mat = [[sum(p[li][hi] for p in per_problem) / n for hi in range(H)]
+               for li in range(L)]
+        flat = [v for row in mat for v in row]
+        top5, gini = _p15_conc(flat)
+        ranked = sorted(((li, hi, v) for li, row in enumerate(mat)
+                         for hi, v in enumerate(row)), key=lambda t: -t[2])
+        return {"model": model_id, "n": n, "n_layers": L, "n_heads": H,
+                "qids": qids,
+                "top5pct_share": round(top5, 5), "gini": round(gini, 5),
+                "mean_head_artifact": round(sum(flat) / len(flat), 5),
+                "max_head_artifact": round(max(flat), 5),
+                "top_heads": [[li, hi, round(v, 5)] for li, hi, v in ranked[:32]],
+                "matrix": [[round(v, 5) for v in row] for row in mat],
+                "per_problem": per_problem}
+    return _cache_or(tag, compute)
+
+
+@app.local_entrypoint()
+def j15_probe():
+    """Phase 15 — does artifact-attention concentration track the sink or the
+    architecture? Pre-registered [PHASE_15.md] at commit 08cbac4, BEFORE this ran."""
+    import random as _rnd
+    seqs = _p15_seqs()
+    for rung in P15_MODELS:
+        assert rung in seqs, f"no sequences assembled for {rung}"
+        print(f"  [assembly] {rung:14s} {len(seqs[rung]):2d} sequences")
+
+    s1 = json.loads((REPO / "artifacts/h13_s1_heads.json").read_text())
+    res, failed = {}, []
+    for rung, (mid, rev, status) in P15_MODELS.items():
+        try:
+            r = j15_heads.remote(mid, rev, seqs[rung], tag=f"j15_heads_{rung}")
+        except Exception as e:                      # per-cell failure, branch D
+            print(f"  !! {rung} FAILED: {type(e).__name__}: {e}")
+            failed.append(rung)
+            continue
+        if not r.get("n"):
+            print(f"  !! {rung} produced no usable sequences")
+            failed.append(rung)
+            continue
+        _persist(f"j15_heads_{rung}", r)
+        res[rung] = r
+        print(f"  {rung:14s} ({status:5s}) n={r['n']:2d} {r['n_layers']}L x "
+              f"{r['n_heads']}H  top5% {r['top5pct_share']:.4f}  "
+              f"gini {r['gini']:.4f}")
+
+    # --- validity: the four S1 cells must reproduce S1's published statistics ---
+    repro, repro_ok = {}, True
+    for rung in ("coder1p5b", "coder3b", "coder7b", "deepseek1p3b"):
+        if rung not in res:
+            repro_ok = False
+            continue
+        d = {m: round(res[rung][m] - s1["models"][rung][m], 5)
+             for m in ("top5pct_share", "gini")}
+        repro[rung] = d
+        ok = all(abs(v) <= 0.01 for v in d.values())
+        repro_ok &= ok
+        print(f"  [repro] {rung:14s} Δtop5% {d['top5pct_share']:+.5f}  "
+              f"Δgini {d['gini']:+.5f}  {'OK' if ok else 'OUT OF TOLERANCE'}")
+
+    # --- architecture check: is general-1.5B really Coder-1.5B's twin? ---
+    arch_twin = None
+    if "general1p5b" in res and "coder1p5b" in res:
+        a, b = res["general1p5b"], res["coder1p5b"]
+        arch_twin = (a["n_layers"] == b["n_layers"] and a["n_heads"] == b["n_heads"])
+        print(f"  [arch] general-1.5B {a['n_layers']}Lx{a['n_heads']}H vs "
+              f"Coder-1.5B {b['n_layers']}Lx{b['n_heads']}H -> "
+              f"{'TWIN (architecture held fixed)' if arch_twin else 'DIFFERENT'}")
+
+    # --- bootstrap over problems (local, free) ---
+    boot = {}
+    for rung, r in res.items():
+        pp = r["per_problem"]
+        flats = [[v for row in p for v in row] for p in pp]
+        n = len(flats)
+        rng = _rnd.Random(P15_BOOT_SEED)
+        ts, gs = [], []
+        for _ in range(P15_BOOT):
+            idx = [rng.randrange(n) for _ in range(n)]
+            mean = [sum(flats[i][h] for i in idx) / n for h in range(len(flats[0]))]
+            t, g = _p15_conc(mean)
+            ts.append(t)
+            gs.append(g)
+        boot[rung] = {"top5pct_share": ts, "gini": gs}
+        lo, hi = int(0.025 * P15_BOOT), int(0.975 * P15_BOOT)
+        st5, sg = sorted(ts), sorted(gs)
+        print(f"  [boot] {rung:14s} top5% [{st5[lo]:.4f},{st5[hi]:.4f}]  "
+              f"gini [{sg[lo]:.4f},{sg[hi]:.4f}]")
+
+    # --- pair adjudication (S1's frozen both-metrics rule) ---
+    pairs_out, tracks = {}, {}
+    for lab, (sk, cl) in P15_PAIRS.items():
+        if sk not in res or cl not in res:
+            pairs_out[lab] = {"status": "unavailable"}
+            tracks[lab] = None
+            continue
+        entry = {}
+        for m in ("top5pct_share", "gini"):
+            d = res[sk][m] - res[cl][m]
+            db = sorted(a - b for a, b in zip(boot[sk][m], boot[cl][m]))
+            lo, hi = int(0.025 * P15_BOOT), int(0.975 * P15_BOOT)
+            entry[m] = {"sink": res[sk][m], "clean": res[cl][m], "delta": round(d, 5),
+                        "boot_ci95": [round(db[lo], 5), round(db[hi], 5)]}
+        t = all(entry[m]["delta"] > 0 for m in entry)
+        tracks[lab] = t
+        entry["tracks"] = t
+        pairs_out[lab] = entry
+        print(f"  [{lab}] Δtop5% {entry['top5pct_share']['delta']:+.5f} "
+              f"CI{entry['top5pct_share']['boot_ci95']}  "
+              f"Δgini {entry['gini']['delta']:+.5f} "
+              f"CI{entry['gini']['boot_ci95']}  tracks: {t}")
+
+    p3 = tracks.get("P3 Coder-1.5B vs general-1.5B")
+    p4 = tracks.get("P4 Coder-3B vs StarCoder2-3B")
+    if failed:
+        branch = f"D — probe failed on {failed}"
+    elif not repro_ok:
+        branch = "INCONCLUSIVE on instrument — S1 cells did not reproduce within 0.01"
+    elif p3 is None or p4 is None:
+        branch = "D — a new pair could not be formed"
+    elif p3 and p4:
+        branch = "A — concentration tracks sink status in both new size-matched pairs"
+    elif not p3:
+        branch = "B — P3 fails: concentration is architecture/scale-linked, not sink-linked"
+    else:
+        branch = "C — mixed: P3 tracks, P4 does not"
+    print(f"\nP15 BRANCH: {branch}")
+
+    (REPO / "artifacts/h15_concentration.json").write_text(json.dumps(
+        {"_label": "Phase 15 — concentration: sink status or architecture? [PHASE_15.md]",
+         "prereg_commit": "08cbac4", "boot": {"n": P15_BOOT, "seed": P15_BOOT_SEED},
+         "models": {k: {kk: vv for kk, vv in v.items() if kk != "per_problem"}
+                    for k, v in res.items()},
+         "s1_reproduction": repro, "s1_reproduction_ok": repro_ok,
+         "general1p5b_is_arch_twin_of_coder1p5b": arch_twin,
+         "boot_ci95": {k: {m: [round(sorted(v[m])[int(0.025 * P15_BOOT)], 5),
+                               round(sorted(v[m])[int(0.975 * P15_BOOT)], 5)]
+                           for m in v} for k, v in boot.items()},
+         "pairs": pairs_out, "failed_cells": failed, "branch": branch}, indent=2))
+    print("wrote artifacts/h15_concentration.json")
+
+
 @app.local_entrypoint()
 def j9_g2_phi():
     """G2 (fired by the DIET branch) — phi-1 at its TRUE match, iterative-targeted

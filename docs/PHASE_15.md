@@ -168,6 +168,26 @@ correlational instrument Phase 12 used, and Phase 12's own caveat stands: attent
 measurements localise correlation, not function. It would also **not** resurrect the
 ablation thread by itself; it would only restore the rationale for designing one properly.
 
+**Branch-mapping clarification (appended 2026-07-25, before any spend — the charter
+above is not edited).** B and C as written overlap: B is "P3 fails", C says "P3 tracks,
+P4 does not (**or vice versa**)", so the case *P3 fails ∧ P4 tracks* falls under both.
+Resolved now, before the data exists, in favour of **B** — because B's *reading* is
+specifically that concentration is architecture/scale-linked, which is precisely what a
+failed P3 shows, and P3 is the pair this phase was built around. The frozen mapping is
+therefore:
+
+| condition | branch |
+|---|---|
+| P3 tracks ∧ P4 tracks | **A** |
+| P3 fails (either P4 outcome) | **B** |
+| P3 tracks ∧ P4 fails | **C** |
+| probe fails on a cell | **D** for that cell |
+
+"Tracks" = the sink-minus-clean difference is **positive on both metrics** (top-5% share
+*and* Gini), which is S1's own frozen both-metrics standard. Bootstrap CIs are reported
+for every pair but are **not** part of the decision rule — they were never pre-registered
+as a threshold and are not retrofitted into one.
+
 **Cost estimate: $0.05–0.20.** Forward passes only, ~6 models × ~30 sequences, no
 generation, model load dominates. **Labelled estimate**, and deliberately low: the
 record's forward-pass estimator has been the badly-calibrated one — Phase 12 was estimated
