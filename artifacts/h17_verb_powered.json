@@ -1,0 +1,100 @@
+{
+  "_label": "Phase 17 \u2014 verb contrast at k=24 [PHASE_17.md]",
+  "prereg_commit": "aeda7ae",
+  "seed": 239,
+  "k": 24,
+  "verbs": {
+    "A": "Improve it so that all tests pass.",
+    "B": "Write a correct program that passes all tests."
+  },
+  "cells": {
+    "coder1p5b": {
+      "model": "Qwen/Qwen2.5-Coder-1.5B",
+      "status": "SINKS",
+      "n": 44,
+      "mean_iid": 0.4704,
+      "mean_artifact": 0.4589,
+      "verbs": {
+        "A": {
+          "verb": "Improve it so that all tests pass.",
+          "mean_cond": 0.396,
+          "sink_vs_artifact": -0.0629,
+          "sink_vs_iid": -0.0744,
+          "below_both_nulls": true,
+          "coverage_cond": 0.4545
+        },
+        "B": {
+          "verb": "Write a correct program that passes all tests.",
+          "mean_cond": 0.3963,
+          "sink_vs_artifact": -0.0625,
+          "sink_vs_iid": -0.0741,
+          "below_both_nulls": true,
+          "coverage_cond": 0.4545
+        }
+      },
+      "delta_B_minus_A": 0.00035,
+      "se": 0.00955,
+      "p": 0.9703801924313141,
+      "validity_ci": [
+        -0.1258,
+        -0.0028
+      ],
+      "validity_ok": true
+    },
+    "deepseek1p3b": {
+      "model": "deepseek-ai/deepseek-coder-1.3b-base",
+      "status": "clean",
+      "n": 39,
+      "mean_iid": 0.3109,
+      "mean_artifact": 0.3608,
+      "verbs": {
+        "A": {
+          "verb": "Improve it so that all tests pass.",
+          "mean_cond": 0.3618,
+          "sink_vs_artifact": 0.0011,
+          "sink_vs_iid": 0.0509,
+          "below_both_nulls": false,
+          "coverage_cond": 0.2051
+        },
+        "B": {
+          "verb": "Write a correct program that passes all tests.",
+          "mean_cond": 0.3652,
+          "sink_vs_artifact": 0.0045,
+          "sink_vs_iid": 0.0543,
+          "below_both_nulls": false,
+          "coverage_cond": 0.2051
+        }
+      },
+      "delta_B_minus_A": 0.0034,
+      "se": 0.0037,
+      "p": 0.3581170681987528,
+      "validity_ci": [
+        -0.0207,
+        0.1164
+      ],
+      "validity_ok": true
+    }
+  },
+  "delta_C": 0.00035,
+  "se_C": 0.00955,
+  "p_C": 0.9703801924313141,
+  "delta_D": 0.0034,
+  "se_D": 0.0037,
+  "delta_D_ci95": [
+    -0.00385,
+    0.01065
+  ],
+  "delta_D_significance_tested": false,
+  "family_difference": -0.00304,
+  "family_se": 0.01024,
+  "family_p": 0.7662701170246615,
+  "validity_ok": true,
+  "phase16_k8_for_contrast": {
+    "delta_C": -0.0336,
+    "se_C": 0.0176,
+    "p_C": 0.0562,
+    "delta_D": 0.0071,
+    "se_D": 0.0067
+  },
+  "branch": "C \u2014 \u0394C not significant: the sink is FRAMING-INVARIANT on a powered test; Phase 16's near-miss does not survive powering"
+}
