@@ -287,6 +287,10 @@ for power, and the *relation* moved while the label did not.
   excess degradation**, which is evidence about the far side of the position
   curve — the trough shrinking toward the arms, consistent with D2's shape.
 
+**[ADJUDICATED 2026-07-24 — author authorized both actions: append the correction
+across the record, and re-run the cell honestly. The correction pass is committed
+(`cb1a1a9`); R3 below is the re-run, pre-registered before spend.]**
+
 **Author adjudication required — the loop halts here.** This contradicts a
 specific committed sub-claim ("7B sink CONFIRMED at n = 37, C4") that is carried
 in the abstract's Phases 8–9 banner, §0 Index rows 8 and 11, §0.3 row 8, and
@@ -296,3 +300,71 @@ the loop does not revise claim status or abstract banners on its own authority.
 **No Index, abstract, or PHASE_8 text has been edited.** R2 is **not authorized**
 (its gate was R1 prediction 1, which missed) and **nothing was spent**.
 
+
+---
+
+## R3 — the honest 7B confirmation at true match *(pre-registered 2026-07-24, BEFORE spend)*
+
+**Question.** Does Qwen2.5-Coder-7B show a genuine **below-both-nulls** sink at
+**true match** (Δ_art ≈ 0), at **n > 20** — i.e. can the confirmation withdrawn
+from C4 be earned back at the position the claim is actually about?
+
+**Why C4 could not answer it.** C4 targeted a fixed artifact frac (0.659) and
+widened the band to ±0.10 for power; the covered subset's i.i.d. rose to 0.749 and
+the achieved relation fell to −0.101. The proxy was held, the relation was not —
+the Phase-8 §10 refinement, unapplied.
+
+### Design
+
+**Select on one seed, measure on another.** The selection stage and the
+measurement stage draw independently, so the subset cannot be selected on the same
+noise it is later scored against. This is the distinct-seed protocol (§10, Phase-6
+P2) applied for the first time to *artifact selection* rather than to a control arm.
+
+- **Step 1 — selection sweep (seed 71).** Coder-7B i.i.d., 8 candidates, over all
+  **80** problems of the fixed donor pool (`lcb_cand_lcb_r2_base_T08`), giving a
+  per-problem i.i.d. map independent of the measurement draw.
+- **Step 2 — offline targeting (free).** Over that map, choose the (target, band)
+  maximising **n** subject to **|predicted Δ_art| ≤ 0.01**, where predicted
+  Δ_art = mean(selected artifact frac) − mean(step-1 i.i.d. on the covered subset).
+  One artifact per problem, in-band candidate nearest target, deterministic
+  tie-break by index — the frozen Phase-7 miner rule, unchanged.
+- **Step 3 — the cell (seed 89).** `_matched_cell`: E0 and E1 measured fresh in one
+  batch on the selected problems. Achieved Δ_art is computed from *this* draw.
+
+Model pinned as in C4: `Qwen/Qwen2.5-Coder-7B`, revision `0396a761…`. Seeds 71 and
+89 are distinct from 17 (M4), 43 (C4), and 101/202 (Phase 9).
+
+### Frozen criterion — the ORIGINAL definition
+
+**Primary: below both nulls** (§9.7, Index claim 8) —
+
+> `mean_cond < mean_iid` **and** `mean_cond < mean_artifact` **and**
+> one-sided `p < 0.05` on cond-vs-artifact **and** `cond − artifact ≤ −0.05`
+
+The Phase-7+ `matched_sink_signature` is computed and reported **for continuity
+only; it does not adjudicate** (P0.2).
+
+**On-target:** `|achieved Δ_art| ≤ 0.03`. **Minimum n = 20** — the cell must at
+least match M4's n to constitute a higher-n confirmation; below that it is reported
+**underpowered**, not pooled. **A miss on either is reported as a miss and NOT
+re-run to fit** — re-targeting after seeing the outcome is tuning past a gate.
+
+### Pre-registered predictions
+
+| # | branch | reading | odds |
+|---|---|---|---|
+| **A** | **SINK CONFIRMED at match** — below both nulls, p < 0.05, cond − artifact ≤ −0.05 | the withdrawn confirmation is **earned back** at the right position and n > 20; claims 8/11 restore a higher-n 7B leg, now criterion-clean | **55%** |
+| **B** | **SUB-THRESHOLD** — negative but > −0.05, or p ≥ 0.05 | the 7B sink holds at M4's position (−0.039) but not demonstrably at true match; scope narrows to a **position band**, not "at match" generally | **25%** |
+| **C** | **NO SINK at match** — cond − artifact ≈ 0 or positive | the 7B sink is specific to Δ_art ≈ −0.04 and absent at 0; a real narrowing of claims 8/11 — inspect, do not halt (M4 still stands at its own position) | **15%** |
+| **D** | off-target (\|Δ_art\| > 0.03) or n < 20 | no adjudication; reported as an instrument miss | **5%** |
+
+**Methodological prediction (separate, committed):** achieved Δ_art will land within
+**±0.03 of predicted**, because selection and measurement use independent draws.
+Under the old same-draw design the expected failure was regression to the mean
+pulling the measured i.i.d. down and Δ_art positive. **65%.**
+
+**Cost estimate: $2–5** (≈640 selection-sweep generations + ≈2 × n × 8 cell
+generations on 7B, plus judging; donor pool reused, no artifact generation).
+Month-to-date workspace spend checked before launch: **$78.04 of the $200 cap**,
+leaving ample headroom; cumulative loop spend before this run: **$0**.
