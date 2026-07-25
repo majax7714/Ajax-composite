@@ -3588,6 +3588,153 @@ def j15_probe():
     print("wrote artifacts/h15_concentration.json")
 
 
+# --- Phase 16: is the sink framing-sensitive? the verb lever ([PHASE_16.md]) ---
+
+P16_SEED = 233
+P16_VERBS = {
+    "A": "Improve it so that all tests pass.",
+    "B": "Write a correct program that passes all tests.",
+}
+
+
+def _d2c_context_verb(a, verb):
+    """Frozen D2C wording with ONLY the final instruction clause swapped.
+
+    verb "A" reproduces _d2c_context byte-for-byte (asserted in the dry-run)."""
+    npass = a["n_tests"] - a["n_failed"]
+    code = (a.get("code") or "")[:3000]
+    return (f"A previous attempt:\n```python\n{code}\n```\n"
+            f"This attempt passed {npass} of {a['n_tests']} tests.\n" + verb)
+
+
+def _p16_two_sided(d):
+    """Paired two-sided p for mean(d) != 0 (normal approx; n>=39 here)."""
+    import math
+    import statistics as st
+    n = len(d)
+    if n < 2:
+        return float("nan"), float("nan"), float("nan")
+    m = st.mean(d)
+    sd = st.stdev(d)
+    se = sd / math.sqrt(n) if sd > 0 else 0.0
+    if se == 0:
+        return m, 0.0, (0.0 if m != 0 else 1.0)
+    t = m / se
+    return m, se, math.erfc(abs(t) / math.sqrt(2))
+
+
+def _p16_arm_stats(cand, res):
+    """per-qid mean frac, plus coverage over the arm."""
+    import statistics as st
+    per = {c["qid"]: st.mean(x["frac"] for x in row) for c, row in zip(cand, res)}
+    cov = {c["qid"]: (1.0 if any(x.get("passed") for x in row) else 0.0)
+           for c, row in zip(cand, res)}
+    return per, cov
+
+
+@app.local_entrypoint()
+def j16_verb():
+    """Phase 16 — verb x family at match. Pre-registered [PHASE_16.md] at commit
+    446b8aa, BEFORE this ran."""
+    import statistics as st
+    assert _d2c_context_verb({"n_tests": 5, "n_failed": 2, "code": "x"}, P16_VERBS["A"]) \
+        == _d2c_context({"n_tests": 5, "n_failed": 2, "code": "x"}), \
+        "VERB-A must reproduce the frozen _d2c_context exactly"
+
+    m7 = json.loads((REPO / "artifacts/h7_matched_artifacts.json").read_text())
+    specs = []
+    arts_c = _p12_cells()["coder1p5b"][0]
+    specs.append(("coder1p5b", *P12_MODELS["coder1p5b"][:2], arts_c,
+                  "j8_cand_P11_coder1p5b", "j8_res_P11_coder1p5b", "SINKS"))
+    specs.append(("deepseek1p3b", *J7_MODELS["M1_deepseek1p3b"],
+                  m7["cells"]["M1_deepseek1p3b"]["artifacts"],
+                  "j7_cand_M1_deepseek1p3b", "j7_res_M1_deepseek1p3b", "clean"))
+
+    out, deltas = {}, {}
+    for rung, mid, rev, arts, ctag, rtag, status in specs:
+        n = len(arts)
+        bc, br = _load(ctag), _load(rtag)
+        assert bc and br, f"missing committed pool {ctag}/{rtag}"
+        iid, iid_cov = _p16_arm_stats(bc[:n], br[:n])
+        art = {a["qid"]: a["frac"] for a in arts}
+        qs = sorted(q for q in iid if q in art)
+        print(f"\n=== {rung} ({status}) n={len(qs)} | cached i.i.d. "
+              f"{st.mean(iid[q] for q in qs):.4f} artifact {st.mean(art[q] for q in qs):.4f} ===")
+
+        per_verb = {}
+        for vk, vtext in P16_VERBS.items():
+            tag = f"j16_{rung}_{vk}"
+            items = [{"qid": a["qid"], "context": _d2c_context_verb(a, vtext)}
+                     for a in arts]
+            g = _load(f"{tag}_cand") or _persist(f"{tag}_cand", h1_gen_lcb.remote(
+                mid, items, 8, tag=f"{tag}_cand", seed=P16_SEED, revision=rev,
+                max_model_len=8192, max_tokens=1536))
+            r = _load(f"{tag}_res") or _persist(f"{tag}_res", h1_lcb_exec.remote(
+                [x["qid"] for x in g], [x["codes"] for x in g], tag=f"{tag}_res"))
+            cond, cov = _p16_arm_stats(g, r)
+            mc = st.mean(cond[q] for q in qs)
+            ma = st.mean(art[q] for q in qs)
+            mi = st.mean(iid[q] for q in qs)
+            cv = st.mean(cov[q] for q in qs)
+            below_both = bool(mc < mi and mc < ma)
+            per_verb[vk] = {"verb": vtext, "mean_cond": round(mc, 4),
+                            "mean_iid": round(mi, 4), "mean_artifact": round(ma, 4),
+                            "sink_vs_artifact": round(mc - ma, 4),
+                            "sink_vs_iid": round(mc - mi, 4),
+                            "coverage_cond": round(cv, 4),
+                            "coverage_iid": round(st.mean(iid_cov[q] for q in qs), 4),
+                            "below_both_nulls": below_both, "_per": cond, "_cov": cov}
+            print(f"  VERB-{vk} \"{vtext}\"")
+            print(f"    cond {mc:.4f}  vs artifact {mc-ma:+.4f}  vs iid {mc-mi:+.4f}  "
+                  f"below-both-nulls {below_both}  coverage {cv:.3f}")
+
+        a_, b_ = per_verb["A"], per_verb["B"]
+        d = [b_["_per"][q] - a_["_per"][q] for q in qs]
+        dm, dse, dp = _p16_two_sided(d)
+        dcov = [b_["_cov"][q] - a_["_cov"][q] for q in qs]
+        cm, cse, cp = _p16_two_sided(dcov)
+        sig = bool(dp < 0.05)
+        deltas[rung] = {"delta_mean_frac": round(dm, 4), "se": round(dse, 4),
+                        "p": dp, "significant": sig,
+                        "delta_coverage": round(cm, 4), "coverage_se": round(cse, 4),
+                        "coverage_p": cp}
+        print(f"  Δ(B−A) mean frac {dm:+.4f} ± {dse:.4f}  p {dp:.4g}  "
+              f"significant {sig}")
+        print(f"  Δ(B−A) coverage  {cm:+.4f} ± {cse:.4f}  p {cp:.4g}")
+        out[rung] = {"model": mid, "status": status, "n": len(qs),
+                     "verbs": {k: {kk: vv for kk, vv in v.items()
+                                   if not kk.startswith("_")}
+                               for k, v in per_verb.items()}}
+
+    # --- validity: VERB-A must reproduce the incumbent sink at the new seed ---
+    va = out["coder1p5b"]["verbs"]["A"]["sink_vs_artifact"]
+    valid = va <= -0.03
+    print(f"\n[validity] Coder-1.5B VERB-A sink vs artifact {va:+.4f} "
+          f"(needs <= -0.03): {'OK' if valid else 'FAILED — rerun stability'}")
+
+    sc = deltas["coder1p5b"]["significant"]
+    sd = deltas["deepseek1p3b"]["significant"]
+    if not valid:
+        branch = ("INCONCLUSIVE on instrument — VERB-A did not reproduce the "
+                  "incumbent sink at seed 233")
+    elif sc and sd:
+        branch = "A — framing moves conditioned performance in BOTH families"
+    elif not sc and not sd:
+        branch = "B — framing-invariant: the verb lever is inert on the sink"
+    elif sc:
+        branch = "C — diet-gated: framing moves the Coder model only"
+    else:
+        branch = "D — framing moves the clean family only"
+    print(f"\nP16 BRANCH: {branch}")
+
+    (REPO / "artifacts/h16_verb_battery.json").write_text(json.dumps(
+        {"_label": "Phase 16 — verb x family at match [PHASE_16.md]",
+         "prereg_commit": "446b8aa", "seed": P16_SEED, "verbs": P16_VERBS,
+         "cells": out, "deltas": deltas,
+         "verb_a_reproduces_incumbent_sink": valid, "branch": branch}, indent=2))
+    print("wrote artifacts/h16_verb_battery.json")
+
+
 @app.local_entrypoint()
 def j9_g2_phi():
     """G2 (fired by the DIET branch) — phi-1 at its TRUE match, iterative-targeted
