@@ -672,6 +672,20 @@ currently believes.** Statuses: LIVE / KILLED / RETRACTED / REVERSED / SCOPED.
   column**, so a number's provenance and the relation it was measured at are both on
   the page.
 
+- **The coverage decomposition of a sink cell** (Phase 16 P0.2, free —
+  [scripts/j16_p0_diversity.py], `h16_p0_diversity.json`) — the SINK has been measured as
+  **mean frac** since D2c. Decomposing the committed cells on the escape law's own currency
+  shows the dominant channel is **coverage**: conditioning costs Coder-1.5B **0.636 → 0.205
+  pass@8 (−0.432)** and Coder-3B **−0.410**, against mean-frac drops of −0.064 / −0.084 —
+  while **Coder-7B at true match loses exactly 0.000**, a far sharper scale separation than
+  the headline number gives. Parse rates are 0.99–1.00 in every arm, so this is not
+  syntactic breakage. It also **disfavours a diversity-collapse account**: candidate
+  diversity contracts in *every* cell and contracts **most** in the clean DeepSeek cell
+  (distinct 7.95 → 4.38, max-cluster 0.13 → **0.56**), which *gains* quality (+0.050) —
+  faithful imitation, not collapse. Sinking models contract *less* and sink anyway.
+  *(Exploratory per §10 — a decomposition of committed cells, not a pre-registered test;
+  it moves no claim and is carried as the strongest available pointer for a successor.)*
+
 ### 0.2 Extraction candidates *(papers are extractions from journal state, not the frame)*
 
 No commitment implied; the journal decides when an extraction is ripe.
@@ -1686,6 +1700,25 @@ Run-loss modes are spend-loss modes; hardening is cheaper than any single recurr
    prevent — the rule was frozen before the run, honoured after it, and never tuned.
    It is the failure mode pre-registration does **not** cover, and §10 now names it
    (addendum, 2026-07-25).
+9. **A threshold set as a round number, not in units of the measured spread *(appended
+   2026-07-25, Phase 16 — [PHASE_16.md])*.** Phase 16 froze a validity condition —
+   VERB-A must reproduce the incumbent sink, `cond − artifact ≤ −0.03` — and it
+   returned **−0.0296**, failing by **0.0004**, so the phase closed INCONCLUSIVE with
+   its substantive question untested. The gate was honoured and not retuned. But the
+   gate was never functional: P11's committed CI for that cell's effect is
+   **[−0.1258, −0.0028]**, width **0.123**, so a threshold at −0.03 sat *inside the
+   noise band* and had roughly even odds of failing on a perfectly faithful
+   replication — which is what the arm was (−0.0412, inside the CI; DeepSeek's
+   replication likewise inside its own). **This is the record's third instance of the
+   same error class**: Phase 10 R3 set an on-target band of ±0.03 against an estimator
+   whose SE was 0.028 (1.08 SE), fixed it by *measuring* the SE and powering the
+   instrument; Phase 16 repeated it on a different kind of threshold without carrying
+   the lesson across. *Practice:* **any pre-registered threshold on a measured quantity
+   is stated in units of that quantity's measured spread, or derived from it — never as
+   a round number.** Where a committed CI exists, the threshold references the CI.
+   *Distinct from entry 8:* that rule asks whether a decision rule **can** fire; this
+   asks whether it fires **for the reason intended**. Both checks are free and belong in
+   every pre-registration.
 
 ## 9. Phase 3R — auditing the two live claims, and the anchoring mechanism
 

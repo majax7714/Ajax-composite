@@ -274,3 +274,113 @@ is load-bearing for §4 — the design would be identical if all six were withdr
 ---
 
 *(Results append below.)*
+
+---
+
+## RESULT (2026-07-25) — **INCONCLUSIVE ON INSTRUMENT. The validity gate fired by 0.0004, and it was never a real gate.** *(`h16_verb_battery.json`)*
+
+All four arms generated and judged cleanly (exit 0, seed 233, n = 44 / 39).
+
+| model | verb | cond | vs artifact | vs i.i.d. | below both nulls | coverage |
+|---|---|---|---|---|---|---|
+| **Coder-1.5B** | A `Improve it…` | 0.4292 | **−0.0296** | −0.0412 | **yes** | 0.318 |
+| **Coder-1.5B** | B `Write a correct program…` | 0.3956 | **−0.0633** | −0.0748 | **yes** | 0.341 |
+| DeepSeek-1.3B | A `Improve it…` | 0.3577 | −0.0031 | +0.0468 | no | 0.128 |
+| DeepSeek-1.3B | B `Write a correct program…` | 0.3648 | +0.0040 | +0.0539 | no | 0.179 |
+
+| contrast | Δ(B−A) mean frac | SE | p | Δ(B−A) coverage | p |
+|---|---|---|---|---|---|
+| Coder-1.5B | **−0.0336** | 0.0176 | **0.0562** | +0.0227 | 0.567 |
+| DeepSeek-1.3B | +0.0071 | 0.0067 | 0.2861 | +0.0513 | 0.152 |
+
+**The frozen validity condition — `cond_A − artifact ≤ −0.03` — returns −0.0296. It fails
+by 0.0004, so no branch is adjudicated and the phase closes INCONCLUSIVE on instrument.**
+It is not retuned, not re-run at a fresh seed, and the threshold is not moved. A kill
+criterion that is honoured only when it is comfortable is not a criterion, and this
+record's other numbers are worth reading precisely because this one was not adjusted.
+
+### The gate was inside the noise band by construction — this is the phase's real finding
+
+P11's committed CI for this cell's `delta_cond_minus_iid` is **[−0.1258, −0.0028]**, width
+**0.123**. The seed-233 replication (−0.0412) sits comfortably inside it, as does
+DeepSeek's (+0.0468 inside [−0.0207, +0.1164]). Both arms replicated their committed cells
+within noise.
+
+So a validity threshold set at **−0.03** on a quantity whose 95% interval spans ±0.06 was
+**never able to function as a gate**. It had roughly even odds of firing on a faithful
+replication, and it did. The threshold was a round number chosen for plausibility, not a
+statistic derived from the measured spread of the thing it was gating.
+
+**This is the same error class the record has already logged twice**, which is what makes
+it worth a ledger entry rather than a shrug:
+
+| where | the guessed tolerance | the measured reality |
+|---|---|---|
+| Phase 10 R3 | on-target band ±0.03 | i.i.d. estimator SE **0.028** — the band was 1.08 SE |
+| **Phase 16 (here)** | validity gate −0.03 | cell CI width **0.123** — the gate sat mid-noise |
+
+Phase 10 fixed its instance by *measuring* the SE and powering the instrument (k = 8 → 24,
+SE 0.028 → 0.011). I did not carry that lesson across to a different kind of threshold.
+**Practice, now explicit: any pre-registered threshold on a measured quantity must be
+stated in units of that quantity's measured spread, or derived from it — never as a round
+number.** Phase 14's rule asks whether a decision rule *can* fire; this asks whether it
+fires *for the reason intended*. They are different failures and both are cheap to check.
+
+### What the arms show, flagged exploratory and NOT adjudicated
+
+Separated per §10 because the gate failed; none of this is a verdict, and no §0 row moves.
+
+- **The independent framing makes the Coder sink deeper, not shallower** (−0.0296 →
+  −0.0633; Δ −0.0336, p 0.0562 — itself a near-miss on the pre-registered p < 0.05).
+  Whatever the sink is, it is **not an artifact of the "improve" instruction**, which was
+  the single most plausible cheap explanation available and is the reason this phase was
+  worth running. This direction is consistent with D2a's own numbers, where
+  `write-correct` halved PULL but *also* lowered mean pass (0.229 → 0.133) and coverage
+  (0.517 → 0.317).
+- **The verb moves per-sample quality, not coverage** (Coder coverage Δ +0.0227, p 0.567),
+  while P0.2 established that conditioning's dominant channel *is* coverage. Two levers,
+  two different axes — which, if it held up under a real gate, would say the verb lever
+  and the sink act through different mechanisms.
+- **The qualitative verdict is verb-invariant.** Coder-1.5B is below both nulls under
+  *both* verbs; DeepSeek under neither. The framing moves the magnitude and leaves the
+  classification alone.
+- **Had validity passed**, both deltas being non-significant would have selected **branch
+  B** (framing-invariant). Stated because it is derivable from the committed data and
+  concealing it would be worse — but it is **not** the phase's verdict, and branch B is not
+  claimed. The next phase must earn it with a gate that works.
+
+## PHASE GATE — CLOSED (2026-07-25)
+
+1. **Outside charter verified before spend; 2 of 3 claims failed and were recorded as
+   failing** (§1). ✓
+2. **Two free P0 results landed and committed** — the vertex audit and the first
+   coverage-axis decomposition of sink cells (§1.2, §2). ✓
+3. **Validity gate honoured as frozen** — failed by 0.0004, phase reports INCONCLUSIVE,
+   nothing retuned, no branch claimed. ✓
+4. **Raw data committed before analysis** (`aa1c4e1`… see log), with the gate failure named
+   in the commit message. ✓
+5. **A mid-run inference of my own withdrawn on checking**: I read the seed-to-seed
+   movement (Coder 0.023 vs DeepSeek 0.003) as evidence that instability tracks sink
+   status. Against the committed CIs both replications are ordinary sampling variation, and
+   the two cells' intervals are comparably wide (0.123 vs 0.137). Withdrawn. ✓
+6. **All six external citations verified before any ledger entry**; two inaccuracies named
+   in place (§6). ✓
+
+**Prediction accounting.** **No branch fired — the phase is INCONCLUSIVE and is scored as
+an instrument miss, not as evidence for any branch.** A (30%), B (20%), C (35%), D (10%),
+E (5%) are all unresolved. The pre-registration's *substantive* odds were never tested;
+what failed was a validity condition attached to them, which is a separate object and is
+where the loop's error was.
+
+**Cost.** Phase 16 **$0.46** (`modal billing report`, queried 2026-07-25 18:25 EDT;
+month-to-date aggregate delta $82.80 → $83.26) against a $0.20–0.60 estimate — **inside
+the band**, the sixth consecutive calibrated generation estimate. Loop total **$5.22**;
+month-to-date **$83.26**, against the Amendment-3 envelope of $100 report / $120 hard stop.
+
+**What is open.** The verb question itself, **unanswered and cheap to answer properly** —
+the four arms exist, and a successor needs only a validity condition derived from the
+measured CI (e.g. "VERB-A's cond−artifact falls within P11's committed CI", which these
+data satisfy) rather than a round number, plus enough n to resolve a −0.034 effect at
+p < 0.05. Also open, and now better motivated than before: **the coverage channel** (§2),
+which is where the sink actually lives and which no phase has yet manipulated. **Nothing
+is running; Phase 16 is closed.**
