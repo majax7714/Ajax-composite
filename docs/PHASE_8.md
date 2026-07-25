@@ -400,7 +400,7 @@ and D1 cannot separate the two). **Label: OOD-leaning.**
 
 | cell | intended | landed (actual Δ_art) | Δ_cond (CI) | p | sink? | verdict |
 |---|---|---|---|---|---|---|
-| **C4** Coder-7B, n=37, seed 43 | match | −0.101 | **−0.103** [−0.169, −0.036] | 0.0028 | **YES** | **7B sink CONFIRMED** (Δ ≤ −0.08; robust to n & seed) |
+| **C4** Coder-7B, n=37, seed 43 | ~~match~~ **−0.101 is NOT match** | −0.101 | **−0.103** [−0.169, −0.036] | 0.0028 | ~~**YES**~~ **NO under below-both-nulls** | ~~**7B sink CONFIRMED**~~ **[WITHDRAWN 2026-07-24 — see the P10 correction addendum at the end of this document]** |
 | **C2** DeepSeek below-0, n=29 | Δ_art −0.04 | **+0.035** | +0.044 [−0.034, +0.115] | 0.86 | no | band asymmetry **NOT closed** (iid drift) |
 | **C3** phi-1, n=47 | match | **+0.042** | **−0.033** [−0.075, **+0.002**] | 0.054 | no (sub-thr.) | **sub-threshold negative — leans Coder-like** |
 
@@ -448,7 +448,7 @@ measured relation, not the proxy you mined to.* (Amended into §10.)
    stands OPEN.
 3. **Diet attribution family-n** — **honest fallback to "Qwen-Coder-stage-specific"**;
    phi is sub-threshold suggestive support, not a clean second family.
-4. **7B sink** — **CONFIRMED at n = 37** (C4), distinct seed; Phase-7 reversal holds.
+4. **7B sink** — ~~**CONFIRMED at n = 37** (C4), distinct seed~~ **[CONFIRMATION WITHDRAWN 2026-07-24, Phase 10 R1 — C4 sat at Δ_art −0.101, cond−artifact −0.003 → not below both nulls. The 7B sink stands on M4 at n = 20; Phase-7 reversal holds. See the correction addendum at the end of this document.]**; Phase-7 reversal holds.
 5. **Index claim ladder** stated explicitly (below); relational figure carries the new
    cells; note gating updated.
 
@@ -467,3 +467,56 @@ question); phi at its **true** match (iterative re-target) to convert its sub-th
 lean into a decision; 0.5B via generated artifacts (C5); the internals probe (attention
 to artifact tokens — the real RECLASS-vs-OOD instrument, outside this toolchain). All
 named in §0.4. **Nothing is running; Phase 8 is fully closed.**
+
+---
+
+## CORRECTION ADDENDUM (2026-07-24, Phase 10 R1) — **the C4 confirmation is withdrawn; the 7B sink is not**
+
+*Appended under append-only; all Phase-8 text above stands unrevised, with in-place
+markers at the two claim sites. Source: [PHASE_10.md] R1, `h10_gain_reanalysis.json`,
+`scripts/j10_gain_reanalysis.py`.*
+
+**What C4 actually measured.**
+
+```
+iid 0.7490   artifact 0.6483   cond 0.6457
+Δ_art  −0.1007       Δ_cond  −0.1033       cond − artifact  −0.0026
+```
+
+The artifact sat **0.10 below the model's own i.i.d.**, and the conditioned output
+landed **0.003 below that artifact** — Coder-7B tracked the artifact almost exactly.
+
+**Why it was scored a sink.** The **original D2c SINK** (§9.7, Index claim 8) is
+*below **both** nulls* — below the model's own i.i.d. **and** below the artifact it
+was shown. The `matched_sink_signature` used from Phase 7 onward tests only
+`cond < iid` ∧ `p < 0.05` ∧ `Δ_cond ≤ −0.05`; **the copy null was dropped.** The two
+criteria agree while Δ_art ≥ 0, because there an artifact at or above the model's own
+level makes "below i.i.d." binding. **Below zero they come apart**: a model that
+faithfully imitates an artifact worse than itself lands below its own i.i.d. *by
+construction*. C4 is the record's only cell where this bit.
+
+**How C4 got below zero.** It was chartered "Coder-7B **at match**" (target i.i.d.
+0.659). The coverage table above shows n = 20 at ±0.05, 34 at ±0.07, 37 at ±0.10;
+**±0.10 was chosen to reach n = 37**, and the widening carried the achieved relation
+onto the below-zero arm. The result table then recorded `Δ_art −0.101` in a row whose
+position column read "match." This is the **matched-relation rule (§10) failing on its
+own amendment** — the band was widened for power, the relation moved, and the label
+did not follow. The lesson generalises: *widening a band to buy n is a move along the
+relation axis, and must be re-checked against the achieved relation, not the target.*
+
+**Scope of the correction — precisely.**
+
+- **The 7B sink is real.** **M4** (Phase 7; n = 20, Δ_art −0.039, Δ_cond −0.129,
+  **cond − artifact −0.089**, p 0.0024) satisfies below-both-nulls and is untouched.
+- **What falls is the confirmation.** C4 measured a *different position* and found no
+  excess degradation there, so it cannot corroborate M4. The 7B sink rests on
+  **n = 20**, as it did before Phase 8. "Robust to n and seed" is not supported.
+- **C4 alone is affected.** G1c (−0.155), G1d (−0.193) and M4 (−0.089) all show
+  genuine excess degradation below zero.
+- **C4 is still informative, read correctly**: Coder-7B at Δ_art −0.101 shows **no
+  excess degradation**, a *far-arm* data point consistent with D2's trough
+  (vertex −0.092) shrinking toward the arms.
+- **Downstream:** Phase-8's gate item 4, the journal abstract's Phases 8–9 banner,
+  Index rows 8 and 11, and §0.3 row 8 all carry the withdrawal.
+
+A properly-positioned higher-n confirmation is pre-registered as **[PHASE_10.md] R3**.
