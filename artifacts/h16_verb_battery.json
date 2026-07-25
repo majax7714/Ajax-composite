@@ -1,0 +1,91 @@
+{
+  "_label": "Phase 16 \u2014 verb x family at match [PHASE_16.md]",
+  "prereg_commit": "446b8aa",
+  "seed": 233,
+  "verbs": {
+    "A": "Improve it so that all tests pass.",
+    "B": "Write a correct program that passes all tests."
+  },
+  "cells": {
+    "coder1p5b": {
+      "model": "Qwen/Qwen2.5-Coder-1.5B",
+      "status": "SINKS",
+      "n": 44,
+      "verbs": {
+        "A": {
+          "verb": "Improve it so that all tests pass.",
+          "mean_cond": 0.4292,
+          "mean_iid": 0.4704,
+          "mean_artifact": 0.4589,
+          "sink_vs_artifact": -0.0296,
+          "sink_vs_iid": -0.0412,
+          "coverage_cond": 0.3182,
+          "coverage_iid": 0.6364,
+          "below_both_nulls": true
+        },
+        "B": {
+          "verb": "Write a correct program that passes all tests.",
+          "mean_cond": 0.3956,
+          "mean_iid": 0.4704,
+          "mean_artifact": 0.4589,
+          "sink_vs_artifact": -0.0633,
+          "sink_vs_iid": -0.0748,
+          "coverage_cond": 0.3409,
+          "coverage_iid": 0.6364,
+          "below_both_nulls": true
+        }
+      }
+    },
+    "deepseek1p3b": {
+      "model": "deepseek-ai/deepseek-coder-1.3b-base",
+      "status": "clean",
+      "n": 39,
+      "verbs": {
+        "A": {
+          "verb": "Improve it so that all tests pass.",
+          "mean_cond": 0.3577,
+          "mean_iid": 0.3109,
+          "mean_artifact": 0.3608,
+          "sink_vs_artifact": -0.0031,
+          "sink_vs_iid": 0.0468,
+          "coverage_cond": 0.1282,
+          "coverage_iid": 0.3846,
+          "below_both_nulls": false
+        },
+        "B": {
+          "verb": "Write a correct program that passes all tests.",
+          "mean_cond": 0.3648,
+          "mean_iid": 0.3109,
+          "mean_artifact": 0.3608,
+          "sink_vs_artifact": 0.004,
+          "sink_vs_iid": 0.0539,
+          "coverage_cond": 0.1795,
+          "coverage_iid": 0.3846,
+          "below_both_nulls": false
+        }
+      }
+    }
+  },
+  "deltas": {
+    "coder1p5b": {
+      "delta_mean_frac": -0.0336,
+      "se": 0.0176,
+      "p": 0.05620782943596196,
+      "significant": false,
+      "delta_coverage": 0.0227,
+      "coverage_se": 0.0397,
+      "coverage_p": 0.5666947561264393
+    },
+    "deepseek1p3b": {
+      "delta_mean_frac": 0.0071,
+      "se": 0.0067,
+      "p": 0.28613525606452184,
+      "significant": false,
+      "delta_coverage": 0.0513,
+      "coverage_se": 0.0358,
+      "coverage_p": 0.15180150558116196
+    }
+  },
+  "verb_a_reproduces_incumbent_sink": false,
+  "branch": "INCONCLUSIVE on instrument \u2014 VERB-A did not reproduce the incumbent sink at seed 233"
+}
