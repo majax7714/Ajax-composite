@@ -1,0 +1,107 @@
+{
+  "_label": "P0 free \u2014 empirical k-scaling + power for the verb contrast [PHASE_17.md P0]",
+  "_method": "subsample k of 8 committed candidates per arm, recompute paired SE, fit SE^2 = a + b/k; no independence assumption between arms",
+  "_superseded": "an earlier analytic decomposition assuming independent arms was discarded: it implied within-problem shares of 123%/347%, which is impossible and reflects same-seed correlation between the arms",
+  "seed": 241,
+  "reps": 400,
+  "cells": {
+    "coder1p5b": {
+      "n": 44,
+      "effect_k8": -0.03364,
+      "se_k8": 0.01762,
+      "measured_se_by_k": {
+        "2": 0.03815,
+        "3": 0.03107,
+        "4": 0.02645,
+        "6": 0.02085,
+        "8": 0.01762
+      },
+      "fit": {
+        "a": 0.0,
+        "b": 0.0030673,
+        "irreducible_se": 0.0
+      },
+      "projection": {
+        "8": {
+          "se_at_n": 0.01958,
+          "abs_t": 1.718,
+          "n_for_80pct": 117
+        },
+        "16": {
+          "se_at_n": 0.01385,
+          "abs_t": 2.43,
+          "n_for_80pct": 59
+        },
+        "24": {
+          "se_at_n": 0.01131,
+          "abs_t": 2.976,
+          "n_for_80pct": 39
+        },
+        "32": {
+          "se_at_n": 0.00979,
+          "abs_t": 3.436,
+          "n_for_80pct": 30
+        },
+        "48": {
+          "se_at_n": 0.00799,
+          "abs_t": 4.209,
+          "n_for_80pct": 20
+        }
+      }
+    },
+    "deepseek1p3b": {
+      "n": 39,
+      "effect_k8": 0.0071,
+      "se_k8": 0.00665,
+      "measured_se_by_k": {
+        "2": 0.02247,
+        "3": 0.01734,
+        "4": 0.01415,
+        "6": 0.00973,
+        "8": 0.00665
+      },
+      "fit": {
+        "a": 0.0,
+        "b": 0.00122885,
+        "irreducible_se": 0.0
+      },
+      "projection": {
+        "8": {
+          "se_at_n": 0.01239,
+          "abs_t": 0.573,
+          "n_for_80pct": 934
+        },
+        "16": {
+          "se_at_n": 0.00876,
+          "abs_t": 0.81,
+          "n_for_80pct": 467
+        },
+        "24": {
+          "se_at_n": 0.00716,
+          "abs_t": 0.992,
+          "n_for_80pct": 312
+        },
+        "32": {
+          "se_at_n": 0.0062,
+          "abs_t": 1.145,
+          "n_for_80pct": 234
+        },
+        "48": {
+          "se_at_n": 0.00506,
+          "abs_t": 1.403,
+          "n_for_80pct": 156
+        }
+      }
+    }
+  },
+  "committed_ci": {
+    "coder1p5b": [
+      -0.1258,
+      -0.0028
+    ],
+    "deepseek1p3b": [
+      -0.0207,
+      0.1164
+    ]
+  }
+}
