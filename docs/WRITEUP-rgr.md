@@ -528,6 +528,34 @@ LIVE claim 1:1 stops the loop** — everything short of that is *inspected*, pro
 from caveat to named hypothesis, and given a discriminating cell (the Phase 8 → 9 move).
 Caution must not be allowed to suppress the record's most productive behaviour.
 
+**Addendum (2026-07-25, Phase 14 — what pre-registration does *not* protect against).**
+Rule 3 above ("pre-register, then append") guards one failure mode: choosing the
+analysis after seeing the data. Phase 14 found a second one that it does **not** touch.
+Its decision rule was frozen at commit `980091a`, executed without adjustment, and
+returned **Δ = ±0.0000 at every K** — because the statistic was **algebraically
+incapable of taking any other value**. With `sink = cond − artifact` and a constant
+artifact null shared by both arms, both curves are the same line and the
+matched-performance comparison is the identity `x − art` minus itself. The
+pre-registered **45% favourite** was certain to fire before a single GPU started, and
+would have read as a substantive confirmation of "ablation acts only via capability."
+
+The lesson is that **freezing a rule proves it was not chosen post-hoc; it does not
+prove it can discriminate.** A rule that cannot fail is not a constraint on the
+experimenter — it is a null instrument that manufactures a confident-sounding sentence
+from arbitrary data, and it is *more* dangerous than an unregistered analysis because
+the timestamp lends it credibility. Rule 3 is therefore extended: **a pre-registration
+is incomplete until its decision rule has been evaluated symbolically against the
+quantities it consumes, and at least two branches shown to be reachable.** Cost: one
+line of algebra. Cost of omitting it here: $2.15, a phase that could not answer its own
+question, and the discovery that Phase 13 S2 had already shipped the same defect
+undetected — which is the more expensive half, since a structural error survives every
+downstream phase that inherits it. Recorded also in §8 (ledger entry 8).
+
+*This is the loop's own error, caught by the loop, before the verdict was written into
+the record — the raw-data commit (`6ece2f2`) states the degeneracy in its message. That
+ordering is the only thing that makes it a methodology result rather than an
+embarrassment.*
+
 ## 0. Claims & Scope Index *(the journal's map — seeded 2026-07-16, Phase 5 J0; maintained at every phase close)*
 
 Every claim this record has ever made, its current status, and the scope the
@@ -590,6 +618,20 @@ currently believes.** Statuses: LIVE / KILLED / RETRACTED / REVERSED / SCOPED.
   Coder 1.5B/3B/7B) and a family effect (layer-profile peak depth ≈57% Qwen vs ≈37%
   DeepSeek), so a null on the contrast of interest is an absence rather than a failure
   to look. First non-vLLM measurement instrument in the record.
+- **The head-ablation harness** (Phase 13 S2 / Phase 14) — a forward pre-hook on
+  `self_attn.o_proj` zeroing a head's slice of the projection input
+  (`[h·d_head : (h+1)·d_head]`), architecture-agnostic across the llama-style blocks both
+  families use ([scripts/modal_h1.py] `j13_ablate_gen`). The **mechanism works** and is
+  reusable: it produces graded, monotone capability degradation with dose (K = 0 → 8 on
+  Coder-1.5B: 0.398 → 0.150 for targeted heads, 0.398 → 0.325 for random ones).
+  **⚠ Its adjudication design has failed twice and must not be reused as-is.** Ablating
+  **only the conditioned arm** leaves the record's `sink = cond − artifact` as
+  conditioned performance minus a constant, so *sink* and *capability* are one variable
+  and no comparison between arms can separate them — at K = 16 this surfaced as
+  capability collapse (P13 branch C) and at K ∈ {1,2,4,8} as an identically-zero
+  matched-performance statistic (P14; §8 entry 8). **Any future ablation phase must
+  ablate the i.i.d. arm under the same head set** and score
+  `sink(K) = cond_ablated(K) − iid_ablated(K)`.
 - **The powered targeting instrument** (Phase 10) — the record's matched cells were
   aimed at a Δ_art target using an i.i.d. estimate whose own SE was **0.028** at 8
   candidates/problem, so "on-target" bands of ±0.05–0.08 were 2–3 SE wide and no cell's
@@ -771,6 +813,27 @@ Recorded here so the Index is also the map of what is *deliberately not being ru
     attention (needs line-level bug labels the artifacts lack); **head-level** structure
     (P12 averages over heads); and **head ablation** — the causal step, which would be
     this record's first intervention and needs its own charter.
+    **[HEAD-LEVEL — RUN, Phase 13 S1 ([PHASE_13.md]): artifact attention is more
+    CONCENTRATED in sinking models (top-5% head share +0.014/+0.030; Gini
+    +0.061/+0.052, both pairs, same sign — the 30% underdog). Correlational; four
+    models, one per cell; head-count caveat partly controlled by the 16H-vs-16H pair.]**
+    **[ABLATION — RUN TWICE, BOTH UNINFORMATIVE ABOUT THE SINK. Phase 13 S2: K=16
+    destroyed the model (branch C, instrument miss). Phase 14: the dose-response at
+    K ∈ {1,2,4,8} ran cleanly but its **adjudication statistic was degenerate** —
+    `sink = cond − artifact` with a constant artifact null makes both arms the same
+    line, so the matched-performance Δ is **identically zero for any data** and the 45%
+    favourite fired vacuously ([PHASE_14.md]; §8 entry 8; §10 addendum 2026-07-25). The
+    structural cause: **only the conditioned arm was ablated**, so sink and capability
+    were the same variable. **The causal question is UNANSWERED.** The corrected design
+    is named: ablate the **i.i.d. arm under the same head set** so
+    `sink(K) = cond_ablated(K) − iid_ablated(K)` and each ablation is scored against its
+    own capability baseline (≈8 arms, ≈$2). What Phase 14 *did* establish, scoped to
+    general capability and **not** to the sink: the S1-selected heads are more
+    load-bearing than random heads at matched dose — consistent in sign at every K and
+    decisive at K=8 (RND−TOP +0.1755, paired SE 0.0205, p 1.3e-17;
+    `h14_matched_k_capability.json`). That is a positive control on the S1 ranking, not
+    a mechanism result — high-artifact-attention heads may simply be high-attention
+    heads generally.]**
   - **The synthetic-data sub-claim (rung 3)** — phi-1 is a **replicated sub-threshold
     lean** (−0.033, −0.042 across two measurements) but never crosses; family-n = 1.
     A second *non-phi* synthetic-code family, or phi at a below-floor position via
@@ -1565,6 +1628,29 @@ Run-loss modes are spend-loss modes; hardening is cheaper than any single recurr
    is labelled **inferred** in the sentence that states it. **Consequence:** §0.4
    shelves the internals probe as "outside this record's budget" — a gate set against
    a phantom price, re-priced in Phase 11.
+8. **A frozen decision rule that could not fire *(appended 2026-07-25, Phase 14 —
+   [PHASE_14.md])*.** Phase 14 pre-registered a dose-response adjudication comparing
+   TOP-K against RND-K head ablation **at matched conditioned performance**, by
+   interpolating the RND curve in the (performance, sink) plane. It ran cleanly on
+   eight arms, cost $2.15, and returned **Δ = ±0.0000 at every interpolable K** —
+   because the frozen definition `sink = cond − artifact` uses an artifact null that
+   is a **single constant shared by both arms**, making both curves the same straight
+   line `y = x − art`. Interpolating that line at a TOP point's performance returns
+   that point's own sink, so `Δ ≡ 0` for **every possible dataset**. The
+   pre-registered 45% favourite (branch B, "ablation acts only via capability") was
+   therefore guaranteed to fire, and would have read as a substantive confirmation.
+   It is recorded as **vacuous and not counted as a hit**; branches A and A′ had
+   probability **zero** under the design. The deeper cause is structural: the phase
+   ablated only the **conditioned** arm while its baseline stayed constant, so *sink*
+   and *capability* were the same variable — and **Phase 13 S2 shipped the identical
+   defect undetected**, masked by its own capability-collapse branch. *Practice:*
+   **before spending, evaluate the frozen decision rule symbolically on the
+   quantities it consumes and confirm at least two branches are reachable** — one
+   line of algebra here would have shown the odds table was ill-posed rather than
+   merely wrong. *Class:* this is **not** the drift failure the loop was built to
+   prevent — the rule was frozen before the run, honoured after it, and never tuned.
+   It is the failure mode pre-registration does **not** cover, and §10 now names it
+   (addendum, 2026-07-25).
 
 ## 9. Phase 3R — auditing the two live claims, and the anchoring mechanism
 

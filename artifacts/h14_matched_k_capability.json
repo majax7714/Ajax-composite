@@ -1,0 +1,48 @@
+{
+  "_label": "Phase 14 salvage \u2014 matched-K capability contrast (paired) [PHASE_14.md]",
+  "_note": "The phase's pre-registered sink statistic is degenerate by construction; this file reports ONLY the general-capability contrast, which is not.",
+  "n_problems": 44,
+  "anchor_K0_perf": 0.3976,
+  "matched_K": [
+    {
+      "K": 1,
+      "top_perf": 0.3843,
+      "rnd_perf": 0.4017,
+      "rnd_minus_top": 0.0174,
+      "paired_se": 0.0183,
+      "t": 0.95,
+      "p": 0.34109239266834346,
+      "n": 44
+    },
+    {
+      "K": 2,
+      "top_perf": 0.3627,
+      "rnd_perf": 0.4042,
+      "rnd_minus_top": 0.0414,
+      "paired_se": 0.022,
+      "t": 1.88,
+      "p": 0.05979053380621299,
+      "n": 44
+    },
+    {
+      "K": 4,
+      "top_perf": 0.3451,
+      "rnd_perf": 0.3863,
+      "rnd_minus_top": 0.0412,
+      "paired_se": 0.0228,
+      "t": 1.8,
+      "p": 0.07128556721493284,
+      "n": 44
+    },
+    {
+      "K": 8,
+      "top_perf": 0.1498,
+      "rnd_perf": 0.3253,
+      "rnd_minus_top": 0.1755,
+      "paired_se": 0.0205,
+      "t": 8.55,
+      "p": 1.2812506071007253e-17,
+      "n": 44
+    }
+  ]
+}
