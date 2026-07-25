@@ -369,7 +369,7 @@ same problems.
 | **M3** | StarCoder2-3B | organic | +0.033 | 0.328 → 0.336 | **+0.008** [−0.075, +0.088] | 0.578 | **No** | 39 |
 | **M2** | general-1.5B | general | +0.064 | 0.266 → 0.265 | **−0.000** [−0.066, +0.059] | 0.501 | **No** | 28 |
 | **M5** | Coder-0.5B | coder | +0.081 | 0.123 → 0.167 | **+0.044** [−0.005, +0.090] | 0.959 | **No** | 43 |
-| **M4** | Coder-7B | coder | −0.039 | 0.702 → 0.574 | **−0.129** [−0.206, −0.054] | **0.0024** | **YES** | 20 |
+| **M4** | Coder-7B | coder | −0.039 | 0.702 → 0.574 | ~~**−0.129** [−0.206, −0.054]~~ | ~~**0.0024**~~ | ~~**YES**~~ **RETRACTED** | 20 |
 
 Reference rows (already at ≈ match, fixed-0.494): **Coder-1.5B −0.095 (sink)**,
 **Coder-3B −0.150 (sink)**. All five M-cells landed in the straddle band (P0.2
@@ -474,7 +474,8 @@ The six closure conditions, audited:
 (it stayed a lift-arm point; M3 needed running and came out flat at match). P1 the
 **30% middle branch fired**, not the 45% favourite (H-diet-modulated rejected — no
 universal negative pressure); H-universal (15%) rejected. The unanticipated result —
-**7B sinks at match, reversing Phase 6's scale-bound** — was *produced by* the
+~~**7B sinks at match, reversing Phase 6's scale-bound**~~ **[RETRACTED — see the
+P10 addendum at the end of this document]** — was *produced by* the
 matched design, exactly the confound class the phase existed to expose. No gate was
 passed by tuning. Re-anchor (P0.3c) resolved **moot** by the provenance audit ($3
 saved).
@@ -488,3 +489,66 @@ the **7B matched-sink confirmation at higher n**; the **0.5B straddle via
 generated artifacts** (resolves the reopened lower bound); the standing successors
 (dose-response hint set; 7B–72B switch-on; TTT/weight-space). **Nothing is running;
 Phase 7 is fully closed.**
+
+---
+
+## CORRECTION ADDENDUM (2026-07-25, Phase 10 R4) — **the 7B sink, and with it P1's scale reversal, is RETRACTED**
+
+*Appended under append-only; all Phase-7 text above stands unrevised, with in-place
+markers at the two claim sites. Source: [PHASE_10.md] R4,
+`h10_r4_coder7b_m4replication.json`.*
+
+**M4 does not replicate on its own inputs.** Phase 10 R4 re-ran M4's configuration with
+a powered targeting instrument (k = 24 per-problem i.i.d.; predicted Δ_art −0.0467,
+achieved **−0.0466**) at **n = 37**. R4's problem set **fully contains M4's 20**, and on
+those 20 problems **both runs used the identical artifacts** (mean 0.6631 — M4's own
+set). This is not a subset, level, or position comparison; it is the same experiment,
+re-run.
+
+| on M4's own 20 problems and artifacts | conditioned mean | cond − artifact |
+|---|---|---|
+| **M4** (this phase, seed 17) | 0.5738 | **−0.0893** |
+| **R4** (Phase 10, seed 107) | 0.6660 | **+0.0030** |
+
+Paired difference on the **conditioned** arm: **+0.0923, sd 0.1396, SE 0.0312 → 2.96 SE,
+p = 0.0027.** The **i.i.d. control** arm differs by only +0.0282 (≈1 SE). The two runs
+separate on the arm that carries the claim and not on the arm that does not.
+
+**Scaffold verified identical before concluding.** `j7_matched` (this phase) and
+`_matched_cell` (Phases 8/10) construct items identically, use the same frozen
+`_d2c_context` wording, the same 8 candidates, the same model and pinned revision, and
+the same `max_model_len`/`max_tokens` defaults. `j7_matched` never passes a seed, so it
+took `h1_gen_lcb`'s default **17**; R4 used **107**. The differences are the generation
+seed and batch composition (40 vs 74 items) — exactly what a replication varies under
+the record's statistical standard (D14).
+
+**Every Coder-7B cell at n ≥ 30 agrees on ≈ 0:** C4 −0.003 (n = 37, withdrawn
+2026-07-24 for criterion drift), R3 −0.010 (n = 30), R4 −0.004 (n = 37). The lone
+n = 20 dissenter is M4.
+
+**What is retracted:**
+
+- **M4's −0.129 / "7B sinks at match"** — the cell does not reproduce.
+- **P1's headline reversal** ("the code sink is NOT scale-bounded; the P6 window's
+  upper bound was position") — it rested entirely on M4.
+- **Gate item 2's** "scale-bound reversed" and **gate item 6's** retraction of the
+  "vanishes at Coder-7B" line for the code channel — both are themselves now withdrawn.
+
+**What is NOT retracted, and must not be over-read:**
+
+- **The Coder-diet finding at 1.5B is untouched** (D2c −0.121, G1c −0.155, G1d −0.193),
+  as is Phase 9's provenance control.
+- **P1's family result is untouched** — DeepSeek, StarCoder2 and general-Qwen show no
+  sink at match. The matched-artifact design's central contribution stands.
+- **The J5/Phase-6 "scale-bounded" reading is not restored.** P1's critique of it —
+  that those cells were measured only far over-quality — stands on its own terms. The
+  scale question is **OPEN**.
+- **"7B sinks at match" was never tested at match.** M4 sat at Δ_art −0.039, R4 at
+  −0.047, and R3 aimed at 0 and missed. [PHASE_10.md] R5 measures Δ_art ≈ 0 directly.
+
+**Method note.** M4 was a single n = 20 cell whose result was carried into the abstract,
+two Index rows, the claims-to-evidence layer, and an extraction spec, and was
+"confirmed" once by a cell (C4) that had drifted off-position under a criterion that had
+itself drifted. The record's own defenses — distinct-seed replication and the
+below-both-nulls definition — would have caught it earlier had either been applied to a
+positive result rather than to controls.
