@@ -694,3 +694,69 @@ Across Phase 10 the loop's favourites have now gone 1-for-4 on substance (70% MI
 65% MISS, 45% MISS, 75% HIT) while a 5%-priced and a 35%-priced branch both fired. The
 one prediction that hit was about the *instrument*, not the science — which is a fair
 summary of what this phase produced.
+
+---
+
+## R5 + R6 — true match at 7B, and the D2 trough after the retraction *(pre-registered 2026-07-25, BEFORE spend)*
+
+*Author authorized the retraction pass plus a true-match cell, then "proceed with the
+loop." R6 is a free consequence discovered while scoping R5 and is pre-registered here
+rather than run silently.*
+
+### R5 — Coder-7B at Δ_art ≈ 0 (paid; the position never tested)
+
+The retracted claim said "7B sinks **at match**." No 7B cell has ever been measured at
+match: M4 sat at −0.039, R4 at −0.047, C4 at −0.101, R3 aimed at 0 and missed. R5
+measures it.
+
+**Design.** Reuses the **cached powered k = 24 map** (seeds 71 + 91 — no new sweep, $0
+for targeting). Frozen miner rule; select (target, band) maximising **n** subject to
+**|predicted Δ_art| ≤ 0.010**, tie-break smaller |pred Δ_art|, then narrower band. Cell
+via `_matched_cell` at **seed 131** (distinct from 17/43/71/89/91/107). **Minimum
+n = 25.** **On-target |Δ_art(powered)| ≤ 0.020.** Criterion: the original
+**below-both-nulls**; legacy signature reported, not adjudicative. A miss is reported,
+not re-run to fit.
+
+*Note on the two nulls at match:* at Δ_art ≈ 0 the i.i.d. and copy nulls converge by
+construction, so `cond − artifact ≈ cond − i.i.d.` This is the position where the
+Phase-7+ signature and the original definition **agree** — R5 is therefore the one cell
+in this phase whose verdict does not depend on which criterion is used, which is
+precisely why it is worth running.
+
+| # | branch | reading | odds |
+|---|---|---|---|
+| **A** | **NO SINK at true match** (cond − artifact > −0.03) | Coder-7B shows no excess degradation anywhere measured (−0.10 → 0); the retraction is complete and the scale question resolves toward **the sink being 1.5B–3B, absent at 7B** — though on matched evidence this time, not J5/P6's confounded cells | **60%** |
+| **B** | **SINK at true match** (below both nulls, ≤ −0.05, p < 0.05) | position-gating is real and sharply peaked at 0; M4 was noise but its *conclusion* was accidentally right, and the trough is much narrower than D2 modelled | **25%** |
+| **C** | intermediate | unresolved; a larger-n design named | **10%** |
+| **D** | off-target / n < 25 | instrument miss | **5%** |
+
+**Cost estimate: $0.10–0.25** (cell only, ≈ 2 × 29 × 8 ≈ 464 generations; targeting
+map cached). Calibrated from R4's measured rate. Reconciled at phase close per
+[AUTONOMOUS_LOOP.md] Amendment 2.
+
+### R6 — refit D2's response curve without the retracted point (free, no GPU)
+
+**M4 is one of the six Coder points in Phase 8's D2 fit** — `[-0.0393, -0.1286,
+'M4 Coder-7B*']` — sitting immediately beside the deepest point (−0.0744, −0.1502) that
+sets the trough. D2's vertex (−0.0923), its "interior trough" reading, and the
+**POSITION-GATED mechanism call** therefore rest partly on a now-retracted cell. This
+was not visible when the retraction was authorised; it is recorded here on discovery.
+
+**Analysis.** Refit the Coder curve (a) with M4 removed, and (b) with M4 removed and the
+three new well-powered 7B cells added — C4 (−0.1007, −0.1033), R3 (−0.0396, −0.0490),
+R4 (−0.0466, −0.0566), plus R5 when it lands. Report the vertex, R², and whether the
+trough remains interior. Output `artifacts/h10_r6_d2_refit.json` +
+`scripts/j10_r6_d2_refit.py`.
+
+| # | prediction | odds |
+|---|---|---|
+| 1 | **The refit does not support a single Coder trough**: the 7B points lie near the imitation line (Δ_cond ≈ Δ_art) while 1.5B/3B sit well below it, so D2's curve was **pooling two scales** and its trough is an artifact of that pooling | **55%** |
+| 2 | The trough survives with a shifted vertex (still interior, R² ≥ 0.6) | **30%** |
+| 3 | Underdetermined — too few points per scale to fit anything defensible | **15%** |
+
+**Decision rule.** If prediction 1 holds, Phase 8's **POSITION-GATED** call is flagged
+as scale-confounded and the mechanism line returns to OPEN on that axis — recorded as a
+finding, propagated no further without author sign-off, since it touches a mechanism
+claim. If 2 holds, D2 stands with a corrected vertex. If 3, the honest report is that
+the response curve is not estimable at the record's current cell count, and that is
+itself worth knowing before any further mechanism work.
