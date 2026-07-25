@@ -2405,6 +2405,142 @@ def j10_r3():
           f"    BRANCH: {branch} ===")
 
 
+# --- Phase 10 R4: powered k=24 instrument + M4 replication ([PHASE_10.md] R4) ---
+R4_AUG_SEED = 91       # augmentation draw, pooled with the committed seed-71 k=8
+R4_AUG_K = 16          # 8 (seed 71) + 16 (seed 91) = k 24
+R4_CELL_SEED = 107     # distinct from 17/43/71/89/91
+R4_TARGET_DART = -0.039    # M4's relational position
+R4_DART_TOL = 0.010        # targeting constraint
+R4_TARGET_LEVEL = 0.663    # M4's absolute artifact level (preference, not constraint)
+R4_MIN_N = 30
+R4_ON_TARGET = 0.020
+
+
+@app.local_entrypoint()
+def j10_r4():
+    """Phase 10 R4 — powered (k=24) targeting, then a replication of M4's cell.
+
+    Pre-registered [PHASE_10.md] R4 at commit 3899fd6, BEFORE this ran."""
+    import statistics as st
+    mid, rev = R3_MODEL
+    qids, pool = _r3_donor_pool()
+
+    # --- powered map: augment the committed seed-71 k=8 sweep to k=24 ---
+    g71 = _load("j10_r3_selsweep_cand")
+    r71 = _load("j10_r3_selsweep_res")
+    assert g71 and r71, "seed-71 sweep must be present (R3)"
+    fr71 = {x["qid"]: [c["frac"] for c in row] for x, row in zip(g71, r71)}
+
+    g91 = _load("j10_r4_aug_cand") or _persist(
+        "j10_r4_aug_cand",
+        h1_gen_lcb.remote(mid, [{"qid": q, "context": None} for q in qids], R4_AUG_K,
+                          tag="j10_r4_aug_cand", seed=R4_AUG_SEED, revision=rev))
+    r91 = _load("j10_r4_aug_res") or _persist(
+        "j10_r4_aug_res",
+        h1_lcb_exec.remote([x["qid"] for x in g91], [x["codes"] for x in g91],
+                           tag="j10_r4_aug_res"))
+    fr91 = {x["qid"]: [c["frac"] for c in row] for x, row in zip(g91, r91)}
+
+    powered, kcount = {}, {}
+    for q in qids:
+        f = fr71.get(q, []) + fr91.get(q, [])
+        if f:
+            powered[q] = st.mean(f)
+            kcount[q] = len(f)
+    kmin = min(kcount.values())
+    print(f"powered map: {len(powered)} problems, k={kmin}-{max(kcount.values())}, "
+          f"mean i.i.d. {st.mean(powered.values()):.4f}")
+    # empirical check of the promised precision: split-half of the pooled draws
+    half = [abs(st.mean(fr71[q]) - st.mean(fr91[q])) for q in powered
+            if fr71.get(q) and fr91.get(q)]
+    print(f"  mean |k8 vs k16 per-problem gap| = {st.mean(half):.4f}")
+
+    # --- targeting: max n s.t. |pred Δart - target| <= tol; prefer level near M4's ---
+    grid = []
+    for i in range(61):
+        ctr = 0.50 + 0.01 * i
+        for hw in (0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.10):
+            s = _r3_select(pool, qids, powered, ctr, hw)
+            if len(s) < R4_MIN_N:
+                continue
+            ma = st.mean(c[1] for c in s.values())
+            si = st.mean(powered[q] for q in s)
+            grid.append({"target": round(ctr, 3), "hw": hw, "n": len(s),
+                         "mean_art": round(ma, 4), "subset_iid": round(si, 4),
+                         "pred_dart": round(ma - si, 4)})
+    ok = [x for x in grid if abs(x["pred_dart"] - R4_TARGET_DART) <= R4_DART_TOL]
+    if not ok:
+        near = sorted(grid, key=lambda x: abs(x["pred_dart"] - R4_TARGET_DART))[:5]
+        print(f"INFEASIBLE: no (target, band) at n>={R4_MIN_N} with |pred Δart "
+              f"- {R4_TARGET_DART}| <= {R4_DART_TOL}. Nearest: {near}")
+        (REPO / "artifacts/h10_r4_targeting.json").write_text(json.dumps(
+            {"_label": "Phase 10 R4 targeting [PHASE_10.md R4]", "grid": grid,
+             "chosen": None, "nearest": near,
+             "branch": "D — infeasible at the pre-registered constraint"}, indent=2))
+        return
+    ch = sorted(ok, key=lambda x: (-x["n"], abs(x["mean_art"] - R4_TARGET_LEVEL)))[0]
+    print(f"targeting: target {ch['target']} ±{ch['hw']}  n={ch['n']}  "
+          f"art {ch['mean_art']:.4f} (M4 0.6631)  powered subset i.i.d. "
+          f"{ch['subset_iid']:.4f}  pred Δart {ch['pred_dart']:+.4f}")
+    (REPO / "artifacts/h10_r4_targeting.json").write_text(json.dumps(
+        {"_label": "Phase 10 R4 targeting [PHASE_10.md R4]",
+         "powered_k_min": kmin, "aug_seed": R4_AUG_SEED, "cell_seed": R4_CELL_SEED,
+         "target_dart": R4_TARGET_DART, "dart_tol": R4_DART_TOL,
+         "grid": grid, "chosen": ch}, indent=2))
+
+    sel = _r3_select(pool, qids, powered, ch["target"], ch["hw"])
+    arts = [{"qid": q, "cand_idx": c[0], "code": c[2], "frac": c[1],
+             "n_tests": c[3], "n_failed": c[3] - c[4]} for q, c in sorted(sel.items())]
+
+    out = _matched_cell(mid, rev, R4_CELL_SEED, arts, "R4_coder7b_m4replication",
+                        f"donor pool @ {ch['target']} ±{ch['hw']}, powered k={kmin} "
+                        f"targeting (aug seed {R4_AUG_SEED}), cell seed {R4_CELL_SEED}")
+
+    # --- below-both-nulls adjudication (original criterion) ---
+    n = out["n_problems"]
+    dres = _load("j8_res_R4_coder7b_m4replication")
+    e1 = [st.mean(x["frac"] for x in row) for row in dres[n:]]
+    d_copy = [a - b["frac"] for a, b in zip(e1, arts)]
+    p_copy = _wilcoxon_mc_one_sided([-x for x in d_copy])
+    me0, me1, mc = out["mean_iid_e0"], out["mean_cond_e1"], out["mean_copy_null"]
+    resid = round(me1 - mc, 4)
+    dart_powered = round(mc - ch["subset_iid"], 4)
+    dart_cell = out["actual_delta_art"]
+    below_both = bool(me1 < me0 and me1 < mc and p_copy < 0.05 and resid <= -0.05)
+    on_target = abs(dart_powered - R4_TARGET_DART) <= R4_ON_TARGET
+    if not on_target or n < R4_MIN_N:
+        branch = f"D — off-target (Δart_powered {dart_powered:+.4f}) or n={n}<{R4_MIN_N}"
+    elif below_both:
+        branch = "A — M4 REPLICATES (below both nulls)"
+    elif resid > -0.03:
+        branch = "B — M4 DOES NOT REPLICATE (7B leg falls; HALT per §3.1)"
+    else:
+        branch = "C — intermediate/ambiguous"
+    adj = {"_label": "Phase 10 R4 result [PHASE_10.md R4]", "prereg_commit": "3899fd6",
+           "cell": out, "n": n, "powered_k_min": kmin,
+           "achieved_delta_art_powered": dart_powered,
+           "achieved_delta_art_cell_k8": dart_cell,
+           "predicted_delta_art": ch["pred_dart"],
+           "dart_prediction_hit": bool(abs(dart_powered - ch["pred_dart"]) <= 0.02),
+           "residual_cond_minus_artifact": resid,
+           "p_one_sided_cond_below_artifact": p_copy,
+           "below_both_nulls": below_both,
+           "matched_sink_signature_legacy": out["matched_sink_signature"],
+           "on_target": on_target, "branch": branch, "targeting": ch,
+           "m4_reference": {"n": 20, "delta_art": -0.0393, "iid": 0.7023,
+                            "artifact": 0.6631, "cond": 0.5738,
+                            "cond_minus_artifact": -0.0893, "p": 0.0024}}
+    (REPO / "artifacts/h10_r4_coder7b_m4replication.json").write_text(
+        json.dumps(adj, indent=2))
+    print(f"\n=== R4: n={n}  Δart_powered {dart_powered:+.4f} (pred {ch['pred_dart']:+.4f}, "
+          f"cell-k8 {dart_cell:+.4f})\n"
+          f"    iid {me0:.4f} → cond {me1:.4f}   artifact {mc:.4f}\n"
+          f"    cond-artifact {resid:+.4f}  p(cond<artifact) {p_copy:.4f}  "
+          f"BELOW-BOTH-NULLS {below_both}\n"
+          f"    M4 was: cond-artifact -0.0893 p 0.0024 (n=20)\n"
+          f"    BRANCH: {branch} ===")
+
+
 @app.local_entrypoint()
 def j9_g2_phi():
     """G2 (fired by the DIET branch) — phi-1 at its TRUE match, iterative-targeted

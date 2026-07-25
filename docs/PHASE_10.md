@@ -574,3 +574,123 @@ generations, cell ≈ 2 × 32 × 8 ≈ 512, total ≈ 1,800. Per [AUTONOMOUS_LOO
 Amendment 2 this estimate is reconciled against the bill at phase close.
 Month-to-date before this run: **$78.31 of the $200 cap**; cumulative loop spend
 **≈$0.27 of the $90/$110 envelope**.
+
+---
+
+## R4 RESULT (2026-07-25) — **BRANCH B: M4 does not replicate. The 7B leg has no surviving evidence.** *(`h10_r4_coder7b_m4replication.json`, `h10_r4_targeting.json`)*
+
+### The instrument worked
+
+The powered map was built by augmentation (16 candidates at seed 91 pooled with the
+committed 8 at seed 71 → **k = 24** on all 80 problems) and **its precision claim was
+verified, not asserted**: the split-half gap between the k=8 and k=16 halves came in at
+**0.0994** against a predicted ≈0.105, implying a per-candidate σ ≈ 0.303 and a k=24
+per-problem sd of **0.0618** — against the 0.0619 predicted. SE of a 30-problem subset
+mean falls **0.028 → 0.011** as specified.
+
+Targeting then landed **target 0.67 ±0.08, n = 37**, artifact 0.6736 (M4: 0.6631),
+powered subset i.i.d. 0.7202, **predicted Δ_art −0.0467**. Achieved: **−0.0466**.
+
+> **The methodological prediction (75%) HIT, to within 0.0001.** R3's equivalent
+> prediction failed by 1.1 SE at k=8; at k=24 the same procedure is accurate to the
+> fourth decimal. The instrument is the fix it was designed to be.
+
+### The cell
+
+| | n | Δ_art (powered) | i.i.d. | artifact | cond | **cond − artifact** | p(cond<art) | below both nulls |
+|---|---|---|---|---|---|---|---|---|
+| **R4** | 37 | −0.0466 | 0.7264 | 0.6736 | 0.6699 | **−0.0037** | 0.457 | **NO** |
+
+**Branch B.** No excess degradation: Coder-7B lands within 0.004 of the artifact it was
+shown.
+
+**Note what the legacy criterion says about this same cell: `matched_sink_signature =
+True`** (Δ vs i.i.d. −0.0566, p 0.0497). Had R4 been scored the Phase-7+ way it would
+have been recorded today as *another* 7B sink confirmation. P0.2's criterion drift,
+caught prospectively on a fresh cell rather than retrospectively on an old one.
+
+### The same-problem, same-artifact replication — the decisive comparison
+
+R4's 37 problems **fully contain M4's 20**, and on those 20 **both runs used the
+identical artifacts** (artifact mean 0.6631 in both — M4's own set). This is therefore
+not a subset comparison, a level comparison, or a position comparison. It is the same
+experiment, re-run.
+
+| on M4's own 20 problems, M4's own 20 artifacts | conditioned mean | **cond − artifact** |
+|---|---|---|
+| **M4** (Phase 7, seed 17) | 0.5738 | **−0.0893** |
+| **R4** (Phase 10, seed 107) | 0.6660 | **+0.0030** |
+
+Paired difference on the conditioned arm: **+0.0923, sd 0.1396, SE 0.0312 → 2.96 SE,
+p = 0.0027.** The i.i.d. control arm differs by only **+0.0282 (≈1 SE)** — ordinary
+seed noise. The two runs are separated on the arm that carries the claim, and not on
+the arm that doesn't.
+
+**Scaffold verified identical** before drawing this conclusion: `j7_matched` and
+`_matched_cell` build items the same way, use the same frozen `_d2c_context` wording,
+the same 8 candidates, the same model and pinned revision, and the same
+`max_model_len`/`max_tokens` defaults. `j7_matched` simply never passes a seed, so it
+took `h1_gen_lcb`'s default **17**; R4 used **107**. The differences are the generation
+seed and the batch composition (40 vs 74 items) — precisely what a replication varies
+under the record's statistical standard (D14).
+
+### The full Coder-7B picture
+
+| cell | n | seed | Δ_art | cond − artifact | verdict (below both nulls) |
+|---|---|---|---|---|---|
+| **M4** (P7) | 20 | 17 | −0.039 | **−0.0893** | the claim's sole support |
+| **C4** (P8) | 37 | 43 | −0.101 | −0.0026 | no — withdrawn 2026-07-24 |
+| **R3** (P10) | 30 | 89 | −0.040 | −0.0097 | no (off-target) |
+| **R4** (P10) | 37 | 107 | −0.047 | **−0.0037** | **no** (on-target, powered) |
+
+**Three independent cells at n = 30–37 agree on ≈ 0. One cell at n = 20 dissents, and
+it does not survive re-running on its own inputs.** The parsimonious reading is that
+M4's −0.0893 was a low outlier on the conditioned draw (~3 SE).
+
+### What this establishes — and what it does not
+
+**Established.** At every relational position where Coder-7B has been measured
+(Δ_art −0.047, −0.040, −0.101, plus J5/Phase-6's far-over-quality cells), it shows
+**no excess degradation** under the original below-both-nulls criterion. The one
+contrary cell does not replicate on identical inputs.
+
+**Not established, and stated plainly:**
+
+- **True match (Δ_art ≈ 0) at 7B remains unmeasured.** M4 sat at −0.039 and R4 at
+  −0.047; R3 aimed at 0 and missed. The claim "7B sinks *at match*" has, in fact, never
+  been tested at Δ_art ≈ 0 — though it is now bracketed by clean measurements on both
+  sides.
+- **Nothing here touches the 1.5B sink**, which is large, repeated, and measured on
+  independent cells (D2c −0.121, G1c −0.155, G1d −0.193). The Coder-diet finding at
+  1.5B, and Phase 9's provenance control, are untouched.
+- **This is a replication failure, not a demonstration that the effect is impossible.**
+
+**Consequences the author must adjudicate — the loop does not touch them.** Phase 7's
+headline **reversal** ("the code sink is NOT scale-bounded — Qwen-Coder-7B sinks at
+match, −0.129, p 0.0024, n = 20") rested entirely on M4. With C4 withdrawn and M4
+non-replicating, that reversal has no evidence behind it, and the J5/Phase-6 reading it
+overturned ("at 7B the code channel blends; the sink is scale-bounded") is no longer
+contradicted — though it cannot simply be restored either, since Phase 7's critique of
+it (measured only far over-quality) still stands on its own terms. The affected text
+includes Index rows 8 and 11, §0.3 row 8, the abstract's Phases 6–7 banner,
+[PHASE_7.md]'s P1 result, and §0.2's extraction spec (axis iii).
+
+**Under [AUTONOMOUS_LOOP.md] §3.1 this is a 1:1 refutation of a LIVE claim's sole
+support, and the loop HALTS.** No Index, abstract, or Phase-7 text has been edited.
+Amendment 1's delegated authority covers choices between approaches; it does not cover
+retracting a headline claim.
+
+### Prediction accounting
+
+| prediction | odds | outcome |
+|---|---|---|
+| **A** M4 replicates | **45%** | **MISS** |
+| **B** M4 does not replicate | 35% | **FIRED** |
+| C intermediate | 15% | — |
+| D off-target | 5% | — |
+| methodological — Δ_art within ±0.02 of predicted | **75%** | **HIT** (0.0001) |
+
+Across Phase 10 the loop's favourites have now gone 1-for-4 on substance (70% MISS,
+65% MISS, 45% MISS, 75% HIT) while a 5%-priced and a 35%-priced branch both fired. The
+one prediction that hit was about the *instrument*, not the science — which is a fair
+summary of what this phase produced.
