@@ -469,6 +469,25 @@ a model-dependent quantity, close the loop on the **measured** relation — iter
 trusting a single-pass mine to a proxy. Matching to threshold means measuring where the
 threshold actually landed.
 
+**Addendum (2026-07-24, before Phase 10 — the loop runs unattended, and says so).**
+From Phase 10 the phase loop advances between author check-ins rather than at every
+turn. The method above is unchanged; only who moves the cursor changes. The operating
+spec is frozen in [AUTONOMOUS_LOOP.md] and pre-registered the same way a run is —
+process committed before it executes, so drift in *how* the record is produced is
+visible against a frozen statement, not just drift in what it claims. Per §10's own
+practice of naming a reframe's drift risk before it can bite: an unattended loop is
+**both experimenter and author of the verdict**, and nothing in the spec eliminates
+that. What it constrains is the *ordering* — pre-registration is committed to git
+before the data exists, the phase doc records that commit hash, and each artifact
+records the hash it ran under, so a third party can verify from `git log` that the
+predictions predate the numbers. This is strictly stronger than the manual phases had:
+Phases 0–9 rested on the author's testimony that the pre-registration came first;
+Phase 10 onward rests on a timestamp. One rule is added to the halt list and belongs
+here because it is methodological, not operational: **a result that directly refutes a
+LIVE claim 1:1 stops the loop** — everything short of that is *inspected*, promoted
+from caveat to named hypothesis, and given a discriminating cell (the Phase 8 → 9 move).
+Caution must not be allowed to suppress the record's most productive behaviour.
+
 ## 0. Claims & Scope Index *(the journal's map — seeded 2026-07-16, Phase 5 J0; maintained at every phase close)*
 
 Every claim this record has ever made, its current status, and the scope the
