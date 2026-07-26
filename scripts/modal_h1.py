@@ -2647,6 +2647,11 @@ def j10_r5():
 P11_MODELS = {
     "coder1p5b": ("Qwen/Qwen2.5-Coder-1.5B", "df3ce67c0e24480f20468b6ef2894622d69eb73b"),
     "coder3b":   ("Qwen/Qwen2.5-Coder-3B",   "09d9bc5d376b0cfa0100a0694ea7de7232525803"),
+    # Phase 19 ([PHASE_19.md]) — the ARCHITECTURE TWIN, added as a rung so it runs the
+    # byte-identical path that produced the Coder rungs. Same base, verified same
+    # 28L x 12H, same scale as coder1p5b; differs only in the Coder continued-pretraining
+    # stage. Same revision Phases 7 and 15 measured.
+    "general1p5b": ("Qwen/Qwen2.5-1.5B", "8faed761d45a263340a0528343f099c05c9a4323"),
 }
 P11_SWEEP_SEED = 151
 P11_CELL_SEED = 173
@@ -4055,6 +4060,127 @@ def j18_temp():
                    "parse_ok": bool(parse_ok), "position_ok": bool(pos_ok)},
          "branch": branch, "stack": _stack_block()}, indent=2))
     print("wrote artifacts/h18_temperature.json")
+
+
+# --- Phase 19: the architecture twin at TRUE match ([PHASE_19.md]) ---
+
+P19_SIBLING_CI = [-0.1258, -0.0028]   # h11_coder1p5b.json delta_cond_minus_iid_ci95
+P19_SIBLING_EFFECT = -0.0638          # the Coder sibling's cond - iid at true match
+P19_PRED_COMPRESSION = -0.0398        # h19_p0_position_audit.json, twin intercept
+P19_PRED_COMPRESSION_CI = [-0.0790, -0.0021]
+
+
+@app.local_entrypoint()
+def j19_twin():
+    """Phase 19 — general-Qwen-1.5B (the architecture twin) at TRUE match, powered.
+    Pre-registered [PHASE_19.md] BEFORE this ran.
+
+    Generation is delegated to j11_ladder's rung path so the twin runs the SAME code,
+    donor pool, selector, seeds (sweep 151 / cell 173) and k as the Coder rungs. This
+    entrypoint adds only the Phase-19 adjudication, whose rules are CI-referenced and
+    whose kill criteria are evaluated INSIDE the branch expression (§8 entry 11 — Phase
+    18 computed its kill criteria, printed them, and let its branch tree ignore them).
+    """
+    import ast
+    import random as _rnd
+    import statistics as st
+
+    cell = "general1p5b"
+    j11_ladder(cell)                       # generates + writes h11_general1p5b.json
+
+    adj = json.loads((REPO / f"artifacts/h11_{cell}.json").read_text())
+    tgt = json.loads((REPO / f"artifacts/h11_targeting_{cell}.json").read_text())
+    if not tgt.get("chosen"):
+        (REPO / "artifacts/h19_twin.json").write_text(json.dumps(
+            {"_label": "Phase 19 — twin at true match [PHASE_19.md]",
+             "prereg_commit": "PENDING", "branch": "D — targeting INFEASIBLE at n>=30",
+             "targeting": tgt.get("nearest")}, indent=2))
+        print("\n=== BRANCH D — targeting infeasible; no cell, no adjudication ===")
+        return
+
+    n = adj["n"]
+    dart = adj["achieved_delta_art_powered"]
+    cand, res = _load(f"j8_cand_P11_{cell}"), _load(f"j8_res_P11_{cell}")
+    per_i = [st.mean(x["frac"] for x in row) for row in res[:n]]
+    per_c = [st.mean(x["frac"] for x in row) for row in res[n:]]
+    d = [c - i for i, c in zip(per_i, per_c)]
+
+    rng = _rnd.Random(311)
+    acc = sorted(st.mean([d[rng.randrange(n)] for _ in range(n)]) for _ in range(4000))
+    lo, hi = round(acc[100], 4), round(acc[3900], 4)
+    eff = round(st.mean(d), 4)
+
+    ok = tot = 0
+    for c in cand:
+        for code in c["codes"]:
+            tot += 1
+            if code:
+                try:
+                    ast.parse(code)
+                    ok += 1
+                except SyntaxError:
+                    pass
+    parse = ok / tot if tot else 0.0
+
+    # ---- frozen gates, ALL evaluated in the expression that picks the branch
+    on_target = abs(dart) <= P11_ON_TARGET
+    powered = n >= P11_MIN_N
+    parse_ok = parse >= 0.95
+    sinks = hi < 0
+    clean = lo <= 0 <= hi
+    like_sibling = P19_SIBLING_CI[0] <= eff <= P19_SIBLING_CI[1]
+
+    print(f"\n=== P19 TWIN {cell}  n={n}  Δ_art {dart:+.4f}  parse {parse:.4f} ===")
+    print(f"  cond − iid {eff:+.4f}  CI95 [{lo:+.4f},{hi:+.4f}]")
+    print(f"  predictions: compression law {P19_PRED_COMPRESSION:+.4f} "
+          f"{P19_PRED_COMPRESSION_CI} | DIET claim +0.0000 | "
+          f"Coder sibling {P19_SIBLING_EFFECT:+.4f}")
+    print(f"  [gates] on_target {on_target} (|{dart:+.4f}| <= {P11_ON_TARGET})   "
+          f"n>={P11_MIN_N} {powered}   parse>=0.95 {parse_ok}")
+    print(f"  [read ] CI excludes 0 (SINKS) {sinks}   CI includes 0 (CLEAN) {clean}   "
+          f"inside sibling CI {like_sibling}")
+
+    if not (on_target and powered and parse_ok):
+        branch = ("KILLED — a frozen criterion fired "
+                  f"(on_target {on_target}, n>={P11_MIN_N} {powered}, "
+                  f"parse_ok {parse_ok}); no adjudication")
+    elif sinks:
+        branch = ("B — TWIN SINKS at true match; the family contrast in rows 8/11 was "
+                  "partly position" + (" (and is indistinguishable from the Coder "
+                                       "sibling)" if like_sibling else ""))
+    elif clean:
+        branch = ("A — TWIN CLEAN at true match; the DIET attribution rests on "
+                  "symmetric evidence and the compression intercept is refuted "
+                  "out-of-sample")
+    else:
+        branch = "C — CI excludes 0 on the positive side; read the table"
+
+    pred_hit = P19_PRED_COMPRESSION_CI[0] <= eff <= P19_PRED_COMPRESSION_CI[1]
+    print(f"  [pred ] compression-law CI contains the observed effect: {pred_hit}")
+    print(f"\n=== BRANCH {branch} ===")
+
+    (REPO / "artifacts/h19_twin.json").write_text(json.dumps(
+        {"_label": "Phase 19 — architecture twin at true match [PHASE_19.md]",
+         "prereg_commit": "PENDING", "model": P11_MODELS[cell][0],
+         "revision": P11_MODELS[cell][1], "n": n,
+         "achieved_delta_art_powered": dart, "parse_rate": round(parse, 4),
+         "cond_minus_iid": eff, "ci95": [lo, hi],
+         "mean_iid": adj["cell"]["mean_iid_e0"], "mean_cond": adj["cell"]["mean_cond_e1"],
+         "mean_artifact": adj["cell"]["mean_copy_null"],
+         "residual_cond_minus_artifact": adj["residual_cond_minus_artifact"],
+         "verdict_legacy_p11_rule": adj["verdict"],
+         "below_both_nulls_p11_rule": adj["below_both_nulls"],
+         "predictions": {"compression_law": P19_PRED_COMPRESSION,
+                         "compression_law_ci": P19_PRED_COMPRESSION_CI,
+                         "compression_law_hit": bool(pred_hit),
+                         "diet_claim": 0.0,
+                         "coder_sibling": P19_SIBLING_EFFECT,
+                         "sibling_ci": P19_SIBLING_CI},
+         "gates": {"on_target": bool(on_target), "powered": bool(powered),
+                   "parse_ok": bool(parse_ok), "sinks": bool(sinks),
+                   "clean": bool(clean), "inside_sibling_ci": bool(like_sibling)},
+         "branch": branch, "stack": _stack_block()}, indent=2))
+    print("wrote artifacts/h19_twin.json")
 
 
 @app.local_entrypoint()
