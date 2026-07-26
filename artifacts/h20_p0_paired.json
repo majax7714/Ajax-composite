@@ -1,0 +1,35 @@
+{
+  "_label": "P0 free \u2014 paired twin-vs-sibling on shared problems + power [PHASE_20.md]",
+  "seed": 317,
+  "boot": 8000,
+  "n_shared": 37,
+  "subset_on_target": false,
+  "twin_effect_shared": 0.0178,
+  "sibling_effect_shared": -0.0359,
+  "paired_difference": 0.0537,
+  "se": 0.0341,
+  "ci95": [
+    -0.0132,
+    0.1206
+  ],
+  "p": 0.1153,
+  "correlation": 0.4146,
+  "unpaired_se_same_n": 0.0445,
+  "variance_fit": {
+    "a": 0.00023764,
+    "b": 0.00730094,
+    "irreducible_se_at_n": 0.0154
+  },
+  "measured_se_by_k": {
+    "2": 0.0623,
+    "3": 0.0522,
+    "4": 0.0448,
+    "6": 0.0382,
+    "8": 0.0341
+  },
+  "best_achievable_pool80_k96": {
+    "se": 0.012,
+    "mde": 0.0337
+  },
+  "pool_size": 80
+}
