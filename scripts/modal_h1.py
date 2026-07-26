@@ -4062,6 +4062,152 @@ def j18_temp():
     print("wrote artifacts/h18_temperature.json")
 
 
+# --- Phase 20: the PAIRED twin-vs-sibling cell ([PHASE_20.md]) ---
+
+P20_SEED = 337
+P20_K = 48
+P20_TOL = 0.10          # per-problem |artifact - own iid| tolerance
+P20_RUNGS = ("general1p5b", "coder1p5b")
+
+
+def _p20_sweep(rung):
+    g, r = _load(f"j11_sweep_cand_{rung}"), _load(f"j11_sweep_res_{rung}")
+    assert g and r, f"missing committed k=24 sweep for {rung}"
+    import statistics as st
+    return {x["qid"]: st.mean(c["frac"] for c in row) for x, row in zip(g, r)}
+
+
+def _p20_select():
+    """Per-problem, per-model artifact: the donor candidate nearest that model's own
+    k=24 i.i.d. on that problem. Shared problem set, per-model artifact — the only way
+    to put two models of different quality at their own match simultaneously."""
+    qids, pool = _r3_donor_pool()
+    sw = {r: _p20_sweep(r) for r in P20_RUNGS}
+    out = {}
+    for q in qids:
+        cands = pool.get(q) or []
+        if not cands:
+            continue
+        pick, ok = {}, True
+        for r in P20_RUNGS:
+            best = min(cands, key=lambda c: abs(c[1] - sw[r][q]))
+            if abs(best[1] - sw[r][q]) > P20_TOL:
+                ok = False
+                break
+            pick[r] = best
+        if ok:
+            out[q] = pick
+    return out, sw
+
+
+@app.local_entrypoint()
+def j20_paired():
+    """Phase 20 — paired twin-vs-sibling, both at their own true match on a SHARED
+    problem set. Pre-registered [PHASE_20.md] BEFORE this ran."""
+    import ast
+    import math
+    import random as _rnd
+    import statistics as st
+
+    sel, sw = _p20_select()
+    qs = sorted(sel)
+    n = len(qs)
+    print(f"[P20] selected n={n} problems (per-problem tol ±{P20_TOL})")
+
+    dart = {r: st.mean(sel[q][r][1] - sw[r][q] for q in qs) for r in P20_RUNGS}
+    for r in P20_RUNGS:
+        print(f"    {r:<14} aggregate Δ_art {dart[r]:+.4f}  "
+              f"(band ±{P11_ON_TARGET})")
+
+    arms, parse = {}, {}
+    for r in P20_RUNGS:
+        mid, rev = P11_MODELS[r]
+        for kind in ("iid", "cond"):
+            tag = f"j20_{r}_{kind}"
+            items = [{"qid": q,
+                      "context": None if kind == "iid" else _d2c_context(
+                          {"qid": q, "code": sel[q][r][2], "frac": sel[q][r][1],
+                           "n_tests": sel[q][r][3],
+                           "n_failed": sel[q][r][3] - sel[q][r][4]})}
+                     for q in qs]
+            g = _load(f"{tag}_cand") or _persist(f"{tag}_cand", h1_gen_lcb.remote(
+                mid, items, P20_K, tag=f"{tag}_cand", seed=P20_SEED, revision=rev,
+                max_model_len=8192, max_tokens=1536))
+            res = _load(f"{tag}_res") or _persist(f"{tag}_res", h1_lcb_exec.remote(
+                [x["qid"] for x in g], [x["codes"] for x in g], tag=f"{tag}_res"))
+            arms[(r, kind)] = {x["qid"]: [y["frac"] for y in row]
+                               for x, row in zip(g, res)}
+            ok = tot = 0
+            for c in g:
+                for code in c["codes"]:
+                    tot += 1
+                    if code:
+                        try:
+                            ast.parse(code)
+                            ok += 1
+                        except SyntaxError:
+                            pass
+            parse[(r, kind)] = ok / tot if tot else 0.0
+            print(f"    {tag:<24} mean {st.mean(st.mean(v) for v in arms[(r, kind)].values()):.4f}"
+                  f"  parse {parse[(r, kind)]:.4f}")
+
+    eff = {r: {q: st.mean(arms[(r, 'cond')][q]) - st.mean(arms[(r, 'iid')][q])
+               for q in qs} for r in P20_RUNGS}
+    d = [eff["general1p5b"][q] - eff["coder1p5b"][q] for q in qs]
+    md = st.mean(d)
+    se = st.stdev(d) / math.sqrt(n)
+    rng = _rnd.Random(349)
+    acc = sorted(st.mean([d[rng.randrange(n)] for _ in range(n)]) for _ in range(8000))
+    lo, hi = round(acc[200], 4), round(acc[7800], 4)
+    p = math.erfc(abs(md / se) / math.sqrt(2)) if se else float("nan")
+
+    mt = st.mean(eff["general1p5b"].values())
+    ms = st.mean(eff["coder1p5b"].values())
+    print(f"\n=== P20 PAIRED  n={n}  k={P20_K} ===")
+    print(f"  twin    cond − iid {mt:+.4f}")
+    print(f"  sibling cond − iid {ms:+.4f}")
+    print(f"  PAIRED difference (twin − sibling) {md:+.4f}  SE {se:.4f}  "
+          f"CI95 [{lo:+.4f},{hi:+.4f}]  p {p:.4g}")
+    print(f"  pre-registered MDE 0.0431; this design CANNOT resolve 0.0166")
+
+    # ---- frozen gates, ALL inside the branch expression (§8 entry 11)
+    on_target = all(abs(dart[r]) <= P11_ON_TARGET for r in P20_RUNGS)
+    parse_ok = all(v >= 0.95 for v in parse.values())
+    powered = n >= P11_MIN_N
+    print(f"  [gates] on_target {on_target}  parse_ok {parse_ok}  n>={P11_MIN_N} {powered}")
+
+    if not (on_target and parse_ok and powered):
+        branch = (f"D — KILLED (on_target {on_target}, parse_ok {parse_ok}, "
+                  f"powered {powered}); no adjudication")
+    elif lo > 0:
+        branch = ("A — twin sinks LESS than its Coder sibling; DIET gets paired, "
+                  "position-controlled, powered support")
+    elif hi < 0:
+        branch = ("C — twin sinks MORE than its Coder sibling; contradicts the DIET "
+                  "direction — HALT AND REPORT")
+    else:
+        branch = ("B — INDISTINGUISHABLE at MDE 0.0431; the family contrast stays "
+                  "unresolved at achievable precision")
+    print(f"\n=== BRANCH {branch} ===")
+
+    (REPO / "artifacts/h20_paired.json").write_text(json.dumps(
+        {"_label": "Phase 20 — paired twin vs sibling at own match [PHASE_20.md]",
+         "prereg_commit": "3e18e67", "seed": P20_SEED, "k": P20_K, "n": n,
+         "per_problem_tol": P20_TOL,
+         "achieved_delta_art": {r: round(dart[r], 4) for r in P20_RUNGS},
+         "parse_rates": {f"{r}_{k}": round(v, 4) for (r, k), v in parse.items()},
+         "arm_means": {f"{r}_{k}": round(st.mean(st.mean(x) for x in v.values()), 4)
+                       for (r, k), v in arms.items()},
+         "twin_effect": round(mt, 4), "sibling_effect": round(ms, 4),
+         "paired_difference": round(md, 4), "se": round(se, 4),
+         "ci95": [lo, hi], "p": p,
+         "prereg_mde": 0.0431, "cannot_resolve": 0.0166,
+         "gates": {"on_target": bool(on_target), "parse_ok": bool(parse_ok),
+                   "powered": bool(powered)},
+         "branch": branch, "stack": _stack_block()}, indent=2))
+    print("wrote artifacts/h20_paired.json")
+
+
 # --- Phase 19: the architecture twin at TRUE match ([PHASE_19.md]) ---
 
 P19_SIBLING_CI = [-0.1258, -0.0028]   # h11_coder1p5b.json delta_cond_minus_iid_ci95
