@@ -24,7 +24,38 @@ cross-family audit that retracted our platform negatives as one family's
 pathology — and finally an existence proof that approach-level direction crosses
 the competence boundary, moving the open question to where direction comes from.*
 
-*Living record — last updated 2026-07-18 (**PHASE 9 CLOSED — diet or provenance? the
+*Living record — last updated 2026-07-25. **PHASE 18 IN FLIGHT** — the coverage channel
+([PHASE_18.md]): its free P0 has landed and **corrected §0.4's coverage pointer** (the
+"sink's dominant channel is coverage" reading is **not licensed** — the copy null is
+degenerate in that currency, 0 of the artifacts in all eight committed matched cells fully
+pass, so below-both-nulls reads TRUE in mean frac and FALSE in coverage on identical data,
+§8 entry 10); coverage loss is **universal at ≤3B across every family and diet measured**
+and **absent at 7B**, so it does **not** track the Coder diet and is **not the sink's
+mechanism**; and a **compression law** — conditioning pulls every model 47–90% of the way
+from its own quality toward the artifact's, R² up to 0.92 across eight cells — is now the
+record's first quantified form of D2a/D2b's "conditioning relocates the distribution". A
+hypothesis built on that law inside the same phase (the intercept as the diet's signature)
+was **refuted by the architecture twin within the hour**. The paid cell — temperature, the
+record's one validated coverage lever, applied to a sink cell with a matched i.i.d. null at
+every T, which D2b never carried — **is running**.
+**Previously 2026-07-25: PHASES 10–17 CLOSED.** **P10**: an audit that restored the drifted
+below-both-nulls criterion and **retracted the 7B sink** with no surviving support, then
+measured its absence at true match; also priced the targeting instrument (SE 0.028 → 0.011)
+and killed a phantom $31. **P11**: the ladder at match, powered — **the sink IS
+scale-bounded** (1.5B −0.052, 3B −0.051, 7B −0.008), every rung at its own Δ_art ≈ 0.
+**P12**: **artifact-attention magnitude excluded** as the mechanism, by an instrument
+carrying its own positive controls. **P13**: concentration higher in sinking models (S1);
+first ablation destroyed the model (S2). **P14**: the ablation dose-response ran on a
+statistic that was **identically zero for any data** — caught by algebra, scored a miss
+(§8 entry 8). **P15**: the **architecture twin retired the concentration finding** —
+general-Qwen-1.5B, same base, same 28L × 12H, clean, and carrying the record's *highest*
+concentration. **P16**: lost to a round-number validity gate by 0.0004, honoured not
+retuned (§8 entry 9); its free decomposition raised the coverage question. **P17**: the
+verb question **CLOSED** — the record's largest anchoring lever is **inert on the sink**
+(+0.0004 ± 0.0096), so the sink is **framing-invariant** and dissociated from the escape
+law. Net: a scoped, provenance-controlled, framing-invariant, scale-bounded effect with
+**no surviving positive mechanism**.
+Previously 2026-07-18 (**PHASE 9 CLOSED — diet or provenance? the
 generated 2×2, [PHASE_9.md]**: the sink's final confound is closed. P0 first turned the
 ledger on ourselves — the one provenance-clean Phase-8 D3 point (Coder-1.5B on its own
 unsurprising output) *sinks*, so the OOD label was amended to **OPEN** and
