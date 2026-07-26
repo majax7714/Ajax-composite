@@ -99,17 +99,30 @@ such a comparison, with every clean non-Coder cell sitting at a favourable posit
 every powered at-match cell belonging to the Coder side. Audited rather than assumed, **the
 diet conclusion survived**, because it rests on a later, position-matched design whose
 residual confound runs *against* it. The missing cell was then run: the architecture twin,
-at true match, measures **clean** — directionally right, but at a precision the charter had
-promised and not checked, so the phase closed by grading its own pre-registration down.
+at true match, measured **clean** — directionally right, but at a precision the charter had
+promised and not checked, so that phase closed by grading its own pre-registration down and
+logging the gap as a ledger entry.
 
-**Current status (2026-07-26):** Phase 19 closed. The architecture twin measures
-**clean at true match**, which is directionally what the diet claim predicts — but the cell
-was underpowered for the comparison its own charter promised, and the write-up says so and
-grades the charter accordingly. The record now has its **first powered at-match non-Coder
-cell**, closing an instrument asymmetry that had gone unnoticed for twelve phases.
-**Nothing is running.** The map table above is current through the last closed phase;
-[the journal's §0](docs/WRITEUP-rgr.md) is the authority on what is believed and at what
-scope.
+**One phase later that entry collected.** Re-run as a *paired* design — both models at their
+own true match on the same problems, which required sharing the problem and varying the
+artifact — the twin **sinks**, below both nulls, and is statistically indistinguishable from
+its Coder sibling. The "clean" reading had been an underpowered false negative, and the
+earlier cell that also called it clean turns out to have sat exactly where a model's pull
+toward its artifact cancels the effect being measured. So the family contrast that carried
+the diet attribution is **dead as stated**: the variable the claim names does not separate
+the two models. What survives is a position-matched result in which the Coder model sinks
+far harder than *DeepSeek* — which points at the **Qwen base** rather than the Coder stage,
+and is a hypothesis rather than a measurement. The record does not rewrite the claim to it.
+Two cheap cells would settle the shape, and the loop stopped to say so rather than run them.
+
+**⚠ Current status (2026-07-26): the loop is HALTED.** Phase 20 refuted a live claim 1:1.
+The architecture twin — a *non-Coder* model differing from its Coder sibling only in the
+continued-pretraining stage — **sinks at true match, as hard as the sibling**, which kills
+the "non-Coder families don't sink" leg the diet attribution rested on. What survives is a
+position-matched result showing Coder sinking far harder than *DeepSeek*, so the shape that
+now fits is a **Qwen-base** effect rather than a Coder-stage one — a hypothesis, not a
+measurement, and nothing has been rewritten to it. Two cheap cells would settle it and are
+named in the journal's §0.4. **Nothing is running; the loop waits for author review.**
 
 ## Map of the composite
 
@@ -143,6 +156,7 @@ first iteration, with its amendments dated on the page.*
 | 17 | [PHASE_17.md](docs/PHASE_17.md) | The verb question, powered and **closed**. The instruction verb is the largest anchoring lever this record has measured (moves PULL ≤0.127, against ≤0.028 for provenance) and had never been applied to a sink cell — every sink number in the journal used one fixed clause. Substituting an independent framing moves the sink by **+0.0004 ± 0.0096** (n=44, k=24), a CI that **excludes** Phase 16's near-miss. The sink is **framing-invariant**: it is dissociated from the escape-distance law's dominant lever, and the cheapest deflationary account of it is excluded |
 | 18 | [PHASE_18.md](docs/PHASE_18.md) | The coverage channel — and a phase whose paid cell bought less than its free one. Seven free analyses **corrected the target before a dollar was spent**: the sink's adjudication criterion **does not survive the change of currency** (no artifact in any of the eight committed cells fully passes, so the copy null scores coverage zero *by construction*), coverage loss turns out **universal at ≤3B across every family and diet** and so is not the sink's mechanism, and the headline −0.432 was the most extreme of three seeds with no error bar. It also found a **compression law** — every model pulled 47–90% of the way toward the artifact it is shown, R² to 0.92 — then built a hypothesis on it and **watched the architecture twin refute it within the hour**. The paid cell tried temperature and closed an **instrument failure, no branch adjudicated**: two frozen kill criteria fired, and the branch tree had ignored both. Temperature **moves the null as hard as the treatment** |
 | 19 | [PHASE_19.md](docs/PHASE_19.md) | The architecture twin at **true match** — and a phase that graded its own charter down. Its free P0 found the record's central family contrast (Phase 7) is **position-confounded**: every non-Coder cell that stayed clean sat at a *favourable* position, worth more shift than the effect being attributed to diet — and every powered at-match cell in the record was a Coder cell. Checked rather than assumed, the **diet claim survived**, because it rests on Phase 9's position-matched 2×2 rather than on Phase 7. The paid cell then measured the twin — same base, same 28L×12H, differing only in the Coder pretraining stage — at true match: **clean** (−0.0027), the 45% favourite. But the charter had claimed the cell could separate two predictions 0.04 apart, and its actual **MDE was 0.080** — so both predictions sit inside the interval and twin-vs-sibling is p 0.150. The instrument asymmetry is fixed; the inference is not |
+| 20 | [PHASE_20.md](docs/PHASE_20.md) | **The paired cell that refuted the record's own family claim.** Both models measured at their own true match on the *same* problems — possible only by sharing the problem and varying the artifact, since the two models differ in quality. The **architecture twin**, a *non-Coder* model differing from its Coder sibling only in the continued-pretraining stage, **sinks at true match** (−0.0372, below both nulls, both CIs excluding zero) and is **indistinguishable from the sibling** (+0.0088 ± 0.0157, p 0.57). The family-contrast leg of the record's central claim is dead as stated. Both earlier cells that called the twin clean are explained: one sat where compression cancels the effect, the other had an MDE twice the effect and returned a false negative — flagged as a ledger entry one phase before it was demonstrated. **Loop halted for author review** |
 
 ## How to read
 
