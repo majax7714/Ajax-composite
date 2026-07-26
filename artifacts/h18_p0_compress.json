@@ -1,0 +1,44 @@
+{
+  "_label": "P0.4 free \u2014 currency-dependence + compression test [PHASE_18.md P0]",
+  "seed": 257,
+  "boot": 4000,
+  "n": 44,
+  "copy_null_coverage": 0.0,
+  "artifacts_fully_passing": 0,
+  "below_both_nulls_by_currency": {
+    "mean frac": {
+      "iid_null": 0.4573,
+      "copy_null": 0.4589,
+      "cond": 0.396,
+      "below_iid": true,
+      "below_copy": true,
+      "below_both_nulls": true
+    },
+    "coverage@24": {
+      "iid_null": 0.6591,
+      "copy_null": 0.0,
+      "cond": 0.4545,
+      "below_iid": true,
+      "below_copy": false,
+      "below_both_nulls": false
+    }
+  },
+  "compression": {
+    "slope": 0.6559,
+    "se": 0.0575,
+    "ci95": [
+      0.5396,
+      0.77
+    ],
+    "intercept": -0.0624,
+    "r2": 0.7558,
+    "mean_gap": 0.0015,
+    "mean_shift": -0.0614,
+    "shift_artifact_above": 0.0802,
+    "shift_artifact_below": -0.2164,
+    "n_above": 23,
+    "n_below": 21,
+    "cov_delta_above": -0.1739,
+    "cov_delta_below": -0.2381
+  }
+}

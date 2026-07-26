@@ -1,0 +1,264 @@
+{
+  "_label": "P0.5 free \u2014 compression law across 4 committed cells [PHASE_18.md P0]",
+  "_model": "shift(q) = a + b*gap(q); shift = cond-iid, gap = artifact-iid, per problem",
+  "seed": 263,
+  "boot": 4000,
+  "cells": {
+    "Coder-1.5B (P11)": {
+      "status": "SINKS",
+      "diet": "Coder",
+      "n": 44,
+      "mean_art": 0.4589,
+      "mean_iid": 0.4704,
+      "mean_cond": 0.4067,
+      "delta_art": -0.0115,
+      "fit": {
+        "slope": 0.6366,
+        "se_slope": 0.0648,
+        "slope_ci": [
+          0.4736,
+          0.7938
+        ],
+        "intercept": -0.0564,
+        "se_intercept": 0.0174,
+        "intercept_ci": [
+          -0.0887,
+          -0.0217
+        ],
+        "r2": 0.6965,
+        "n": 44
+      },
+      "coverage_k8": {
+        "iid": 0.6364,
+        "cond": 0.2045,
+        "delta": -0.4318
+      },
+      "artifacts_fully_passing": 0,
+      "copy_null_coverage": 0.0
+    },
+    "Coder-3B (P11)": {
+      "status": "SINKS",
+      "diet": "Coder",
+      "n": 39,
+      "mean_art": 0.6096,
+      "mean_iid": 0.643,
+      "mean_cond": 0.559,
+      "delta_art": -0.0334,
+      "fit": {
+        "slope": 0.7871,
+        "se_slope": 0.0697,
+        "slope_ci": [
+          0.6222,
+          0.9566
+        ],
+        "intercept": -0.0577,
+        "se_intercept": 0.0186,
+        "intercept_ci": [
+          -0.095,
+          -0.02
+        ],
+        "r2": 0.7749,
+        "n": 39
+      },
+      "coverage_k8": {
+        "iid": 0.7949,
+        "cond": 0.3846,
+        "delta": -0.4103
+      },
+      "artifacts_fully_passing": 0,
+      "copy_null_coverage": 0.0
+    },
+    "Coder-7B (R5 true match)": {
+      "status": "clean",
+      "diet": "Coder",
+      "n": 29,
+      "mean_art": 0.7264,
+      "mean_iid": 0.7526,
+      "mean_cond": 0.7184,
+      "delta_art": -0.0263,
+      "fit": {
+        "slope": 0.5554,
+        "se_slope": 0.1175,
+        "slope_ci": [
+          0.336,
+          0.7979
+        ],
+        "intercept": -0.0197,
+        "se_intercept": 0.027,
+        "intercept_ci": [
+          -0.076,
+          0.0327
+        ],
+        "r2": 0.4528,
+        "n": 29
+      },
+      "coverage_k8": {
+        "iid": 0.7931,
+        "cond": 0.7931,
+        "delta": 0.0
+      },
+      "artifacts_fully_passing": 0,
+      "copy_null_coverage": 0.0
+    },
+    "DeepSeek-1.3B (P7 M1)": {
+      "status": "clean",
+      "diet": "non-Coder",
+      "n": 39,
+      "mean_art": 0.3608,
+      "mean_iid": 0.3109,
+      "mean_cond": 0.3605,
+      "delta_art": 0.0499,
+      "fit": {
+        "slope": 0.7844,
+        "se_slope": 0.0391,
+        "slope_ci": [
+          0.6887,
+          0.9063
+        ],
+        "intercept": 0.0105,
+        "se_intercept": 0.0104,
+        "intercept_ci": [
+          -0.0148,
+          0.0325
+        ],
+        "r2": 0.9157,
+        "n": 39
+      },
+      "coverage_k8": {
+        "iid": 0.3846,
+        "cond": 0.1795,
+        "delta": -0.2051
+      },
+      "artifacts_fully_passing": 0,
+      "copy_null_coverage": 0.0
+    },
+    "general-Qwen-1.5B (P7 M2) *TWIN*": {
+      "status": "clean",
+      "diet": "non-Coder",
+      "n": 28,
+      "mean_art": 0.3297,
+      "mean_iid": 0.2655,
+      "mean_cond": 0.2654,
+      "delta_art": 0.0642,
+      "fit": {
+        "slope": 0.6187,
+        "se_slope": 0.0766,
+        "slope_ci": [
+          0.4791,
+          0.8048
+        ],
+        "intercept": -0.0398,
+        "se_intercept": 0.0183,
+        "intercept_ci": [
+          -0.079,
+          -0.0021
+        ],
+        "r2": 0.7151,
+        "n": 28
+      },
+      "coverage_k8": {
+        "iid": 0.3929,
+        "cond": 0.1786,
+        "delta": -0.2143
+      },
+      "artifacts_fully_passing": 0,
+      "copy_null_coverage": 0.0
+    },
+    "StarCoder2-3B (P7 M3)": {
+      "status": "clean",
+      "diet": "non-Coder",
+      "n": 39,
+      "mean_art": 0.3608,
+      "mean_iid": 0.3281,
+      "mean_cond": 0.3362,
+      "delta_art": 0.0326,
+      "fit": {
+        "slope": 0.8814,
+        "se_slope": 0.0823,
+        "slope_ci": [
+          0.7023,
+          1.0998
+        ],
+        "intercept": -0.0208,
+        "se_intercept": 0.0211,
+        "intercept_ci": [
+          -0.0671,
+          0.0225
+        ],
+        "r2": 0.7562,
+        "n": 39
+      },
+      "coverage_k8": {
+        "iid": 0.4359,
+        "cond": 0.2308,
+        "delta": -0.2051
+      },
+      "artifacts_fully_passing": 0,
+      "copy_null_coverage": 0.0
+    },
+    "Coder-7B (P7 M4, retracted)": {
+      "status": "clean",
+      "diet": "Coder",
+      "n": 20,
+      "mean_art": 0.6631,
+      "mean_iid": 0.7023,
+      "mean_cond": 0.5738,
+      "delta_art": -0.0393,
+      "fit": {
+        "slope": 0.4695,
+        "se_slope": 0.136,
+        "slope_ci": [
+          0.3298,
+          0.7395
+        ],
+        "intercept": -0.1101,
+        "se_intercept": 0.0325,
+        "intercept_ci": [
+          -0.177,
+          -0.0389
+        ],
+        "r2": 0.3985,
+        "n": 20
+      },
+      "coverage_k8": {
+        "iid": 0.8,
+        "cond": 0.7,
+        "delta": -0.1
+      },
+      "artifacts_fully_passing": 0,
+      "copy_null_coverage": 0.0
+    },
+    "Coder-0.5B (P7 M5) *OPEN*": {
+      "status": "unadjudicated",
+      "diet": "Coder",
+      "n": 43,
+      "mean_art": 0.2043,
+      "mean_iid": 0.1229,
+      "mean_cond": 0.1672,
+      "delta_art": 0.0814,
+      "fit": {
+        "slope": 0.9048,
+        "se_slope": 0.0419,
+        "slope_ci": [
+          0.7934,
+          1.052
+        ],
+        "intercept": -0.0293,
+        "se_intercept": 0.0078,
+        "intercept_ci": [
+          -0.0516,
+          -0.0091
+        ],
+        "r2": 0.9193,
+        "n": 43
+      },
+      "coverage_k8": {
+        "iid": 0.1395,
+        "cond": 0.0233,
+        "delta": -0.1163
+      },
+      "artifacts_fully_passing": 0,
+      "copy_null_coverage": 0.0
+    }
+  }
+}

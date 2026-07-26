@@ -1,0 +1,123 @@
+{
+  "_label": "P0 free \u2014 coverage channel with error bars [PHASE_18.md P0]",
+  "_estimator": "unbiased pass@k (Chen et al. 2021) over the committed k=24 pools",
+  "seed": 251,
+  "boot": 4000,
+  "n": 44,
+  "cell": "Qwen2.5-Coder-1.5B at match (P11 problem set)",
+  "arms": {
+    "iid_k24": "j11_sweep_*_coder1p5b (seed 151)",
+    "cond_k24": "j17_coder1p5b_A_* (seed 239, VERB-A == _d2c_context)"
+  },
+  "p0_1_passk_curve": {
+    "1": {
+      "iid": 0.2377,
+      "cond": 0.0653,
+      "delta": -0.1723,
+      "ci95": [
+        -0.2348,
+        -0.1127
+      ]
+    },
+    "2": {
+      "iid": 0.3594,
+      "cond": 0.1142,
+      "delta": -0.2451,
+      "ci95": [
+        -0.3283,
+        -0.1673
+      ]
+    },
+    "4": {
+      "iid": 0.4796,
+      "cond": 0.1851,
+      "delta": -0.2945,
+      "ci95": [
+        -0.3976,
+        -0.1979
+      ]
+    },
+    "8": {
+      "iid": 0.5735,
+      "cond": 0.2792,
+      "delta": -0.2942,
+      "ci95": [
+        -0.4085,
+        -0.1824
+      ]
+    },
+    "16": {
+      "iid": 0.6329,
+      "cond": 0.3921,
+      "delta": -0.2407,
+      "ci95": [
+        -0.3819,
+        -0.1011
+      ]
+    },
+    "24": {
+      "iid": 0.6591,
+      "cond": 0.4545,
+      "delta": -0.2045,
+      "ci95": [
+        -0.3636,
+        -0.0455
+      ]
+    }
+  },
+  "p0_1_mean_frac": {
+    "iid": 0.4573,
+    "cond": 0.396,
+    "delta": -0.0614,
+    "ci95": [
+      -0.1187,
+      -0.0042
+    ]
+  },
+  "p0_2_seed_replication": {
+    "173 (P11 cell)": {
+      "cov": 0.2045,
+      "delta_cov": -0.4318,
+      "mean_frac": 0.4067,
+      "n": 44
+    },
+    "233 (P16 VERB-A)": {
+      "cov": 0.3182,
+      "delta_cov": -0.3182,
+      "mean_frac": 0.4292,
+      "n": 44
+    },
+    "239 (P17 VERB-A, subsampled)": {
+      "cov": 0.2786,
+      "delta_cov": -0.3577,
+      "mean_frac": 0.396,
+      "n": 44
+    }
+  },
+  "p0_2_spread": {
+    "coverage": 0.1137,
+    "mean_frac": 0.0332
+  },
+  "p0_3_candidate_bands": {
+    "iid": {
+      "zero (0.0)": 0.2803,
+      "weak (0,0.25)": 0.1117,
+      "correct (1.0)": 0.2377,
+      "near [0.75,1.0)": 0.0795,
+      "partial [0.25,0.75)": 0.2907
+    },
+    "cond": {
+      "partial [0.25,0.75)": 0.6316,
+      "zero (0.0)": 0.2102,
+      "weak (0,0.25)": 0.0587,
+      "near [0.75,1.0)": 0.0341,
+      "correct (1.0)": 0.0653
+    }
+  },
+  "p0_3_solvedness_k24": {
+    "both": 17,
+    "iid_only": 12,
+    "cond_only": 3,
+    "neither": 12
+  }
+}

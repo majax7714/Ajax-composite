@@ -1,0 +1,64 @@
+{
+  "_label": "P0.6 free \u2014 committed predictor + tolerances [PHASE_18.md P0]",
+  "_law": "shift(q) = a + b*gap(q), fit on the at-match cell, k=24 both arms",
+  "seed": 269,
+  "boot": 8000,
+  "fit": {
+    "intercept": -0.0624,
+    "slope": 0.6559,
+    "residual_sd": 0.096,
+    "n": 44,
+    "gap_range_fit": [
+      -0.5,
+      0.5222
+    ]
+  },
+  "symmetry_slope_diff_ci95": [
+    -0.4966,
+    0.3526
+  ],
+  "bands": {
+    "LOW": {
+      "target": 0.2,
+      "hw": 0.1,
+      "n": 60,
+      "mean_art": 0.1972,
+      "mean_iid_powered": 0.3694,
+      "mean_gap": -0.1722,
+      "gap_range": [
+        -0.7576,
+        0.2028
+      ],
+      "pred_shift": -0.1753,
+      "pred_cond": 0.1941,
+      "se_param": 0.0199,
+      "se_cell": 0.0124,
+      "se_total": 0.0234,
+      "hit_band_2sd": [
+        -0.2222,
+        -0.1285
+      ]
+    },
+    "HIGH": {
+      "target": 0.67,
+      "hw": 0.08,
+      "n": 37,
+      "mean_art": 0.6736,
+      "mean_iid_powered": 0.4866,
+      "mean_gap": 0.187,
+      "gap_range": [
+        -0.25,
+        0.5889
+      ],
+      "pred_shift": 0.0603,
+      "pred_cond": 0.5469,
+      "se_param": 0.0158,
+      "se_cell": 0.0158,
+      "se_total": 0.0223,
+      "hit_band_2sd": [
+        0.0156,
+        0.105
+      ]
+    }
+  }
+}
