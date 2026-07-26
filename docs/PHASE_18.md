@@ -418,28 +418,70 @@ is catastrophic. §9.3.1 W2 recorded that the domain boundary "descends with dif
 The **collapse gate did not fire**: i.i.d. coverage 0.5455 against a threshold of 0.5227,
 surviving by 0.023 — at the very edge of its own committed noise band. Not retuned.
 
-### 5.3 Branch C fires formally; what is licensed is narrower
+### 5.3 ⚠ **NO BRANCH IS ADJUDICATED — the paid cell is an instrument failure**
 
-| T = 1.0 gate | value | verdict |
-|---|---|---|
-| coverage rescued (Δcov > −0.0455) | Δcov **−0.1818** | **NO** |
-| sink unmoved (inside [−0.1258, −0.0028]) | sink **−0.0360** | **YES** |
-| both arms collapsed (cov_iid < 0.5227) | 0.5455 | **NO** |
+*This section supersedes what the run printed. It is written after seeing the parse rates,
+which landed with the final arms; §5.1–5.2 above were written before them.*
 
-**Branch C — "neither moved: scope restriction on claim 13."** Priced at **30%**, the
-second favourite. Neither coverage nor the sink responded: Δcov −0.2273 → −0.1818 and
-sink −0.0480 → −0.0360, both changes small and the sink still inside its committed CI.
+The **second** kill criterion also fired, and it invalidates the adjudication cell:
 
-**But branch C cannot be claimed cleanly, because its own cell failed the position
-criterion.** What is licensed is the weaker and more useful statement: *on LCB at 1.5B,
-temperature cannot be applied as a coverage intervention at fixed relational position at
-all* — the manipulation and the confound are the same knob. Claim 13 is **not refuted**;
-its **applicability** is restricted, and the restriction is a fact about the benchmark and
-scale rather than about the lever.
+| T | parse rate i.i.d. | parse rate cond | frozen floor | |
+|---|---|---|---|---|
+| 0.8 | 0.9886 | 0.9953 | 0.95 | ✓ |
+| **1.0** | **0.9299** | **0.9375** | 0.95 | ✗ **FIRES** |
+| 1.2 | 0.4896 | 0.3750 | 0.95 | ✗ **FIRES** |
+
+§3 froze: *"Any arm's parse rate below 0.95 → that temperature is an instrument failure,
+reported as invalid and **not** retuned in-phase."* **T = 1.0 — the phase's entire
+adjudication cell — is an instrument failure**, and it independently failed the position
+criterion (Δ_art drift +0.1515 vs ±0.05). Two frozen kill criteria, both fired.
+
+> **Branch C is NOT claimed.** The odds table does not pay out. The gate values are
+> reported below for the record, but no branch — A, B, C or D — is adjudicated, because
+> the cell they would be read from is invalid by rules frozen at `4abb0b1`.
+>
+> | T = 1.0 gate | value | |
+> |---|---|---|
+> | coverage rescued (Δcov > −0.0455) | −0.1818 | no |
+> | sink unmoved (inside [−0.1258, −0.0028]) | −0.0360 | yes |
+> | both arms collapsed (cov_iid < 0.5227) | 0.5455 | no |
+>
+> *(For the accounting: had the cell been valid these would have read branch C, the 30%
+> second favourite. It was not, so that is a counterfactual and not a hit.)*
+
+**What survives, and why it is not nothing.** The load-bearing measurement of this phase
+requires **no conditioning contrast at all** — it is a property of the **i.i.d. arm alone**,
+measured directly rather than inferred from a difference:
+
+| T | i.i.d. mean frac | i.i.d. cov@24 | parse |
+|---|---|---|---|
+| 0.8 | 0.4314 | 0.7045 | 0.989 |
+| 1.0 | 0.2799 | 0.5455 | 0.930 |
+| 1.2 | 0.1056 | 0.4318 | 0.490 |
+
+**Temperature is not an available intervention on this cell.** By T = 1.0 the
+*unconditioned* model has lost 35% of its mean frac and fallen below the record's own
+instrument floor on parse rate; by T = 1.2 it is destroyed. There is no temperature setting
+on LCB at 1.5B that raises coverage while leaving the model intact — the window between
+"no effect" and "instrument failure" does not contain a usable operating point. Claim 13
+is **not refuted**: its *applicability* is restricted, and the restriction is a fact about
+this benchmark and scale, not about the lever. D2b's dose-response stands where it was
+measured, on HumanEval, where E0 is flat across the same range.
+
+**The pre-registered domain probe behaved exactly as charted.** §2 froze T = 1.2 as
+out-of-domain on §9.3.1 W2's authority; it collapsed (collapse gate fires, cov_iid 0.4318 <
+0.5227). That is a **confirmation of the frozen domain bound**, and the bound is now known
+to sit **below T = 1.0** rather than near 1.2 — tighter than the record had it.
 
 ### 5.4 Exploratory — temperature releases the anchor *and* deepens the penalty
 
 *Post-hoc, not pre-registered. Per §10 it is a diagnostic and may not reopen a verdict.*
+**⚠ Further downgraded by §5.3: the T = 1.0 arms failed the parse gate (0.930/0.938), so
+everything in this subsection is computed on data this phase has itself declared an
+instrument failure. It is retained as a lead for a successor, not as a finding.** Roughly
+7% of the T = 1.0 candidates did not parse and enter the fit at frac ≈ 0, which biases the
+conditioned and i.i.d. arms by an unknown and unequal amount — precisely the kind of
+contamination the 0.95 floor exists to exclude.
 
 Fitting P0.5's compression law `shift = a + b·gap` separately at each temperature, paired
 bootstrap over the same 44 problems (6000 resamples, seed 1009):
@@ -468,6 +510,83 @@ M5 and M2, so it is the less trustworthy of the two numbers. (iii) The two slope
 fitted over **different regions of the gap axis** (mean gap +0.028 vs +0.179), so
 *"temperature reduces the pull"* and *"the relation is nonlinear and we sampled a different
 part of it"* are **not separated** — P0.6's symmetry check was underpowered, so
-nonlinearity is not excluded.
+nonlinearity is not excluded. (iv) And, per §5.3, the arms themselves are invalid.
+
+### 5.5 The adjudication code did not implement the frozen rules *(§8 ledger entry 11)*
+
+`j18_temp` **computed** `parse_ok` and `pos_ok`, **stored** both in the artifact and
+**printed** both to the log — and its `if/elif` branch tree never consulted either. So the
+committed artifact carries `"branch": "C — neither moved …"` directly above a gates block
+reading `parse_ok: false, position_ok: false`.
+
+Nothing here is drift: the criteria were frozen at `4abb0b1` before the run, they are being
+honoured now, and nothing was retuned. The failure is that **the code implementing the
+pre-registration did not match the pre-registration** — the same class as Phase 14 (§8
+entry 8), a defect in the machinery of adjudication rather than in the science.
+
+**It was caught because the kill criteria were printed.** Had `j18_temp` emitted only its
+branch string, this phase would have published a clean-looking branch-C result whose own
+cell was invalid on two counts. *Practice:* **a pre-registration's kill criteria must be
+evaluated in the same expression that selects the branch, not merely reported alongside
+it** — and every gate a phase freezes gets printed whether or not it fires, because the
+printed value is what made this visible.
+
+The raw artifact is committed **unedited** (`9c0c567`, before this verdict) so the
+discrepancy is legible in git history. The entrypoint was fixed after the run with an
+inline note recording that the fix postdates it. **The charter governs, not the code.**
+
+---
+
+## 6. GATE
+
+**No branch fired. The paid cell is an instrument failure and the odds table does not pay
+out.** Two frozen kill criteria fired on the adjudication cell (parse 0.930/0.938 < 0.95;
+Δ_art drift +0.1515 > ±0.05), and a third failure — the code defect in §5.5 — nearly hid it.
+
+**Prediction accounting.** A 15% / B 40% / C 30% / D 15% — **none adjudicated**. Branch C
+would have read as the outcome had the cell been valid; it was not, so that is a
+counterfactual and is **not counted as a hit**. This is the third time in five phases that
+this loop has declined to bank a favourite whose cell failed its own gate (Phase 14's
+vacuous 45%; Phase 16 by 0.0004).
+
+**What the phase established anyway — all of it from P0 or from the i.i.d. arm alone:**
+
+1. **§0.4's coverage pointer was wrong in three places**, corrected on the page: the
+   below-both-nulls criterion **does not transfer to the coverage currency** (copy null
+   degenerate, 0/44 artifacts fully pass — §8 entry 10); coverage loss is **universal at
+   ≤3B across every family and diet measured** and therefore **not the sink's mechanism**;
+   and the −0.432 was the most extreme of three seeds, quoted without an error bar.
+2. **The compression law** — `shift = a + b·gap`, b ∈ [0.47, 0.90] across all eight
+   committed matched cells, R² to 0.92 — with a **fresh-seed replication** here
+   (+0.7042 vs the committed +0.6559).
+3. **The flagship sink cell replicated at a fourth independent seed, on both currencies**
+   (Δcov −0.2273, sink −0.0480, both inside their committed CIs).
+4. **Temperature is not an available intervention** on LCB at 1.5B: no setting raises
+   coverage while leaving the model intact, and the escape law's domain boundary sits
+   **below T = 1.0** — tighter than §9.3.1 W2 recorded.
+5. **A hypothesis this loop generated mid-phase was refuted by the architecture twin**
+   within the hour (P0.5), and **a degenerate simulation arm it wrote was caught, labelled
+   and retained** rather than deleted (P0.7).
+
+**Cost. $1.06**, read as a month-to-date aggregate delta ($83.81 → $84.87,
+`modal billing report`) and labelled as such per Amendment 2, since Modal's per-app daily
+lines lag. Against a $0.70–1.40 estimate: **inside the band — the eighth consecutive
+calibrated generation estimate.** Loop total **$6.83**; MTD **$84.87** against Amendment 3's
+$100 report / $120 hard stop.
+
+**What is now open.**
+
+- **The coverage channel is still un-intervened-on, and temperature is now excluded as the
+  instrument.** A successor needs a lever that raises coverage *without* moving the model's
+  own quality — nucleus/top-k truncation, or candidate-budget scaling, which P0.1 already
+  shows narrows the gap at large k. Named, not chartered.
+- **The compression law's slope is the record's most robust unexplained regularity** —
+  eight cells, two seeds, R² to 0.92 — and it does **not** separate sinking from clean
+  models. Why every model tracks the artifact at 47–90% has never been asked.
+- **The sink still has no positive mechanism.** OOD/surprise, attention magnitude,
+  attention concentration, framing, and now the coverage reframing are all excluded or
+  disqualified; head ablation remains unanswered, with a corrected design named and
+  unchartered.
+- **Nothing is running. Phase 18 is closed.**
 
 ---

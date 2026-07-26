@@ -79,16 +79,26 @@ attempted twice, informative about neither, the second attempt caught by algebra
 than by data when its adjudication statistic turned out to be **identically zero for any
 input**. And most recently the sink was shown to be **framing-invariant** — inert to the
 largest lever the record's own anchoring law possesses — which dissociates it from that
-law and rules out the cheapest deflationary reading of it. What is left standing is a
-sharply-scoped, provenance-controlled, framing-invariant, scale-bounded effect with **no
-surviving positive mechanism**, and one live pointer that has never been intervened on:
-measured in the escape law's own currency, the sink is not mainly a loss of per-sample
-quality but a loss of **coverage**.
+law and rules out the cheapest deflationary reading of it. Then the one remaining pointer —
+that measured in the escape law's own currency the sink looks like a loss of **coverage**
+rather than of per-sample quality — was taken up, and it did not survive being examined: the
+sink's own adjudication criterion **does not transfer to that currency** (the copy null
+scores coverage zero by construction), and coverage loss turns out to be **universal** across
+every family and diet at this scale rather than specific to the pathology. The attempt to
+intervene on it with temperature then failed as an instrument, because temperature degrades
+the model faster than it releases the anchor. What is left standing is a sharply-scoped,
+provenance-controlled, framing-invariant, scale-bounded effect with **no surviving positive
+mechanism** — and, from the same free work, one robust and entirely unexplained regularity:
+**every model tested, sinking or clean, is pulled 47–90% of the way from its own quality
+toward whatever artifact it is shown.**
 
-**Current status (2026-07-25):** Phase 17 closed; the verb/framing question is **closed**
-with a powered null. Phase 18 is chartered on the coverage channel. The map table above is
-current through the last closed phase; [the journal's §0](docs/WRITEUP-rgr.md) is the
-authority on what is believed and at what scope.
+**Current status (2026-07-26):** Phase 18 closed. Its paid cell was an **instrument
+failure with no branch adjudicated** — temperature cannot be used as a coverage lever at
+this scale because it degrades the model faster than it releases the anchor — but its free
+work corrected three wrong sentences in the journal's own index and produced a compression
+law that holds across every matched cell the record owns. **Nothing is running.** The map
+table above is current through the last closed phase; [the journal's §0](docs/WRITEUP-rgr.md)
+is the authority on what is believed and at what scope.
 
 ## Map of the composite
 
@@ -120,6 +130,7 @@ first iteration, with its amendments dated on the page.*
 | 15 | [PHASE_15.md](docs/PHASE_15.md) | The **architecture twin**. Phase 13's concentration finding survived a size control and a head-count control, then died to one cell that holds architecture fixed: general-Qwen-1.5B vs Coder-1.5B — same base, verified same 28L×12H, one clean and one sinking, **indistinguishable in concentration** (and the clean model carries the record's *highest*). Concentration is architecture-linked, not sink-linked. The decisive cell had been committed since Phase 7 and never looked at |
 | 16 | [PHASE_16.md](docs/PHASE_16.md) | Is the sink **framing**-sensitive? Originated in an outside-reader charter that asked for its own load-bearing claims to be checked first — two of three did not survive, and the charter was reshaped on the page. Closed **INCONCLUSIVE on instrument**: a frozen validity gate returned −0.0296 against a ≤ −0.03 threshold and failed **by 0.0004**. Honoured, not retuned. Its free decomposition found what became the next question: the sink's dominant channel is **coverage** |
 | 17 | [PHASE_17.md](docs/PHASE_17.md) | The verb question, powered and **closed**. The instruction verb is the largest anchoring lever this record has measured (moves PULL ≤0.127, against ≤0.028 for provenance) and had never been applied to a sink cell — every sink number in the journal used one fixed clause. Substituting an independent framing moves the sink by **+0.0004 ± 0.0096** (n=44, k=24), a CI that **excludes** Phase 16's near-miss. The sink is **framing-invariant**: it is dissociated from the escape-distance law's dominant lever, and the cheapest deflationary account of it is excluded |
+| 18 | [PHASE_18.md](docs/PHASE_18.md) | The coverage channel — and a phase whose paid cell bought less than its free one. Seven free analyses **corrected the target before a dollar was spent**: the sink's adjudication criterion **does not survive the change of currency** (no artifact in any of the eight committed cells fully passes, so the copy null scores coverage zero *by construction*), coverage loss turns out **universal at ≤3B across every family and diet** and so is not the sink's mechanism, and the headline −0.432 was the most extreme of three seeds with no error bar. It also found a **compression law** — every model pulled 47–90% of the way toward the artifact it is shown, R² to 0.92 — then built a hypothesis on it and **watched the architecture twin refute it within the hour**. The paid cell tried temperature and closed an **instrument failure, no branch adjudicated**: two frozen kill criteria fired, and the branch tree had ignored both. Temperature **moves the null as hard as the treatment** |
 
 ## How to read
 

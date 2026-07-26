@@ -24,8 +24,19 @@ cross-family audit that retracted our platform negatives as one family's
 pathology — and finally an existence proof that approach-level direction crosses
 the competence boundary, moving the open question to where direction comes from.*
 
-*Living record — last updated 2026-07-25. **PHASE 18 IN FLIGHT** — the coverage channel
-([PHASE_18.md]): its free P0 has landed and **corrected §0.4's coverage pointer** (the
+*Living record — last updated 2026-07-26. **PHASE 18 CLOSED — the coverage channel,
+[PHASE_18.md]. NO BRANCH ADJUDICATED: the paid cell was an instrument failure**, two frozen
+kill criteria firing on the adjudication cell (parse 0.930/0.938 below the 0.95 floor;
+Δ_art drift +0.1515 against ±0.05), and a third failure — the branch tree not consulting
+the kill criteria it had computed and printed — nearly hid it (§8 entry 11). **Temperature
+is excluded as a coverage instrument**: it moves the null as hard as the treatment — the
+*unconditioned* arm loses −0.152 mean frac and −0.159 coverage from T 0.8→1.0 and is
+destroyed by 1.2 — so claim 13's **applicability** is restricted to where its premise (E0
+flat across T) holds, and the escape law's LCB domain boundary sits **below T = 1.0**. The
+phase's substance came from its **free P0** instead — see below, all of it $0 — plus a
+**fourth-seed replication of the flagship sink cell on both currencies** (Δcov −0.2273,
+sink −0.0480). Cost $1.06 against a $0.70–1.40 estimate, the eighth consecutive calibrated
+one. *Earlier the same phase:* the free P0 **corrected §0.4's coverage pointer** (the
 "sink's dominant channel is coverage" reading is **not licensed** — the copy null is
 degenerate in that currency, 0 of the artifacts in all eight committed matched cells fully
 pass, so below-both-nulls reads TRUE in mean frac and FALSE in coverage on identical data,
@@ -35,9 +46,7 @@ mechanism**; and a **compression law** — conditioning pulls every model 47–9
 from its own quality toward the artifact's, R² up to 0.92 across eight cells — is now the
 record's first quantified form of D2a/D2b's "conditioning relocates the distribution". A
 hypothesis built on that law inside the same phase (the intercept as the diet's signature)
-was **refuted by the architecture twin within the hour**. The paid cell — temperature, the
-record's one validated coverage lever, applied to a sink cell with a matched i.i.d. null at
-every T, which D2b never carried — **is running**.
+was **refuted by the architecture twin within the hour**.
 **Previously 2026-07-25: PHASES 10–17 CLOSED.** **P10**: an audit that restored the drifted
 below-both-nulls criterion and **retracted the 7B sink** with no surviving support, then
 measured its absence at true match; also priced the targeting instrument (SE 0.028 → 0.011)
@@ -863,7 +872,7 @@ per-artifact `stack` fingerprint block, §8.)*
 | 10 | hint result (generalizes) | `h2a_hint_arm.json`, `h2a_rerun_stability.json`, `h2a_validation_struct.json`, `h5_deepseek_fourarm.json`, `h6_p2_distinct_seed_b1.json` | Qwen **13/68** (11 hint-only/0, p = 4.9e-4, r ≈ 0.19); DeepSeek **9/76** (8/0, p = 0.0039, r ≈ 0.12); all rerun-stable; ≥ 0.16 AST-novel; timeout-class enriched | both families, medium strata, **complete-strategy-grade** hints (dose-response unmeasured — J2 ceiling 123/125 COMPLETE) | same-seed B1 control suppressed → contrast conservative; **P2 measured it: distinct-seed fresh B1 = 2** (overlap 0.27 vs ~0.50) — the 13-vs-2 contrast stands on a measured control ([PHASE_6.md] P2) | Modal L4/vLLM/bf16 |
 | 11 | Qwen pathology / double dissociation (Coder-diet-specific, cross-scale on code) | `h1_cross_family.json`, `h2_manip_check.json`, `h2_manip_check_deepseek.json`, `h5_7b_pathology.json`, `h6_size_curve.json`, `h7_matched_M*.json` | Qwen code −0.095, language −0.096; DeepSeek +0.107 / +0.088 (double dissociation); **P6: general-1.5B (non-Coder) clean → Coder-stage diet; language harm 1.5B-only (3B +0.076) = MIXED**; **P7 matched: non-Coder families NO code sink at match (DeepSeek +0.050, StarCoder2 +0.008, general −0.000); ~~code sink NOT scale-bounded — 7B sinks −0.129 at match (the "blend" was position)~~ [RETRACTED 2026-07-25 — P10 R1 withdrew C4, P10 R4 found M4 non-replicating on its own inputs (−0.089 → +0.003), P10 R5 measured the absence at true match (−0.008, p 0.41, n=29); **P11 powered ladder at match: 1.5B −0.052 (n=44), 3B −0.051 (n=39), 7B −0.008 (n=29) → the sink IS scale-bounded**. This row asserted the opposite of row 8 for eight phases; the contradiction was caught in Phase 18's state read and is recorded rather than silently repaired.]** | **code** sink Coder-diet, ~~**cross-scale at match (1.5B–7B)**~~ **SCALE-BOUNDED at match: present 1.5B–3B, absent 7B (P10 R5 + P11)** vs non-Coder (no sink); **language** MIXED (1.5B-only); origin = Coder-stage diet, **position-controlled** (P7) | ~~code-channel 7B **re-tested at match (sinks)**~~ **7B re-tested at true match and does NOT sink (P10 R5); 3B→7B boundary unmeasured, 0.5B rung unplaceable by mining (§0.4)**; language-channel 7B not re-tested (P1 code-only); 7B language near-saturation (E0 → 0.9) | Modal L4/vLLM/bf16 |
 | 12 | production bottleneck (cross-family + cross-scale) | `h5_selfhint_qwen.json` + `_grades`, `h5_deepseek_selfhint_grades.json`, `h5_7b_selfhint_grades.json` | production-adequate self-hints **0/68** (Qwen-1.5B), **1/76** (DeepSeek-1.3B), **5/101** (Qwen-7B); self-hint arms floor-equivalent all three | 1.3B–7B; switch-on above 7B; cascade is the deployable shape through 7B | 7B arm read under same-seed confound (branch (a) adjudicated on the neutral-draw correction) | Modal L4/vLLM/bf16 |
-| 13 | temperature dose-response | `dmeasure_conditioning.json` | T 0.8→1.2 coverage: E0 −0.02 (flat), E1 +0.10, E2 +0.18 (more-anchored ~2×) | Qwen, HumanEval cells, within the law's domain (T ≲ 1.2) | — | Modal L4/vLLM/bf16 |
+| 13 | temperature dose-response | `dmeasure_conditioning.json`, `h18_temperature.json` | T 0.8→1.2 coverage: E0 −0.02 (flat), E1 +0.10, E2 +0.18 (more-anchored ~2×) | Qwen, HumanEval cells, within the law's domain (T ≲ 1.2). **APPLICABILITY RESTRICTED 2026-07-26 (Phase 18): NOT usable on LCB at 1.5B.** The HumanEval evidence rests on E0 being *flat* across T, so the lever moves anchoring without moving capability. On LCB that premise fails: the **unconditioned** arm loses **−0.152 mean frac / −0.159 coverage** from T 0.8→1.0 and falls below the record's parse-rate floor (0.930 vs 0.95), and by T=1.2 it is destroyed (mean frac 0.1056, parse 0.490). **No temperature setting on this benchmark raises coverage while leaving the model intact**, so temperature cannot be applied at fixed relational position (Δ_art drifted +0.028→+0.179). The claim is **not refuted** — its evidence stands where it was measured; its *reach* is now bounded | Phase 18's paid cell was an **instrument failure** (two frozen kill criteria fired) and **no branch was adjudicated**; the restriction above rests on the **i.i.d. arm alone**, measured directly and needing no conditioning contrast. The **domain boundary is now known to sit below T=1.0** on LCB, tighter than §9.3.1 W2's "T=1.2 already collapses" | Modal L4/vLLM/bf16 |
 | 14 | provenance near-irrelevance | `dmeasure_d2a_verb_provenance.json`, `h0a_d2a_ast_followup.json` | provenance ΔPULL ≤ 0.028 (lexical) / ≤ 0.034 (AST) vs verb up to +0.127 (3–4×) | Qwen; holds under lexical and AST | — | Modal L4/vLLM/bf16 |
 | 15 | false-zero floor model (5-for-6) | `w0c_stratum_falsezero.json`, `h5_deepseek_floor_fit.json`, `h5_7b_floor_fit.json`, `h5_7b_hard_floor_fit.json`, `scripts/j6_p2_floor_predict.py`, `h6_p2_distinct_seed_b1.json` | hits 2.01→2, 2.01→2, 0.00→1, hard 2.09→1, **P2 distinct-seed 2.01→2**; miss medium 5.11→1 (harness confound; corrected E 3.02, P(X≤1) ≈ 0.20) | two families, three stratum shapes; π₀ = 0 at 7B-medium (live tail), 0.76 at 7B-hard | the same-seed confound is the miss that found it; distinct-seed now mandatory; **P2 6th test HIT** (distinct-seed B1 = 2 ∈ [0,4]; overlap 0.27 vs ~0.50) | Modal L4/vLLM/bf16 |
 
@@ -995,6 +1004,19 @@ Recorded here so the Index is also the map of what is *deliberately not being ru
   **What SURVIVES and is strengthened:** the **7B zero is real, not a coincidence of
   counts** — churn 2/29 problems at R5 and 2/20 at M4, so 7B is genuinely untouched;
   and **coverage has still never been manipulated**, which is what [PHASE_18.md] charters.]**
+  **[STILL OPEN after Phase 18, and one instrument is now EXCLUDED (2026-07-26).** The paid
+  cell tried the record's one validated coverage lever — **temperature** (claim 13) — and
+  closed as an **instrument failure with no branch adjudicated**: two frozen kill criteria
+  fired on the adjudication cell (parse 0.930/0.938 below the 0.95 floor; Δ_art drift
+  +0.1515 against ±0.05). The reason needs no conditioning contrast and is the useful part:
+  **temperature moves the null as hard as the treatment.** On LCB at 1.5B the
+  *unconditioned* arm loses −0.152 mean frac and −0.159 coverage from T 0.8→1.0 — larger
+  than the entire sink effect the intervention was meant to relieve — and by T = 1.2 the
+  model is destroyed (mean frac 0.1056, parse 0.490). **There is no usable operating point
+  between "no effect" and "instrument failure."** A successor needs a lever that raises
+  coverage *without* moving the model's own quality — **nucleus/top-k truncation**, or
+  **candidate-budget scaling**, which P0.1 already shows narrows the gap at large k
+  (Δcov −0.294 at k=8 → −0.205 at k=24). Named, not chartered.]**
 - **The compression law** *(Phase 18 P0.5, free — `h18_p0_compress_battery.json`)*. Per
   problem, with gap = artifact frac − own i.i.d. and shift = conditioned − own i.i.d.,
   **`shift = a + b·gap` holds in all eight committed matched cells with b ∈ [0.47, 0.90]**
@@ -1870,6 +1892,26 @@ Run-loss modes are spend-loss modes; hardening is cheaper than any single recurr
     for the same degeneracy — **the third instance of entry 8's defect** — caught in
     analysis, labelled `_S2_VOID` in the artifact and retained rather than deleted, since
     removing degenerate arms is how a record loses the ability to see the pattern recur.
+11. **The adjudication code did not implement the frozen rules *(appended 2026-07-26,
+    Phase 18 — [PHASE_18.md] §5.5)*.** Phase 18 froze three kill criteria. `j18_temp`
+    **computed** two of them (`parse_ok`, `pos_ok`), **stored** both in the result artifact
+    and **printed** both to the log — and its `if/elif` branch tree never consulted either.
+    The committed artifact therefore reads `"branch": "C — neither moved …"` immediately
+    above a gates block reading `parse_ok: false, position_ok: false`. Both had fired: the
+    adjudication cell's parse rates were **0.9299 / 0.9375** against a frozen floor of
+    **0.95**, and its Δ_art had drifted **+0.1515** against a frozen **±0.05**. Had the
+    branch string been believed, the phase would have published a **clean-looking branch-C
+    result read off a cell that was invalid on two independent counts**. *Not drift:* the
+    criteria were frozen before the run at `4abb0b1`, are honoured in the verdict, and
+    nothing was retuned — the defect is that **the machinery of adjudication did not match
+    the pre-registration it implemented**, the same class as entry 8. *Caught by:* the
+    criteria being **printed** even though the branch tree ignored them. *Practice:*
+    **evaluate a pre-registration's kill criteria inside the same expression that selects
+    the branch — never merely alongside it — and print every frozen gate whether or not it
+    fires.** The raw artifact was committed unedited *before* the verdict so the
+    discrepancy stays legible in git history; the code was fixed afterwards with an inline
+    note recording that the fix postdates the run. **The charter governs, not the code that
+    implements it.**
 
 ## 9. Phase 3R — auditing the two live claims, and the anchoring mechanism
 

@@ -4009,7 +4009,19 @@ def j18_temp():
                    for c in cells.values())
     pos_ok = abs(one["achieved_delta_art"] - base["achieved_delta_art"]) <= 0.05
 
-    if not valid:
+    # NOTE (fixed 2026-07-26, AFTER the run — see [PHASE_18.md] §5.5). The two lines
+    # below were missing when j18_temp executed: `parse_ok` and `pos_ok` were computed,
+    # stored and printed, and then the branch tree never consulted them. The committed
+    # artifact h18_temperature.json therefore carries `branch: "C ..."` while its own
+    # gates block reads parse_ok false / position_ok false. THE CHARTER'S KILL CRITERIA
+    # GOVERN: T=1.0 is an instrument failure (parse 0.9299/0.9375 < 0.95) and a position
+    # confound (Δ_art drift +0.1515 > 0.05), so NO branch is adjudicated. The artifact's
+    # branch string is superseded by the phase doc; it is left unedited on purpose so the
+    # discrepancy stays visible. §8 ledger entry 11.
+    if not parse_ok or not pos_ok:
+        branch = ("INSTRUMENT FAILURE — a frozen kill criterion fired "
+                  f"(parse_ok {parse_ok}, position_ok {pos_ok}); no branch adjudicated")
+    elif not valid:
         branch = "NON-REPLICATION — validity gate failed, no branch adjudicated"
     elif collapsed:
         branch = "D — both arms collapsed at T=1.0 (LCB boundary below 1.0)"
