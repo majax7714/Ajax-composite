@@ -644,6 +644,53 @@ the record — the raw-data commit (`6ece2f2`) states the degeneracy in its mess
 ordering is the only thing that makes it a methodology result rather than an
 embarrassment.*
 
+### Addendum (2026-07-26, at the Phase-20 halt) — **two rules the record needed and did not have**
+
+Phase 20 refuted the family leg of the central claim. The result matters less than *why it
+took thirteen phases*, because both causes are procedural and both are now fixable.
+
+**1. A named confounder creates a standing balance obligation — from the moment it is
+named, not from the moment its coefficient is known.**
+
+Phase 7 *introduced* the relational axis (Δ_art) precisely to kill a position confound, and
+succeeded: it matched **each model to its own quality**. What it never did was ask whether
+the cells it then **compared to each other** sat at the same position. They did not — its
+non-Coder cells landed at Δ_art +0.033 / +0.050 / +0.064 and its one sinking cell at −0.039.
+**Those five numbers were committed in Phase 7's own result artifact.** Reading them as a
+column is the entire discovery, and it required no new data, no instrument, and no
+arithmetic beyond noticing that four numbers are positive and one is negative.
+
+Why it waited until Phase 19: the loop treated "position matters" as *qualitative* until
+Phase 18 measured the compression slope, and only then thought to ask how much the imbalance
+was worth. **That is backwards.** Balance is checkable the instant a variable is declared
+important; the coefficient only tells you the *size* of a problem you should already have
+looked for. *Rule:* **whenever this record names a variable as a confounder, every
+subsequent between-group comparison reports that variable's value per group — a balance
+row — before reporting the contrast.** §0.3 gains an achieved-position column for exactly
+this reason.
+
+**2. The operational ledger records failures, and therefore misses the obligations created
+by successes.**
+
+§8's entries are all post-mortems: something broke, here is the practice that prevents it.
+Phase 7 did not break — it *fixed* something — so it wrote no entry, and the standing
+obligation its fix created ("this variable now confounds every comparison") was never
+written down anywhere the loop would re-read. The same is true of §11: the reconciliation
+ledger carried Olausson, Self-Debug and Spurious Rewards, all engaged as *methods* or as
+*a specific rival*, and never carried the **general-degradation null** (Huang et al., §11)
+that competed directly with the central attribution. **A ledger that only ingests failures
+and specific rivals will not stock the hypothesis that a claim is simply an instance of a
+known general effect.** *Rule:* **a phase that resolves a confound, introduces an axis, or
+establishes an instrument writes a forward obligation into §8 in the same commit — stating
+what every later phase now owes — and any family-, diet-, or model-specific attribution
+must name the general-effect null from §11 that it is claiming to beat.**
+
+*Honest scoring of the process:* the loop did find it, unprompted, from its own data, and
+halted on it. But it found it thirteen phases late, by building an expensive quantitative
+tool, when a free balance check would have raised it at Phase 7 — and an ordinary literature
+prior would have made it the hypothesis to beat before Phase 6 ever attributed anything to a
+diet.
+
 ## 0. Claims & Scope Index *(the journal's map — seeded 2026-07-16, Phase 5 J0; maintained at every phase close)*
 
 Every claim this record has ever made, its current status, and the scope the
@@ -3303,6 +3350,37 @@ design constant. Each entry states (a) their setup specifics, (b) the delta to o
   Qwen, which sank; it predicts the blend elsewhere, which held). The H3 fork
   stands for the scale axis; its SINK-discrimination leg now tests a narrower
   question: whether Qwen's anomalous sink deepens or dissolves with scale.*
+- **⚠ Huang et al., *LLMs Cannot Self-Correct Reasoning Yet* (arXiv 2310.01798, ICLR 2024)
+  → THE NULL THIS RECORD NEVER POSED.** *(Appended 2026-07-26 at the Phase-20 halt, as a
+  retrospective ledger entry — which is itself the point.)* (a) **What it claims:**
+  intrinsic self-correction — a model revising its own output **without reliable external
+  feedback** — fails to improve and *"at times, their performance even degrades after
+  self-correction."* A related line holds that apparent gains from iterative prompting are
+  explained by **sampling and selection effects** rather than by critique content, and that
+  **smaller models refine worst**. (b) **What we measured:** the D2c SINK — conditioning on
+  a partial-credit artifact lands *below both* the model's own i.i.d. and the copy null.
+  Our prompt carries execution feedback, but only a **test-pass count** (~2 bits), and §9.3's
+  own Self-Debug reconciliation already concluded that a ~2-bit signal **does not supply
+  direction**. Our setting is therefore much nearer *intrinsic* than *fed-back*.
+  (c) **How the two square — and the failure:** Huang et al. makes
+  **"conditioning degrades, generally, and worse in small models"** the *prior*. This record
+  instead attributed its degradation to a **family/diet** cause across Phases 6–19 and
+  **never posed the general-degradation null as a rival hypothesis**. The ledger existed the
+  whole time and carried three literature entries; none of them was the one that competed
+  with the central claim. **Phase 20 then refuted the family leg empirically** — a non-Coder
+  architecture twin sinks at true match, indistinguishable from its Coder sibling — which is
+  the result the general null predicts and the family claim does not.
+  (d) **What is still ours, and is NOT in the literature we found:** the **relational
+  position axis** (measuring the effect at each model's *own* quality, Δ_art), the
+  **below-both-nulls** criterion (*worse than copying* the exemplar), and the **compression
+  law** — a measured coefficient of **0.60–0.70** for how far a model is pulled from its own
+  quality toward whatever artifact it is shown, holding across eight cells and both families.
+  Searches surfaced qualitative statements that exemplar quality matters and that models are
+  sensitive to demonstrations, but **no quantified regression-toward-exemplar-quality
+  relationship**. So the phenomenon is real and the *quantification* looks novel; the
+  **attribution** was the error. (e) **Licence:** the general null must now be carried as the
+  standing rival to any family- or diet-level claim in this record, and any such claim must
+  beat it explicitly rather than by omission.
 - **Spurious Rewards (arXiv 2506.10947) + contamination follow-up (2507.10532) →
   H1's existence.** (a) RLVR on Qwen2.5-Math with *random* rewards nearly matched
   ground-truth rewards — driven by Qwen-specific pretraining priors (code-reasoning
