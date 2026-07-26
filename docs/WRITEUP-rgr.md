@@ -971,6 +971,39 @@ the **D2c SINK** — row 8 — both ran **self-provenance, near-match conditioni
 Phase-9 H-SELF fires, those results are **reinterpretable as instances of a general
 self-conditioning hazard** — scope pre-declared here, no conclusion drawn.)*
 
+#### 0.3.1 Balance table — achieved position of every matched cell *(added 2026-07-26, §10 addendum rule 1)*
+
+**Read this before reading any between-cell contrast in §0.3.** Δ_art is a declared
+confounder with a measured coefficient of **0.60–0.70** (the compression law, §0.1), so a
+position difference between compared cells is worth 0.6–0.7× itself in effect. The table
+that makes that checkable did not exist for thirteen phases; its absence is what let the
+family contrast stand on an imbalance visible in Phase 7's own artifact.
+
+| cell | group | phase | instrument | **achieved Δ_art** | measured effect (cond − iid) | verdict |
+|---|---|---|---|---|---|---|
+| Coder-1.5B | Coder | P11 | k=24 | **+0.0016** | −0.0638 | SINK |
+| Coder-3B | Coder | P11 | k=24 | **−0.0005** | −0.0510 | SINK |
+| Coder-7B | Coder | P10 R5 | k=24 | **+0.0023** | −0.0080 | clean |
+| Coder-7B (M4) | Coder | P7 | k=8 | **−0.0393** | −0.0890 | *retracted* |
+| Coder-0.5B | Coder | P7 | k=8 | **+0.0814** | — | clean *(unadjudicated)* |
+| DeepSeek-1.3B | non-Coder | P7 | k=8 | **+0.0499** | +0.0496 | clean |
+| general-Qwen-1.5B | non-Coder | P7 | k=8 | **+0.0642** | −0.0001 | clean *(cancellation)* |
+| StarCoder2-3B | non-Coder | P7 | k=8 | **+0.0326** | +0.0081 | clean |
+| **general-Qwen-1.5B** | non-Coder | **P20** | **k=24, paired** | **−0.0054** | **−0.0372** | **SINK** |
+| **Coder-1.5B** *(same problems)* | Coder | **P20** | **k=24, paired** | **−0.0042** | **−0.0460** | **SINK** |
+
+**The imbalance, stated plainly:** every Phase-7 cell that read *clean* sat at **positive**
+Δ_art (+0.033 to +0.081); the one that read *sink* sat at **−0.039**. Sink status separated
+perfectly on position as well as on diet, and only the diet reading was carried forward.
+The two Phase-20 rows are the first time two models of different families were placed at the
+**same** position on the **same** problems — and the family difference vanished.
+
+**Estimated at-match effect for cells never measured there** *(the compression intercept;
+validated out-of-sample by Phase 20, which predicted −0.0398 for the twin and measured
+−0.0372)*: DeepSeek-1.3B **+0.011** [−0.015, +0.033]; StarCoder2-3B **−0.021**
+[−0.067, +0.022]; Coder-0.5B **−0.029** [−0.052, −0.009]. **These are extrapolations, not
+measurements**, and are carried only as pre-registered predictions for a successor.
+
 ### 0.4 Open successors *(named, not chartered — [PHASE_6.md] P3; carried without commitment)*
 
 Recorded here so the Index is also the map of what is *deliberately not being run*.
