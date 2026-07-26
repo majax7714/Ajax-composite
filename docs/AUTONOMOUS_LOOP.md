@@ -221,3 +221,46 @@ already model the tone (they name what was *retracted* as prominently as what wa
 ended at Phase 9's diet-vs-provenance result — eight phases stale at the moment this
 amendment was written, which is itself the evidence that the surface needed a rule. Phases
 10–17 were backfilled in the same commit as this amendment, before Phase 18's spend.
+
+### Amendment 4a (2026-07-25, same day) — **it was never only the README**
+
+Written after the backfill above, because fixing the README exposed that the diagnosis was
+too narrow. The journal has **two more summary surfaces with the identical failure**, both
+found stale during Phase 18's state read:
+
+- the **living-record line** at the top of `WRITEUP-rgr.md` — the line the README explicitly
+  directs readers to for current status — last updated **2026-07-18, at Phase 9**;
+- the **abstract's banner chain** — which §1 step 9 already required ("abstract banner if a
+  claim's status moves") — last extended at **Phase 10 R4**, with Phases 11–17 missing,
+  including four movements that *did* change claim status: the scale question being answered
+  (P11), attention magnitude excluded (P12), concentration retired (P15), and
+  framing-invariance established (P17).
+
+**The pattern, stated because it is the useful part.** These surfaces drift for a structural
+reason, not a lazy one: **a phase's own documents are where its work naturally lands**, and
+every summary surface is by definition somebody else's document. The detailed record —
+phase charters, §0.3 rows, §0.4 successors — stayed current throughout, because each phase
+had a reason to touch them. Nothing gave any phase a reason to touch the abstract, so seven
+in a row did not. **Compliance with step 9 was not partial; it was invisible.**
+
+**What changes.** Step 9's write-up set is now enumerated explicitly, and a phase does not
+close until each is either updated or *recorded as deliberately unchanged*:
+
+1. the phase doc RESULT; 2. the §9.x addendum; 3. §0 index rows; 4. §0.3 evidence rows;
+5. **§0.4 open successors**; 6. **the living-record line**; 7. **the abstract banner chain**
+(when a claim's status moved); 8. **`README.md`** (Amendment 4); 9. §8 ledger entry (when an
+operational failure occurred).
+
+"Recorded as deliberately unchanged" is a real option and the common one — most phases move
+no claim status and owe the abstract nothing. The requirement is that the *decision* is
+visible, not that every surface is edited. A gate that is silent when skipped is how seven
+phases skipped it.
+
+**Related defect found in the same pass, and why it belongs here.** §0.3 rows 8 and 11 had
+**contradicted each other about the 7B sink since Phase 10** — row 8 carrying the retraction,
+row 11 still asserting the retracted claim in its evidence, scope, *and* caveat cells. The
+claims-to-evidence layer exists precisely so that an extraction is *selecting rows rather
+than re-deriving support*; two rows disagreeing about one fact defeats its entire purpose,
+and it survived eight phases because no phase's own work required reading row 11. Same
+structural cause as the stale surfaces, so it is recorded against the same amendment rather
+than as an isolated slip.

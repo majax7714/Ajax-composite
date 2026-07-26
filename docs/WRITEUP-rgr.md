@@ -252,6 +252,35 @@ see §0.)*
 > never tested at match* — M4 sat at Δ_art −0.039 and R4 at −0.047. R5 measures Δ_art ≈ 0
 > directly. **Nothing here touches the 1.5B sink** (D2c −0.121, G1c −0.155, G1d −0.193)
 > or Phase 9's provenance control, which are unaffected.
+>
+> **The shape settles, and every mechanism candidate falls (2026-07-25, Phases 11–17 —
+> [PHASE_11.md] … [PHASE_17.md]).** *Landed late: loop step 9 owes this surface a banner
+> whenever a claim's status moves, and seven phases closed without one. The omission is
+> recorded rather than backdated; see [AUTONOMOUS_LOOP.md] Amendment 4.*
+> **The scale question, left OPEN above, is answered.** Phase 11 ran the Coder ladder with
+> every rung matched on the *measured* relation — each at its own Δ_art ≈ 0, so scale is no
+> longer confounded with position: **sink at 1.5B (−0.052, n = 44) and 3B (−0.051, n = 39),
+> absent at 7B (−0.008, n = 29). The sink IS scale-bounded**, now on ground the original
+> "scale-bounded" reading never had. It also discharges the small-n exposure under the
+> flagship claim. Then the search for *why* became a sequence of eliminations. **Phase 12**
+> built the record's first non-vLLM instrument and excluded **artifact-attention magnitude**
+> — a strong null, not a blind one, since the same measurement resolves a monotone size
+> effect and a family effect 5–10× larger on the same sequences. **Phase 13** found attention
+> more *concentrated* in sinking models; **Phase 15 retired it**, on the one cell that holds
+> architecture fixed — general-Qwen-1.5B, same base, verified same 28L × 12H, measured clean
+> and carrying the **highest concentration in the record**. Concentration is
+> architecture-linked, not sink-linked. **Head ablation was attempted twice and answered
+> neither time**: Phase 13 S2 destroyed the model, and Phase 14's dose-response ran cleanly
+> on a statistic that was **identically zero for any data** — caught by algebra, scored a
+> miss, corrected design named (§8 entry 8). **Phase 16** froze a validity gate as a round
+> number and lost the phase to it by 0.0004 (§8 entry 9); **Phase 17** re-ran it powered and
+> **closed the verb question**: the instruction verb — the largest anchoring lever this
+> record has measured, moving PULL ≤ 0.127 against ≤ 0.028 for provenance — is **inert on
+> the sink** (+0.0004 ± 0.0096, n = 44, k = 24; the CI **excludes** Phase 16's near-miss).
+> **The sink is framing-invariant, and therefore dissociated from the escape-distance law's
+> dominant lever**, which also excludes the cheapest deflationary account of it. Net after
+> seven phases: a **sharply-scoped, provenance-controlled, framing-invariant, scale-bounded**
+> effect with **no surviving positive mechanism**. Index rows 8/11, §0.1, §0.4.
 
 We test one claim in isolation: that an explicit internal state vector — a
 *register* — updated across refinement steps and gating generation improves
