@@ -139,3 +139,23 @@ Loop total to date $8.79.
 Frozen at commit `PENDING` (stamped at close), **before** any Phase-21 generation ran.
 
 ---
+
+## 4. Step-9a search plan — *committed mid-run, before any arm was adjudicated*
+
+*Appended while arms 4–8 were still generating. Amendment 5 requires a literature check at
+the finding; a search run **after** seeing the result can be steered, unconsciously, toward
+whatever confirms it. So the queries are fixed here, while the answer is still unknown. Under
+§1(c)'s practice, anything returned at snippet level only is marked as such and not treated
+as source-verified.*
+
+| if the branch is | queries, in this order | a hit that would change the reading |
+|---|---|---|
+| **A** — both sink | "degradation self-correction base models code"; "small language model conditioning worse than sampling"; "in-context exemplar quality regression code generation" | any paper reporting the effect as **general across base families** would move this from our finding to a **replication**, and §0.2's Qwen-pathology framing would have to be withdrawn as a claim of novelty |
+| **B** — both clean | "Qwen2.5 base model in-context degradation"; "family-specific self-repair failure code LLM"; "pretraining data code repair sensitivity" | a **pretraining-corpus** account of Qwen-family behaviour would supply the mechanism this record cannot reach, and the finding would have to be stated as consistent-with rather than evidence-for |
+| **C** — DeepSeek exceptional | "deepseek-coder fill-in-the-middle repair robustness"; "DeepSeek-Coder pretraining repository-level objective"; "model-specific robustness to low-information feedback" | DeepSeek's **repo-level / FIM pretraining objective** is the obvious candidate mechanism; if it is documented as producing exemplar-independence, that becomes the leading explanation and this phase's result is its prediction, not a discovery |
+
+**Applies to every branch:** re-check the general null (Huang et al., §11) against whatever
+is found, and record — as §1(c) did — what the search **failed** to find, not only what it
+returned. A null search result is evidence about novelty and belongs in the write-up.
+
+---
