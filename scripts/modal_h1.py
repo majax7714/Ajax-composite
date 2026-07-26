@@ -3855,6 +3855,196 @@ def j17_verb_powered():
     print("wrote artifacts/h17_verb_powered.json")
 
 
+# --- Phase 18: intervening on the coverage channel with temperature ([PHASE_18.md]) ---
+
+P18_SEED = 281
+P18_K = 24
+P18_TEMPS = (0.8, 1.0, 1.2)
+# Committed references, all measured in P0 and frozen HERE before the run.
+# Gates are expressed against these intervals, never against round numbers
+# (WRITEUP §8 entry 9; the Phase-16 gate that failed by 0.0004).
+P18_REF = {
+    "cov_iid_ci": [0.5227, 0.7955],      # h18_p0_coverage.json, k=24, n=44
+    "dcov_ci": [-0.3636, -0.0455],       # committed Δcov@24 CI95
+    "sink_ci": [-0.1258, -0.0028],       # h11_coder1p5b.json delta_cond_minus_iid_ci95
+}
+
+
+def _p18_passk(fracs, k):
+    """Unbiased pass@k (Chen et al. 2021). At k == len(fracs) this is the indicator."""
+    import math
+    n = len(fracs)
+    c = sum(1 for f in fracs if f >= 1.0)
+    if n - c < k:
+        return 1.0
+    return 1.0 - math.comb(n - c, k) / math.comb(n, k)
+
+
+def _p18_boot(vals, seed=283, b=4000):
+    import random as _r
+    import statistics as _st
+    rng = _r.Random(seed)
+    acc = sorted(_st.mean([vals[rng.randrange(len(vals))] for _ in vals])
+                 for _ in range(b))
+    return round(acc[int(0.025 * b)], 4), round(acc[int(0.975 * b)], 4)
+
+
+def _p18_bands(cand):
+    """P0.3's per-candidate frac distribution, recomputed at each temperature."""
+    import ast
+    n_ok = n_tot = 0
+    for c in cand:
+        for code in c["codes"]:
+            n_tot += 1
+            if code:
+                try:
+                    ast.parse(code)
+                    n_ok += 1
+                except SyntaxError:
+                    pass
+    return n_ok / n_tot if n_tot else 0.0
+
+
+@app.local_entrypoint()
+def j18_temp():
+    """Phase 18 — does temperature restore conditioned coverage, and does the SINK
+    follow? Pre-registered [PHASE_18.md] BEFORE this ran. Six arms
+    ({cond, iid} x T in {0.8, 1.0, 1.2}) at k=24, all fresh at seed 281 so the
+    temperature ladder is seed-internally matched (P0.2 measured a 0.114 seed swing
+    in coverage — larger than several effects this phase must resolve)."""
+    import statistics as st
+
+    assert _d2c_context({"n_tests": 5, "n_failed": 2, "code": "x"}), "context drifted"
+    mid, rev = P11_MODELS["coder1p5b"]
+
+    # rebuild the P11 matched artifact set with the frozen selector; verify vs commit
+    qids, pool = _r3_donor_pool()
+    g0, r0 = _load("j11_sweep_cand_coder1p5b"), _load("j11_sweep_res_coder1p5b")
+    assert g0 and r0, "missing committed k=24 sweep"
+    powered = {x["qid"]: st.mean(c["frac"] for c in row) for x, row in zip(g0, r0)}
+    ch = json.loads(
+        (REPO / "artifacts/h11_targeting_coder1p5b.json").read_text())["chosen"]
+    sel = _r3_select(pool, qids, powered, ch["target"], ch["hw"])
+    arts = [{"qid": q, "cand_idx": c[0], "code": c[2], "frac": c[1],
+             "n_tests": c[3], "n_failed": c[3] - c[4]} for q, c in sorted(sel.items())]
+    assert len(arts) == ch["n"], f"n {len(arts)} != committed {ch['n']}"
+    ma = round(st.mean(a["frac"] for a in arts), 4)
+    assert ma == ch["mean_art"], f"mean_art {ma} != committed {ch['mean_art']}"
+    print(f"[P18] artifact set verified: n={len(arts)} mean_art {ma:.4f} "
+          f"(committed {ch['mean_art']:.4f})")
+
+    cond_items = [{"qid": a["qid"], "context": _d2c_context(a)} for a in arts]
+    iid_items = [{"qid": a["qid"], "context": None} for a in arts]
+    art_by_q = {a["qid"]: a["frac"] for a in arts}
+
+    def run(kind, items, T):
+        tag = f"j18_{kind}_T{str(T).replace('.', 'p')}"
+        g = _load(f"{tag}_cand") or _persist(f"{tag}_cand", h1_gen_lcb.remote(
+            mid, items, P18_K, tag=f"{tag}_cand", temperature=T, seed=P18_SEED,
+            revision=rev, max_model_len=8192, max_tokens=1536))
+        r = _load(f"{tag}_res") or _persist(f"{tag}_res", h1_lcb_exec.remote(
+            [x["qid"] for x in g], [x["codes"] for x in g], tag=f"{tag}_res"))
+        return g, r
+
+    cells = {}
+    for T in P18_TEMPS:
+        gi, ri = run("iid", iid_items, T)
+        gc, rc = run("cond", cond_items, T)
+        fi = {x["qid"]: [y["frac"] for y in row] for x, row in zip(gi, ri)}
+        fc = {x["qid"]: [y["frac"] for y in row] for x, row in zip(gc, rc)}
+        qs = sorted(set(fi) & set(fc) & set(art_by_q))
+
+        cvi = [_p18_passk(fi[q], P18_K) for q in qs]
+        cvc = [_p18_passk(fc[q], P18_K) for q in qs]
+        dcov = [b - a for a, b in zip(cvi, cvc)]
+        mfi = [st.mean(fi[q]) for q in qs]
+        mfc = [st.mean(fc[q]) for q in qs]
+        dmf = [b - a for a, b in zip(mfi, mfc)]
+        mart = st.mean(art_by_q[q] for q in qs)
+        dart = mart - st.mean(mfi)
+        dm, dse, dp = _p16_two_sided(dmf)
+
+        cells[str(T)] = {
+            "T": T, "n": len(qs),
+            "cov_iid": round(st.mean(cvi), 4), "cov_iid_ci": _p18_boot(cvi),
+            "cov_cond": round(st.mean(cvc), 4), "cov_cond_ci": _p18_boot(cvc),
+            "delta_cov": round(st.mean(dcov), 4), "delta_cov_ci": _p18_boot(dcov),
+            "mean_iid": round(st.mean(mfi), 4), "mean_cond": round(st.mean(mfc), 4),
+            "mean_artifact": round(mart, 4),
+            "sink_vs_iid": round(dm, 4), "se": round(dse, 4), "p": dp,
+            "sink_vs_artifact": round(st.mean(mfc) - mart, 4),
+            "below_both_nulls": bool(st.mean(mfc) < st.mean(mfi)
+                                     and st.mean(mfc) < mart),
+            "achieved_delta_art": round(dart, 4),
+            "parse_rate_iid": round(_p18_bands(gi), 4),
+            "parse_rate_cond": round(_p18_bands(gc), 4)}
+        c = cells[str(T)]
+        print(f"\n=== T={T}  n={c['n']}  Δ_art {c['achieved_delta_art']:+.4f} ===")
+        print(f"  coverage@24  iid {c['cov_iid']:.4f}  cond {c['cov_cond']:.4f}  "
+              f"Δ {c['delta_cov']:+.4f} CI {c['delta_cov_ci']}")
+        print(f"  mean frac    iid {c['mean_iid']:.4f}  cond {c['mean_cond']:.4f}  "
+              f"Δ {c['sink_vs_iid']:+.4f} ± {c['se']:.4f}  p {c['p']:.4g}  "
+              f"below-both {c['below_both_nulls']}")
+        print(f"  parse rate   iid {c['parse_rate_iid']:.4f}  "
+              f"cond {c['parse_rate_cond']:.4f}")
+
+    # ---------------------------------------------- frozen gates ([PHASE_18.md] §3)
+    base = cells["0.8"]
+    dlo, dhi = P18_REF["dcov_ci"]
+    slo, shi = P18_REF["sink_ci"]
+    ilo, _ = P18_REF["cov_iid_ci"]
+    valid = (dlo <= base["delta_cov"] <= dhi) and (slo <= base["sink_vs_iid"] <= shi)
+    print(f"\n[VALIDITY] T=0.8 replication of the committed cell:")
+    print(f"    Δcov {base['delta_cov']:+.4f} in [{dlo:+.4f},{dhi:+.4f}]: "
+          f"{dlo <= base['delta_cov'] <= dhi}")
+    print(f"    sink {base['sink_vs_iid']:+.4f} in [{slo:+.4f},{shi:+.4f}]: "
+          f"{slo <= base['sink_vs_iid'] <= shi}")
+    print(f"    -> {'OK' if valid else 'FAILED — NON-REPLICATION, no adjudication'}")
+
+    one = cells["1.0"]
+    rescued = one["delta_cov"] > dhi
+    sink_unmoved = slo <= one["sink_vs_iid"] <= shi
+    collapsed = one["cov_iid"] < ilo
+    parse_ok = all(c["parse_rate_iid"] >= 0.95 and c["parse_rate_cond"] >= 0.95
+                   for c in cells.values())
+    pos_ok = abs(one["achieved_delta_art"] - base["achieved_delta_art"]) <= 0.05
+
+    if not valid:
+        branch = "NON-REPLICATION — validity gate failed, no branch adjudicated"
+    elif collapsed:
+        branch = "D — both arms collapsed at T=1.0 (LCB boundary below 1.0)"
+    elif rescued and not sink_unmoved:
+        branch = "A — coverage rescued AND the sink moved with it"
+    elif rescued and sink_unmoved:
+        branch = "B — coverage rescued, sink UNMOVED (dissociated under intervention)"
+    elif not rescued and sink_unmoved:
+        branch = "C — neither moved: scope restriction on claim 13 (temperature)"
+    else:
+        branch = "UNCLASSIFIED — coverage not rescued but sink moved; read the table"
+
+    print(f"\n[T=1.0] rescued {rescued}  sink_unmoved {sink_unmoved}  "
+          f"collapsed {collapsed}")
+    print(f"[KILL ] parse>=0.95 all arms {parse_ok}   "
+          f"Δ_art drift <=0.05 {pos_ok} "
+          f"({one['achieved_delta_art'] - base['achieved_delta_art']:+.4f})")
+    print(f"\n=== BRANCH {branch} ===")
+    if cells["1.2"]["cov_iid"] < ilo:
+        print("    T=1.2 collapsed as pre-registered — confirms the frozen LCB domain "
+              "bound (§9.3.1 W2), not a failed intervention")
+
+    (REPO / "artifacts/h18_temperature.json").write_text(json.dumps(
+        {"_label": "Phase 18 — temperature on the coverage channel [PHASE_18.md]",
+         "prereg_commit": "PENDING", "seed": P18_SEED, "k": P18_K,
+         "model": mid, "revision": rev, "n": base["n"],
+         "committed_refs": P18_REF, "cells": cells,
+         "gates": {"validity_ok": bool(valid), "rescued_at_1.0": bool(rescued),
+                   "sink_unmoved_at_1.0": bool(sink_unmoved),
+                   "collapsed_at_1.0": bool(collapsed),
+                   "parse_ok": bool(parse_ok), "position_ok": bool(pos_ok)},
+         "branch": branch, "stack": _stack_block()}, indent=2))
+    print("wrote artifacts/h18_temperature.json")
+
+
 @app.local_entrypoint()
 def j9_g2_phi():
     """G2 (fired by the DIET branch) — phi-1 at its TRUE match, iterative-targeted
