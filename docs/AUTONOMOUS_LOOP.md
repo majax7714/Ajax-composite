@@ -181,3 +181,43 @@ burn rate (Phases 12–16: $0.02–$2.15 each).
 **Unchanged:** §4's within-$30-of-cap launch guard; §3's halt list, including the 1:1
 refutation rule. If the author intended the loop envelope rather than the month-to-date
 figure, that is a one-line re-amendment — it would not change behaviour for many phases.
+
+## Amendment 4 (2026-07-25) — **the README is a maintained surface, updated every pass**
+
+*Author instruction, verbatim: "add to the loop to update readme going forward with every
+pass."* Context given in the same message: the author reads results **on mobile, after
+pushing**. That is the operative fact — the README is the repository's landing page and the
+first thing a phone renders, so it is the one document whose staleness is *invisible from
+inside the loop* and *maximally visible from outside it*.
+
+**What changes — §1 step 9 gains a fourth surface.** Step 9 (*Write up*) currently names
+the phase doc, the journal (§9.x / §0 / §0.3 / abstract / §8), and nothing else. It now
+reads: phase doc RESULT; journal addenda and index rows; **`README.md`**; gate. Concretely,
+at every phase close the README must carry:
+
+- a **row in the "Map of the composite" table** for the phase that just closed, in the same
+  one-sentence-verdict register as the existing rows;
+- a **current-status line** naming the phase number, its verdict, and what is now open, so a
+  reader who never opens `docs/` still knows where the record stands;
+- the **arc paragraph** brought current *if and only if* a claim's status moved. Phases that
+  close INCONCLUSIVE or as instrument misses get a table row, not an arc rewrite — the arc is
+  the record's thesis line, not its changelog.
+
+**What does NOT change.** The README is a *pointer*, never a source. No number appears there
+that is not already in the journal with its artifact, and the README is never the place a
+result is first written down — that ordering (data commit → verdict commit → summary) is what
+§1 steps 7–9 exist to enforce. Append-only does **not** apply to the README: it is explicitly
+a rendered view of current state, and it may be rewritten freely, because git history holds
+its prior versions and the journal holds the append-only record. That distinction is stated
+here so a later reader does not mistake a rewritten README line for a silent revision.
+
+**Failure mode this creates, named so it can be caught.** A summary surface maintained by the
+same agent that produces the results is where over-claiming is cheapest — the README has no
+odds, no CIs, no scope column, and no gate. The counter-pressure is the sourcing rule above:
+every README sentence must be checkable against a journal row, and the table's existing rows
+already model the tone (they name what was *retracted* as prominently as what was found).
+
+**Backfill (2026-07-25).** The README's map table stopped at Phase 9 and its arc paragraph
+ended at Phase 9's diet-vs-provenance result — eight phases stale at the moment this
+amendment was written, which is itself the evidence that the surface needed a rule. Phases
+10–17 were backfilled in the same commit as this amendment, before Phase 18's spend.

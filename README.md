@@ -66,6 +66,30 @@ not the provenance of the code being conditioned on — the origin line standing
 last, on ground no remaining confound can shift, with the deeper question of *why*
 that diet does it left honestly open.
 
+Chasing that *why* is what the unattended loop has been doing since, and it has mostly
+been a demolition. An audit found the adjudication criterion had silently drifted and
+**retracted the effect's largest number**, after which a powered ladder — every rung
+measured at its own matched relation — established the shape that survives: present at
+1.5B and 3B, **absent at 7B**. Then the mechanism candidates fell one at a time.
+Artifact-attention magnitude: excluded, by an instrument that proved it could see by
+resolving two larger effects on the same sequences. Attention *concentration*: it tracked
+the sink across three model pairs and died to the fourth — the one that holds architecture
+fixed — so it is a property of the architecture, not of the pathology. Head ablation:
+attempted twice, informative about neither, the second attempt caught by algebra rather
+than by data when its adjudication statistic turned out to be **identically zero for any
+input**. And most recently the sink was shown to be **framing-invariant** — inert to the
+largest lever the record's own anchoring law possesses — which dissociates it from that
+law and rules out the cheapest deflationary reading of it. What is left standing is a
+sharply-scoped, provenance-controlled, framing-invariant, scale-bounded effect with **no
+surviving positive mechanism**, and one live pointer that has never been intervened on:
+measured in the escape law's own currency, the sink is not mainly a loss of per-sample
+quality but a loss of **coverage**.
+
+**Current status (2026-07-25):** Phase 17 closed; the verb/framing question is **closed**
+with a powered null. Phase 18 is chartered on the coverage channel. The map table above is
+current through the last closed phase; [the journal's §0](docs/WRITEUP-rgr.md) is the
+authority on what is believed and at what scope.
+
 ## Map of the composite
 
 | Phase | Charter | What it was |
@@ -81,6 +105,21 @@ that diet does it left honestly open.
 | 7 | [PHASE_7.md](docs/PHASE_7.md) | Is the sink Qwen's, the diet's, or everyone's? The matched-artifact battery mined artifacts to each model's own quality and sampled the sink's region off-Coder for the first time: the sink is **Coder-diet-specific** (non-Coder families flat at match) — and the battery **reversed** Phase 6's "vanishes at 7B", which was itself a position artifact (7B sinks at match). The "competence window" becomes a diet × relational-position rule |
 | 8 | [PHASE_8.md](docs/PHASE_8.md) | The mechanism of the sink + closing the confounds. Mechanism read (later amended): matched conditioning lands off a Coder model's manifold, so it elaborates rather than copies the artifact and degrades — position-gated. The **7B sink is confirmed** (n=37). Three confounds left honestly **open** (provenance, the sign/below-zero question, a second synthetic-code family) — each cheap, each named, none papered over |
 | 9 | [PHASE_9.md](docs/PHASE_9.md) | Diet or provenance? A Phase-8 data point sitting in a caveat (a Coder model sinking on its *own unsurprising* output) was promoted to a rival hypothesis: maybe models sink on their own near-quality output, not because of any diet. The **generated 2×2** (model × self/foreign provenance, generation held flat) settled it: **the Coder model sinks on foreign code too, the non-Coder model on neither → the diet causes it, provenance-controlled; the self-conditioning hypothesis is refuted.** The mechanism read is corrected in the same motion — the sink is decoupled from surprise, so the earlier "off-manifold" story is disfavored; *why* the diet does it stays open |
+
+*From Phase 10 the loop runs unattended between author check-ins, under a spec that is
+itself pre-registered — [AUTONOMOUS_LOOP.md](docs/AUTONOMOUS_LOOP.md), frozen before its
+first iteration, with its amendments dated on the page.*
+
+| Phase | Charter | What it was |
+|---|---|---|
+| 10 | [PHASE_10.md](docs/PHASE_10.md) | The audit that cost the record its biggest number. Chartered to measure a clean model *below* match, it instead found that the sink criterion had silently drifted — the original "below **both** nulls" had become a signature that dropped the copy null, which scores a false sink by construction wherever the artifact is worse than the model. Restoring it **withdrew one 7B confirmation and pre-empted a second**; a replication at a fresh seed then failed outright, and the 7B sink — cited across the journal — was retracted with **no surviving support**. Its absence was then *measured* at true match. Also priced the targeting instrument that every matched cell had been aimed with (SE 0.028 → 0.011) and killed a phantom $31 line item |
+| 11 | [PHASE_11.md](docs/PHASE_11.md) | The ladder at match, powered. The first scale statement in this record resting on cells matched on the **measured relation** rather than the raw stimulus — every rung at its own Δ_art ≈ 0: sink at 1.5B (−0.052, n=44) and 3B (−0.051, n=39), **absent at 7B** (−0.008, n=29). The sink **is** scale-bounded, on ground the earlier "scale-bounded" reading never had. Also discharged the small-n exposure under the flagship claim |
+| 12 | [PHASE_12.md](docs/PHASE_12.md) | The first non-vLLM instrument: a probe that teacher-forces a model over its own committed generation and splits attention across the artifact / problem / generated spans. **Artifact-attention magnitude is excluded as the mechanism** — all four models sit near 10%, the two pairs disagree in sign, both deltas < 1 SE. A strong null rather than a blind one: the same measurement resolves a monotone size effect and a family effect 5–10× larger, so the instrument was demonstrably looking |
+| 13 | [PHASE_13.md](docs/PHASE_13.md) | Head-level structure, and the record's first **intervention**. S1 (correlational): artifact attention is more *concentrated* in sinking models — the 30% underdog fired. S2 (causal): ablating 16 heads destroyed the model, a recorded instrument miss with K deliberately **not** retuned in-phase |
+| 14 | [PHASE_14.md](docs/PHASE_14.md) | The ablation dose-response — and a **design-level miss caught mid-run by algebra**. Ablating only the conditioned arm makes `sink = cond − artifact` a difference of the same variable, so the adjudication statistic was **identically zero for any data** and the 45% favourite fired *vacuously*. Scored a miss, not a hit; the corrected design is named on the page. Salvage: the S1-selected heads are genuinely more load-bearing than random heads at matched dose (p 1.3e-17) |
+| 15 | [PHASE_15.md](docs/PHASE_15.md) | The **architecture twin**. Phase 13's concentration finding survived a size control and a head-count control, then died to one cell that holds architecture fixed: general-Qwen-1.5B vs Coder-1.5B — same base, verified same 28L×12H, one clean and one sinking, **indistinguishable in concentration** (and the clean model carries the record's *highest*). Concentration is architecture-linked, not sink-linked. The decisive cell had been committed since Phase 7 and never looked at |
+| 16 | [PHASE_16.md](docs/PHASE_16.md) | Is the sink **framing**-sensitive? Originated in an outside-reader charter that asked for its own load-bearing claims to be checked first — two of three did not survive, and the charter was reshaped on the page. Closed **INCONCLUSIVE on instrument**: a frozen validity gate returned −0.0296 against a ≤ −0.03 threshold and failed **by 0.0004**. Honoured, not retuned. Its free decomposition found what became the next question: the sink's dominant channel is **coverage** |
+| 17 | [PHASE_17.md](docs/PHASE_17.md) | The verb question, powered and **closed**. The instruction verb is the largest anchoring lever this record has measured (moves PULL ≤0.127, against ≤0.028 for provenance) and had never been applied to a sink cell — every sink number in the journal used one fixed clause. Substituting an independent framing moves the sink by **+0.0004 ± 0.0096** (n=44, k=24), a CI that **excludes** Phase 16's near-miss. The sink is **framing-invariant**: it is dissociated from the escape-distance law's dominant lever, and the cheapest deflationary account of it is excluded |
 
 ## How to read
 
