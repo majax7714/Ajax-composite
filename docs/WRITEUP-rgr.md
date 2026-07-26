@@ -663,6 +663,14 @@ currently believes.** Statuses: LIVE / KILLED / RETRACTED / REVERSED / SCOPED.
   a faithful imitator scores a false sink by construction. It produced one false
   confirmation (C4) and would have produced a second (R4, whose legacy signature reads
   True). Adjudication is on the original definition; the legacy value is reported only.
+  *(2026-07-25, Phase 18 P0.4 — **the criterion is currency-bound, and that is now part of
+  its specification.** Its second null is the **copy** null, which in the coverage currency
+  is **degenerate**: matched artifacts are partial-credit by construction and **0 of them
+  fully pass in any of the eight committed matched cells**, so copying scores coverage
+  exactly 0.0000 and any conditioned arm clears it trivially. Below-both-nulls therefore
+  reads **TRUE in mean frac and FALSE in coverage on identical data**. The criterion is
+  defined on **mean frac** and may not be carried into another currency without being
+  re-derived there. §8 ledger entry 10.)*
 - **The relational axis + stack fingerprint** (Phase 7) — re-expressing every
   conditioning cell on **Δ_art** (artifact frac − own i.i.d.) turned a hidden
   position confound into a measurable axis and caught it in two consecutive phases
@@ -895,13 +903,62 @@ Recorded here so the Index is also the map of what is *deliberately not being ru
   anchoring lever. Tested at power (k=24, n=44): **inert**, ΔC +0.0004 ± 0.0096. Phase 16's
   k=8 near-miss (−0.0336, p 0.056) did not survive and is excluded by the powered CI. The
   sink is not an anchoring phenomenon in the escape law's sense.
-- **The coverage channel — the strongest live pointer in the record, and never manipulated**
+- ~~**The coverage channel — the strongest live pointer in the record, and never manipulated**
   (Phase 16 P0.2, free). The SINK has always been measured as **mean frac**; decomposed on
   the escape law's own currency it is dominated by **coverage** loss — Coder-1.5B
   0.636 → 0.205 pass@8 (**−0.432**) and Coder-3B −0.410, against mean-frac drops of −0.064 /
   −0.084, while **Coder-7B at true match loses 0.000**. Parse rates 0.99–1.00, so it is not
   syntactic breakage; and diversity contraction does *not* track sink status (the clean
-  DeepSeek cell contracts most and gains quality). No phase has yet intervened on coverage.
+  DeepSeek cell contracts most and gains quality). No phase has yet intervened on coverage.~~
+  **[CORRECTED 2026-07-25, Phase 18 P0 (free, [PHASE_18.md] §1) — three of the sentences
+  above do not survive their own follow-up, and the pointer is smaller and different than
+  written.**
+  1. **"The sink's dominant channel is coverage" is NOT LICENSED as a restatement of
+     claim 8.** The SINK is defined as below **both** nulls — own i.i.d. *and* the copy
+     null. **0 of the artifacts in all eight committed matched cells fully pass**, so the
+     copy null scores coverage **0.0000 by construction** and the conditioned arm beats it
+     enormously. Below-both-nulls is **TRUE in mean frac and FALSE in coverage** on the
+     flagship cell (0.6591 i.i.d. / 0.0000 copy / 0.4545 cond). Claim 8 is a **mean-frac**
+     statement and cannot be re-expressed in a currency where its own second null is
+     degenerate. What *is* licensed: conditioning's damage is **concentrated in coverage
+     measured against the i.i.d. null alone** — a weaker sentence.
+  2. **Coverage loss does NOT track the Coder diet, so it is not the sink's mechanism.**
+     Every clean cell loses coverage too: DeepSeek-1.3B −0.205, the **architecture twin**
+     general-Qwen-1.5B −0.215, StarCoder2-3B −0.205, Coder-0.5B −0.117. It is **universal
+     at ≤3B across every family and diet measured** and **absent at 7B**. Two different
+     phenomena had been conflated by a shared measurement.
+  3. **The −0.432 was the most extreme of three seeds and had no error bar.** Same cell,
+     same prompt, matched k=8: 0.2045 / 0.3182 / 0.2786 at seeds 173 / 233 / 239, spread
+     **0.114**. Re-measured on matched-k=24 arms with a bootstrap over problems the effect
+     is real and significant at every k (k=8 −0.2942 CI95 [−0.4085, −0.1824]; k=24 −0.2045
+     CI95 [−0.3636, −0.0455]) but **peaks near k=4–8 and narrows after**.
+  **What SURVIVES and is strengthened:** the **7B zero is real, not a coincidence of
+  counts** — churn 2/29 problems at R5 and 2/20 at M4, so 7B is genuinely untouched;
+  and **coverage has still never been manipulated**, which is what [PHASE_18.md] charters.]**
+- **The compression law** *(Phase 18 P0.5, free — `h18_p0_compress_battery.json`)*. Per
+  problem, with gap = artifact frac − own i.i.d. and shift = conditioned − own i.i.d.,
+  **`shift = a + b·gap` holds in all eight committed matched cells with b ∈ [0.47, 0.90]**
+  and R² up to 0.92 — every model, sinking or clean, Coder-diet or not, is pulled roughly
+  half to nine-tenths of the way from its own quality toward the artifact's. This is the
+  record's first *quantified* form of what D2a/D2b stated qualitatively ("conditioning
+  relocates the distribution"). **A hypothesis built on it was refuted in the same phase:**
+  on the first four cells the *intercept* looked like the diet's signature (SINKS −0.056 /
+  −0.058, CI-excluding zero; clean cells including zero), but the full eight-cell set kills
+  it — the **architecture twin** general-Qwen-1.5B, measured **clean**, also excludes zero
+  at −0.0398, as do Coder-0.5B (−0.0293) and the retracted M4 (−0.1101, the largest in the
+  table). The intercept is a re-parameterisation of each cell's own at-match `cond − iid`
+  and inherits everything that number does, including M4's non-replication. **A second
+  caveat on the intercept, stated because it is easy to miss:** it is the fit evaluated at
+  gap = 0, and the cells are not all centred there — Δ_art runs from −0.039 (M4) to +0.081
+  (M5) — so for the Phase-11 rungs (Δ_art −0.011 / −0.033) the intercept is an
+  *interpolation* while for M5 and the twin M2 (+0.081 / +0.064) it is a modest
+  *extrapolation* past the cell's own centre. That asymmetry cuts against the refuted
+  hypothesis, not for it: the two cells whose intercepts are least trustworthy are among
+  the clean ones that broke it, so the refutation rests on M2 and M5 being *at least*
+  approximately right, which the record cannot currently sharpen without new cells.
+  *(Exploratory per §10; it moves no claim. Carried because the slope is a robust
+  descriptive fact and the refutation is a second instance of the Phase-15
+  architecture-twin lesson.)*
 - **The 0.5B rung and the 3B→7B boundary** (Phase 11) — the ladder is measured at
   1.5B / 3B / 7B at match; **0.5B** cannot be placed at its own straddle by mining
   (needs generated artifacts) and **nothing has been measured between 3B and 7B**, where
@@ -1732,6 +1789,27 @@ Run-loss modes are spend-loss modes; hardening is cheaper than any single recurr
    *Distinct from entry 8:* that rule asks whether a decision rule **can** fire; this
    asks whether it fires **for the reason intended**. Both checks are free and belong in
    every pre-registration.
+10. **An adjudication criterion that does not survive a change of units *(appended
+    2026-07-25, Phase 18 P0.4 — [PHASE_18.md])*.** The D2c SINK is defined as below
+    **both** nulls: the model's own i.i.d. **and** the copy null. §0.4 had begun
+    describing the sink as "dominated by coverage," a re-expression in a different
+    currency — and nobody checked whether the criterion transfers. **It does not.** The
+    matched artifacts are partial-credit by construction and **0 of them fully pass in
+    any of the eight committed matched cells**, so the copy null scores coverage
+    **exactly 0.0000 everywhere** and any conditioned arm beats it trivially.
+    Below-both-nulls is **TRUE in mean frac and FALSE in coverage** on the same cell,
+    same data. A statement licensed in one currency was being carried into another that
+    cannot support it. *Practice:* **a claim's adjudication criterion travels with its
+    currency. Re-expressing a result in new units requires re-deriving the criterion in
+    those units — including checking that each null is non-degenerate there — before the
+    restatement is written down, not after.** *Relation to entries 8 and 9:* those catch
+    a rule that cannot fire and a threshold that fires for the wrong reason; this catches
+    a rule that is valid where it was written and silently invalid where it was moved to.
+    All three are free desk checks. *Second finding, same phase, same class:* Phase 18's
+    own P0.7 shipped a simulation arm (S2) that returned exactly 0.0000 for any input,
+    for the same degeneracy — **the third instance of entry 8's defect** — caught in
+    analysis, labelled `_S2_VOID` in the artifact and retained rather than deleted, since
+    removing degenerate arms is how a record loses the ability to see the pattern recur.
 
 ## 9. Phase 3R — auditing the two live claims, and the anchoring mechanism
 
