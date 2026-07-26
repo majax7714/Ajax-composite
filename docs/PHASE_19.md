@@ -215,3 +215,128 @@ Frozen at commit `2bf474d`, **before** any Phase-19 generation ran.
 P0 was committed separately and earlier.
 
 ---
+
+## 5. RESULT — **BRANCH A fires, and the charter over-claimed its own power**
+
+### 5.1 The cell
+
+All frozen gates pass: **n = 54** (≥ 30), achieved powered **Δ_art −0.0040** (|·| ≤ 0.020),
+**parse 0.9896** (≥ 0.95). Targeting was feasible at 14 bands, so branch D never applied.
+
+| | i.i.d. | cond | artifact | **cond − iid** | CI95 |
+|---|---|---|---|---|---|
+| **twin** general-Qwen-1.5B, n=54 | 0.3037 | 0.3010 | 0.3075 | **−0.0027** | [−0.0588, +0.0533] |
+| sibling Coder-1.5B, n=44 *(P11)* | 0.4704 | 0.4067 | 0.4589 | **−0.0638** | [−0.1250, −0.0025] |
+
+**BRANCH A — TWIN CLEAN at true match.** The pre-registered rule was *"TWIN CLEAN ⟺ the
+cond − iid CI95 includes zero."* It does. The 45% favourite fired, on a rule frozen at
+`2bf474d`.
+
+`verdict_legacy_p11_rule` reads **NO SINK** and `below_both_nulls_p11_rule` **False**, in
+agreement — but the precise reason matters and is not "the twin is above the nulls." The
+twin is **nominally below both** (−0.0027 vs its i.i.d., −0.0065 vs the artifact); it fails
+the sink criterion because neither margin is significant or material. **The twin is
+indistinguishable from its nulls, not above them.**
+
+### 5.2 ⚠ The charter asserted discriminating power it did not have
+
+§2 said: *"Two predictions, ~0.04 apart, and the cell distinguishes them."* **It does not,
+and no power calculation was done before the run.**
+
+| hypothesis | value | inside the twin's CI? |
+|---|---|---|
+| DIET claim | 0.0000 | **yes** (\|t\| 0.10) |
+| compression law | −0.0398 | **yes** (\|t\| 1.30) |
+| Coder sibling | −0.0638 | no (\|t\| 2.14) |
+
+Achieved SE **0.0286** → **minimum detectable effect at 80% power = 0.0800**. The
+separation the phase was built to resolve is **0.04 — half the MDE.** Both candidate
+predictions sit inside the interval; the cell could not have chosen between them whatever
+it returned.
+
+**And the twin-vs-sibling comparison is not significant either.** The correct test is the
+difference of the two estimates, not whether one point lies outside the other's interval:
+
+> **twin − sibling = +0.0610 ± 0.0424, CI95 [−0.0220, +0.1440], \|t\| 1.44, p 0.150.**
+
+So the `inside_sibling_ci: false` flag in the artifact — which turns on −0.0027 vs a bound
+of −0.0028, a margin of **0.0001** — is a point-against-interval comparison and must not be
+read as a demonstration that the twin differs from its Coder sibling. **It does not
+establish that.**
+
+### 5.3 What the phase does and does not establish
+
+**Does:**
+- **A powered, on-target, at-match non-Coder cell now exists** — n = 54, Δ_art −0.0040,
+  k = 24 targeting, parse 0.99, run through the byte-identical path as the Coder rungs.
+  §1.1's *instrument* asymmetry — every powered at-match cell being a Coder cell — **is
+  fixed.** That was half the P0 complaint and it is discharged.
+- The twin's point estimate (−0.0027) is **an order of magnitude closer to zero** than its
+  sibling's (−0.0638), which is **directionally** what the DIET claim predicts.
+- The compression law's **point** prediction of −0.0398 **missed by 0.037** — the observed
+  effect is 93% closer to zero than predicted. Its *interval* contains the observation by
+  **0.0006** at the extreme edge; that is a boundary artifact and **nothing is built on
+  it in either direction.**
+
+**Does not:**
+- It does **not** show the twin differs from the Coder sibling (p 0.150).
+- It does **not** discriminate DIET from the compression law (both inside the CI).
+- It therefore does **not** close §1.1's *inferential* complaint, only its instrumental one.
+
+**Net effect on the record:** the DIET attribution is **unchanged and still rests on Phase 9's
+position-matched 2×2** (§1.3). Phase 19 adds a properly-instrumented non-Coder at-match cell
+that is directionally consistent with it, and removes the excuse that no such cell existed.
+The §0.2 / §0.3 position caveat landed at `6d34068` **stands as written** — it was owed on
+P7's evidence quality regardless of this result, and this phase does not repair P7.
+
+### 5.4 §8 ledger entry 12 — a discriminating-power claim asserted, not computed
+
+Phase 17 fixed exactly this failure: it **measured** the k-scaling empirically in P0 rather
+than assuming power, and its charter carried an explicit MDE. **Phase 19, one phase later,
+asserted "the cell distinguishes them" from the fact that two predictions were numerically
+0.04 apart — without computing the SE a 54-problem cell would achieve.** The arithmetic was
+free, available before the run from any committed cell's per-problem spread, and would have
+shown the design needed roughly **4× the problems** (SE 0.0143 for an MDE of 0.04) or a
+paired design against the sibling on shared problems.
+
+*Practice:* **any charter claiming that a cell discriminates between two hypotheses states
+the achieved-SE estimate and the implied MDE, and compares the MDE to the separation, in
+the pre-registration.** "The predictions are X apart" is not a power claim.
+
+*Class:* this is the **fourth** distinct way this record has mis-specified a decision
+quantity — entry 8 (a rule that cannot fire), entry 9 (a threshold not in units of spread),
+entry 10 (a criterion that does not survive a change of units), entry 11 (kill criteria not
+wired into the branch), and now entry 12 (power asserted, not computed). All five are free
+desk checks. All five belong in every pre-registration.
+
+---
+
+## 6. GATE
+
+**Branch A fired at 45% — the favourite, on a frozen rule — but is weaker than the charter
+claimed, and the charter's error is recorded as §8 entry 12.**
+
+**Prediction accounting.** A 45% / B 40% / C 5% / D 10%. **A fires.** It is counted as a
+hit, with the annotation that the cell's MDE (0.080) was twice the separation it was built
+to resolve (0.04), so the hit constrains less than the charter implied. B is *not* excluded
+by this cell — −0.0398 sits inside the observed CI.
+
+**Cost. $0.53**, read as a month-to-date aggregate delta ($84.87 → $85.40,
+`modal billing report`, 2026-07-26) and labelled as such per Amendment 2. Against a
+$0.30–0.70 estimate: **inside the band — the ninth consecutive calibrated generation
+estimate.** Loop total **$7.36**; MTD **$85.40** against $100 report / $120 hard stop.
+
+**What is now open.**
+
+- **The twin at adequate power.** The single cheapest high-value cell in the record is now a
+  *repeat* of this one at n ≈ 200, or better, a **paired** twin-vs-sibling design on shared
+  problems, which would cut the difference SE substantially. The question — does a
+  non-Coder model at true match sink? — remains genuinely open at ±0.06.
+- **The compression law's slope**, still the record's most robust unexplained regularity
+  (eight cells, R² to 0.92), and still not separating sinking from clean models.
+- **The coverage channel**, un-intervened-on, with temperature excluded as an instrument
+  (Phase 18) and nucleus/top-k or candidate-budget scaling named as successors.
+- **The sink's positive mechanism**, still absent after six excluded candidates.
+- **Nothing is running. Phase 19 is closed.**
+
+---

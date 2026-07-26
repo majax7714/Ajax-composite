@@ -92,13 +92,24 @@ mechanism** — and, from the same free work, one robust and entirely unexplaine
 **every model tested, sinking or clean, is pulled 47–90% of the way from its own quality
 toward whatever artifact it is shown.**
 
-**Current status (2026-07-26):** Phase 18 closed. Its paid cell was an **instrument
-failure with no branch adjudicated** — temperature cannot be used as a coverage lever at
-this scale because it degrades the model faster than it releases the anchor — but its free
-work corrected three wrong sentences in the journal's own index and produced a compression
-law that holds across every matched cell the record owns. **Nothing is running.** The map
-table above is current through the last closed phase; [the journal's §0](docs/WRITEUP-rgr.md)
-is the authority on what is believed and at what scope.
+That regularity then turned on the record itself. If a cell's outcome depends that strongly
+on *where* it sits relative to its artifact, then comparing cells at different positions is
+confounded — and the family contrast underpinning the diet claim turned out to be exactly
+such a comparison, with every clean non-Coder cell sitting at a favourable position and
+every powered at-match cell belonging to the Coder side. Audited rather than assumed, **the
+diet conclusion survived**, because it rests on a later, position-matched design whose
+residual confound runs *against* it. The missing cell was then run: the architecture twin,
+at true match, measures **clean** — directionally right, but at a precision the charter had
+promised and not checked, so the phase closed by grading its own pre-registration down.
+
+**Current status (2026-07-26):** Phase 19 closed. The architecture twin measures
+**clean at true match**, which is directionally what the diet claim predicts — but the cell
+was underpowered for the comparison its own charter promised, and the write-up says so and
+grades the charter accordingly. The record now has its **first powered at-match non-Coder
+cell**, closing an instrument asymmetry that had gone unnoticed for twelve phases.
+**Nothing is running.** The map table above is current through the last closed phase;
+[the journal's §0](docs/WRITEUP-rgr.md) is the authority on what is believed and at what
+scope.
 
 ## Map of the composite
 
@@ -131,6 +142,7 @@ first iteration, with its amendments dated on the page.*
 | 16 | [PHASE_16.md](docs/PHASE_16.md) | Is the sink **framing**-sensitive? Originated in an outside-reader charter that asked for its own load-bearing claims to be checked first — two of three did not survive, and the charter was reshaped on the page. Closed **INCONCLUSIVE on instrument**: a frozen validity gate returned −0.0296 against a ≤ −0.03 threshold and failed **by 0.0004**. Honoured, not retuned. Its free decomposition found what became the next question: the sink's dominant channel is **coverage** |
 | 17 | [PHASE_17.md](docs/PHASE_17.md) | The verb question, powered and **closed**. The instruction verb is the largest anchoring lever this record has measured (moves PULL ≤0.127, against ≤0.028 for provenance) and had never been applied to a sink cell — every sink number in the journal used one fixed clause. Substituting an independent framing moves the sink by **+0.0004 ± 0.0096** (n=44, k=24), a CI that **excludes** Phase 16's near-miss. The sink is **framing-invariant**: it is dissociated from the escape-distance law's dominant lever, and the cheapest deflationary account of it is excluded |
 | 18 | [PHASE_18.md](docs/PHASE_18.md) | The coverage channel — and a phase whose paid cell bought less than its free one. Seven free analyses **corrected the target before a dollar was spent**: the sink's adjudication criterion **does not survive the change of currency** (no artifact in any of the eight committed cells fully passes, so the copy null scores coverage zero *by construction*), coverage loss turns out **universal at ≤3B across every family and diet** and so is not the sink's mechanism, and the headline −0.432 was the most extreme of three seeds with no error bar. It also found a **compression law** — every model pulled 47–90% of the way toward the artifact it is shown, R² to 0.92 — then built a hypothesis on it and **watched the architecture twin refute it within the hour**. The paid cell tried temperature and closed an **instrument failure, no branch adjudicated**: two frozen kill criteria fired, and the branch tree had ignored both. Temperature **moves the null as hard as the treatment** |
+| 19 | [PHASE_19.md](docs/PHASE_19.md) | The architecture twin at **true match** — and a phase that graded its own charter down. Its free P0 found the record's central family contrast (Phase 7) is **position-confounded**: every non-Coder cell that stayed clean sat at a *favourable* position, worth more shift than the effect being attributed to diet — and every powered at-match cell in the record was a Coder cell. Checked rather than assumed, the **diet claim survived**, because it rests on Phase 9's position-matched 2×2 rather than on Phase 7. The paid cell then measured the twin — same base, same 28L×12H, differing only in the Coder pretraining stage — at true match: **clean** (−0.0027), the 45% favourite. But the charter had claimed the cell could separate two predictions 0.04 apart, and its actual **MDE was 0.080** — so both predictions sit inside the interval and twin-vs-sibling is p 0.150. The instrument asymmetry is fixed; the inference is not |
 
 ## How to read
 
