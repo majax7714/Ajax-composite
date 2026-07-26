@@ -1,0 +1,52 @@
+{
+  "_label": "Phase 20 \u2014 paired twin vs sibling at own match [PHASE_20.md]",
+  "prereg_commit": "3e18e67",
+  "seed": 337,
+  "k": 48,
+  "n": 61,
+  "per_problem_tol": 0.1,
+  "achieved_delta_art": {
+    "general1p5b": -0.0054,
+    "coder1p5b": -0.0042
+  },
+  "parse_rates": {
+    "general1p5b_iid": 0.9874,
+    "general1p5b_cond": 0.9836,
+    "coder1p5b_iid": 0.9877,
+    "coder1p5b_cond": 0.9928
+  },
+  "arm_means": {
+    "general1p5b_iid": 0.3004,
+    "general1p5b_cond": 0.2632,
+    "coder1p5b_iid": 0.3508,
+    "coder1p5b_cond": 0.3048
+  },
+  "twin_effect": -0.0372,
+  "sibling_effect": -0.046,
+  "paired_difference": 0.0088,
+  "se": 0.0157,
+  "ci95": [
+    -0.0215,
+    0.0394
+  ],
+  "p": 0.5734644376601965,
+  "prereg_mde": 0.0431,
+  "cannot_resolve": 0.0166,
+  "gates": {
+    "on_target": true,
+    "parse_ok": true,
+    "powered": true
+  },
+  "branch": "B \u2014 INDISTINGUISHABLE at MDE 0.0431; the family contrast stays unresolved at achievable precision",
+  "stack": {
+    "gpu_name": "NVIDIA L4",
+    "gpu_capability": "8.9",
+    "dtype": "bfloat16",
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8",
+    "vllm": "0.11.0",
+    "gen_template_hash": "1e43a51cdc2cc3b5",
+    "d2c_context_hash": "b9323ddf1a9b253d",
+    "judge_hash": "dbd4f9fa650a6a2f"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "_label": "P0 free \u2014 compression law corrected for shared noise + EIV [PHASE_21.md]",
+  "_issue": "Phase 18 P0.5 fit shift = a + b*gap with the SAME estimated iid on both axes; shared noise biases b upward for any data. Corrected here with two independent iid estimates, then de-attenuated for x-axis noise.",
+  "seed": 353,
+  "boot": 4000,
+  "cells": {
+    "Coder-1.5B": {
+      "n": 44,
+      "slope_published_shared_noise": 0.6366,
+      "slope_decorrelated": 0.5812,
+      "slope_eiv_corrected": 0.603,
+      "eiv_ci95": [
+        0.4062,
+        0.8028
+      ],
+      "intercept_decorrelated": -0.0647,
+      "iid_noise_sd_k24": 0.0489,
+      "reliability": 0.9639,
+      "inflation_published_vs_eiv": 0.0337
+    },
+    "Coder-3B": {
+      "n": 39,
+      "slope_published_shared_noise": 0.7871,
+      "slope_decorrelated": 0.6672,
+      "slope_eiv_corrected": 0.7048,
+      "eiv_ci95": [
+        0.4609,
+        0.9734
+      ],
+      "intercept_decorrelated": -0.0837,
+      "iid_noise_sd_k24": 0.0592,
+      "reliability": 0.9467,
+      "inflation_published_vs_eiv": 0.0823
+    },
+    "general-Qwen-1.5B (TWIN)": {
+      "n": 54,
+      "slope_published_shared_noise": 0.6585,
+      "slope_decorrelated": 0.6212,
+      "slope_eiv_corrected": 0.6437,
+      "eiv_ci95": [
+        0.4669,
+        0.8408
+      ],
+      "intercept_decorrelated": -0.0003,
+      "iid_noise_sd_k24": 0.046,
+      "reliability": 0.9649,
+      "inflation_published_vs_eiv": 0.0148
+    }
+  },
+  "all_corrected_slopes_exclude_zero": true
+}
