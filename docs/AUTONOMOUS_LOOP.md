@@ -264,3 +264,51 @@ than re-deriving support*; two rows disagreeing about one fact defeats its entir
 and it survived eight phases because no phase's own work required reading row 11. Same
 structural cause as the stale surfaces, so it is recorded against the same amendment rather
 than as an isolated slip.
+
+## Amendment 5 (2026-07-26) — **literature is checked at the charter and at the finding, not only at the ledger**
+
+*Author instruction, verbatim: "if you can use web to search for relational literature upon
+findings. could save a phase run always worth the check."*
+
+**What this replaces.** The standing practice was narrower than the author intended: web
+verification was performed **before writing a §11 reconciliation-ledger entry**, i.e. only
+once the loop had already decided some outside work was relevant. That ordering means the
+literature can only ever *confirm or correct* a connection the loop already made. It can
+never *supply* one, and it can never prevent a run.
+
+**The failure that forced this.** Phases 6–19 attributed the D2c SINK to a
+Coder-continued-pretraining diet. The competing general explanation — *intrinsic
+self-correction degrades, worst in small models* (Huang et al., arXiv 2310.01798, ICLR 2024)
+— is prior, well-known, and directly applicable, since §9.3 had already concluded this
+record's ~2-bit feedback supplies no direction. **It was never on the page.** The
+reconciliation ledger held three entries at the time and none of them was the one that
+competed with the central claim. Phase 20 refuted the family leg empirically at a cost of
+roughly a dozen phases of attribution built on an unposed null. A ten-minute search at
+Phase 6 would have made the general effect the hypothesis to beat.
+
+**What changes — two new checkpoints in §1.**
+
+- **Step 2a (question selection, BEFORE any spend).** Before a charter is frozen, search for
+  (i) whether the question is already answered, (ii) whether a **general-effect null** exists
+  that the proposed finding would be an instance of, and (iii) whether the design has a known
+  failure mode. Record the search in the charter — **including when it returns nothing
+  useful**, which is itself information and is the common case. A charter may not claim a
+  model-, family-, or scale-specific cause without naming the general null it intends to beat.
+- **Step 9a (on a finding).** When a phase produces a result, search for related work before
+  the verdict is written, and record what squares and what does not. A finding that turns out
+  to be a known effect is not thereby worthless — but it must be *labelled* as a replication
+  with a scope extension, not presented as a discovery.
+
+**Both checkpoints are cheap and neither is a gate.** Nothing halts because a search returns
+results; the obligation is to *record* them. The failure mode being prevented is silence, not
+disagreement.
+
+**Failure mode this creates, named so it can be caught.** Search results are summaries and
+can be wrong, stale, or mismatched to our setting; treating them as authority would be its
+own drift. So: a literature claim only becomes load-bearing after the **source itself** has
+been checked, not a search snippet — the practice already in force for §11 entries, now
+extended to these checkpoints. Where only snippet-level evidence exists, it is labelled as
+such. (Recorded honestly: the Huang et al. entry was grounded by fetching the paper's own
+abstract page and a second failed fetch is on the record — the Self-Refine abstract does
+**not** contain the small-model limitation the search summary implied, so that half of the
+claim rests on secondary summaries and is marked accordingly.)
