@@ -4093,7 +4093,7 @@ def j19_twin():
     if not tgt.get("chosen"):
         (REPO / "artifacts/h19_twin.json").write_text(json.dumps(
             {"_label": "Phase 19 — twin at true match [PHASE_19.md]",
-             "prereg_commit": "PENDING", "branch": "D — targeting INFEASIBLE at n>=30",
+             "prereg_commit": "2bf474d", "branch": "D — targeting INFEASIBLE at n>=30",
              "targeting": tgt.get("nearest")}, indent=2))
         print("\n=== BRANCH D — targeting infeasible; no cell, no adjudication ===")
         return
@@ -4161,7 +4161,7 @@ def j19_twin():
 
     (REPO / "artifacts/h19_twin.json").write_text(json.dumps(
         {"_label": "Phase 19 — architecture twin at true match [PHASE_19.md]",
-         "prereg_commit": "PENDING", "model": P11_MODELS[cell][0],
+         "prereg_commit": "2bf474d", "model": P11_MODELS[cell][0],
          "revision": P11_MODELS[cell][1], "n": n,
          "achieved_delta_art_powered": dart, "parse_rate": round(parse, 4),
          "cond_minus_iid": eff, "ci95": [lo, hi],

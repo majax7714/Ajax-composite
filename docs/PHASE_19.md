@@ -211,7 +211,7 @@ band widened for the sweep's longer i.i.d. completions. Month-to-date read **$84
 
 ## 4. Pre-registration freeze
 
-Frozen at commit `PENDING` (stamped at close), **before** any Phase-19 generation ran.
+Frozen at commit `2bf474d`, **before** any Phase-19 generation ran.
 P0 was committed separately and earlier.
 
 ---
