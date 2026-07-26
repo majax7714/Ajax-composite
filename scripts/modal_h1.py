@@ -4034,7 +4034,7 @@ def j18_temp():
 
     (REPO / "artifacts/h18_temperature.json").write_text(json.dumps(
         {"_label": "Phase 18 — temperature on the coverage channel [PHASE_18.md]",
-         "prereg_commit": "PENDING", "seed": P18_SEED, "k": P18_K,
+         "prereg_commit": "4abb0b1", "seed": P18_SEED, "k": P18_K,
          "model": mid, "revision": rev, "n": base["n"],
          "committed_refs": P18_REF, "cells": cells,
          "gates": {"validity_ok": bool(valid), "rescued_at_1.0": bool(rescued),

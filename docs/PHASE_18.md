@@ -332,6 +332,26 @@ per §2, and reported for its own sake.
   carried as descriptive only.
 - Validity gate failure (above) → non-replication, no adjudication, no retune.
 
+### The smoke step, and why it is skipped here *(documented fork, Amendment 1)*
+
+Loop step 5 requires the cheapest possible cell first — template, context length, judge
+semantics. **Every one of those is byte-identical to Phase 17's**, which ran three days'
+worth of cells on this exact model, problem set, k, and judge: the conditioned prompt is
+`_d2c_context` with an in-code assert, the context length and `max_tokens` are unchanged,
+and `h1_lcb_exec` is the same all-cases judge. **The only new variable in this phase is a
+single float passed to `SamplingParams`.**
+
+What a smoke *would* have caught is the one genuine unknown — whether higher temperature
+produces longer outputs that hit `max_tokens = 1536` or degrade parse rates. Two things
+bound that instead: the pre-registered **parse-rate kill criterion (< 0.95)**, and
+**per-arm volume-first persistence**, so each of the six arms is checkpointed as it lands
+and the exposure of a bad temperature is one arm (≈ $0.15), not the phase.
+
+*Alternative considered and rejected:* a k = 4, n = 10 smoke at T = 1.2 first (≈ $0.02).
+Rejected because at n = 10 × k = 4 the parse-rate estimate has a half-width wider than
+the 0.05 the kill criterion turns on, so it could not have fired the gate it exists to
+pre-test. A smoke that cannot fail its own gate is the Phase-14 defect in miniature.
+
 ### Cost
 
 **Estimate $0.70–1.40.** Basis: Phase 17 ran 3984 generations of the same model class,
@@ -348,7 +368,7 @@ landed inside their bands. This one is reconciled against the bill at close like
 
 ## 4. Pre-registration freeze
 
-Frozen at commit `PENDING` (recorded below at close), **before** any Phase-18 generation
+Frozen at commit `4abb0b1`, **before** any Phase-18 generation
 ran. P0 was committed separately and earlier, at `f581337`.
 
 ---
