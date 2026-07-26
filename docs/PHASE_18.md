@@ -369,6 +369,105 @@ landed inside their bands. This one is reconciled against the bill at close like
 ## 4. Pre-registration freeze
 
 Frozen at commit `4abb0b1`, **before** any Phase-18 generation
-ran. P0 was committed separately and earlier, at `f581337`.
+ran. P0 was committed separately and earlier, at `f581337`. The independent gate
+verifier (`scripts/j18_verify_gates.py`) was committed at `cda3ce7`, **while the run was
+still generating and before any result existed** — a second implementation of every
+adjudicated quantity, by a different route, with the frozen intervals transcribed by hand
+rather than imported so a typo in the entrypoint surfaces as a mismatch instead of being
+inherited. Three of §8's ten ledger entries are adjudication arithmetic nobody checked;
+three of those were caught by re-deriving a number a second way.
+
+---
+
+## 5. RESULT
+
+### 5.1 The validity gate passes — the flagship cell replicates at a fourth seed
+
+| | Δcov@24 | sink (mean frac) |
+|---|---|---|
+| fresh T = 0.8 (seed 281) | **−0.2273** | **−0.0480** |
+| committed reference | −0.2045 | −0.0614 (P11: −0.0638) |
+| frozen gate interval | [−0.3636, −0.0455] ✓ | [−0.1258, −0.0028] ✓ |
+
+Both conditions inside their committed intervals, so the ladder has a sound baseline and
+T = 1.0 adjudicates. This is also the record's flagship sink cell replicating at a
+**fourth independent seed**, on both currencies at once.
+
+### 5.2 The pre-registered position kill criterion FIRES
+
+The artifact set is fixed at 0.4589 by construction. Raising temperature moves the
+*model's own* quality, and therefore moves the cell's relational position:
+
+| T | i.i.d. mean frac | i.i.d. cov@24 | **achieved Δ_art** |
+|---|---|---|---|
+| 0.8 | 0.4314 | 0.7045 | **+0.0275** |
+| 1.0 | 0.2799 | 0.5455 | **+0.1790** |
+
+**Δ_art drift = +0.1515 against a frozen ±0.05 tolerance.** Under §3's kill criterion the
+T = 1.0 coverage comparison is therefore **descriptive only, not adjudicative**, and is
+reported as a position confound with the drift measured.
+
+This is the phase's central finding and it is a *design* result: **temperature moves the
+null as hard as the treatment.** Going 0.8 → 1.0 costs the unconditioned model −0.152
+mean frac and −0.159 coverage — **larger than the entire sink effect the intervention was
+meant to relieve**. D2b's HumanEval reference has the unanchored condition E0 **flat**
+across temperature (−0.02 over the *larger* 0.8 → 1.2 step); on LCB at 1.5B a smaller step
+is catastrophic. §9.3.1 W2 recorded that the domain boundary "descends with difficulty" —
+**it descends further than the record had it, below T = 1.0.**
+
+The **collapse gate did not fire**: i.i.d. coverage 0.5455 against a threshold of 0.5227,
+surviving by 0.023 — at the very edge of its own committed noise band. Not retuned.
+
+### 5.3 Branch C fires formally; what is licensed is narrower
+
+| T = 1.0 gate | value | verdict |
+|---|---|---|
+| coverage rescued (Δcov > −0.0455) | Δcov **−0.1818** | **NO** |
+| sink unmoved (inside [−0.1258, −0.0028]) | sink **−0.0360** | **YES** |
+| both arms collapsed (cov_iid < 0.5227) | 0.5455 | **NO** |
+
+**Branch C — "neither moved: scope restriction on claim 13."** Priced at **30%**, the
+second favourite. Neither coverage nor the sink responded: Δcov −0.2273 → −0.1818 and
+sink −0.0480 → −0.0360, both changes small and the sink still inside its committed CI.
+
+**But branch C cannot be claimed cleanly, because its own cell failed the position
+criterion.** What is licensed is the weaker and more useful statement: *on LCB at 1.5B,
+temperature cannot be applied as a coverage intervention at fixed relational position at
+all* — the manipulation and the confound are the same knob. Claim 13 is **not refuted**;
+its **applicability** is restricted, and the restriction is a fact about the benchmark and
+scale rather than about the lever.
+
+### 5.4 Exploratory — temperature releases the anchor *and* deepens the penalty
+
+*Post-hoc, not pre-registered. Per §10 it is a diagnostic and may not reopen a verdict.*
+
+Fitting P0.5's compression law `shift = a + b·gap` separately at each temperature, paired
+bootstrap over the same 44 problems (6000 resamples, seed 1009):
+
+| parameter | T = 0.8 | T = 1.0 | difference | CI95 |
+|---|---|---|---|---|
+| slope *b* — pull toward the artifact | +0.7042 | +0.5538 | **−0.1503** | [−0.2795, −0.0056] excludes 0 |
+| intercept *a* — constant conditioning penalty | −0.0674 | −0.1351 | **−0.0677** | [−0.1070, −0.0304] excludes 0 |
+
+**Temperature does what claim 13 says it does — and it is not enough.** The pull toward
+the artifact falls by 0.15, which is this record's first measurement of anti-anchoring as a
+*change in the compression coefficient* rather than as a coverage delta. Simultaneously the
+constant cost of conditioning roughly doubles, and capability collapses. The three effects
+net out negative at this cell.
+
+It also gives the compression law a **fresh-seed replication**: the T = 0.8 fit here
+(slope +0.7042, intercept −0.0674) reproduces the committed law fit on different arms in
+P0.6 (+0.6559, −0.0624).
+
+**Three caveats carried, not buried.** (i) The law fit at T = 0.8 predicts a shift of
+**+0.055** at T = 1.0's Δ_art of +0.179; observed **−0.036**. The law does **not**
+extrapolate across temperature — which is exactly what §5.4 measures, but it also means
+the T = 0.8 law is a *within-temperature* instrument only. (ii) The T = 1.0 intercept is an
+extrapolation to gap = 0 from a cell centred at +0.179, the same weakness §0.1 records for
+M5 and M2, so it is the less trustworthy of the two numbers. (iii) The two slopes are
+fitted over **different regions of the gap axis** (mean gap +0.028 vs +0.179), so
+*"temperature reduces the pull"* and *"the relation is nonlinear and we sampled a different
+part of it"* are **not separated** — P0.6's symmetry check was underpowered, so
+nonlinearity is not excluded.
 
 ---
