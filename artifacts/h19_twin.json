@@ -1,0 +1,54 @@
+{
+  "_label": "Phase 19 \u2014 architecture twin at true match [PHASE_19.md]",
+  "prereg_commit": "2bf474d",
+  "model": "Qwen/Qwen2.5-1.5B",
+  "revision": "8faed761d45a263340a0528343f099c05c9a4323",
+  "n": 54,
+  "achieved_delta_art_powered": -0.004,
+  "parse_rate": 0.9896,
+  "cond_minus_iid": -0.0027,
+  "ci95": [
+    -0.0607,
+    0.0515
+  ],
+  "mean_iid": 0.3037,
+  "mean_cond": 0.301,
+  "mean_artifact": 0.3075,
+  "residual_cond_minus_artifact": -0.0065,
+  "verdict_legacy_p11_rule": "NO SINK",
+  "below_both_nulls_p11_rule": false,
+  "predictions": {
+    "compression_law": -0.0398,
+    "compression_law_ci": [
+      -0.079,
+      -0.0021
+    ],
+    "compression_law_hit": true,
+    "diet_claim": 0.0,
+    "coder_sibling": -0.0638,
+    "sibling_ci": [
+      -0.1258,
+      -0.0028
+    ]
+  },
+  "gates": {
+    "on_target": true,
+    "powered": true,
+    "parse_ok": true,
+    "sinks": false,
+    "clean": true,
+    "inside_sibling_ci": false
+  },
+  "branch": "A \u2014 TWIN CLEAN at true match; the DIET attribution rests on symmetric evidence and the compression intercept is refuted out-of-sample",
+  "stack": {
+    "gpu_name": "NVIDIA L4",
+    "gpu_capability": "8.9",
+    "dtype": "bfloat16",
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8",
+    "vllm": "0.11.0",
+    "gen_template_hash": "1e43a51cdc2cc3b5",
+    "d2c_context_hash": "b9323ddf1a9b253d",
+    "judge_hash": "dbd4f9fa650a6a2f"
+  }
+}
