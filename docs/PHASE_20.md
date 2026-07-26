@@ -158,6 +158,114 @@ marginal attempt is worse value than one decisive one.
 
 ## 4. Pre-registration freeze
 
-Frozen at commit `PENDING` (stamped below), **before** any Phase-20 generation ran.
+Frozen at commit `3e18e67`, **before** any Phase-20 generation ran. The independent
+verifier (`scripts/j20_verify.py`) was committed at `583e80d`, while the run was still
+generating and before any result existed.
+
+---
+
+## 5. RESULT — ⚠ **a LIVE claim is refuted 1:1. The loop HALTS here (§3.1).**
+
+### 5.1 The cell
+
+All frozen gates pass: twin Δ_art **−0.0054**, sibling **−0.0042** (both within ±0.020);
+parse rate **0.99** on all four arms; n = 61 ≥ 30. The independent verifier — committed
+before any result existed — rebuilds the selection to n = 61, confirms **32/61 problems
+gave the two models genuinely different artifacts**, and reports **ALL QUANTITIES AGREE**.
+
+| | i.i.d. | cond | artifact | **cond − i.i.d.** | **cond − artifact** | below **both** nulls |
+|---|---|---|---|---|---|---|
+| **TWIN** `Qwen2.5-1.5B` *(non-Coder)* | 0.3004 | 0.2632 | 0.2885 | **−0.0372** [−0.0573, −0.0176] | **−0.0253** [−0.0438, −0.0079] | **YES** |
+| **SIBLING** `Qwen2.5-Coder-1.5B` | 0.3508 | 0.3048 | 0.3561 | **−0.0460** [−0.0683, −0.0240] | **−0.0513** [−0.0712, −0.0318] | **YES** |
+
+> **PAIRED difference (twin − sibling) = +0.0088 ± 0.0157, CI95 [−0.0210, +0.0388],
+> p 0.5735.** **BRANCH B — indistinguishable**, the 35% branch.
+
+### 5.2 What this refutes
+
+**Claims 8 and 11 both assert, as their family-contrast leg:** *"non-Coder families
+(DeepSeek / StarCoder2 / general-Qwen) show **no** code sink at match"*, and from that,
+*"the Coder continued-pretraining diet, **not** architecture/tie, not scale."*
+
+**The architecture twin is a non-Coder model and it sinks at true match.** Below its own
+i.i.d. **and** below the copy null, both intervals excluding zero — a SINK under the
+record's original below-both-nulls definition, the one Phase 10 P0.2 restored. And it
+sinks **as hard as its Coder sibling**: the difference is +0.009 with a CI that **excludes**
+every prior estimate of it (+0.061 from Phase 19, +0.054 from this phase's own gated P0).
+
+This is not a failure to find a difference. **It is a measurement that the difference is
+smaller than 0.039**, on the cleanest control the record possesses — same base, verified
+same 28L × 12H, same scale, same problems, same donor pool, same selector, same k, same
+seed, same judge, differing only in the Coder continued-pretraining stage.
+
+### 5.3 Why every previous cell missed it — and why the record is coherent, not contradictory
+
+Nothing here contradicts a prior *measurement*; it contradicts a prior *reading*.
+
+- **Phase 7 M2** measured the twin at **Δ_art +0.0642** and got ≈ −0.0001. Phase 19's P0
+  already showed why: at that position the twin's own compression (+0.040) almost exactly
+  cancels its intercept (−0.040). **Its "clean" verdict was arithmetically a cancellation**,
+  and this phase confirms it by removing the cancellation.
+- **Phase 19** measured the twin at true match and got −0.0027, CI [−0.0588, +0.0533], and
+  called it CLEAN. **Phase 20's −0.0372 sits inside that CI.** Phase 19 was not wrong; it
+  was underpowered — the MDE was 0.080 and it recorded that as §8 entry 12. **The very next
+  cell demonstrated that the underpowered "clean" verdict was a false negative.** That is
+  the strongest possible vindication of writing entry 12 rather than banking branch A.
+- **The sibling replicates**: −0.0460 here against P11's −0.0638 (inside its CI). So the
+  design reproduces the known Coder sink *and* finds the twin matching it.
+
+### 5.4 What is NOT refuted — stated precisely, because the scope matters
+
+- **Phase 9's 2×2 stands.** At Δ_art ≈ −0.06 with generated artifacts, Coder-1.5B sank
+  −0.200/−0.238 while **DeepSeek-1.3B** sank only −0.062. That is a 3–4× family difference
+  at matched position and this phase does not touch it. **DeepSeek is a different model from
+  general-Qwen**, and the two results are compatible.
+- So the surviving statement is narrower and stranger: **general-Qwen-1.5B sinks like
+  Coder-1.5B; DeepSeek-1.3B does not.** "Non-Coder ⇒ no sink" is dead. Something separates
+  DeepSeek from *both* Qwen models — which points at the **Qwen base**, not the Coder stage.
+- **DeepSeek and StarCoder2 have never been measured at true match either** (Δ_art +0.050,
+  +0.033 — the same cancellation zone as P7's M2). Their "clean" verdicts are now
+  **suspect on exactly the same grounds** and must be re-measured before anything is said
+  about families.
+
+### 5.5 Prediction accounting, and the odds that were right for the wrong reason
+
+A 55% / **B 35%** / C 5% / D 5%. **B fires.** The charter read B as *"indistinguishable at
+MDE 0.043; the family contrast stays unresolved"* — but B is stronger than the charter
+anticipated, because the charter did not consider that **both** models might sink
+significantly. The pre-registered reading of B was "unresolved"; the actual content is
+"resolved, and against the claim." The odds were right; the interpretation attached to them
+was too weak, and that is recorded rather than quietly upgraded.
+
+**Cost $1.43** (MTD aggregate delta $85.40 → $86.83, per Amendment 2) against a $1.50–2.60
+estimate — **below the band**, the first under-run in ten estimates. Loop total **$8.79**;
+MTD **$86.83** against $100 / $120.
+
+---
+
+## 6. GATE — **HALT AND REPORT (§3 condition 1)**
+
+The loop spec's first halt condition is *"a result directly refutes a LIVE claim 1:1.
+Freeze, write it up, stop."* The author's standing instruction is identical and explicit.
+**This is that case**, and the loop stops here rather than chartering a successor.
+
+**Frozen for the author:**
+
+1. **A non-Coder model sinks at true match, as hard as its Coder sibling** (−0.0372 vs
+   −0.0460, difference +0.009, p 0.57, both below both nulls at power).
+2. **The family-contrast leg of claims 8 and 11 is refuted as stated.** The Coder-diet
+   attribution's *architecture control* has flipped: the variable the claim names — the
+   Coder continued-pretraining stage — does not separate sinking from non-sinking here.
+3. **What survives** is Phase 9's provenance-controlled 2×2 (Coder ≫ DeepSeek at matched
+   position). The likely revised shape is **a Qwen-base effect rather than a Coder-stage
+   effect**, but that is a hypothesis, not a measurement, and no claim should be rewritten
+   to it without a cell.
+4. **Two cells would settle the shape**, both cheap and both now obvious: **DeepSeek-1.3B
+   and StarCoder2-3B at TRUE match**, paired against the sibling exactly as here. If they
+   stay clean at match while both Qwen models sink, the claim becomes "Qwen base," not
+   "Coder diet." If they sink too, the sink is universal at ≤3B and the whole family axis
+   collapses. Estimated $1.20–2.00 for both.
+
+**Nothing is running. Phase 20 is closed and the loop is halted pending author review.**
 
 ---
