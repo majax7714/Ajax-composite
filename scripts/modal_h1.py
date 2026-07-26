@@ -4062,6 +4062,202 @@ def j18_temp():
     print("wrote artifacts/h18_temperature.json")
 
 
+# --- Phase 21: four models at their own true match on ONE shared set ([PHASE_21.md]) ---
+
+P21_SEED = 367
+P21_K = 24
+P21_TOL = 0.10
+P21_MIN_N = 30
+# rung -> (model_id, revision). Rungs 1-2 have committed k=24 sweeps; 3-4 do not.
+P21_RUNGS = {
+    "coder1p5b":     P11_MODELS["coder1p5b"],
+    "general1p5b":   P11_MODELS["general1p5b"],
+    "deepseek1p3b":  J7_MODELS["M1_deepseek1p3b"],
+    "starcoder2_3b": J7_MODELS["M3_starcoder2_3b"],
+}
+P21_INTERCEPT = {"coder1p5b": -0.056, "general1p5b": -0.040,
+                 "deepseek1p3b": +0.011, "starcoder2_3b": -0.021}
+
+
+def _p21_sweep(rung):
+    """k=24 i.i.d. sweep over the donor pool; generated on demand for new rungs."""
+    import statistics as st
+    tag = f"j11_sweep_{{}}_{rung}"
+    g, r = _load(tag.format("cand")), _load(tag.format("res"))
+    if not g:
+        qids, _ = _r3_donor_pool()
+        mid, rev = P21_RUNGS[rung]
+        g = _persist(tag.format("cand"), h1_gen_lcb.remote(
+            mid, [{"qid": q, "context": None} for q in qids], 24,
+            tag=tag.format("cand"), seed=P11_SWEEP_SEED, revision=rev))
+        r = _persist(tag.format("res"), h1_lcb_exec.remote(
+            [x["qid"] for x in g], [x["codes"] for x in g], tag=tag.format("res")))
+    return {x["qid"]: st.mean(c["frac"] for c in row) for x, row in zip(g, r)}
+
+
+def _p21_select(rungs):
+    """Shared problem set; per-problem, per-model artifact nearest that model's own iid."""
+    qids, pool = _r3_donor_pool()
+    sw = {r: _p21_sweep(r) for r in rungs}
+    out = {}
+    for q in qids:
+        cands = pool.get(q) or []
+        if not cands:
+            continue
+        pick, ok = {}, True
+        for r in rungs:
+            b = min(cands, key=lambda c: abs(c[1] - sw[r][q]))
+            if abs(b[1] - sw[r][q]) > P21_TOL:
+                ok = False
+                break
+            pick[r] = b
+        if ok:
+            out[q] = pick
+    return out, sw
+
+
+@app.local_entrypoint()
+def j21_fourway():
+    """Phase 21 — four models at their own true match on one shared set.
+    Pre-registered [PHASE_21.md] at 120f995, BEFORE this ran."""
+    import ast
+    import math
+    import random as _rnd
+    import statistics as st
+
+    rungs = list(P21_RUNGS)
+    sel, sw = _p21_select(rungs)
+    if len(sel) < P21_MIN_N:
+        print(f"[P21] four-way n={len(sel)} < {P21_MIN_N} — PRE-REGISTERED FALLBACK "
+              f"to pairwise cells")
+        rungs = ["coder1p5b", "deepseek1p3b"]
+        sel, sw = _p21_select(rungs)
+        print(f"[P21] pairwise (coder1p5b vs deepseek1p3b) n={len(sel)}")
+    qs = sorted(sel)
+    n = len(qs)
+    mode = "four-way" if len(rungs) == 4 else "pairwise-fallback"
+    print(f"[P21] {mode}: n={n} problems, {len(rungs)} models, k={P21_K}")
+
+    dart = {r: st.mean(sel[q][r][1] - sw[r][q] for q in qs) for r in rungs}
+    for r in rungs:
+        print(f"    {r:<15} Δ_art {dart[r]:+.4f}   (band ±{P11_ON_TARGET})")
+
+    arms, parse = {}, {}
+    for r in rungs:
+        mid, rev = P21_RUNGS[r]
+        for kind in ("iid", "cond"):
+            tag = f"j21_{r}_{kind}"
+            items = [{"qid": q,
+                      "context": None if kind == "iid" else _d2c_context(
+                          {"qid": q, "code": sel[q][r][2], "frac": sel[q][r][1],
+                           "n_tests": sel[q][r][3],
+                           "n_failed": sel[q][r][3] - sel[q][r][4]})}
+                     for q in qs]
+            g = _load(f"{tag}_cand") or _persist(f"{tag}_cand", h1_gen_lcb.remote(
+                mid, items, P21_K, tag=f"{tag}_cand", seed=P21_SEED, revision=rev,
+                max_model_len=8192, max_tokens=1536))
+            res = _load(f"{tag}_res") or _persist(f"{tag}_res", h1_lcb_exec.remote(
+                [x["qid"] for x in g], [x["codes"] for x in g], tag=f"{tag}_res"))
+            arms[(r, kind)] = {x["qid"]: [y["frac"] for y in row]
+                               for x, row in zip(g, res)}
+            ok = tot = 0
+            for c in g:
+                for code in c["codes"]:
+                    tot += 1
+                    if code:
+                        try:
+                            ast.parse(code)
+                            ok += 1
+                        except SyntaxError:
+                            pass
+            parse[(r, kind)] = ok / tot if tot else 0.0
+
+    rng = _rnd.Random(373)
+
+    def ci(v, b=8000):
+        a = sorted(st.mean([v[rng.randrange(len(v))] for _ in v]) for _ in range(b))
+        return round(a[int(.025 * b)], 4), round(a[int(.975 * b)], 4)
+
+    cells, eff = {}, {}
+    print(f"\n{'model':<15} {'iid':>7} {'cond':>7} {'art':>7} {'cond-iid [CI95]':>26} "
+          f"{'cond-art [CI95]':>26} {'SINK':>5}")
+    for r in rungs:
+        I, C = arms[(r, "iid")], arms[(r, "cond")]
+        art = {q: sel[q][r][1] for q in qs}
+        de = [st.mean(C[q]) - st.mean(I[q]) for q in qs]
+        da = [st.mean(C[q]) - art[q] for q in qs]
+        l1, h1 = ci(de)
+        l2, h2 = ci(da)
+        sink = bool(h1 < 0 and h2 < 0)
+        eff[r] = de
+        cells[r] = {"model": P21_RUNGS[r][0], "n": n,
+                    "achieved_delta_art": round(dart[r], 4),
+                    "mean_iid": round(st.mean(st.mean(I[q]) for q in qs), 4),
+                    "mean_cond": round(st.mean(st.mean(C[q]) for q in qs), 4),
+                    "mean_artifact": round(st.mean(art.values()), 4),
+                    "cond_minus_iid": round(st.mean(de), 4), "ci_iid": [l1, h1],
+                    "cond_minus_artifact": round(st.mean(da), 4), "ci_art": [l2, h2],
+                    "below_both_nulls": sink,
+                    "predicted_intercept": P21_INTERCEPT[r],
+                    "prediction_hit": bool(l1 <= P21_INTERCEPT[r] <= h1),
+                    "parse_iid": round(parse[(r, "iid")], 4),
+                    "parse_cond": round(parse[(r, "cond")], 4)}
+        c = cells[r]
+        print(f"{r:<15} {c['mean_iid']:>7.4f} {c['mean_cond']:>7.4f} "
+              f"{c['mean_artifact']:>7.4f} "
+              f"{c['cond_minus_iid']:>+9.4f} [{l1:+.4f},{h1:+.4f}] "
+              f"{c['cond_minus_artifact']:>+9.4f} [{l2:+.4f},{h2:+.4f}] {str(sink):>5}")
+
+    paired = {}
+    for r in rungs:
+        if r == "coder1p5b":
+            continue
+        d = [a - b for a, b in zip(eff[r], eff["coder1p5b"])]
+        lo, hi = ci(d)
+        se = st.stdev(d) / math.sqrt(n)
+        paired[r] = {"vs_coder1p5b": round(st.mean(d), 4), "se": round(se, 4),
+                     "ci95": [lo, hi],
+                     "p": math.erfc(abs(st.mean(d) / se) / math.sqrt(2)) if se else None}
+        print(f"  paired {r} − coder1p5b: {paired[r]['vs_coder1p5b']:+.4f} "
+              f"± {se:.4f}  CI95 [{lo:+.4f},{hi:+.4f}]  p {paired[r]['p']:.4g}")
+
+    on_target = all(abs(dart[r]) <= P11_ON_TARGET for r in rungs)
+    parse_ok = all(v >= 0.95 for v in parse.values())
+    powered = n >= P21_MIN_N
+    print(f"\n  [gates] on_target {on_target}  parse_ok {parse_ok}  n>={P21_MIN_N} {powered}")
+
+    ds = cells.get("deepseek1p3b", {}).get("below_both_nulls")
+    sc = cells.get("starcoder2_3b", {}).get("below_both_nulls")
+    if not (on_target and parse_ok and powered):
+        branch = (f"D — KILLED (on_target {on_target}, parse_ok {parse_ok}, "
+                  f"powered {powered}); no adjudication")
+    elif ds and sc:
+        branch = ("A — BOTH SINK: the general null wins; the family axis collapses")
+    elif ds is False and sc is False:
+        branch = ("B — BOTH CLEAN: a Qwen-base effect, scoped to small base models under "
+                  "~2-bit feedback (see §1(b) — public repair benchmarks order Qwen ABOVE "
+                  "DeepSeek at 32B-instruct with rich feedback)")
+    elif ds is False and sc:
+        branch = ("C — DeepSeek CLEAN, StarCoder2 SINKS: DeepSeek is the exception, not a "
+                  "family class")
+    else:
+        branch = ("UNCLASSIFIED — DeepSeek sinks while StarCoder2 does not; read the table")
+    print(f"\n=== BRANCH {branch} ===")
+    if sc is False and cells.get("starcoder2_3b", {}).get("ci_iid", [0, 0])[0] < -0.039:
+        print("  ⚠ StarCoder2's null is UNINFORMATIVE per the charter's power statement "
+              "(MDE 0.039 vs a predicted −0.021) — do NOT report it as clean")
+
+    (REPO / "artifacts/h21_fourway.json").write_text(json.dumps(
+        {"_label": "Phase 21 — four models at own true match [PHASE_21.md]",
+         "prereg_commit": "120f995", "seed": P21_SEED, "k": P21_K, "n": n,
+         "mode": mode, "rungs": rungs, "per_problem_tol": P21_TOL,
+         "prereg_mde": 0.039, "cells": cells, "paired_vs_coder1p5b": paired,
+         "gates": {"on_target": bool(on_target), "parse_ok": bool(parse_ok),
+                   "powered": bool(powered)},
+         "branch": branch, "stack": _stack_block()}, indent=2))
+    print("wrote artifacts/h21_fourway.json")
+
+
 # --- Phase 20: the PAIRED twin-vs-sibling cell ([PHASE_20.md]) ---
 
 P20_SEED = 337
