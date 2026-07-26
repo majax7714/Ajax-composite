@@ -1,0 +1,135 @@
+{
+  "_label": "Phase 18 \u2014 temperature on the coverage channel [PHASE_18.md]",
+  "prereg_commit": "4abb0b1",
+  "seed": 281,
+  "k": 24,
+  "model": "Qwen/Qwen2.5-Coder-1.5B",
+  "revision": "df3ce67c0e24480f20468b6ef2894622d69eb73b",
+  "n": 44,
+  "committed_refs": {
+    "cov_iid_ci": [
+      0.5227,
+      0.7955
+    ],
+    "dcov_ci": [
+      -0.3636,
+      -0.0455
+    ],
+    "sink_ci": [
+      -0.1258,
+      -0.0028
+    ]
+  },
+  "cells": {
+    "0.8": {
+      "T": 0.8,
+      "n": 44,
+      "cov_iid": 0.7045,
+      "cov_iid_ci": [
+        0.5682,
+        0.8409
+      ],
+      "cov_cond": 0.4773,
+      "cov_cond_ci": [
+        0.3409,
+        0.6364
+      ],
+      "delta_cov": -0.2273,
+      "delta_cov_ci": [
+        -0.3636,
+        -0.1136
+      ],
+      "mean_iid": 0.4314,
+      "mean_cond": 0.3834,
+      "mean_artifact": 0.4589,
+      "sink_vs_iid": -0.048,
+      "se": 0.0271,
+      "p": 0.076532610374013,
+      "sink_vs_artifact": -0.0755,
+      "below_both_nulls": true,
+      "achieved_delta_art": 0.0275,
+      "parse_rate_iid": 0.9886,
+      "parse_rate_cond": 0.9953
+    },
+    "1.0": {
+      "T": 1.0,
+      "n": 44,
+      "cov_iid": 0.5455,
+      "cov_iid_ci": [
+        0.4091,
+        0.7045
+      ],
+      "cov_cond": 0.3636,
+      "cov_cond_ci": [
+        0.2273,
+        0.5
+      ],
+      "delta_cov": -0.1818,
+      "delta_cov_ci": [
+        -0.3182,
+        -0.0455
+      ],
+      "mean_iid": 0.2799,
+      "mean_cond": 0.2439,
+      "mean_artifact": 0.4589,
+      "sink_vs_iid": -0.036,
+      "se": 0.0206,
+      "p": 0.08029229662955915,
+      "sink_vs_artifact": -0.215,
+      "below_both_nulls": true,
+      "achieved_delta_art": 0.179,
+      "parse_rate_iid": 0.9299,
+      "parse_rate_cond": 0.9375
+    },
+    "1.2": {
+      "T": 1.2,
+      "n": 44,
+      "cov_iid": 0.4318,
+      "cov_iid_ci": [
+        0.2955,
+        0.5682
+      ],
+      "cov_cond": 0.0909,
+      "cov_cond_ci": [
+        0.0227,
+        0.1818
+      ],
+      "delta_cov": -0.3409,
+      "delta_cov_ci": [
+        -0.4773,
+        -0.2045
+      ],
+      "mean_iid": 0.1056,
+      "mean_cond": 0.0625,
+      "mean_artifact": 0.4589,
+      "sink_vs_iid": -0.0431,
+      "se": 0.0105,
+      "p": 3.8029450976148946e-05,
+      "sink_vs_artifact": -0.3964,
+      "below_both_nulls": true,
+      "achieved_delta_art": 0.3533,
+      "parse_rate_iid": 0.4896,
+      "parse_rate_cond": 0.375
+    }
+  },
+  "gates": {
+    "validity_ok": true,
+    "rescued_at_1.0": false,
+    "sink_unmoved_at_1.0": true,
+    "collapsed_at_1.0": false,
+    "parse_ok": false,
+    "position_ok": false
+  },
+  "branch": "C \u2014 neither moved: scope restriction on claim 13 (temperature)",
+  "stack": {
+    "gpu_name": "NVIDIA L4",
+    "gpu_capability": "8.9",
+    "dtype": "bfloat16",
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8",
+    "vllm": "0.11.0",
+    "gen_template_hash": "1e43a51cdc2cc3b5",
+    "d2c_context_hash": "b9323ddf1a9b253d",
+    "judge_hash": "dbd4f9fa650a6a2f"
+  }
+}
