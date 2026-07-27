@@ -115,24 +115,32 @@ far harder than *DeepSeek* — which points at the **Qwen base** rather than the
 and is a hypothesis rather than a measurement. The record does not rewrite the claim to it.
 Two cheap cells would settle the shape, and the loop stopped to say so rather than run them.
 
-**Current status (2026-07-26): Phase 21 ran those two cells — and was KILLED by its own
-frozen gate.** Four models were placed at their **own** true match on one shared
-problem set (n=56, every cell within ±0.006 of match — the tightest simultaneous positioning
-in the record). Then `starcoder2_3b_iid` parsed at **0.9308** against a pre-registered ≥0.95
-threshold, and the frozen kill criterion fired: **branch D, no adjudication.**
+**Current status (2026-07-27): Phase 22 reopened the family question rather than closing it.**
+The per-cell criterion that Phase 21's failure forced into the spec worked on first use — the
+same StarCoder2 instrument failure that voided *all* of Phase 21 voided **one cell**, and three
+adjudicated. The reference model reproduced its known value, so the instrument is validated.
 
-Two things make that worth more than the result would have been. **The branch expression
-consulted its own gates** — the first live test of a fix for a defect the record logged one
-phase earlier, where a kill criterion was printed and then ignored. And **the gate fired
-against the charter's own favourite.** StarCoder2 returns *empty* output on 3.7% of bare
-problem statements but complies once handed an artifact to copy formatting from; empty
-generations score zero, which depresses its unconditioned arm and biases the comparison
-*toward* the "clean" verdict the charter had priced at 35%. A decode-corruption explanation
-was tested and rejected before that conclusion was drawn. **The numbers exist, are committed,
-and are not being cited** — re-adjudicating a killed phase by dropping the arm that killed it
-is a post-hoc rescue, so the corrected criterion goes into a **new pre-registration** and
-Phase 21 stays dead. Two operational failures logged (§8 entries 13 and 14), including a lost
-cost measurement that broke a ten-phase streak of measured-against-estimated reconciliations.
+**The favoured hypothesis did not fire.** "DeepSeek is the exception" was priced at 55%.
+DeepSeek escapes the sink verdict by **0.0008** — against the copy null it *is* down, and the
+scoring convention committed in advance as a secondary flips it to sinking outright. Its
+interval cannot even exclude the effect it is being used to deny. Both Qwen models sink. The
+compression law's intercept table took its **first miss**, on precisely the entry the record
+had already flagged as an extrapolation.
+
+**StarCoder2 turned out to be outside this harness's domain — with citations.** A
+pre-registered literature check found its own authors documenting that base models do "very
+poorly" on instruction-style prompts, with a third of output incomplete. We had applied a
+prompt format the model's authors call unsuitable; better to learn that from a search than to
+publish it.
+
+**Two pieces of free work, one durable and one dead.** Durable: conditioning **collapses output
+entropy** — two independent seeds produce the identical candidate string 0.15% of the time
+unconditioned and up to **29%** once an artifact is in the prompt, and an independent
+string-distance measure reproduces that ordering exactly. Dead: the tempting mechanism that a
+model's apparent cleanliness *is* its copying fidelity. It was the most interesting idea on the
+page; the test designed to kill it, with its null reading stated in advance, killed it within
+the hour — and exposed that the test's own pass threshold had counted a cell the phase had
+already voided, which is now ledger entry 15.
 
 ## Map of the composite
 
@@ -168,6 +176,7 @@ first iteration, with its amendments dated on the page.*
 | 19 | [PHASE_19.md](docs/PHASE_19.md) | The architecture twin at **true match** — and a phase that graded its own charter down. Its free P0 found the record's central family contrast (Phase 7) is **position-confounded**: every non-Coder cell that stayed clean sat at a *favourable* position, worth more shift than the effect being attributed to diet — and every powered at-match cell in the record was a Coder cell. Checked rather than assumed, the **diet claim survived**, because it rests on Phase 9's position-matched 2×2 rather than on Phase 7. The paid cell then measured the twin — same base, same 28L×12H, differing only in the Coder pretraining stage — at true match: **clean** (−0.0027), the 45% favourite. But the charter had claimed the cell could separate two predictions 0.04 apart, and its actual **MDE was 0.080** — so both predictions sit inside the interval and twin-vs-sibling is p 0.150. The instrument asymmetry is fixed; the inference is not |
 | 20 | [PHASE_20.md](docs/PHASE_20.md) | **The paired cell that refuted the record's own family claim.** Both models measured at their own true match on the *same* problems — possible only by sharing the problem and varying the artifact, since the two models differ in quality. The **architecture twin**, a *non-Coder* model differing from its Coder sibling only in the continued-pretraining stage, **sinks at true match** (−0.0372, below both nulls, both CIs excluding zero) and is **indistinguishable from the sibling** (+0.0088 ± 0.0157, p 0.57). The family-contrast leg of the record's central claim is dead as stated. Both earlier cells that called the twin clean are explained: one sat where compression cancels the effect, the other had an MDE twice the effect and returned a false negative — flagged as a ledger entry one phase before it was demonstrated. **Loop halted for author review** |
 | 21 | [PHASE_21.md](docs/PHASE_21.md) | **A phase killed by its own gate — and the gate fired against the hypothesis the charter favoured.** Four models placed at their own true match on ONE shared problem set (n=56, every cell within ±0.006 of match; per-model artifact selection verified not to collapse). `starcoder2_3b_iid` parsed 0.9308 against a frozen ≥0.95 threshold → **branch D, no adjudication**. Diagnosis run rather than argued with: 50 of 93 failures are *empty* completions, all unconditioned; a decode-corruption hypothesis was tested and **rejected**; the real quantity is the **between-arm** parse gap (+5.7pp vs ≤1.1pp for every other model), which biases cond−iid toward "clean" because empties score 0. Also the first live test of the fix for §8 entry 11 — the branch expression consulted its own kill criteria instead of printing and ignoring them. Measured-not-adjudicated numbers are committed and *not* cited; the corrected per-cell gate needs a new pre-registration, because the author who would write it has now seen the numbers it would license. Two ledger entries (13: criterion at the wrong granularity and on the wrong quantity; 14: cost measurement lost, ≈$2.44 derived not measured). |
+| 22 | [PHASE_22.md](docs/PHASE_22.md) | **The favoured hypothesis lost, and the free work outran the paid work.** Same four models, fresh seed, per-cell kill criteria — the fix forced by Phase 21's failure, working on first use: one cell voided instead of the phase, three adjudicated, reference model reproduced its known value. **Branch C (55%) did not fire.** DeepSeek escapes the sink verdict by **0.0008**, is *below* the copy null (CI excludes zero), and **flips to sinking** under the alternate scoring committed before the run — while its interval cannot exclude the effect it is used to deny. Both Qwen models sink. First **miss** in the compression-law intercept table, on the one entry already flagged as extrapolated. StarCoder2 ruled outside the harness's domain **with citations** from its own authors, found by a pre-registered literature check. Free ($0): conditioning **collapses output entropy** (0.15% → 29% seed-to-seed string identity) and string-distance PULL reproduces that ordering exactly (ρ +1.000, DeepSeek +0.764 vs Coder +0.418). Also free: the mechanism those results suggested — cleanliness *is* copying — was **withdrawn within the hour** by the test built to kill it, which in turn exposed ledger entry 15, the first mis-specification here that would have produced a false positive in the record's own favour. |
 
 ## How to read
 
