@@ -1,0 +1,71 @@
+{
+  "_label": "Phase 22 P1 \u2014 within-model copy split (exploratory) [PHASE_22.md] \u00a77",
+  "_exploratory": true,
+  "n_problems": 56,
+  "predictions": {
+    "Q1_high_copy_intercept_closer_to_zero_in_at_least": 3,
+    "Q2_high_copy_slope_larger": true
+  },
+  "cells": {
+    "coder1p5b": {
+      "median_sim": 0.4989,
+      "n_high": 28,
+      "n_low": 28,
+      "intercept_high": -0.037,
+      "intercept_low": -0.0459,
+      "slope_high": 0.879,
+      "slope_low": 0.573,
+      "r2_high": 0.734,
+      "r2_low": 0.392,
+      "high_intercept_closer_to_zero": true,
+      "high_slope_larger": true,
+      "void": false
+    },
+    "general1p5b": {
+      "median_sim": 0.5139,
+      "n_high": 28,
+      "n_low": 28,
+      "intercept_high": -0.0435,
+      "intercept_low": -0.0147,
+      "slope_high": 0.6621,
+      "slope_low": 0.6386,
+      "r2_high": 0.471,
+      "r2_low": 0.26,
+      "high_intercept_closer_to_zero": false,
+      "high_slope_larger": true,
+      "void": false
+    },
+    "deepseek1p3b": {
+      "median_sim": 0.81,
+      "n_high": 28,
+      "n_low": 28,
+      "intercept_high": -0.012,
+      "intercept_low": -0.0123,
+      "slope_high": 1.0609,
+      "slope_low": 0.9243,
+      "r2_high": 0.923,
+      "r2_low": 0.751,
+      "high_intercept_closer_to_zero": true,
+      "high_slope_larger": true,
+      "void": false
+    },
+    "starcoder2_3b": {
+      "median_sim": 0.6709,
+      "n_high": 28,
+      "n_low": 28,
+      "intercept_high": -0.0281,
+      "intercept_low": -0.0495,
+      "slope_high": 0.8057,
+      "slope_low": 0.3839,
+      "r2_high": 0.694,
+      "r2_low": 0.037,
+      "high_intercept_closer_to_zero": true,
+      "high_slope_larger": true,
+      "void": true
+    }
+  },
+  "q1_hits": 3,
+  "q1_hits_excluding_void": 2,
+  "q2_hits": 4,
+  "verdict": "supports"
+}

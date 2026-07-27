@@ -474,3 +474,62 @@ hash covers the function source, so it moved for a reason unrelated to what the 
 Recorded because a future reader comparing two hashes would otherwise be right to suspect an
 undocumented instrument change, and this record's whole defence against silent drift is that
 such things are written down rather than noticed later.
+
+---
+
+## 7. P1 RESULT ($0) — the killing test does NOT support §6, and my own threshold was mis-specified
+
+*Exploratory per §10. Script and predictions committed at the previous commit, before running.
+Artifact `artifacts/h22_p1_copysplit.json`.*
+
+Each model's 56 problems split at its own median conditioned-similarity; `shift = a + b·gap`
+fitted separately on each half.
+
+| model | median sim | intercept HIGH-copy | intercept LOW-copy | closer to 0? | slope H / L |
+|---|---|---|---|---|---|
+| Coder-1.5B | 0.4989 | −0.0370 | −0.0459 | ✓ (Δ 0.0089) | 0.879 / 0.573 |
+| general-Qwen-1.5B | 0.5139 | **−0.0435** | **−0.0147** | **✗ reversed** (Δ −0.0288) | 0.662 / 0.639 |
+| DeepSeek-1.3B | 0.8100 | −0.0120 | −0.0123 | ✓ **(Δ 0.0003)** | 1.061 / 0.924 |
+| StarCoder2-3B *(VOID)* | 0.6709 | −0.0281 | −0.0495 | ✓ (Δ 0.0214) | 0.806 / 0.384 |
+
+**The script prints "SUPPORTS §6" at 3/4. That verdict is wrong, and the fault is in the
+prediction I wrote.** Q1's threshold was "at least 3 of **4** models" — but this phase's own
+frozen rule voids StarCoder2's cell, and a void cell must not count toward adjudication. I
+wrote a threshold over four models while one was **already known to be void**. Read under the
+phase's own rule the live count is **2 of 3**, which does not meet the bar. Logged as **§8
+entry 15**.
+
+**And the 2 of 3 does not survive inspection either.** DeepSeek's difference is **0.0003** —
+its intercept is flat across the split, i.e. within the model that the entire copying account
+is *about*, copying harder does **not** reduce sinking. General-Qwen runs **backwards** by
+0.0288, the largest live magnitude in the table. Only Coder-1.5B shows the predicted effect
+with a real magnitude.
+
+**Q3 fires.** The pre-registered null reading applies: string similarity and pass-rate
+degradation behave as **largely independent axes** that happen to order four models alike.
+
+### 7.1 What survives, and what I am withdrawing
+
+**Withdrawn:** §6.1's proposed mechanism — *"a model's cleanliness is produced by its copying
+fidelity"* — as a per-problem mechanism. Its own designed test does not support it, and the
+model it was invented to explain shows no gradient at all.
+
+**Survives, and is still unexplained:**
+
+- **The between-model correlation is real and large.** PULL orders the models exactly as
+  copy-identity does (ρ +1.000) and DeepSeek copies nearly twice as hard as Coder-1.5B
+  (+0.764 vs +0.418, ≈9.7 SE). That is not noise — but it is four points, and Q1 now says it
+  is not mediated problem-by-problem, so it may be a family-level coincidence or a property
+  operating at a level this design cannot see.
+- **Conditioning collapses output entropy** (§5.6): 0.15% → up to 29% seed-to-seed string
+  identity. Untouched by this result.
+- **DeepSeek's slope at true match is ≈1.0** (1.061 high-copy / 0.924 low-copy), far above the
+  0.784 the committed battery carries from a cell at Δ_art +0.0499. A model with b ≈ 1 lands
+  *on* the artifact, which is a cleaner statement of what makes it look clean than the
+  mechanism I withdrew — and it is a **measurement**, not an inference. It also corroborates
+  §5.4: the battery's DeepSeek row is unreliable because it was extrapolated.
+
+**Time from hypothesis to withdrawal: under an hour, at $0.** The account was the most
+interesting thing on the page, I designed the test that could kill it and stated the null
+reading in advance, and it fired. That is the practice working, and it is worth more than the
+hypothesis was.
