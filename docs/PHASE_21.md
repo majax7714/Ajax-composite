@@ -273,10 +273,16 @@ particular instance of it appears unpre-empted.
 Generations: 3,840 (two k=24 sweeps) + 10,752 (eight arms × 56 × 24) = **14,592**. The charter
 projected ~12,500 assuming n ≈ 45; the four-way held at n = 56, **17% above plan**.
 
-**Cost $2.87** — MTD aggregate delta **$86.83 → $89.70** (Amendment 2's standing convention,
-the same method every prior phase used), against a pre-registered **$1.60–2.80**.
+**Cost ≈$2.91** — MTD aggregate delta **$86.83 → $89.7364** (Amendment 2's standing
+convention, the same method every prior phase used), against a pre-registered **$1.60–2.80**.
 
-**This is an OVERRUN, the first in eleven phases**, by $0.07 / 2.5% above the top of the band.
+*Refined 2026-07-26, same day.* First recorded as $2.87 from an author-reported **$89.70**.
+Once workspace credentials were installed the query returned **$89.7364**, giving $2.9064.
+Both endpoints inherit the $86.83 baseline's own rounding, so the honest statement is
+**$2.90–2.91**. Refined rather than left alone because the correction runs **against** this
+phase — it widens the overrun — and a rounding that flatters is the kind that gets kept.
+
+**This is an OVERRUN, the first in eleven phases**, by ≈$0.11 / 4% above the top of the band.
 Cause is identified and was visible in the run: the charter sized the estimate at n ≈ 45 and
 the four-way feasibility held at **n = 56**, putting 17% more generations through the arms
 than planned. The estimate was right about the per-generation economics and wrong about the
