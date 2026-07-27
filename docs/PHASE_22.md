@@ -533,3 +533,17 @@ model it was invented to explain shows no gradient at all.
 interesting thing on the page, I designed the test that could kill it and stated the null
 reading in advance, and it fired. That is the practice working, and it is worth more than the
 hypothesis was.
+
+### 7.2 Write-up surfaces — Amendment 4a compliance
+
+| # | surface | disposition |
+|---|---|---|
+| 1 | phase doc RESULT | **updated** — §5, §6, §7 |
+| 2 | §9.x addendum | **deliberately unchanged** — no claim status moved; the durable content is methodological and landed in §8 entry 15 and §0.4 |
+| 3 | §0 index rows | **deliberately unchanged** — branch E adjudicates no status change; DeepSeek's verdict is weakened, not reversed |
+| 4 | §0.3 evidence rows | **updated** — rows 8 and 11 carry the P22 marker, including that no claim may rest on DeepSeek being clean |
+| 5 | §0.4 open successors | **updated** — three new items, one of them now the top open item |
+| 6 | living-record line | **updated** — Phase 22 banner |
+| 7 | abstract banner chain | **deliberately unchanged** — no claim status moved. Recorded so the skip is visible |
+| 8 | `README.md` | **updated** — row 22 and the status block |
+| 9 | §8 ledger entry | **updated** — entry **15** (threshold counted a voided cell) |
