@@ -165,3 +165,85 @@ Frozen at commit `PENDING` (stamped at close), **before** any Phase-23 generatio
 | **D** | "benchmark floor effect small model pass@k evaluation headroom" | prior treatment of floor-limited evaluation would give the INFEASIBLE verdict a citation instead of an anecdote |
 
 **Every branch:** re-check Huang et al. (§11), and record what the search **failed** to find.
+
+---
+
+## 5. RESULT — **BRANCH C fires by the frozen rule, and the frozen rule is not what happened**
+
+*Closed 2026-07-27. Raw artifact committed **unread** at `96f1e83`.*
+
+| quantity | value |
+|---|---|
+| n | **31** (32 dropped for headroom, 17 for no artifact within ±0.10) |
+| achieved Δ_art | **+0.0018** |
+| mean i.i.d. / cond / artifact | 0.2919 / 0.2682 / 0.3168 |
+| **cond − i.i.d.** | **−0.0236**, CI95 **[−0.0575, +0.0090]** — includes zero |
+| **cond − artifact** | **−0.0485**, CI95 **[−0.0773, −0.0225]** — **excludes zero** |
+| relative sink | −0.0211, CI95 **[−0.1865, +0.1631]** |
+| below both nulls | **false** → branch **C** |
+| parse i.i.d. / cond | 0.9772 / 0.9892, gap **1.21pp** (under the 2.0pp void) |
+
+**Branch C's committed text reads "a HARD lower edge." That is not supported and must not be
+quoted.** At n=31 the MDE is ≈**0.050** and the interval reaches **−0.0575** — this null cannot
+exclude an effect larger than the one measured at 1.5B. **It is an underpowered null, not
+evidence of absence.** The point estimate (−0.0236) is directionally shallower than 1.5B's
+−0.045, and both pre-registered "shallower" flags fired, so the data leans toward B/C — but the
+phase **cannot distinguish A from B from C** and the honest verdict is that the lower-edge
+question remains open.
+
+**Two pre-registrations that did something useful by failing.** (i) The **floor concern
+dissolved**: the headroom restriction selected almost entirely from the sweep's upper mode
+(bimodal — 25 problems under 0.05, 23 in [0.30,0.35)), giving the cell a mean i.i.d. of 0.2919,
+so max expressible sink was −0.29 and the floor never bound. The relative statistic was
+co-primary *for a problem the design's own restriction removed*. (ii) That relative statistic
+proved **useless at this n** — CI [−0.1865, +0.1631], four times the width of the absolute one,
+because dividing by small i.i.d. values inflates variance. Both are recorded as
+pre-registration misses, and both were only visible because the quantities were committed in
+advance.
+
+**Scope, stated plainly.** The cell measures **0.5B on the 31 problems it handles well** — mean
+i.i.d. 0.2919, essentially Coder-1.5B's overall quality — not 0.5B at its typical competence
+(sweep mean 0.2022). The ladder comparison is also **unpaired**: the 1.5B cell sat on a
+different subset. A lower-edge claim from this cell would be confounded with subset selection.
+
+### 5.1 The finding is not the branch — it is which leg produced it
+
+`below_both_nulls` is a **conjunction**: cond−iid AND cond−artifact must both exclude zero.
+**These two legs do not carry equal variance.** `cond − artifact` compares an estimated
+quantity to a **fixed, exactly-known** number. `cond − iid` compares an estimated quantity to
+**another estimated** one, so it carries roughly twice the variance component. Measured across
+every committed at-match cell:
+
+| cell | i.i.d.-leg CI width | artifact-leg CI width | ratio | verdict |
+|---|---|---|---|---|
+| P19 twin | 0.1121 | — | — | clean (i.i.d. leg only) |
+| P22 Coder-1.5B | 0.0531 | 0.0377 | 1.41 | SINK |
+| P22 general-Qwen-1.5B | 0.0422 | 0.0362 | 1.17 | SINK |
+| **P22 DeepSeek-1.3B** | 0.0445 | 0.0174 | **2.56** | **clean — gated by the i.i.d. leg** |
+| P22 StarCoder2-3B | 0.0709 | 0.0663 | 1.07 | clean — both legs |
+| **P23 Coder-0.5B** | 0.0673 | 0.0547 | 1.23 | **clean — gated by the i.i.d. leg** |
+
+**The i.i.d. leg is wider in every single cell.** And of the three "clean" verdicts with an
+artifact leg measured, **two — DeepSeek and now Coder-0.5B — have an artifact leg that
+decisively excludes zero.** Both models are measurably **below the copy null**. Their clean
+verdicts rest entirely on the noisier leg failing to resolve.
+
+> **"Clean" in this record has systematically meant "the higher-variance leg could not be
+> resolved," not "no effect."** Three verdicts, one mechanism — and the first of them, Phase
+> 19's twin, was already proven wrong by a better-powered design in Phase 20.
+
+That is now **§8 entry 16**, and it changes how every clean verdict in the record should be
+read, including the one this phase just produced.
+
+### 5.2 Cost
+
+**$0.6702** measured — MTD **$91.7985 → $92.4687**, snapshot taken in the launching shell —
+against a pre-registered **$0.55–1.20** with $0.76 central. **Inside the band, 12% under
+central.** Cheapest phase in the record. MTD $92.47 against $130 / $200.
+
+### 5.3 Process failure: no verifier was written before this run
+
+Phases 20, 21 and 22 each committed an independent verifier **before** any result existed.
+**Phase 23 did not.** The re-derivation in §5.1 was run *after* the artifact landed — it agrees
+to four decimals, but a check written after seeing the answer is worth strictly less than one
+written before, and the record should not pretend otherwise. Logged as **§8 entry 17**.

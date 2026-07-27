@@ -2248,6 +2248,37 @@ Run-loss modes are spend-loss modes; hardening is cheaper than any single recurr
     produced a **false positive in the record's own favour** — the previous six cost
     information; this one would have bought a finding.
 
+16. **The below-both-nulls conjunction is not power-symmetric, and "clean" has systematically
+    meant "the noisier leg failed" *(appended 2026-07-27, Phase 23 — [PHASE_23.md] §5.1)*.**
+    The record's central criterion requires **both** `cond − iid` and `cond − artifact` to
+    exclude zero. Those legs do not carry equal variance: **cond−artifact compares an estimated
+    quantity to a fixed, exactly-known number, while cond−iid compares one estimate to another**,
+    carrying roughly twice the variance component. Measured across every committed at-match cell,
+    **the i.i.d. leg is wider in all six** (ratios 1.07–2.56). The consequence is not academic:
+    of the three "clean" verdicts with an artifact leg measured, **two — DeepSeek-1.3B (Phase 22)
+    and Coder-0.5B (Phase 23) — have an artifact leg that decisively excludes zero.** Both models
+    are measurably **below the copy null**; their clean verdicts rest entirely on the noisier leg
+    failing to resolve. And the third, Phase 19's twin, was already **proven wrong** by the
+    better-powered Phase 20. *Caught by:* tabulating both legs' CI widths across cells instead of
+    reading each cell's verdict on its own. *Practice:* **report both legs and their widths
+    whenever a cell is called clean, and never state a clean verdict without the MDE beside it —
+    a conjunction is only as strong as its weakest leg, and in this design that leg is known in
+    advance.** *Class:* the eighth distinct way this record has mis-specified a decision quantity
+    (entries 8–13, 15–16), and the most consequential: it does not affect one phase, it changes
+    how **every clean verdict in the record** should be read.
+17. **A phase ran without the independent verifier that three prior phases established as
+    practice *(appended 2026-07-27, Phase 23 — [PHASE_23.md] §5.3)*.** Phases 20, 21 and 22 each
+    committed a verifier **before** any result existed, and Phase 21's caught nothing while Phase
+    22's produced the fresh-draw check that validated its whole premise. **Phase 23 shipped with
+    none.** A re-derivation was run afterwards and agrees to four decimals — but a check written
+    after the answer is visible cannot demonstrate independence from it, which is the entire
+    property the practice exists to provide. The lapse was not a decision; the phase was cheap and
+    single-celled and the step was simply skipped. *Practice:* **the verifier is part of the
+    entrypoint commit, not a separate act of virtue** — if it is not committed before spend, the
+    phase is not ready to run. *Class:* not a mis-specified quantity; a **skipped control**, and
+    the same structural failure as Amendment 4a's stale surfaces — a step with no gate that
+    announces its own omission.
+
 ## 9. Phase 3R — auditing the two live claims, and the anchoring mechanism
 
 Phase 3 published two load-bearing results on *inherited* Phase-0 choices: **H1** (an
