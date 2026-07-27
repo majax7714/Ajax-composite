@@ -115,14 +115,24 @@ far harder than *DeepSeek* — which points at the **Qwen base** rather than the
 and is a hypothesis rather than a measurement. The record does not rewrite the claim to it.
 Two cheap cells would settle the shape, and the loop stopped to say so rather than run them.
 
-**⚠ Current status (2026-07-26): the loop is HALTED.** Phase 20 refuted a live claim 1:1.
-The architecture twin — a *non-Coder* model differing from its Coder sibling only in the
-continued-pretraining stage — **sinks at true match, as hard as the sibling**, which kills
-the "non-Coder families don't sink" leg the diet attribution rested on. What survives is a
-position-matched result showing Coder sinking far harder than *DeepSeek*, so the shape that
-now fits is a **Qwen-base** effect rather than a Coder-stage one — a hypothesis, not a
-measurement, and nothing has been rewritten to it. Two cheap cells would settle it and are
-named in the journal's §0.4. **Nothing is running; the loop waits for author review.**
+**Current status (2026-07-26): Phase 21 ran those two cells — and was KILLED by its own
+frozen gate.** Four models were placed at their **own** true match on one shared
+problem set (n=56, every cell within ±0.006 of match — the tightest simultaneous positioning
+in the record). Then `starcoder2_3b_iid` parsed at **0.9308** against a pre-registered ≥0.95
+threshold, and the frozen kill criterion fired: **branch D, no adjudication.**
+
+Two things make that worth more than the result would have been. **The branch expression
+consulted its own gates** — the first live test of a fix for a defect the record logged one
+phase earlier, where a kill criterion was printed and then ignored. And **the gate fired
+against the charter's own favourite.** StarCoder2 returns *empty* output on 3.7% of bare
+problem statements but complies once handed an artifact to copy formatting from; empty
+generations score zero, which depresses its unconditioned arm and biases the comparison
+*toward* the "clean" verdict the charter had priced at 35%. A decode-corruption explanation
+was tested and rejected before that conclusion was drawn. **The numbers exist, are committed,
+and are not being cited** — re-adjudicating a killed phase by dropping the arm that killed it
+is a post-hoc rescue, so the corrected criterion goes into a **new pre-registration** and
+Phase 21 stays dead. Two operational failures logged (§8 entries 13 and 14), including a lost
+cost measurement that broke a ten-phase streak of measured-against-estimated reconciliations.
 
 ## Map of the composite
 
@@ -157,6 +167,7 @@ first iteration, with its amendments dated on the page.*
 | 18 | [PHASE_18.md](docs/PHASE_18.md) | The coverage channel — and a phase whose paid cell bought less than its free one. Seven free analyses **corrected the target before a dollar was spent**: the sink's adjudication criterion **does not survive the change of currency** (no artifact in any of the eight committed cells fully passes, so the copy null scores coverage zero *by construction*), coverage loss turns out **universal at ≤3B across every family and diet** and so is not the sink's mechanism, and the headline −0.432 was the most extreme of three seeds with no error bar. It also found a **compression law** — every model pulled 47–90% of the way toward the artifact it is shown, R² to 0.92 — then built a hypothesis on it and **watched the architecture twin refute it within the hour**. The paid cell tried temperature and closed an **instrument failure, no branch adjudicated**: two frozen kill criteria fired, and the branch tree had ignored both. Temperature **moves the null as hard as the treatment** |
 | 19 | [PHASE_19.md](docs/PHASE_19.md) | The architecture twin at **true match** — and a phase that graded its own charter down. Its free P0 found the record's central family contrast (Phase 7) is **position-confounded**: every non-Coder cell that stayed clean sat at a *favourable* position, worth more shift than the effect being attributed to diet — and every powered at-match cell in the record was a Coder cell. Checked rather than assumed, the **diet claim survived**, because it rests on Phase 9's position-matched 2×2 rather than on Phase 7. The paid cell then measured the twin — same base, same 28L×12H, differing only in the Coder pretraining stage — at true match: **clean** (−0.0027), the 45% favourite. But the charter had claimed the cell could separate two predictions 0.04 apart, and its actual **MDE was 0.080** — so both predictions sit inside the interval and twin-vs-sibling is p 0.150. The instrument asymmetry is fixed; the inference is not |
 | 20 | [PHASE_20.md](docs/PHASE_20.md) | **The paired cell that refuted the record's own family claim.** Both models measured at their own true match on the *same* problems — possible only by sharing the problem and varying the artifact, since the two models differ in quality. The **architecture twin**, a *non-Coder* model differing from its Coder sibling only in the continued-pretraining stage, **sinks at true match** (−0.0372, below both nulls, both CIs excluding zero) and is **indistinguishable from the sibling** (+0.0088 ± 0.0157, p 0.57). The family-contrast leg of the record's central claim is dead as stated. Both earlier cells that called the twin clean are explained: one sat where compression cancels the effect, the other had an MDE twice the effect and returned a false negative — flagged as a ledger entry one phase before it was demonstrated. **Loop halted for author review** |
+| 21 | [PHASE_21.md](docs/PHASE_21.md) | **A phase killed by its own gate — and the gate fired against the hypothesis the charter favoured.** Four models placed at their own true match on ONE shared problem set (n=56, every cell within ±0.006 of match; per-model artifact selection verified not to collapse). `starcoder2_3b_iid` parsed 0.9308 against a frozen ≥0.95 threshold → **branch D, no adjudication**. Diagnosis run rather than argued with: 50 of 93 failures are *empty* completions, all unconditioned; a decode-corruption hypothesis was tested and **rejected**; the real quantity is the **between-arm** parse gap (+5.7pp vs ≤1.1pp for every other model), which biases cond−iid toward "clean" because empties score 0. Also the first live test of the fix for §8 entry 11 — the branch expression consulted its own kill criteria instead of printing and ignoring them. Measured-not-adjudicated numbers are committed and *not* cited; the corrected per-cell gate needs a new pre-registration, because the author who would write it has now seen the numbers it would license. Two ledger entries (13: criterion at the wrong granularity and on the wrong quantity; 14: cost measurement lost, ≈$2.44 derived not measured). |
 
 ## How to read
 

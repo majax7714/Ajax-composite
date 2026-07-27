@@ -136,7 +136,9 @@ Loop total to date $8.79.
 
 ## 3. Pre-registration freeze
 
-Frozen at commit `PENDING` (stamped at close), **before** any Phase-21 generation ran.
+Frozen at commit `120f995`, **before** any Phase-21 generation ran. Entrypoint at `e11fb99`,
+also before spend. Verifier `8702557` and the §4 search plan `dcd0cbe` were both committed
+mid-run, before any result existed. Raw artifact committed unread at `4ab79a0`.
 
 ---
 
@@ -157,5 +159,170 @@ as source-verified.*
 **Applies to every branch:** re-check the general null (Huang et al., §11) against whatever
 is found, and record — as §1(c) did — what the search **failed** to find, not only what it
 returned. A null search result is evidence about novelty and belongs in the write-up.
+
+---
+
+## 5. RESULT — **BRANCH D: KILLED by a frozen kill criterion. No adjudication.**
+
+*Closed 2026-07-26. Raw artifact `artifacts/h21_fourway.json` committed **unread** at `4ab79a0`
+before any analysis. Independent verifier (`scripts/j21_verify.py`, committed at `8702557`
+before any result existed) agrees on **every quantity and on the branch**.*
+
+**The gate that fired:** `INSTRUMENT FAILURE ⟺ any arm's parse rate < 0.95`.
+`starcoder2_3b_iid` parsed at **0.9308**. The other seven arms all parsed ≥ 0.9814.
+
+| gate | value | verdict |
+|---|---|---|
+| OFF-TARGET (all \|Δ_art\| ≤ 0.020) | −0.0060 / −0.0045 / −0.0033 / −0.0023 | **passes** |
+| UNDERPOWERED (n ≥ 30) | **n = 56**, four-way held; no fallback | **passes** |
+| INSTRUMENT FAILURE (all parse ≥ 0.95) | **starcoder2_3b_iid = 0.9308** | **FIRES** |
+
+**The branch expression consulted its own gates.** This is the first live test of the fix for
+§8 entry 11, where Phase 18 printed `parse_ok false` and then adjudicated a substantive
+branch above it. Here the kill criterion was evaluated *inside* the branch expression, fired,
+and suppressed adjudication. The defect is fixed, demonstrated under conditions that would
+have rewarded the bug.
+
+### 5.1 Measured, NOT adjudicated
+
+Recorded because the numbers exist and the raw artifact is committed; **none of it is a
+finding**, and no claim status moves on it. n = 56, k = 24, seed 367.
+
+| model | i.i.d. | cond | artifact | cond−iid [CI95] | cond−art [CI95] | below both nulls |
+|---|---|---|---|---|---|---|
+| Coder-1.5B | 0.3188 | 0.2732 | 0.3241 | **−0.0456** [−0.0717,−0.0202] | −0.0509 [−0.0710,−0.0318] | true |
+| general-Qwen-1.5B | 0.2836 | 0.2471 | 0.2689 | **−0.0365** [−0.0566,−0.0170] | −0.0219 [−0.0370,−0.0064] | true |
+| DeepSeek-1.3B | 0.2443 | 0.2443 | 0.2522 | **+0.0000** [−0.0161,+0.0160] | −0.0079 [−0.0152,−0.0014] | false |
+| StarCoder2-3B | 0.2567 | 0.2350 | 0.2443 | −0.0217 [−0.0487,+0.0075] | −0.0094 [−0.0336,+0.0260] | false |
+
+Paired against Coder-1.5B on the shared set: general +0.0091 ± 0.0159 (p 0.57);
+DeepSeek **+0.0456 ± 0.0175 (p 0.0091)**; StarCoder2 +0.0239 ± 0.0187 (p 0.20).
+
+**Design integrity held.** Per-model artifact selection did not collapse: every model pair
+drew different artifacts on 23–40 of 56 problems. All four cells landed within ±0.006 of
+true match — the tightest simultaneous positioning in the record.
+
+### 5.2 Why the gate was RIGHT to fire — the diagnosis
+
+A parse gate could be pedantry. It was not. Inspecting the 93 failing generations:
+
+- **50 are empty completions**, all in the unconditioned arm;
+- **~43 are indentation-loss** syntax errors — otherwise-coherent Python with every line
+  flush-left.
+
+**A decode-corruption hypothesis was tested and REJECTED.** If StarCoder2's tokenizer or the
+decode path were dropping whitespace, indentation prevalence would be depressed across its
+output. It is not: 0.7701 (iid) vs 0.7679 (cond), against 0.7783 for Coder-1.5B. Nothing is
+stripping whitespace. The cause is the model.
+
+**The real quantity is the between-arm parse differential, not the absolute level:**
+
+| model | parse iid | parse cond | **gap** |
+|---|---|---|---|
+| Coder-1.5B | 0.9836 | 0.9948 | +1.1pp |
+| general-Qwen-1.5B | 0.9866 | 0.9814 | −0.5pp |
+| DeepSeek-1.3B | 0.9851 | 0.9963 | +1.1pp |
+| **StarCoder2-3B** | **0.9308** | 0.9874 | **+5.7pp** |
+
+StarCoder2 given only a problem statement often emits nothing extractable; given an artifact
+to format from, it complies. **Empty generations score 0**, so they depress the i.i.d. arm and
+bias `cond − iid` **upward — toward "clean."** The kill therefore protected branch C, the
+charter's own 35% favourite, from being handed a win by a formatting asymmetry rather than by
+reasoning. A gate that only ever fires against your disfavoured hypothesis is not doing work;
+this one fired against the favoured one.
+
+### 5.3 Prediction accounting
+
+The compression-law intercept predicted all four cells, and all four intervals contain the
+prediction. **Three of the four sit on clean arms** (Coder −0.056 pred / −0.0456 meas;
+general −0.040 / −0.0365; DeepSeek +0.011 / +0.0000). The fourth, StarCoder2 (−0.021 /
+−0.0217), sits on the **gated** arm and is **excluded from the accounting** — its apparent
+near-exactness is not evidence, because the arm that produced it failed the instrument test.
+
+**A downstream exposure this opens, and it is not small.** StarCoder2's committed intercept
+of −0.021 was itself estimated from earlier cells that used the same unconditioned prompting.
+If those cells carried the same empty-completion deficit, their i.i.d. arms were likewise
+depressed and **the −0.021 intercept is biased toward zero** — i.e. StarCoder2 may sink harder
+than the law records. Every StarCoder2 number in this journal inherits the question. Logged to
+§0.4 as an open item; not investigated here.
+
+### 5.4 Step 9a — literature *(Amendment 5)*
+
+**The §4 branch queries were NOT run.** No branch was adjudicated, so the pre-registered A/B/C
+query sets do not apply; they carry forward unspent to the phase that adjudicates. Recording
+this because a search plan that gets run anyway, against whatever happened, is not a
+pre-registration.
+
+What was searched instead is the finding that *did* occur — conditioning-induced format
+compliance as an evaluation confound. Two relevant results, **snippet-level only, not
+source-verified**, per §1(c)'s practice:
+
+- *The Format Tax* (arXiv 2604.03616) — grammar-constrained decoding lifts format compliance
+  55.7% → 92.2% while reasoning accuracy stays 5–7pp *below* the freeform baseline.
+  **Compliance and reasoning are separable**, which is exactly why a conditioning-induced
+  compliance gain must not be read as a reasoning gain.
+- *Cascaded Information Disclosure* (arXiv 2507.23776) — brittle answer extraction distorts
+  cross-model comparison (90%+ parse failure for Phi-4 on GPQA under lm-evaluation-harness).
+
+**What the search did NOT find:** any treatment of a *between-arm* parse asymmetry biasing a
+conditioned-vs-unconditioned contrast specifically. The general hazard is established; this
+particular instance of it appears unpre-empted.
+
+### 5.5 Cost, and an honest gap
+
+Generations: 3,840 (two k=24 sweeps) + 10,752 (eight arms × 56 × 24) = **14,592**. The charter
+projected ~12,500 assuming n ≈ 45; the four-way held at n = 56, **17% above plan**.
+
+**Derived** cost at Phase 18's calibrated rate ($1.06 / 6,336 gens of 1.5B-class):
+**≈ $2.44**, inside the pre-registered $1.60–2.80 band, near its top as the extra n and the
+3B rung both predict.
+
+**This is a derivation, not a measurement, and the distinction is the point.** The billing
+query needs workspace credentials that the analysis shell does not hold (the detached run
+inherited them from the launching shell; there is no `~/.modal.toml`). Ten consecutive phases
+have carried a *measured* cost; this one does not. To stamp it:
+`modal billing report --for "this month" --json`. Until then the figure above is an estimate
+wearing no disguise.
+
+### 5.6 What this phase settles, and what it does not
+
+**Settles:** nothing about the sink. Branch D means no adjudication, and the temptation to
+read §5.1 as "branch C, with an asterisk" is precisely what the criterion exists to refuse.
+Three models were measured at true match on a shared set with clean instruments — that data is
+committed and re-usable — but the phase's own question is **unanswered**.
+
+**Does not settle, and must not be quietly claimed:** whether DeepSeek is exceptional. Its
+cell is clean (parse 0.9851/0.9963) and its null is *informative* — the verifier's symmetric
+guard confirms CI [−0.0158,+0.0159] excludes effects past the MDE, so this is a real bound,
+not an underpowered shrug. But it was gathered inside a phase that failed its instrument test,
+and re-adjudicating a killed phase by dropping the arm that killed it is a post-hoc rescue.
+The successor must **pre-register** the re-adjudication.
+
+**The successor.** The cheapest correct move is a three-model re-run of the *criterion*, not
+the data: pre-register that (a) the parse gate is evaluated **per-cell**, so one model's
+instrument failure voids that cell rather than the phase, and (b) a **between-arm parse gap
+> 2pp** is itself a kill for that cell, since it is the differential — not the level — that
+biases the contrast. StarCoder2 then needs an instrument that gets it to emit code
+unconditioned before it can be measured at all; absent that, it is **outside this
+instrument's domain**, the same verdict Phase 18 reached for T > 1.0. Note the awkward part
+plainly: the author writing that criterion has now seen the numbers it would license.
+
+### 5.7 Write-up surfaces — Amendment 4a compliance
+
+*Each of the nine is updated **or** recorded as deliberately unchanged. The requirement is
+that the decision is visible; a gate that is silent when skipped is how seven phases skipped
+it.*
+
+| # | surface | disposition |
+|---|---|---|
+| 1 | phase doc RESULT | **updated** — §5 above |
+| 2 | §9.x addendum | **deliberately unchanged** — no claim moved, and the phase's durable content is methodological, so it landed in §8 entries 13–14 and §0.4 rather than in a claim narrative |
+| 3 | §0 index rows | **deliberately unchanged** — branch D adjudicates nothing; no status moves |
+| 4 | §0.3 evidence rows | **updated** — rows 8 and 11 carry a P21 marker recording that the at-match four-way was *attempted and killed*, so a later reader does not mistake this for untried ground |
+| 5 | §0.4 open successors | **updated** — the top open item marked ATTEMPTED-AND-KILLED / STILL OPEN with the corrected-criterion successor; **one new open item added** (StarCoder2's intercept possibly biased toward zero) |
+| 6 | living-record line | **updated** — Phase 21 banner replaces the Phase-20 halt |
+| 7 | abstract banner chain | **deliberately unchanged** — Amendment 4a requires a banner "when a claim's status moved." None did. Recorded here so the skip is visible rather than invisible |
+| 8 | `README.md` | **updated** — row 21, and the status block rewritten from HALTED to the kill |
+| 9 | §8 ledger entry | **updated** — entries **13** (criterion granularity + wrong quantity) and **14** (cost measurement lost) |
 
 ---
