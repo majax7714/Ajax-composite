@@ -4466,6 +4466,181 @@ def j22_fourway():
     print("wrote artifacts/h22_fourway.json")
 
 
+# --- Phase 23: the bottom of the ladder — a lower edge? ([PHASE_23.md]) ---
+
+P23_SEED = 433
+P23_K = 24
+P23_TOL = 0.10           # per-problem |artifact - own iid|
+P23_MIN_IID = 0.08       # headroom restriction, pre-registered
+P23_MIN_N = 30
+P23_GAP = 0.020          # between-arm parse gap voiding the cell (§8 entry 13)
+P23_PARSE = 0.95
+P23_RUNG = J7_MODELS["M5_coder0p5b"]
+# committed at-match references for the ladder, absolute and relative
+P23_LADDER = {"1.5B": (-0.045, 0.331), "3B": (-0.051, 0.643), "7B": (-0.008, 0.753)}
+
+
+@app.local_entrypoint()
+def j23_bottom():
+    """Phase 23 — Coder-0.5B at true match; is there a lower edge?
+    Pre-registered [PHASE_23.md] at 2b845cb, BEFORE this ran."""
+    import ast
+    import random as _rnd
+    import statistics as st
+
+    mid, rev = P23_RUNG
+    qids, pool = _r3_donor_pool()
+
+    g = _load("j23_sweep_cand") or _persist("j23_sweep_cand", h1_gen_lcb.remote(
+        mid, [{"qid": q, "context": None} for q in qids], P23_K,
+        tag="j23_sweep_cand", seed=P11_SWEEP_SEED, revision=rev))
+    r = _load("j23_sweep_res") or _persist("j23_sweep_res", h1_lcb_exec.remote(
+        [x["qid"] for x in g], [x["codes"] for x in g], tag="j23_sweep_res"))
+    iid_sweep = {x["qid"]: st.mean(c["frac"] for c in row) for x, row in zip(g, r)}
+    print(f"[P23] k={P23_K} sweep: {len(iid_sweep)} problems, "
+          f"mean i.i.d. {st.mean(iid_sweep.values()):.4f}")
+
+    # headroom restriction + per-problem artifact match, both pre-registered
+    sel, no_head, no_art = {}, 0, 0
+    for q in qids:
+        if iid_sweep.get(q, 0.0) < P23_MIN_IID:
+            no_head += 1
+            continue
+        cands = pool.get(q) or []
+        if not cands:
+            no_art += 1
+            continue
+        b = min(cands, key=lambda c: abs(c[1] - iid_sweep[q]))
+        if abs(b[1] - iid_sweep[q]) > P23_TOL:
+            no_art += 1
+            continue
+        sel[q] = b
+    qs = sorted(sel)
+    n = len(qs)
+    print(f"[P23] eligible n={n}  (dropped: {no_head} below iid {P23_MIN_IID}, "
+          f"{no_art} no artifact within ±{P23_TOL})")
+
+    if n < P23_MIN_N:
+        branch = (f"D — INFEASIBLE (n={n} < {P23_MIN_N}); the 0.5B rung is un-measurable "
+                  f"at true match in this instrument, open since Phase 7 and now closed "
+                  f"as such")
+        print(f"\n=== BRANCH {branch} ===")
+        (REPO / "artifacts/h23_bottom.json").write_text(json.dumps(
+            {"_label": "Phase 23 — Coder-0.5B at true match [PHASE_23.md]",
+             "prereg_commit": "2b845cb", "seed": P23_SEED, "k": P23_K, "n": n,
+             "min_iid": P23_MIN_IID, "dropped_no_headroom": no_head,
+             "dropped_no_artifact": no_art, "branch": branch,
+             "stack": _stack_block()}, indent=2))
+        print("wrote artifacts/h23_bottom.json")
+        return
+
+    dart = st.mean(sel[q][1] - iid_sweep[q] for q in qs)
+    print(f"[P23] achieved Δ_art {dart:+.4f}  (band ±{P11_ON_TARGET})")
+
+    arms, parse = {}, {}
+    for kind in ("iid", "cond"):
+        tag = f"j23_{kind}"
+        items = [{"qid": q,
+                  "context": None if kind == "iid" else _d2c_context(
+                      {"qid": q, "code": sel[q][2], "frac": sel[q][1],
+                       "n_tests": sel[q][3], "n_failed": sel[q][3] - sel[q][4]})}
+                 for q in qs]
+        gg = _load(f"{tag}_cand") or _persist(f"{tag}_cand", h1_gen_lcb.remote(
+            mid, items, P23_K, tag=f"{tag}_cand", seed=P23_SEED, revision=rev,
+            max_model_len=8192, max_tokens=1536, emit_meta=True))
+        rr = _load(f"{tag}_res") or _persist(f"{tag}_res", h1_lcb_exec.remote(
+            [x["qid"] for x in gg], [x["codes"] for x in gg], tag=f"{tag}_res"))
+        arms[kind] = {x["qid"]: [y["frac"] for y in row] for x, row in zip(gg, rr)}
+        ok = tot = 0
+        for x in gg:
+            for code in x["codes"]:
+                tot += 1
+                if code:
+                    try:
+                        ast.parse(code)
+                        ok += 1
+                    except SyntaxError:
+                        pass
+        parse[kind] = ok / tot if tot else 0.0
+
+    rng = _rnd.Random(439)
+
+    def ci(v, b=8000):
+        a = sorted(st.mean([v[rng.randrange(len(v))] for _ in v]) for _ in range(b))
+        return round(a[int(.025 * b)], 4), round(a[int(.975 * b)], 4)
+
+    I, C = arms["iid"], arms["cond"]
+    de = [st.mean(C[q]) - st.mean(I[q]) for q in qs]
+    da = [st.mean(C[q]) - sel[q][1] for q in qs]
+    rel = [(st.mean(C[q]) - st.mean(I[q])) / st.mean(I[q])
+           for q in qs if st.mean(I[q]) > 0]
+    l1, h1 = ci(de)
+    l2, h2 = ci(da)
+    lr, hr = ci(rel)
+    sink = bool(h1 < 0 and h2 < 0)
+    mean_iid = st.mean(st.mean(I[q]) for q in qs)
+    abs_eff, rel_eff = st.mean(de), st.mean(rel)
+
+    print(f"\n  mean iid {mean_iid:.4f}   mean cond "
+          f"{st.mean(st.mean(C[q]) for q in qs):.4f}   "
+          f"mean artifact {st.mean(sel[q][1] for q in qs):.4f}")
+    print(f"  cond−iid  {abs_eff:+.4f} [{l1:+.4f},{h1:+.4f}]")
+    print(f"  cond−art  {st.mean(da):+.4f} [{l2:+.4f},{h2:+.4f}]")
+    print(f"  RELATIVE  {rel_eff:+.4f} [{lr:+.4f},{hr:+.4f}]   "
+          f"(ladder: 1.5B −0.136, 3B −0.079, 7B −0.011)")
+    print(f"  below both nulls: {sink}   parse iid/cond "
+          f"{parse['iid']:.4f}/{parse['cond']:.4f}  gap {parse['cond']-parse['iid']:+.4f}")
+
+    void = bool(min(parse.values()) < P23_PARSE
+                or abs(parse["cond"] - parse["iid"]) > P23_GAP)
+    off = bool(abs(dart) > P11_ON_TARGET)
+    ref_abs, ref_rel = P23_LADDER["1.5B"][0], -0.136
+    shallower_abs = abs_eff > ref_abs        # less negative than 1.5B
+    shallower_rel = rel_eff > ref_rel
+    print(f"\n  [gates] void {void} (parse)   off_target {off}   n {n}")
+    print(f"  shallower than 1.5B — absolute {shallower_abs}, relative {shallower_rel}")
+
+    if void or off:
+        branch = (f"D — KILLED (void {void}, off_target {off}); no adjudication")
+    elif not sink:
+        branch = ("C — DOES NOT SINK: a HARD lower edge. The highest embedding fraction in "
+                  "the record is clean, and a model too weak to use an artifact is not "
+                  "dragged down by one")
+    elif shallower_abs and shallower_rel:
+        branch = ("B — SINKS BUT SHALLOWER on BOTH statistics: the sink has a LOWER EDGE; "
+                  "the scale story is an inverted-U / competence window")
+    elif not shallower_abs and not shallower_rel:
+        branch = ("A — AS DEEP OR DEEPER than 1.5B: monotone accounts survive, no lower "
+                  "edge. NOTE this is also the literature's null (small models degrade) and "
+                  "is the least informative substantive outcome")
+    else:
+        branch = (f"UNCLASSIFIED — absolute and relative DISAGREE (shallower_abs "
+                  f"{shallower_abs}, shallower_rel {shallower_rel}); per [PHASE_23.md] §2 "
+                  f"the disagreement IS the finding: the floor is doing the work")
+    print(f"\n=== BRANCH {branch} ===")
+
+    (REPO / "artifacts/h23_bottom.json").write_text(json.dumps(
+        {"_label": "Phase 23 — Coder-0.5B at true match [PHASE_23.md]",
+         "prereg_commit": "2b845cb", "seed": P23_SEED, "k": P23_K, "n": n,
+         "min_iid": P23_MIN_IID, "dropped_no_headroom": no_head,
+         "dropped_no_artifact": no_art, "achieved_delta_art": round(dart, 4),
+         "mean_iid": round(mean_iid, 4),
+         "mean_cond": round(st.mean(st.mean(C[q]) for q in qs), 4),
+         "mean_artifact": round(st.mean(sel[q][1] for q in qs), 4),
+         "cond_minus_iid": round(abs_eff, 4), "ci_iid": [l1, h1],
+         "cond_minus_artifact": round(st.mean(da), 4), "ci_art": [l2, h2],
+         "relative_sink": round(rel_eff, 4), "ci_relative": [lr, hr],
+         "ladder_reference": {"1.5B_abs": ref_abs, "1.5B_rel": ref_rel,
+                              "3B_rel": -0.079, "7B_rel": -0.011},
+         "below_both_nulls": sink, "shallower_than_1p5b_absolute": bool(shallower_abs),
+         "shallower_than_1p5b_relative": bool(shallower_rel),
+         "parse_iid": round(parse["iid"], 4), "parse_cond": round(parse["cond"], 4),
+         "parse_gap": round(parse["cond"] - parse["iid"], 4),
+         "gates": {"void": void, "off_target": off},
+         "branch": branch, "stack": _stack_block()}, indent=2))
+    print("wrote artifacts/h23_bottom.json")
+
+
 # --- Phase 20: the PAIRED twin-vs-sibling cell ([PHASE_20.md]) ---
 
 P20_SEED = 337
