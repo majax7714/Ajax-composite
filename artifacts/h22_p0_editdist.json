@@ -1,0 +1,64 @@
+{
+  "_label": "Phase 22 P0 \u2014 anchoring in string space (exploratory) [PHASE_22.md] \u00a76",
+  "_exploratory": true,
+  "n": 56,
+  "source_arms": "j22_* (seed 401)",
+  "metric": "line-level difflib ratio to own selected artifact; PULL = (sim_cond - sim_iid) / (1 - sim_iid)",
+  "predictions": {
+    "P1_copy_identity_order": [
+      "deepseek1p3b",
+      "starcoder2_3b",
+      "general1p5b",
+      "coder1p5b"
+    ],
+    "P2_compression_b_order": [
+      "starcoder2_3b",
+      "deepseek1p3b",
+      "coder1p5b",
+      "general1p5b"
+    ],
+    "P3_all_positive_and_nonqwen_above_qwen": true,
+    "P4_spearman_pull_vs_b_at_least": 0.5
+  },
+  "cells": {
+    "coder1p5b": {
+      "sim_iid": 0.13588389288956326,
+      "sim_cond": 0.4936437741406243,
+      "pull": 0.41781471583799423,
+      "n": 56,
+      "pull_se": 0.02986732630105523
+    },
+    "general1p5b": {
+      "sim_iid": 0.13864432464094475,
+      "sim_cond": 0.5154495589498291,
+      "pull": 0.435065310642175,
+      "n": 56,
+      "pull_se": 0.034974208923691824
+    },
+    "deepseek1p3b": {
+      "sim_iid": 0.11773659541566828,
+      "sim_cond": 0.7881527932082897,
+      "pull": 0.7636522778447906,
+      "n": 56,
+      "pull_se": 0.019236681657208602
+    },
+    "starcoder2_3b": {
+      "sim_iid": 0.0940090513794973,
+      "sim_cond": 0.653328794165745,
+      "pull": 0.6225676290312967,
+      "n": 56,
+      "pull_se": 0.021109507629878684
+    }
+  },
+  "pull_order": [
+    "deepseek1p3b",
+    "starcoder2_3b",
+    "general1p5b",
+    "coder1p5b"
+  ],
+  "spearman_pull_vs_b": 0.6,
+  "spearman_pull_vs_identity": 1.0,
+  "void_cells": [
+    "starcoder2_3b"
+  ]
+}

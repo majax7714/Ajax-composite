@@ -400,3 +400,77 @@ one question. (ii) **Test the §5.6 hypothesis directly:** measure per-candidate
 to the artifact across all four models at match, on committed data, at **$0**. If DeepSeek's
 apparent cleanliness is more faithful copying rather than more resistance, that reframes the
 family question instead of merely re-powering it — and the data to check it is already on disk.
+
+---
+
+## 6. P0 RESULT ($0) — the family difference in *sinking* may be a family difference in *copying*
+
+*Exploratory per §10; moves no claim. Script and both competing predictions committed at
+`6b6cb57` **before** it ran. Artifact `artifacts/h22_p0_editdist.json`.*
+
+Per problem, line-level similarity between each candidate and that model's own selected
+artifact, both arms. The i.i.d. arm is the baseline — what the model writes without having
+seen the artifact. **PULL = (sim_cond − sim_iid) / (1 − sim_iid)**: the fraction of available
+string distance that conditioning closes. The compression law's *b*, in string space.
+
+| model | sim i.i.d. | sim cond | **PULL** | cond−art (§5.2) |
+|---|---|---|---|---|
+| Coder-1.5B | 0.1359 | 0.4936 | **+0.418 ± 0.030** | −0.0377 |
+| general-Qwen-1.5B | 0.1386 | 0.5154 | **+0.435 ± 0.035** | −0.0240 |
+| **DeepSeek-1.3B** | 0.1177 | **0.7882** | **+0.764 ± 0.019** | **−0.0124** |
+| StarCoder2-3B *(void)* | 0.0940 | 0.6533 | +0.623 ± 0.021 | −0.0322 |
+
+**The prediction that came from the incidental observation won outright.** PULL reproduces the
+**copy-identity ordering exactly** — Spearman **+1.000** — and correlates with the committed
+compression slopes at **+0.600**, clearing the pre-registered ≥ +0.5. P3 holds: every PULL is
+positive and both non-Qwen models exceed both Qwen models.
+
+**DeepSeek copies nearly twice as hard as its Coder counterpart.** +0.764 vs +0.418, a gap of
+**+0.346 ≈ 9.7 SE**. Its conditioned output is **79% line-similar to the artifact it was
+shown**; Coder-1.5B's is 49%.
+
+### 6.1 Why this reframes the whole family question
+
+The sink criterion requires a model to fall below **both** nulls — its own i.i.d. *and* the
+artifact. **A model that copies the artifact faithfully lands AT the artifact**, so its
+cond−artifact distance goes to zero and it cannot be "below both" almost by construction.
+
+Among the three non-void cells the relationship is monotone with no exceptions: PULL 0.418 /
+0.435 / 0.764 against cond−art −0.0377 / −0.0240 / −0.0124. **The harder a model copies, the
+less it sinks** — and DeepSeek, the record's one persistently "clean" family, is the hardest
+copier in the set by a wide margin.
+
+So the live hypothesis is no longer *"DeepSeek resists the pathology."* It is:
+
+> **DeepSeek is not resisting the artifact — it is copying it. Its "clean" verdict is a
+> consequence of copying fidelity, not of robustness.**
+
+That is the **opposite** reading of the same data, and it dissolves the family question rather
+than answering it: "which families sink" may have been measuring "which families copy," a
+property with no obvious bearing on reasoning degradation at all.
+
+### 6.2 What would kill this, stated now
+
+The account is coherent, large, and **exploratory on n = 3–4 models**. It is a correlation
+across four points measured on one set of runs, and four points can be ordered by many things.
+It does not establish that copying *causes* the clean verdict. Two cheap tests would move it:
+
+1. **Within-model, across problems.** If the account is right, problems where a model copies
+   harder should be problems where it sinks less — a per-problem correlation inside each cell,
+   available on committed data at **$0**. A null there would be strong evidence against.
+2. **Force the copy.** Condition on an artifact while instructing divergence, or vary artifact
+   quality: if cleanliness tracks copying rather than family, a high-copy Qwen cell should look
+   as clean as DeepSeek.
+
+Until at least (1) runs, this is the most interesting thing on the page and it is **not a
+finding.**
+
+### 6.3 A note on the generation-template hash
+
+`gen_template_hash` moved from `1e43a51cdc2cc3b5` (Phase 21) to `808966428bb668ad` (Phase 22).
+**The prompt and sampling parameters are byte-identical** — verified by diff: the only changes
+to `h1_gen_lcb` are the `emit_meta` parameter, a comment, and the metadata return branch. The
+hash covers the function source, so it moved for a reason unrelated to what the model sees.
+Recorded because a future reader comparing two hashes would otherwise be right to suspect an
+undocumented instrument change, and this record's whole defence against silent drift is that
+such things are written down rather than noticed later.
