@@ -1189,6 +1189,37 @@ Recorded here so the Index is also the map of what is *deliberately not being ru
   near **−0.036**, which **n = 56 already resolves**. The cell is feasible; what must be fixed
   is the **instrument**, not the power. The −0.036 is a two-point extrapolation off an
   uninstrumented arm: **design input only, never citable as a result**.]**]**
+- **⚠ IS DeepSeek CLEAN AT ALL? — the top open item *(new 2026-07-27, Phase 22
+  [PHASE_22.md] §5.3)*.** The "Qwen-base" shape that survived Phase 20 rests entirely on
+  DeepSeek not sinking. Phase 22, on a fresh seed with a validated instrument, returns
+  cond−iid **−0.0201, CI [−0.0437, +0.0008]** — clean by the frozen rule and by **0.0008**.
+  Against the copy null it **is** down (−0.0124, CI [−0.0215,−0.0041], excludes zero). The
+  **pre-registered** parse-only scoring returns −0.0223, CI [−0.0454,−0.0006], which
+  **excludes zero and makes it a sink**. And the interval reaches −0.0437, past the
+  pre-registered MDE, so the null is **uninformative**: this data cannot exclude a −0.04
+  effect. *What would settle it:* DeepSeek at MDE ≈0.020 needs **n ≈ 200**, i.e. a donor pool
+  more than twice the current 80 problems — the first question in this record that the
+  existing instrument cannot answer by any amount of care, only by being enlarged. Until
+  then **no claim may rest on DeepSeek being clean**, which includes the Qwen-base reading.
+- **⚠ THE COMPRESSION LAW'S INTERCEPTS ARE UNRELIABLE UNDER EXTRAPOLATION *(new 2026-07-27,
+  Phase 22 §5.4)*.** The intercept table took its first miss: DeepSeek predicted **+0.011**,
+  measured **−0.0201**, prediction outside the interval. The cause was already recorded — that
+  intercept was extrapolated from a cell sitting at Δ_art **+0.0499**, and it is precisely the
+  intercept derived furthest from its own cell's centre that failed. Phase 22 also measures
+  DeepSeek's slope **at true match** at ≈**1.0** (1.061 high-copy / 0.924 low-copy) against the
+  battery's extrapolated 0.784. **The slope survives; every intercept estimated off-match is
+  now suspect** and should be re-derived from at-match cells where they exist.
+- **⚠ WHY DOES COPYING ORDER THE MODELS WHEN IT DOES NOT ORDER THE PROBLEMS? *(new
+  2026-07-27, Phase 22 §6–§7)*.** String-space PULL — the fraction of line-level distance
+  conditioning closes — orders the four models **exactly** as seed-to-seed copy-identity does
+  (ρ **+1.000**) and correlates with committed compression slopes at +0.600; DeepSeek copies
+  nearly **twice** as hard as Coder-1.5B (+0.764 vs +0.418, ≈9.7 SE). The obvious mechanism —
+  that cleanliness *is* copying fidelity — was **tested and withdrawn the same day**: within
+  models, the intercept is flat across DeepSeek's copy split (Δ 0.0003) and **reversed** in
+  general-Qwen. So a large, clean between-model regularity is **not mediated problem-by-
+  problem**, and either operates at a level this design cannot see or is a four-point
+  coincidence. Cheap next step: more models, since the whole measurement is $0 on committed
+  arms and the current n is 4.
 - **⚠ IS StarCoder2's COMPRESSION INTERCEPT BIASED TOWARD ZERO? *(new 2026-07-26, Phase 21
   §5.3)*.** StarCoder2-3B returns **empty completions on 3.7% of unconditioned prompts** and
   far fewer once conditioned (parse 0.9308 vs 0.9874). Empty generations score 0, so its
