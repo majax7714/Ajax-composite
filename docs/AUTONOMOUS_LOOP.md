@@ -312,3 +312,34 @@ such. (Recorded honestly: the Huang et al. entry was grounded by fetching the pa
 abstract page and a second failed fetch is on the record — the Self-Refine abstract does
 **not** contain the small-model limitation the search summary implied, so that half of the
 claim rests on secondary summaries and is marked accordingly.)
+
+---
+
+### Amendment 6 (2026-07-26) — the budget ceiling, corrected by the author
+
+**Author instruction, verbatim in substance:** the $100 report / $120 hard stop were *"a
+sanity check for you"*, not a real constraint; *"the only actual hard stop is the $200 for
+the Modal account,"* with authority to raise the working ceiling to **$110–130**.
+
+**What changes.**
+
+- **Working report threshold: $130.** At or above it, report to the author before further
+  paid spend.
+- **Hard stop: $200** — the Modal account limit. This one is external and real; it is not
+  raiseable by the loop under any circumstance, including a phase mid-flight.
+- **§4's within-$30-of-cap guard now measures against $200**, not $120.
+- Amendment 2's cost method is **unchanged and reaffirmed**: cost is the **MTD aggregate
+  delta**, which needs one month-to-date figure. See §8 entry 14 — the loop declared a cost
+  unmeasurable on the same day this amendment was written, while that method sat in this
+  document unconsulted.
+
+**What does not change, and why it is worth saying.** A raised ceiling is not a licence to
+spend more per phase. Every phase still pre-registers a cost estimate and reconciles the
+measured figure against it, and an overrun is still a recorded miss — Phase 21 posted the
+first one in eleven phases ($2.87 against $1.60–2.80) *in the same close that raised this
+ceiling*. The estimate discipline is what makes the ceiling almost never bind; loosening the
+ceiling while loosening the estimates would remove the only mechanism that has kept twelve
+phases inside roughly $12 total.
+
+**Standing carve-out retained (Amendment 1 / the flag-over-literal rule).** Real money still
+gets author sign-off when a phase's estimate exceeds **$10**, regardless of headroom.

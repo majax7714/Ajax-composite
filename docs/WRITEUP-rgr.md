@@ -2115,19 +2115,30 @@ Run-loss modes are spend-loss modes; hardening is cheaper than any single recurr
     who would now rewrite this criterion has already seen the numbers the rewrite would
     license. The corrected gate therefore belongs in a **new pre-registration**, and Phase 21
     stays killed — a criterion re-specified after seeing its result is not a criterion.
-14. **The cost measurement was lost, breaking a ten-phase streak *(appended 2026-07-26,
-    Phase 21 — [PHASE_21.md] §5.5)*.** Every phase since Phase 11 closed with a **measured**
-    Modal cost reconciled against its pre-registered estimate. Phase 21 closes with a
-    **derivation** (≈$2.44 from Phase 18's calibrated $/generation, inside the $1.60–2.80
-    band) because `modal billing report` needs workspace credentials the analysis shell does
-    not hold: the detached run inherited them from the launching shell's environment, there
-    is no `~/.modal.toml`, and shell state does not persist between tool calls. The gap is
-    small in dollars and total in kind — an estimate that lands inside its own band is not
-    evidence that the band was right, which is the entire purpose of the reconciliation.
-    *Practice:* **capture the billing snapshot in the same shell that launches the run, before
-    it exits — a cost that can only be measured from a shell you no longer have is not
-    measurable.** *Class:* not a mis-specified decision quantity; a lost measurement, the
-    first in the ledger.
+14. **A measurement declared impossible while the record's own method for it stood unused
+    *(appended 2026-07-26, Phase 21 — [PHASE_21.md] §5.5; **rewritten same day**, see below)*.**
+    Phase 21 first closed by recording its cost as **unmeasurable**, substituting a derivation
+    (≈$2.44 from Phase 18's per-generation rate) on the grounds that `modal billing report`
+    needs workspace credentials the analysis shell does not hold — the detached run inherited
+    them from the launching shell, there is no `~/.modal.toml`, and shell state does not
+    persist between tool calls. Every part of that was true. **It was also beside the point:
+    [AUTONOMOUS_LOOP.md] Amendment 2 defines this record's cost measurement as the MTD
+    aggregate delta** — Phase 20's own close reads "MTD aggregate delta $85.40 → $86.83" —
+    which requires **one** month-to-date figure, not a per-run billing query. Supplied with
+    that figure ($89.70), the cost measured **$2.87** immediately, and turned out to be the
+    record's **first overrun in eleven phases** ($1.60–2.80 pre-registered), caused by the
+    four-way feasibility holding at n=56 against a charter sized for n≈45. So the failure was
+    not a lost measurement; **it was reaching for a tool while the method sat in the frozen
+    spec**, and it cost more than a number: it briefly converted a falsifiable overrun into an
+    unfalsifiable "inside the band," which is the direction of error that flatters. *Caught
+    by:* the author supplying the MTD figure rather than the per-run one that had been asked
+    for. *Practice:* **when an instrument is unavailable, re-read the spec for the method
+    before declaring the quantity unmeasurable — a missing tool is not a missing method.**
+    Secondary: capture the billing snapshot in the shell that launches the run, so the
+    preferred path stays open. *Class:* not a mis-specified decision quantity and not a lost
+    measurement; **a procedure the record already owned and did not consult** — the first of
+    its kind here, and the one most likely to recur, since it fails silently and produces a
+    plausible number.
 
 ## 9. Phase 3R — auditing the two live claims, and the anchoring mechanism
 

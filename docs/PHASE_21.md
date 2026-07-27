@@ -273,16 +273,28 @@ particular instance of it appears unpre-empted.
 Generations: 3,840 (two k=24 sweeps) + 10,752 (eight arms × 56 × 24) = **14,592**. The charter
 projected ~12,500 assuming n ≈ 45; the four-way held at n = 56, **17% above plan**.
 
-**Derived** cost at Phase 18's calibrated rate ($1.06 / 6,336 gens of 1.5B-class):
-**≈ $2.44**, inside the pre-registered $1.60–2.80 band, near its top as the extra n and the
-3B rung both predict.
+**Cost $2.87** — MTD aggregate delta **$86.83 → $89.70** (Amendment 2's standing convention,
+the same method every prior phase used), against a pre-registered **$1.60–2.80**.
 
-**This is a derivation, not a measurement, and the distinction is the point.** The billing
-query needs workspace credentials that the analysis shell does not hold (the detached run
-inherited them from the launching shell; there is no `~/.modal.toml`). Ten consecutive phases
-have carried a *measured* cost; this one does not. To stamp it:
-`modal billing report --for "this month" --json`. Until then the figure above is an estimate
-wearing no disguise.
+**This is an OVERRUN, the first in eleven phases**, by $0.07 / 2.5% above the top of the band.
+Cause is identified and was visible in the run: the charter sized the estimate at n ≈ 45 and
+the four-way feasibility held at **n = 56**, putting 17% more generations through the arms
+than planned. The estimate was right about the per-generation economics and wrong about the
+design's own success — a cell that clears its feasibility bar by more than expected costs
+more than expected. Worth stating because ten calibrated estimates in a row is exactly the
+condition under which one stops sanity-checking the input assumptions.
+
+*Cross-check.* Author-reported spend for 2026-07-26 is **$5.80**; Phase 20 measured $1.43 and
+Phase 21 $2.87 = $4.30, leaving ~$1.50 for the same-day Phase-20 prerequisites (the
+general-Qwen k=24 sweep and the j8 arms, 11:04–11:55). Consistent.
+
+*An initial claim in this section was wrong and is corrected rather than removed.* This phase
+first recorded the cost as **unmeasurable** (≈$2.44 derived from Phase 18's per-generation
+rate) on the grounds that `modal billing report` needs workspace credentials the analysis
+shell does not hold. That was a real limitation and an irrelevant one: **Amendment 2 defines
+this record's cost measurement as the MTD aggregate delta**, which needs a single MTD figure,
+not a per-run billing query. The tool was missing; the method was not. See §8 entry 14, which
+is rewritten around that distinction.
 
 ### 5.6 What this phase settles, and what it does not
 
