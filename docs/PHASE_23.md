@@ -247,3 +247,17 @@ Phases 20, 21 and 22 each committed an independent verifier **before** any resul
 **Phase 23 did not.** The re-derivation in §5.1 was run *after* the artifact landed — it agrees
 to four decimals, but a check written after seeing the answer is worth strictly less than one
 written before, and the record should not pretend otherwise. Logged as **§8 entry 17**.
+
+### 5.4 Write-up surfaces — Amendment 4a compliance
+
+| # | surface | disposition |
+|---|---|---|
+| 1 | phase doc RESULT | **updated** — §5 |
+| 2 | §9.x addendum | **deliberately unchanged** — no claim status moved; the durable content is a criterion defect and landed in §8 entries 16–17 |
+| 3 | §0 index rows | **deliberately unchanged** — branch C is an underpowered null and moves no status |
+| 4 | §0.3 evidence rows | **updated** — rows 8 and 11 carry the P23 marker and the instruction to read every clean verdict with both leg widths and the MDE |
+| 5 | §0.4 open successors | **updated** — the DeepSeek item sharpened: its artifact leg excludes zero, so it is below the copy null and clean only on the noisier leg |
+| 6 | living-record line | **updated** — Phase 23 banner led by entry 16 rather than by the rung |
+| 7 | abstract banner chain | **deliberately unchanged** — no claim status moved. Recorded so the skip is visible |
+| 8 | `README.md` | **updated** — row 23 and the status block |
+| 9 | §8 ledger entry | **updated** — entries **16** (leg asymmetry) and **17** (skipped verifier) |

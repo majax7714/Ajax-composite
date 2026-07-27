@@ -115,32 +115,26 @@ far harder than *DeepSeek* — which points at the **Qwen base** rather than the
 and is a hypothesis rather than a measurement. The record does not rewrite the claim to it.
 Two cheap cells would settle the shape, and the loop stopped to say so rather than run them.
 
-**Current status (2026-07-27): Phase 22 reopened the family question rather than closing it.**
-The per-cell criterion that Phase 21's failure forced into the spec worked on first use — the
-same StarCoder2 instrument failure that voided *all* of Phase 21 voided **one cell**, and three
-adjudicated. The reference model reproduced its known value, so the instrument is validated.
+**Current status (2026-07-27): a phase about one small model turned into a finding about the
+project's own yardstick.** Phase 23 measured Coder-0.5B at true match — the oldest open rung,
+untouched since Phase 7. It came back *not sinking*, and the pre-written branch text called that
+"a hard lower edge." **That text is not supported and the record says so**: at n=31 the interval
+is wide enough to contain effects larger than the one measured at 1.5B, so it is an underpowered
+null, and the phase cannot tell its own three outcomes apart.
 
-**The favoured hypothesis did not fire.** "DeepSeek is the exception" was priced at 55%.
-DeepSeek escapes the sink verdict by **0.0008** — against the copy null it *is* down, and the
-scoring convention committed in advance as a secondary flips it to sinking outright. Its
-interval cannot even exclude the effect it is being used to deny. Both Qwen models sink. The
-compression law's intercept table took its **first miss**, on precisely the entry the record
-had already flagged as an extrapolation.
+**The result worth having came from asking why.** The project's central test asks whether a model
+falls below *both* a copy of the code it was shown *and* its own unaided baseline. Those two
+comparisons are not equally hard to make: one is measured against a fixed, exactly-known number,
+the other against a second estimate carrying its own noise. Across all six comparable cells, the
+noisier side is wider every time. And of the three models this project has ever called "clean,"
+**two are measurably worse than the code they were shown** — they escaped the verdict only
+because the noisier side could not resolve them. The third was already proven wrong a phase
+later by a better-powered design.
 
-**StarCoder2 turned out to be outside this harness's domain — with citations.** A
-pre-registered literature check found its own authors documenting that base models do "very
-poorly" on instruction-style prompts, with a third of output incomplete. We had applied a
-prompt format the model's authors call unsuitable; better to learn that from a search than to
-publish it.
-
-**Two pieces of free work, one durable and one dead.** Durable: conditioning **collapses output
-entropy** — two independent seeds produce the identical candidate string 0.15% of the time
-unconditioned and up to **29%** once an artifact is in the prompt, and an independent
-string-distance measure reproduces that ordering exactly. Dead: the tempting mechanism that a
-model's apparent cleanliness *is* its copying fidelity. It was the most interesting idea on the
-page; the test designed to kill it, with its null reading stated in advance, killed it within
-the hour — and exposed that the test's own pass threshold had counted a cell the phase had
-already voided, which is now ledger entry 15.
+So **"clean" here has systematically meant "we could not resolve it," not "nothing happened"** —
+which changes how every such verdict in the record should be read, including the one this phase
+just produced. Also logged: this phase shipped without the independent verifier the three before
+it committed in advance, a skipped control recorded rather than glossed.
 
 ## Map of the composite
 
@@ -177,6 +171,7 @@ first iteration, with its amendments dated on the page.*
 | 20 | [PHASE_20.md](docs/PHASE_20.md) | **The paired cell that refuted the record's own family claim.** Both models measured at their own true match on the *same* problems — possible only by sharing the problem and varying the artifact, since the two models differ in quality. The **architecture twin**, a *non-Coder* model differing from its Coder sibling only in the continued-pretraining stage, **sinks at true match** (−0.0372, below both nulls, both CIs excluding zero) and is **indistinguishable from the sibling** (+0.0088 ± 0.0157, p 0.57). The family-contrast leg of the record's central claim is dead as stated. Both earlier cells that called the twin clean are explained: one sat where compression cancels the effect, the other had an MDE twice the effect and returned a false negative — flagged as a ledger entry one phase before it was demonstrated. **Loop halted for author review** |
 | 21 | [PHASE_21.md](docs/PHASE_21.md) | **A phase killed by its own gate — and the gate fired against the hypothesis the charter favoured.** Four models placed at their own true match on ONE shared problem set (n=56, every cell within ±0.006 of match; per-model artifact selection verified not to collapse). `starcoder2_3b_iid` parsed 0.9308 against a frozen ≥0.95 threshold → **branch D, no adjudication**. Diagnosis run rather than argued with: 50 of 93 failures are *empty* completions, all unconditioned; a decode-corruption hypothesis was tested and **rejected**; the real quantity is the **between-arm** parse gap (+5.7pp vs ≤1.1pp for every other model), which biases cond−iid toward "clean" because empties score 0. Also the first live test of the fix for §8 entry 11 — the branch expression consulted its own kill criteria instead of printing and ignoring them. Measured-not-adjudicated numbers are committed and *not* cited; the corrected per-cell gate needs a new pre-registration, because the author who would write it has now seen the numbers it would license. Two ledger entries (13: criterion at the wrong granularity and on the wrong quantity; 14: cost measurement lost, ≈$2.44 derived not measured). |
 | 22 | [PHASE_22.md](docs/PHASE_22.md) | **The favoured hypothesis lost, and the free work outran the paid work.** Same four models, fresh seed, per-cell kill criteria — the fix forced by Phase 21's failure, working on first use: one cell voided instead of the phase, three adjudicated, reference model reproduced its known value. **Branch C (55%) did not fire.** DeepSeek escapes the sink verdict by **0.0008**, is *below* the copy null (CI excludes zero), and **flips to sinking** under the alternate scoring committed before the run — while its interval cannot exclude the effect it is used to deny. Both Qwen models sink. First **miss** in the compression-law intercept table, on the one entry already flagged as extrapolated. StarCoder2 ruled outside the harness's domain **with citations** from its own authors, found by a pre-registered literature check. Free ($0): conditioning **collapses output entropy** (0.15% → 29% seed-to-seed string identity) and string-distance PULL reproduces that ordering exactly (ρ +1.000, DeepSeek +0.764 vs Coder +0.418). Also free: the mechanism those results suggested — cleanliness *is* copying — was **withdrawn within the hour** by the test built to kill it, which in turn exposed ledger entry 15, the first mis-specification here that would have produced a false positive in the record's own favour. |
+| 23 | [PHASE_23.md](docs/PHASE_23.md) | **The cheapest phase in the record found the biggest problem with it.** Coder-0.5B at true match, closing a rung open since Phase 7: it does not sink — but at n=31 that null cannot exclude an effect bigger than the one measured at 1.5B, so the branch's own "hard lower edge" text is disowned and the question stays open. Asking which half of the verdict produced it exposed that the project's central criterion is a **conjunction of two unequally-powered comparisons** — the i.i.d. leg is wider in all six cells — and that **two of three "clean" models are in fact below the copy null**, clean only because the noisier leg failed. Ledger entry 16, the most consequential yet: it does not affect one phase, it re-reads every clean verdict in the record. Entry 17 records that this phase skipped the pre-committed verifier its three predecessors established. Cost $0.67, inside band. |
 
 ## How to read
 
