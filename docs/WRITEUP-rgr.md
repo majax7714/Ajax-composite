@@ -1189,6 +1189,25 @@ Recorded here so the Index is also the map of what is *deliberately not being ru
   near **−0.036**, which **n = 56 already resolves**. The cell is feasible; what must be fixed
   is the **instrument**, not the power. The −0.036 is a two-point extrapolation off an
   uninstrumented arm: **design input only, never citable as a result**.]**]**
+- **⚠ EVERY FAMILY CONTRAST IS CONFOUNDED FOUR WAYS — and the one clean contrast is null
+  *(new 2026-07-27, [ARCHITECTURE_AUDIT.md])*.** Attention scheme (GQA 12q/2kv vs MHA 16 vs
+  GQA+sliding-window), vocabulary (151,646 vs 32,000 vs 49,152), embedding tying, and
+  depth/width **all move together with "family."** No cell in this record separates them. The
+  only architecturally clean contrast ever run — Coder-1.5B vs its twin, identical everything
+  but the continued-pretraining stage — came back **null** (Phase 20, +0.0088 ± 0.0157). So
+  *the one clean comparison finds no difference and every comparison finding a difference is
+  confounded.* **Consequence: do NOT buy the n≈200 DeepSeek cell** — it would resolve a
+  four-way-confounded contrast at real cost and could not attribute whatever it returned.
+- **⚠ H-EMBED — the scale boundary may be an EMBEDDING-FRACTION boundary *(new 2026-07-27,
+  [ARCHITECTURE_AUDIT.md] §3)*.** Embedding parameters as a share of total: Coder-0.5B ≈28%,
+  Coder-1.5B and general-Qwen-1.5B ≈15%, Coder-3B ≈10%, Coder-7B ≈7%, StarCoder2-3B ≈5%,
+  DeepSeek-1.3B ≈5%, phi-1 ≈8%. **Every model at ≥10% sinks; every model at ≤7% is clean or
+  ambiguous.** That separates the data better than family (killed in Phase 20) and better than
+  raw scale (DeepSeek-1.3B is *smaller* than Coder-1.5B and does not sink). **Sharp prediction:
+  Coder-0.5B at ≈28% should sink hardest of any cell in the record** — and it is a Qwen-Coder
+  model, so family, diet, tokenizer and prompt are all held fixed while the proposed variable
+  is pushed to its extreme. Post-hoc ordering over eight points with hand-computed numbers:
+  a hypothesis for pre-registration, **not a finding**.
 - **⚠ IS DeepSeek CLEAN AT ALL? — the top open item *(new 2026-07-27, Phase 22
   [PHASE_22.md] §5.3)*.** The "Qwen-base" shape that survived Phase 20 rests entirely on
   DeepSeek not sinking. Phase 22, on a fresh seed with a validated instrument, returns
@@ -1228,7 +1247,16 @@ Recorded here so the Index is also the map of what is *deliberately not being ru
   survives is a dissociation and a universal:** PULL is positive in all eight cells
   (+0.163 to +0.764), so conditioning always drags output toward the artifact in string space —
   but how hard it pulls **does not predict degradation**. String-space copying and pass-rate
-  degradation are separate axes.]**
+  degradation are separate axes.]**  **[FURTHER, 2026-07-27 — [ARCHITECTURE_AUDIT.md] §2: the
+  cross-family PULL ordering is CONFOUNDED WITH TOKENIZATION and withdrawn as a model-level
+  claim.** Tokens-per-character of committed code under each model's own tokenizer:
+  DeepSeek 0.3935 → PULL +0.764; StarCoder2 0.3590 → +0.623; both Qwen models 0.3164 →
+  +0.418/+0.435. **Spearman(tokens/char, PULL) = +1.000**, and the two models with *identical*
+  tokenizers land adjacent, exactly as the confound predicts. Finer tokenization means each
+  copy step is a shorter prediction, so PULL is rank-indistinguishable from a tokenizer
+  property. The **universal survives** (all eight cells positive); the **ordering does not**.
+  n=4 over 3 distinct tokenizers is weak and phi-1 breaks it (+0.163 on a ~51k vocab) — the
+  weight is carried by the identical-tokenizer pair.]**
 - **⚠ IS StarCoder2's COMPRESSION INTERCEPT BIASED TOWARD ZERO? *(new 2026-07-26, Phase 21
   §5.3)*.** StarCoder2-3B returns **empty completions on 3.7% of unconditioned prompts** and
   far fewer once conditioned (parse 0.9308 vs 0.9874). Empty generations score 0, so its
