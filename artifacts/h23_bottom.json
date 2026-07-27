@@ -1,0 +1,57 @@
+{
+  "_label": "Phase 23 \u2014 Coder-0.5B at true match [PHASE_23.md]",
+  "prereg_commit": "2b845cb",
+  "seed": 433,
+  "k": 24,
+  "n": 31,
+  "min_iid": 0.08,
+  "dropped_no_headroom": 32,
+  "dropped_no_artifact": 17,
+  "achieved_delta_art": 0.0018,
+  "mean_iid": 0.2919,
+  "mean_cond": 0.2682,
+  "mean_artifact": 0.3168,
+  "cond_minus_iid": -0.0236,
+  "ci_iid": [
+    -0.0575,
+    0.009
+  ],
+  "cond_minus_artifact": -0.0485,
+  "ci_art": [
+    -0.0773,
+    -0.0225
+  ],
+  "relative_sink": -0.0211,
+  "ci_relative": [
+    -0.1865,
+    0.1631
+  ],
+  "ladder_reference": {
+    "1.5B_abs": -0.045,
+    "1.5B_rel": -0.136,
+    "3B_rel": -0.079,
+    "7B_rel": -0.011
+  },
+  "below_both_nulls": false,
+  "shallower_than_1p5b_absolute": true,
+  "shallower_than_1p5b_relative": true,
+  "parse_iid": 0.9772,
+  "parse_cond": 0.9892,
+  "parse_gap": 0.0121,
+  "gates": {
+    "void": false,
+    "off_target": false
+  },
+  "branch": "C \u2014 DOES NOT SINK: a HARD lower edge. The highest embedding fraction in the record is clean, and a model too weak to use an artifact is not dragged down by one",
+  "stack": {
+    "gpu_name": "NVIDIA L4",
+    "gpu_capability": "8.9",
+    "dtype": "bfloat16",
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8",
+    "vllm": "0.11.0",
+    "gen_template_hash": "808966428bb668ad",
+    "d2c_context_hash": "b9323ddf1a9b253d",
+    "judge_hash": "dbd4f9fa650a6a2f"
+  }
+}
