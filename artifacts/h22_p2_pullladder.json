@@ -1,0 +1,109 @@
+{
+  "_label": "Phase 22 P2 \u2014 PULL across eight committed cells (exploratory) [PHASE_22.md] \u00a78",
+  "_exploratory": true,
+  "predictions": {
+    "R1_coder7b_pulls_hardest_in_family": true,
+    "R2_spearman_pull_vs_cond_art_at_least": 0.5,
+    "R3_all_pull_positive": true
+  },
+  "cells": {
+    "P11 coder1p5b": {
+      "sim_iid": 0.1323,
+      "sim_cond": 0.5668,
+      "pull": 0.5061,
+      "pull_se": 0.0349,
+      "n": 44,
+      "cond_artifact": -0.052,
+      "void": false,
+      "sub_threshold": false
+    },
+    "P11 coder3b": {
+      "sim_iid": 0.1476,
+      "sim_cond": 0.6281,
+      "pull": 0.5641,
+      "pull_se": 0.0362,
+      "n": 39,
+      "cond_artifact": -0.051,
+      "void": false,
+      "sub_threshold": false
+    },
+    "P11 general1p5b": {
+      "sim_iid": 0.118,
+      "sim_cond": 0.5557,
+      "pull": 0.5016,
+      "pull_se": 0.0365,
+      "n": 54,
+      "cond_artifact": -0.019,
+      "void": false,
+      "sub_threshold": false
+    },
+    "R5 coder7b": {
+      "sim_iid": 0.154,
+      "sim_cond": 0.4977,
+      "pull": 0.4084,
+      "pull_se": 0.0405,
+      "n": 29,
+      "cond_artifact": -0.008,
+      "void": false,
+      "sub_threshold": false
+    },
+    "C3 phi1": {
+      "sim_iid": 0.08,
+      "sim_cond": 0.2286,
+      "pull": 0.163,
+      "pull_se": 0.0272,
+      "n": 47,
+      "cond_artifact": -0.042,
+      "void": false,
+      "sub_threshold": true
+    },
+    "P22 coder1p5b": {
+      "sim_iid": 0.1359,
+      "sim_cond": 0.4936,
+      "pull": 0.4178,
+      "pull_se": 0.0299,
+      "n": 56,
+      "cond_artifact": -0.0377,
+      "void": false,
+      "sub_threshold": false
+    },
+    "P22 general1p5b": {
+      "sim_iid": 0.1386,
+      "sim_cond": 0.5154,
+      "pull": 0.4351,
+      "pull_se": 0.035,
+      "n": 56,
+      "cond_artifact": -0.024,
+      "void": false,
+      "sub_threshold": false
+    },
+    "P22 deepseek1p3b": {
+      "sim_iid": 0.1177,
+      "sim_cond": 0.7882,
+      "pull": 0.7637,
+      "pull_se": 0.0192,
+      "n": 56,
+      "cond_artifact": -0.0124,
+      "void": false,
+      "sub_threshold": false
+    },
+    "P22 starcoder2_3b": {
+      "sim_iid": 0.094,
+      "sim_cond": 0.6533,
+      "pull": 0.6226,
+      "pull_se": 0.0211,
+      "n": 56,
+      "cond_artifact": -0.0322,
+      "void": true,
+      "sub_threshold": false
+    }
+  },
+  "R1_ladder": {
+    "P11 coder1p5b": 0.5061,
+    "P11 coder3b": 0.5641,
+    "R5 coder7b": 0.4084
+  },
+  "R1_pass": false,
+  "R2_spearman": -0.119,
+  "R3_pass": true
+}

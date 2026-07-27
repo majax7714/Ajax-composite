@@ -547,3 +547,73 @@ hypothesis was.
 | 7 | abstract banner chain | **deliberately unchanged** — no claim status moved. Recorded so the skip is visible |
 | 8 | `README.md` | **updated** — row 22 and the status block |
 | 9 | §8 ledger entry | **updated** — entry **15** (threshold counted a voided cell) |
+
+---
+
+## 8. P2 RESULT ($0) — the copying account is dead, and the four-point correlation was a coincidence
+
+*Exploratory per §10. Script and predictions committed before running. Artifact
+`artifacts/h22_p2_pullladder.json`.*
+
+| cell | sim i.i.d. | sim cond | **PULL** | n | cond−art | status |
+|---|---|---|---|---|---|---|
+| P11 Coder-1.5B | 0.1323 | 0.5668 | **+0.506 ± 0.035** | 44 | −0.052 | SINKS |
+| P11 Coder-3B | 0.1476 | 0.6281 | **+0.564 ± 0.036** | 39 | −0.051 | SINKS |
+| **R5 Coder-7B** | 0.1540 | 0.4977 | **+0.408 ± 0.041** | 29 | −0.008 | **CLEAN** |
+| P11 general-Qwen-1.5B | 0.1180 | 0.5557 | +0.502 ± 0.037 | 54 | −0.019 | |
+| C3 phi-1 | 0.0800 | 0.2286 | **+0.163 ± 0.027** | 47 | −0.042 | sub-threshold sink |
+| P22 Coder-1.5B | 0.1359 | 0.4936 | +0.418 ± 0.030 | 56 | −0.038 | SINKS |
+| P22 general-Qwen-1.5B | 0.1386 | 0.5154 | +0.435 ± 0.035 | 56 | −0.024 | SINKS |
+| P22 DeepSeek-1.3B | 0.1177 | 0.7882 | **+0.764 ± 0.019** | 56 | −0.012 | clean by 0.0008 |
+| P22 StarCoder2-3B *(void)* | 0.0940 | 0.6533 | +0.623 ± 0.021 | 56 | −0.032 | VOID |
+
+### 8.1 R1 fails inside the family, in the wrong direction
+
+**Coder-7B is the clean rung, and it copies LEAST of the three.**
+
+> Coder-1.5B **+0.506** (sinks) · Coder-3B **+0.564** (sinks) · **Coder-7B +0.408 (clean)**
+
+Same family, same continued-pretraining diet, same prompt, same harness — the only clean rung
+copies **less** than both sinking rungs. The copying account predicts the opposite, and family
+cannot absorb the result because there is no family difference here.
+
+**phi-1 makes the same point from the other end:** the *lowest* PULL in the record (+0.163,
+less than a quarter of DeepSeek's) and it still sinks, sub-threshold, at −0.042. Weak copying
+with degradation; strong copying without it. The two axes come apart in both directions.
+
+### 8.2 R2 — the +1.000 correlation does not survive contact with more cells
+
+Over the four Phase-22 cells, PULL ordered the models **exactly** as copy-identity did
+(ρ +1.000) and tracked the committed compression slopes at +0.600. Over **eight** cells,
+Spearman(PULL, cond−artifact) = **−0.119** — no relationship, and if anything the wrong sign.
+
+**§7's Q3 said this in advance:** *"similarity and degradation behave as largely independent
+axes that happen to order four models alike."* Four points can be ordered by many things. This
+is what it looks like when a beautiful correlation is a small-n coincidence, and the record
+now has it measured rather than argued.
+
+### 8.3 What survives, and it is not nothing
+
+**R3 holds in every cell: PULL is positive everywhere, from +0.163 to +0.764.** Across eight
+cells, five model families and 0.5B–7B, **conditioning always drags output toward the artifact
+in string space** — models rewrite from ~0.08–0.15 similarity to ~0.23–0.79. That is the
+compression law's phenomenon in a currency the record had never used, and it is **universal**,
+exactly as the pass-rate version is.
+
+**What is now established is a dissociation:**
+
+> **Conditioning pulls every model toward the artifact in string space, and how hard it pulls
+> does not predict whether the model degrades.** String-space copying and pass-rate
+> degradation are separate axes.
+
+That is a real finding, it is negative in the useful sense, and it closes §0.4's "why does
+copying order the models" item with *it doesn't — n was 4*.
+
+### 8.4 Consequence for the family question
+
+DeepSeek's PULL is the highest measured (+0.764) and Coder-3B at +0.564 sinks hard. So
+**DeepSeek's near-clean verdict cannot be attributed to copying fidelity** — the explanation
+offered in §6.1, tested in §7, and now buried in §8. DeepSeek's status stays exactly where
+§5.3 left it: clean by 0.0008, below the copy null, flipped by the pre-registered alternate
+scoring, and uninformative at the pre-registered MDE. **The record has no mechanism for it,
+and now has one fewer candidate than it did this morning.**

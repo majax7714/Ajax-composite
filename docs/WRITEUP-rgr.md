@@ -1218,8 +1218,17 @@ Recorded here so the Index is also the map of what is *deliberately not being ru
   models, the intercept is flat across DeepSeek's copy split (Δ 0.0003) and **reversed** in
   general-Qwen. So a large, clean between-model regularity is **not mediated problem-by-
   problem**, and either operates at a level this design cannot see or is a four-point
-  coincidence. Cheap next step: more models, since the whole measurement is $0 on committed
-  arms and the current n is 4.
+  coincidence. **[RESOLVED SAME DAY at $0 — [PHASE_22.md] §8: IT IS A COINCIDENCE.** Extended
+  from 4 to **8 committed cells**, the correlation vanishes: Spearman(PULL, cond−artifact) =
+  **−0.119**, against +1.000 on the original four. The decisive cell is the **scale ladder**,
+  where the sinking/clean contrast sits inside one family: Coder-1.5B **+0.506** (sinks),
+  Coder-3B **+0.564** (sinks), **Coder-7B +0.408 (CLEAN)** — the clean rung copies **least**,
+  the opposite of the account, with no family difference available to absorb it. phi-1 makes
+  the point from the other end: lowest PULL in the record (+0.163) and it still sinks. **What
+  survives is a dissociation and a universal:** PULL is positive in all eight cells
+  (+0.163 to +0.764), so conditioning always drags output toward the artifact in string space —
+  but how hard it pulls **does not predict degradation**. String-space copying and pass-rate
+  degradation are separate axes.]**
 - **⚠ IS StarCoder2's COMPRESSION INTERCEPT BIASED TOWARD ZERO? *(new 2026-07-26, Phase 21
   §5.3)*.** StarCoder2-3B returns **empty completions on 3.7% of unconditioned prompts** and
   far fewer once conditioned (parse 0.9308 vs 0.9874). Empty generations score 0, so its
