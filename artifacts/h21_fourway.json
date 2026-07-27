@@ -1,0 +1,156 @@
+{
+  "_label": "Phase 21 \u2014 four models at own true match [PHASE_21.md]",
+  "prereg_commit": "120f995",
+  "seed": 367,
+  "k": 24,
+  "n": 56,
+  "mode": "four-way",
+  "rungs": [
+    "coder1p5b",
+    "general1p5b",
+    "deepseek1p3b",
+    "starcoder2_3b"
+  ],
+  "per_problem_tol": 0.1,
+  "prereg_mde": 0.039,
+  "cells": {
+    "coder1p5b": {
+      "model": "Qwen/Qwen2.5-Coder-1.5B",
+      "n": 56,
+      "achieved_delta_art": -0.006,
+      "mean_iid": 0.3188,
+      "mean_cond": 0.2732,
+      "mean_artifact": 0.3241,
+      "cond_minus_iid": -0.0456,
+      "ci_iid": [
+        -0.0717,
+        -0.0202
+      ],
+      "cond_minus_artifact": -0.0509,
+      "ci_art": [
+        -0.071,
+        -0.0318
+      ],
+      "below_both_nulls": true,
+      "predicted_intercept": -0.056,
+      "prediction_hit": true,
+      "parse_iid": 0.9836,
+      "parse_cond": 0.9948
+    },
+    "general1p5b": {
+      "model": "Qwen/Qwen2.5-1.5B",
+      "n": 56,
+      "achieved_delta_art": -0.0045,
+      "mean_iid": 0.2836,
+      "mean_cond": 0.2471,
+      "mean_artifact": 0.2689,
+      "cond_minus_iid": -0.0365,
+      "ci_iid": [
+        -0.0566,
+        -0.017
+      ],
+      "cond_minus_artifact": -0.0219,
+      "ci_art": [
+        -0.037,
+        -0.0064
+      ],
+      "below_both_nulls": true,
+      "predicted_intercept": -0.04,
+      "prediction_hit": true,
+      "parse_iid": 0.9866,
+      "parse_cond": 0.9814
+    },
+    "deepseek1p3b": {
+      "model": "deepseek-ai/deepseek-coder-1.3b-base",
+      "n": 56,
+      "achieved_delta_art": -0.0033,
+      "mean_iid": 0.2443,
+      "mean_cond": 0.2443,
+      "mean_artifact": 0.2522,
+      "cond_minus_iid": 0.0,
+      "ci_iid": [
+        -0.0161,
+        0.016
+      ],
+      "cond_minus_artifact": -0.0079,
+      "ci_art": [
+        -0.0152,
+        -0.0014
+      ],
+      "below_both_nulls": false,
+      "predicted_intercept": 0.011,
+      "prediction_hit": true,
+      "parse_iid": 0.9851,
+      "parse_cond": 0.9963
+    },
+    "starcoder2_3b": {
+      "model": "bigcode/starcoder2-3b",
+      "n": 56,
+      "achieved_delta_art": -0.0023,
+      "mean_iid": 0.2567,
+      "mean_cond": 0.235,
+      "mean_artifact": 0.2443,
+      "cond_minus_iid": -0.0217,
+      "ci_iid": [
+        -0.0487,
+        0.0075
+      ],
+      "cond_minus_artifact": -0.0094,
+      "ci_art": [
+        -0.0336,
+        0.026
+      ],
+      "below_both_nulls": false,
+      "predicted_intercept": -0.021,
+      "prediction_hit": true,
+      "parse_iid": 0.9308,
+      "parse_cond": 0.9874
+    }
+  },
+  "paired_vs_coder1p5b": {
+    "general1p5b": {
+      "vs_coder1p5b": 0.0091,
+      "se": 0.0159,
+      "ci95": [
+        -0.0224,
+        0.0397
+      ],
+      "p": 0.5676658147312476
+    },
+    "deepseek1p3b": {
+      "vs_coder1p5b": 0.0456,
+      "se": 0.0175,
+      "ci95": [
+        0.0113,
+        0.0794
+      ],
+      "p": 0.009129818679403687
+    },
+    "starcoder2_3b": {
+      "vs_coder1p5b": 0.0239,
+      "se": 0.0187,
+      "ci95": [
+        -0.0115,
+        0.0609
+      ],
+      "p": 0.2030843369881212
+    }
+  },
+  "gates": {
+    "on_target": true,
+    "parse_ok": false,
+    "powered": true
+  },
+  "branch": "D \u2014 KILLED (on_target True, parse_ok False, powered True); no adjudication",
+  "stack": {
+    "gpu_name": "NVIDIA L4",
+    "gpu_capability": "8.9",
+    "dtype": "bfloat16",
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8",
+    "vllm": "0.11.0",
+    "gen_template_hash": "1e43a51cdc2cc3b5",
+    "d2c_context_hash": "b9323ddf1a9b253d",
+    "judge_hash": "dbd4f9fa650a6a2f"
+  }
+}
