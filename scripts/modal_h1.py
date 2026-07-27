@@ -120,7 +120,7 @@ def h1_download():
 def h1_gen_lcb(model_id: str, items: list, n: int, tag: str,
                temperature: float = 0.8, top_p: float = 1.0, seed: int = 17,
                revision: str = None, max_model_len: int = 8192,
-               max_tokens: int = 1536):
+               max_tokens: int = 1536, emit_meta: bool = False):
     """Frozen R2/p3b fenced-completion scaffold, parametrized by model.
     items: [{qid, context|None}]. `revision` (added Phase 6, no-op default —
     existing frozen callers omit it) pins the exact HF commit at load time.
@@ -146,6 +146,19 @@ def h1_gen_lcb(model_id: str, items: list, n: int, tag: str,
         sp = SamplingParams(n=n, temperature=temperature, top_p=top_p,
                             max_tokens=max_tokens, seed=seed, stop=["```", "\nProblem:"])
         outs = llm.generate([prompt(it) for it in items], sp)
+        if emit_meta:
+            # Phase 22: per-candidate generation metadata, so an empty `code` can be
+            # attributed. The prompt already ends in an opening ```python fence and
+            # generation stops at the closing fence, so `code` IS the raw text — there
+            # is no extraction step that can fail. An empty code therefore means the
+            # model emitted nothing before closing the fence, which `stop_reason` and
+            # the token count make legible. No-op default; existing callers unchanged.
+            return [{"qid": it["qid"],
+                     "codes": [(o.text.strip() or None) for o in req.outputs],
+                     "meta": [{"fr": o.finish_reason, "sr": str(o.stop_reason),
+                               "nt": len(o.token_ids), "rawlen": len(o.text)}
+                              for o in req.outputs]}
+                    for it, req in zip(items, outs)]
         return [{"qid": it["qid"], "codes": [(o.text.strip() or None) for o in req.outputs]}
                 for it, req in zip(items, outs)]
     return _cache_or(tag, compute)
@@ -4256,6 +4269,201 @@ def j21_fourway():
                    "powered": bool(powered)},
          "branch": branch, "stack": _stack_block()}, indent=2))
     print("wrote artifacts/h21_fourway.json")
+
+
+# --- Phase 22: the same question, properly instrumented ([PHASE_22.md]) ---
+
+P22_SEED = 401
+P22_K = 24
+P22_MIN_N = 30
+P22_GAP = 0.020          # between-arm parse gap that voids a CELL (§8 entry 13)
+P22_PARSE = 0.95         # absolute per-arm parse floor that voids a CELL
+P22_VALID = 0.040        # Coder-1.5B reproduction band, 2 SE of a seed-to-seed diff
+P22_REF = -0.048         # committed at-match reference for Coder-1.5B
+P22_PRED = {"coder1p5b": -0.048, "general1p5b": -0.037,
+            "deepseek1p3b": +0.011, "starcoder2_3b": -0.036}
+
+
+@app.local_entrypoint()
+def j22_fourway():
+    """Phase 22 — Phase 21's question on a fresh draw, with per-CELL kill criteria.
+    Pre-registered [PHASE_22.md] at ace9984, BEFORE this ran."""
+    import ast
+    import math
+    import random as _rnd
+    import statistics as st
+
+    rungs = list(P21_RUNGS)
+    sel, sw = _p21_select(rungs)          # deterministic; reproduces Phase 21's set
+    qs = sorted(sel)
+    n = len(qs)
+    print(f"[P22] n={n} problems, {len(rungs)} models, k={P22_K}, seed={P22_SEED}")
+
+    dart = {r: st.mean(sel[q][r][1] - sw[r][q] for q in qs) for r in rungs}
+    for r in rungs:
+        print(f"    {r:<15} Δ_art {dart[r]:+.4f}   (band ±{P11_ON_TARGET})")
+
+    arms, parse, meta = {}, {}, {}
+    for r in rungs:
+        mid, rev = P21_RUNGS[r]
+        for kind in ("iid", "cond"):
+            tag = f"j22_{r}_{kind}"
+            items = [{"qid": q,
+                      "context": None if kind == "iid" else _d2c_context(
+                          {"qid": q, "code": sel[q][r][2], "frac": sel[q][r][1],
+                           "n_tests": sel[q][r][3],
+                           "n_failed": sel[q][r][3] - sel[q][r][4]})}
+                     for q in qs]
+            g = _load(f"{tag}_cand") or _persist(f"{tag}_cand", h1_gen_lcb.remote(
+                mid, items, P22_K, tag=f"{tag}_cand", seed=P22_SEED, revision=rev,
+                max_model_len=8192, max_tokens=1536, emit_meta=True))
+            res = _load(f"{tag}_res") or _persist(f"{tag}_res", h1_lcb_exec.remote(
+                [x["qid"] for x in g], [x["codes"] for x in g], tag=f"{tag}_res"))
+            # per-candidate parse flags, aligned with fracs
+            flags, ok, tot, empty = {}, 0, 0, 0
+            for x in g:
+                row = []
+                for code in x["codes"]:
+                    tot += 1
+                    p = False
+                    if code:
+                        try:
+                            ast.parse(code)
+                            p = True
+                        except SyntaxError:
+                            pass
+                    else:
+                        empty += 1
+                    ok += p
+                    row.append(p)
+                flags[x["qid"]] = row
+            parse[(r, kind)] = {"rate": ok / tot if tot else 0.0,
+                                "empty": empty / tot if tot else 0.0}
+            arms[(r, kind)] = ({x["qid"]: [y["frac"] for y in row]
+                                for x, row in zip(g, res)}, flags)
+            # why were candidates empty? (emit_meta; §2 pre-registered diagnostic)
+            mm = [m for x in g if "meta" in x for m in x["meta"]]
+            if mm:
+                zero = [m for m in mm if m["rawlen"] == 0]
+                meta[f"{r}_{kind}"] = {
+                    "n_meta": len(mm), "raw_empty": len(zero),
+                    "stop_reasons": dict(sorted(
+                        {str(m["sr"]): sum(1 for z in mm if str(z["sr"]) == str(m["sr"]))
+                         for m in mm}.items(), key=lambda kv: -kv[1])[:4]),
+                    "mean_tokens": round(st.mean(m["nt"] for m in mm), 1)}
+
+    rng = _rnd.Random(409)
+
+    def ci(v, b=8000):
+        a = sorted(st.mean([v[rng.randrange(len(v))] for _ in v]) for _ in range(b))
+        return round(a[int(.025 * b)], 4), round(a[int(.975 * b)], 4)
+
+    cells = {}
+    print(f"\n{'model':<15} {'iid':>7} {'cond':>7} {'cond-iid [CI95]':>26} "
+          f"{'cond-art [CI95]':>26} {'SINK':>5} {'gap':>7} {'VOID':>5}")
+    for r in rungs:
+        (I, fI), (C, fC) = arms[(r, "iid")], arms[(r, "cond")]
+        art = {q: sel[q][r][1] for q in qs}
+        de = [st.mean(C[q]) - st.mean(I[q]) for q in qs]
+        da = [st.mean(C[q]) - art[q] for q in qs]
+        l1, h1 = ci(de)
+        l2, h2 = ci(da)
+        sink = bool(h1 < 0 and h2 < 0)
+
+        # pre-registered SECONDARY: parse-only scoring, reported for every model
+        po, dropped = [], 0
+        for q in qs:
+            a = [f for f, k in zip(I[q], fI[q]) if k]
+            b = [f for f, k in zip(C[q], fC[q]) if k]
+            if a and b:
+                po.append(st.mean(b) - st.mean(a))
+            else:
+                dropped += 1
+        pl, ph = ci(po) if po else (None, None)
+
+        pr_i, pr_c = parse[(r, "iid")]["rate"], parse[(r, "cond")]["rate"]
+        gap = pr_c - pr_i
+        void_parse = bool(min(pr_i, pr_c) < P22_PARSE or abs(gap) > P22_GAP)
+        void_pos = bool(abs(dart[r]) > P11_ON_TARGET)
+        cells[r] = {"model": P21_RUNGS[r][0], "n": n,
+                    "achieved_delta_art": round(dart[r], 4),
+                    "mean_iid": round(st.mean(st.mean(I[q]) for q in qs), 4),
+                    "mean_cond": round(st.mean(st.mean(C[q]) for q in qs), 4),
+                    "mean_artifact": round(st.mean(art.values()), 4),
+                    "cond_minus_iid": round(st.mean(de), 4), "ci_iid": [l1, h1],
+                    "cond_minus_artifact": round(st.mean(da), 4), "ci_art": [l2, h2],
+                    "below_both_nulls": sink,
+                    "parse_iid": round(pr_i, 4), "parse_cond": round(pr_c, 4),
+                    "parse_gap": round(gap, 4),
+                    "empty_iid": round(parse[(r, "iid")]["empty"], 4),
+                    "empty_cond": round(parse[(r, "cond")]["empty"], 4),
+                    "parse_only_cond_minus_iid": round(st.mean(po), 4) if po else None,
+                    "parse_only_ci": [pl, ph], "parse_only_dropped": dropped,
+                    "predicted": P22_PRED[r],
+                    "prediction_hit": bool(l1 <= P22_PRED[r] <= h1),
+                    "void": bool(void_parse or void_pos),
+                    "void_reason": ("parse" if void_parse else
+                                    ("off_target" if void_pos else None))}
+        c = cells[r]
+        print(f"{r:<15} {c['mean_iid']:>7.4f} {c['mean_cond']:>7.4f} "
+              f"{c['cond_minus_iid']:>+9.4f} [{l1:+.4f},{h1:+.4f}] "
+              f"{c['cond_minus_artifact']:>+9.4f} [{l2:+.4f},{h2:+.4f}] "
+              f"{str(sink):>5} {gap:>+7.4f} {str(c['void']):>5}")
+        print(f"{'':<15} parse-only cond-iid {c['parse_only_cond_minus_iid']} "
+              f"[{pl},{ph}] (dropped {dropped})   parse {pr_i:.4f}/{pr_c:.4f}   "
+              f"empty {c['empty_iid']:.4f}/{c['empty_cond']:.4f}")
+
+    ref = cells["coder1p5b"]
+    ref_reproduces = bool(not ref["void"]
+                          and abs(ref["cond_minus_iid"] - P22_REF) <= P22_VALID)
+    powered = n >= P22_MIN_N
+    live = [r for r in rungs if r != "coder1p5b" and not cells[r]["void"]]
+    print(f"\n  [gates] n>={P22_MIN_N} {powered}   reference reproduces "
+          f"(|{ref['cond_minus_iid']:+.4f} − {P22_REF}| ≤ {P22_VALID}) {ref_reproduces}   "
+          f"live non-reference cells {live}")
+
+    ds = cells["deepseek1p3b"]["below_both_nulls"] if not cells["deepseek1p3b"]["void"] else None
+    sc = cells["starcoder2_3b"]["below_both_nulls"] if not cells["starcoder2_3b"]["void"] else None
+    if not powered or ref["void"] or not ref_reproduces or not live:
+        branch = (f"D — KILLED (powered {powered}, reference void {ref['void']}, "
+                  f"reference reproduces {ref_reproduces}, live cells {live}); "
+                  f"no adjudication")
+    elif ds is not None and sc is None:
+        branch = ("E — PARTIAL: StarCoder2's cell VOID (outside this instrument's domain); "
+                  f"DeepSeek adjudicates {'SINK' if ds else 'CLEAN'}. The family question "
+                  "stays half-open")
+    elif ds and sc:
+        branch = "A — BOTH SINK: the general null wins; the family axis collapses"
+    elif ds is False and sc is False:
+        branch = ("B — BOTH CLEAN: a Qwen-base effect, scoped to small base models under "
+                  "~2-bit feedback")
+    elif ds is False and sc:
+        branch = ("C — DeepSeek CLEAN, StarCoder2 SINKS: DeepSeek is the exception. "
+                  "Per [PHASE_22.md] §1(b) this may be stated ONLY as robustness to "
+                  "repair-style conditioning at 1.3B — DeepSeek-Coder-1.3B is publicly "
+                  "reported with the largest degradation on HumanEval Infilling")
+    else:
+        branch = ("UNCLASSIFIED — DeepSeek's cell is void or the pattern is unenumerated; "
+                  "read the table")
+    print(f"\n=== BRANCH {branch} ===")
+    for r in rungs:
+        c = cells[r]
+        print(f"  prediction {r:<15} {c['predicted']:+.3f} → measured "
+              f"{c['cond_minus_iid']:+.4f}  hit {c['prediction_hit']}"
+              f"{'  (VOID — excluded from accounting)' if c['void'] else ''}")
+
+    (REPO / "artifacts/h22_fourway.json").write_text(json.dumps(
+        {"_label": "Phase 22 — Phase 21's question on a fresh draw [PHASE_22.md]",
+         "prereg_commit": "ace9984", "seed": P22_SEED, "k": P22_K, "n": n,
+         "rungs": rungs, "bootstrap_seed": 409,
+         "criteria": {"parse_floor": P22_PARSE, "parse_gap_void": P22_GAP,
+                      "validation_band": P22_VALID, "reference": P22_REF,
+                      "min_n": P22_MIN_N},
+         "cells": cells, "generation_meta": meta,
+         "gates": {"powered": bool(powered), "reference_reproduces": ref_reproduces,
+                   "live_non_reference_cells": live},
+         "branch": branch, "stack": _stack_block()}, indent=2))
+    print("wrote artifacts/h22_fourway.json")
 
 
 # --- Phase 20: the PAIRED twin-vs-sibling cell ([PHASE_20.md]) ---

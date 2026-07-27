@@ -169,9 +169,48 @@ to date $11.66.
 
 ---
 
+## 2.1 Pre-spend addendum — the diagnostic answered itself by code inspection
+
+*Appended while building the entrypoint, **before any Phase-22 generation ran**. Recorded now
+so it cannot later be mistaken for a post-result rationalisation.*
+
+§2 pre-registered a two-way decision on whether StarCoder2's empty completions were a **model**
+failure or an **extraction** failure. Reading `h1_gen_lcb` settles it without spending:
+
+- the prompt already **ends with an opening ` ```python ` fence**, and
+- sampling stops at `"```"`, and
+- `code = o.text.strip() or None`.
+
+**There is no fence-searching extraction step that could fail.** `code` *is* the raw generated
+text. An empty code therefore means the model emitted nothing — or immediately closed the
+fence — before the stop token. **Branch (i) of §2's decision (extraction fallback) cannot
+fire, and is dead.** The live reading is branch (ii): the empties are genuine model behaviour,
+and StarCoder2 is heading for a **void cell / outside-the-instrument's-domain** verdict unless
+the fresh seed changes its behaviour materially, which nothing predicts it will.
+
+**Consequence for the frozen odds, stated and NOT acted on.** This makes branch **E** —
+StarCoder2 void, DeepSeek adjudicates — mechanically more likely than the 15% it was priced
+at, probably substantially. **The odds are not being re-priced**: they were frozen, the
+information arrived after the freeze, and quietly re-pricing a pre-registration on new
+reasoning is how pre-registrations stop meaning anything. This is recorded instead as a
+**miss in the charter's own design analysis** — the code path was available to read before the
+odds were written, and was not read — to be scored as such at close.
+
+**What the phase still buys at $2.12,** with E as the likely outcome: a fresh-seed, clean-
+instrument adjudication of **DeepSeek against both Qwen models** — which is the core of the
+question (*is DeepSeek exceptional?*). StarCoder2 was always the weaker leg. And a model
+declared out of domain is a result, not a gap: Phase 18 set that precedent for T > 1.0.
+
+The entrypoint retains the `emit_meta` diagnostic anyway — per-candidate `finish_reason`,
+`stop_reason` and token counts — because it converts "the model emitted nothing" from an
+inference into a measurement, at zero marginal cost.
+
+---
+
 ## 3. Pre-registration freeze
 
-Frozen at commit `PENDING` (stamped at close), **before** any Phase-22 generation ran.
+Frozen at commit `ace9984`, **before** any Phase-22 generation ran. Entrypoint at the commit
+below, also before spend. §2.1 appended pre-spend.
 
 ---
 
