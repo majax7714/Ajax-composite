@@ -1182,7 +1182,13 @@ Recorded here so the Index is also the map of what is *deliberately not being ru
   number. Note also that at n=56 the MDE is ≈0.035 while StarCoder2's predicted effect is
   −0.021 — separating it needs n ≈ 155, which **exceeds the 80-problem donor pool entirely**,
   so that particular cell is not merely underpowered here but unresolvable in this
-  instrument.]**
+  instrument. **[CORRECTED same day, [PHASE_21.md] §6 — the n ≈ 155 figure was computed
+  against the wrong target effect.** It assumed StarCoder2's true effect is the intercept
+  table's −0.021. The free desk-check shows the parse asymmetry biases raw `cond − iid`
+  *upward* by ≈ `parse gap × mean frac` — ≈0.014 for that arm — putting the corrected effect
+  near **−0.036**, which **n = 56 already resolves**. The cell is feasible; what must be fixed
+  is the **instrument**, not the power. The −0.036 is a two-point extrapolation off an
+  uninstrumented arm: **design input only, never citable as a result**.]**]**
 - **⚠ IS StarCoder2's COMPRESSION INTERCEPT BIASED TOWARD ZERO? *(new 2026-07-26, Phase 21
   §5.3)*.** StarCoder2-3B returns **empty completions on 3.7% of unconditioned prompts** and
   far fewer once conditioned (parse 0.9308 vs 0.9874). Empty generations score 0, so its
@@ -1194,6 +1200,20 @@ Recorded here so the Index is also the map of what is *deliberately not being ru
   recompute the affected cells' i.i.d. arms excluding empty generations and see whether the
   intercept moves. Until then, **every StarCoder2 number in this journal carries the
   question**, including the "intermediate intercept" framing that motivated its inclusion.
+  **[RESOLVED SAME DAY at $0 — [PHASE_21.md] §6.** Run on the committed Phase 7 M3 cell that
+  produced the intercept. The Phase-21 *empty-completion* mode does **not** occur there (zero
+  empties, both arms), but a parse asymmetry does — 0.9679 i.i.d. vs 0.9936 cond, **2.56pp**,
+  same direction, under half the size — and all 12 non-parsing generations score exactly
+  0.0000, verifying the assumption the concern rested on. **The intercept does not move:
+  −0.0208 → −0.0208, 0.00 SE.** The reason generalises and is the keeper: depressing the
+  i.i.d. arm lowers `shift` and `gap` *together*, so with `a = shift − b·gap` the bias enters
+  as **Δa = δ_cond − δ_iid·(1−b)** and at b ≈ 0.88 only **12%** of it survives — **the
+  compression law's intercept is self-insulating against arm-asymmetric quality loss.** The
+  raw `cond − iid` statistic is not: it moved **+0.0080 → −0.0001** on that same 2.56pp gap,
+  which independently corroborates why Phase 21's kill was correct. Bias is predictable as
+  `parse gap × mean frac of parsing generations` (0.0086 predicted vs 0.0082 observed).
+  **Exposure closed for the intercept and for the eight-cell battery; confirmed for raw
+  shift statistics, which must be reported with their arms' parse rates.**]**
 - **The 0.5B rung and the 3B→7B boundary** (Phase 11) — the ladder is measured at
   1.5B / 3B / 7B at match; **0.5B** cannot be placed at its own straddle by mining
   (needs generated artifacts) and **nothing has been measured between 3B and 7B**, where

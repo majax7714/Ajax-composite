@@ -338,3 +338,68 @@ it.*
 | 9 | §8 ledger entry | **updated** — entries **13** (criterion granularity + wrong quantity) and **14** (cost measurement lost) |
 
 ---
+
+## 6. Free desk-check ($0) — is StarCoder2's compression intercept biased toward zero?
+
+*Appended 2026-07-26 after the close, on committed data only. No compute. §5.3 raised the
+exposure; this settles it, and the answer is more useful than either outcome I expected.*
+
+**Target.** The −0.0208 intercept comes from the Phase 7 M3 cell (n=39, `j7_*_M3_starcoder2_3b`).
+If that cell carried the same unconditioned-arm deficit Phase 21 found, its i.i.d. arm was
+depressed and the intercept biased **toward zero**.
+
+**The asymmetry is real there, and smaller.** Zero empty completions in either arm — the
+Phase-21 empty-completion mode does **not** appear. But the parse asymmetry does:
+
+| arm | parse | mean frac |
+|---|---|---|
+| i.i.d. (A) | 0.9679 | 0.3281 |
+| conditioned (B) | 0.9936 | 0.3362 |
+
+**gap 2.56pp**, same direction as Phase 21's +5.7pp, under half the size. (Arm identity is
+confirmed, not assumed: 0.3281 / 0.3362 reproduce the battery's committed `mean_iid` /
+`mean_cond` exactly.) All **12** non-parsing generations score frac **0.0000** — the
+assumption behind the whole concern, now verified rather than asserted.
+
+**Result — the raw statistic is badly biased; the intercept is not.**
+
+| | i.i.d. | cond | shift | gap |
+|---|---|---|---|---|
+| as-run | 0.3281 | 0.3362 | **+0.0080** | +0.0327 |
+| parse-only | 0.3373 | 0.3372 | **−0.0001** | +0.0235 |
+
+**Intercept: −0.0208 → −0.0208. It moves by 0.0000, i.e. 0.00 SE.**
+
+**Why, and this is the part worth keeping.** Depressing the i.i.d. arm enters *both* axes of
+the law: it lowers `shift = cond − iid` and lowers `gap = artifact − iid` by the same amount.
+With `a = shift − b·gap`,
+
+> **Δa = δ_cond − δ_iid·(1 − b)**
+
+so at b ≈ 0.88 only **12%** of an i.i.d.-side bias survives into the intercept, and here even
+that is cancelled by the conditioned arm's own small correction (δ_iid 0.0092, δ_cond 0.0010
+→ Δa −0.0001). **The compression law's intercept is self-insulating against arm-asymmetric
+quality loss.** The raw `cond − iid` statistic has no such protection — it moved 0.0081, from
+positive to zero, on a 2.56pp gap.
+
+The bias is also *predictable*: `parse gap × mean frac of parsing generations` = 0.0256 ×
+0.337 = **0.0086**, against 0.0082 observed.
+
+**Disposition.** The §5.3 exposure is **closed for the intercept** — StarCoder2's −0.021 needs
+no correction and the eight-cell battery is unaffected. It is **confirmed for the raw
+statistic**, which independently corroborates §5.2's account of why the kill was right: a
+parse asymmetry moves `cond − iid` toward zero, measured here in a cell nobody chose for the
+purpose.
+
+**One consequence for the successor, stated as design input and NOT as a result.** Applying
+the same predictor to Phase 21's StarCoder2 arm (gap 5.66pp, i.i.d. 0.2567) gives ≈**0.014**
+of upward bias, i.e. a corrected shift near **−0.036** rather than the −0.0217 observed. **This
+is not an adjudication and must never be cited as one** — it is an uninstrumented arm run
+through a two-point extrapolation. Its only legitimate use is **powering the successor**: if
+StarCoder2's true effect is ≈−0.036 rather than the −0.021 the intercept table predicted, then
+the MDE needed is ≈0.036, which **n = 56 already achieves**. §0.4's note that separating
+StarCoder2 would need n ≈ 155 and was therefore "unresolvable in this instrument" was computed
+against the wrong target effect. **The cell is feasible — the instrument, not the power, is
+what has to be fixed.**
+
+---
