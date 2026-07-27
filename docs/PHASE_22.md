@@ -224,3 +224,179 @@ below, also before spend. §2.1 appended pre-spend.
 
 **Every branch:** re-check Huang et al.; re-check the DeepSeek-infilling tension in §1(b)
 against whatever is found; and record what the search **failed** to find.
+
+---
+
+## 5. RESULT — **BRANCH E: PARTIAL.** StarCoder2 void; DeepSeek "clean" by 0.0008, and the reading is not the one the charter favoured
+
+*Closed 2026-07-27. Raw artifact `artifacts/h22_fourway.json` committed **unread** at `08bef20`.
+Independent verifier (`scripts/j22_verify.py`, committed `adca663` before any result existed)
+agrees on **every quantity and on the branch**.*
+
+### 5.1 Gates
+
+| gate | value | verdict |
+|---|---|---|
+| n ≥ 30 | **n = 56** | passes |
+| **instrument validation** — Coder-1.5B reproduces −0.048 within ±0.040 | **−0.0450** | **passes** |
+| per-cell OFF-TARGET (all abs(Δ_art) ≤ 0.020) | −0.0060 / −0.0045 / −0.0033 / −0.0023 | passes |
+| per-cell parse ≥0.95 and gap ≤2.0pp | **StarCoder2: 0.9167, gap +5.51pp** | **VOIDS THAT CELL ONLY** |
+
+**The per-cell correction (§8 entry 13) did its job.** In Phase 21 the identical StarCoder2
+failure voided the entire phase. Here it voids one cell and three cells adjudicate. That is
+the whole content of the ledger entry, working.
+
+### 5.2 Cells
+
+| model | i.i.d. | cond | cond−iid [CI95] | cond−art [CI95] | below both nulls | parse i/c | gap | pred | hit |
+|---|---|---|---|---|---|---|---|---|---|
+| Coder-1.5B | 0.3314 | 0.2864 | **−0.0450** [−0.0716,−0.0185] | −0.0377 [−0.0560,−0.0183] | **true** | .9896/.9940 | +0.45pp | −0.048 | ✓ |
+| general-Qwen-1.5B | 0.2838 | 0.2449 | **−0.0388** [−0.0606,−0.0184] | −0.0240 [−0.0431,−0.0069] | **true** | .9844/.9836 | −0.07pp | −0.037 | ✓ |
+| DeepSeek-1.3B | 0.2600 | 0.2398 | **−0.0201** [−0.0437,**+0.0008**] | −0.0124 [−0.0215,−0.0041] | false | .9851/.9955 | +1.04pp | +0.011 | **✗ MISS** |
+| StarCoder2-3B | 0.2549 | 0.2122 | −0.0427 [−0.0760,−0.0051] | −0.0322 [−0.0607,+0.0056] | false | **.9167/.9717** | **+5.51pp** | −0.036 | ✓ (VOID) |
+
+### 5.3 DeepSeek is "clean" by one part in twelve hundred, and three things say don't lean on it
+
+Branch C — *DeepSeek is the exception* — was the charter's favourite at **55%**. **It did not
+fire**, and the reason is worth stating precisely rather than rounding off:
+
+1. **The margin is 0.0008.** DeepSeek fails `below_both_nulls` only because its cond−iid
+   interval's upper end sits at **+0.0008**. One part in ~1250 the other way and this phase
+   reads as branch A.
+2. **It IS below the copy null.** cond−artifact = **−0.0124, CI [−0.0215,−0.0041]**, which
+   **excludes zero**. DeepSeek fails the conjunction on the i.i.d. leg alone; against the
+   artifact it is unambiguously down.
+3. **The pre-registered secondary scoring flips it.** Under parse-only scoring — committed in
+   §2 *before* the run, for every model, precisely so this could not be a post-hoc choice —
+   DeepSeek reads **−0.0223, CI [−0.0454, −0.0006]**, which **excludes zero**. Combined with
+   (2), under parse-only scoring **DeepSeek is below both nulls, i.e. it sinks.**
+
+**And the null is uninformative anyway.** The symmetric guard fires: CI reaches **−0.0437**,
+past the pre-registered MDE of 0.039. A verdict of "clean" here is **not evidence of absence**;
+the data is consistent with a −0.04 effect.
+
+**Verdict, stated at the strength the evidence supports:** the frozen rule returns *clean*, and
+the frozen rule is what governs. But "DeepSeek is exceptional" is now a **much weaker claim
+than before this phase**, resting on a 0.0008 margin, one scoring convention out of two
+pre-registered, and an interval that cannot exclude the effect it is being used to deny.
+
+### 5.4 A falsified prediction — the intercept table's first miss
+
+**Predicted +0.011 for DeepSeek; measured −0.0201, CI [−0.0437,+0.0008].** The interval does
+**not** contain the prediction. Three of four predictions hit (Coder −0.048/−0.0450; general
+−0.037/−0.0388; StarCoder2 −0.036/−0.0427, on a void cell and so excluded from the accounting);
+DeepSeek misses.
+
+**The cause was on the page in advance.** §0.4 already recorded that DeepSeek's intercept was
+an **extrapolation**: its Phase-7 cell sat at Δ_art **+0.0499**, well off match, so the
+intercept was projected to a gap of zero the cell never occupied. The one intercept derived
+furthest from its cell's own centre is the one that failed. That is the predicted failure mode
+of the method failing exactly where predicted — which supports the compression law's *slope*
+while marking its *intercept* as unreliable under extrapolation.
+
+### 5.5 StarCoder2 is outside this instrument's domain — now a measurement, and a known limitation
+
+`emit_meta` converts Phase 21's inference into evidence. In the i.i.d. arm: **13 raw-empty
+generations** and — the real finding — **36 candidates stopped at `"\nProblem:"`**, against 11
+in the conditioned arm. StarCoder2 given a bare problem statement does not fail to write code
+so much as **wander off and begin inventing a new problem**. Given an artifact, it complies.
+
+**Step 9a fired its branch-E hit condition.** The pre-registered query returned prior
+documentation of exactly this, so our instrument note is **not a novel observation — it is a
+known limitation with a citation**:
+
+- StarCoder2 base models *"perform very poorly when given an instruction prompt, which
+  motivates using a different prompt format"* ([StarCoder2 and The Stack v2](https://arxiv.org/pdf/2402.19173));
+  for the base model *"one-third of the code generated is incomplete."*
+- StarCoder produces *"effectively empty solutions, e.g. `pass` or a comment 'Insert code
+  here'"* on HumanEval ([StarCoder](https://arxiv.org/pdf/2305.06161)) — noted there as
+  occurring in **every model evaluated**, which is why the *differential* rather than the level
+  is the right gate (§8 entry 13).
+
+*Snippet-level, not source-verified.* **Consequence:** the honest statement is that this record
+applied a prompt format the StarCoder2 authors document as unsuitable for their base model.
+StarCoder2 is not evidence about the sink; it is evidence about the harness. Removing it from
+the family question is now a **cited** decision rather than a convenient one.
+
+### 5.6 Exploratory — conditioning collapses generation diversity, and DeepSeek collapses hardest
+
+*Not pre-registered. Fell out of the verifier's fresh-draw check. Exploratory per §10 — it
+moves no claim.*
+
+The fresh-draw check compared seed 367 and seed 401 candidate strings per model/arm/problem,
+to confirm the re-run is a genuinely independent draw. It is, for the unconditioned arms. But
+the **conditioned** arms tell a second story:
+
+| model | i.i.d. identical | **cond identical** | ratio |
+|---|---|---|---|
+| Coder-1.5B | 0.15% | **3.27%** | 22× |
+| general-Qwen-1.5B | 0.15% | **6.40%** | 43× |
+| StarCoder2-3B | 0.00% | **13.76%** | — |
+| DeepSeek-1.3B | 0.15% | **29.02%** | **195×** |
+
+Two independent seeds agree on the *exact string* 0.15% of the time unconditioned, and up to
+**29%** of the time once an artifact is in the prompt. **Showing a model an artifact collapses
+its output entropy by up to two orders of magnitude.** This is the compression phenomenon in a
+currency the record has never used — string identity rather than pass-rate — and it came free.
+
+**And it inverts the natural reading of DeepSeek.** DeepSeek shows the *highest* copy-identity
+(29%) and the *smallest* distance below the artifact null (cond−art −0.0124, against −0.0377,
+−0.0240, −0.0322 for the others). Those two facts fit one account: **DeepSeek does not resist
+the artifact — it copies it more completely**, converging toward the artifact's score instead
+of degrading past it. On that reading "DeepSeek is clean" would mean *more* captured by the
+conditioning, not less. That is the opposite interpretation of the same data, it is a
+**hypothesis and not a measurement**, and the cheap test is direct: measure per-candidate edit
+distance to the artifact across families at match.
+
+### 5.7 Fresh-draw premise — verified, and a caveat the verifier's own label got wrong
+
+The premise holds where it matters: unconditioned arms are **0.00–0.15% identical** across
+seeds, so this is an independent draw and not a re-score. Conditioned arms are correlated by
+the mechanism under study (§5.6), which is a finding rather than a defect — but it does mean
+**the conditioned arms are less independent between Phases 21 and 22 than the i.i.d. arms**,
+and any future comparison of the two phases must say so.
+
+*A correction to my own tooling.* The verifier prints `mismatch -> extraction, not the model`
+for StarCoder2's conditioned arm (empty codes 0.0074, raw-empty 0.0000). **That label is
+wrong.** The gap is whitespace-only output — `code = o.text.strip() or None`, so text that is
+non-empty but all whitespace becomes an empty candidate. That is still the model, not the
+extractor. The check is right; its message is misleading and is recorded here rather than
+silently edited.
+
+### 5.8 Cost — measured, and the streak restored
+
+**Cost $2.0621** — MTD **$89.7364 → $91.7985**, snapshot taken **in the launching shell before
+the run**, which is §8 entry 14's practice fix now operating rather than merely written down.
+Against a pre-registered **$1.70–2.90** with a $2.12 central estimate: **inside the band, 2.7%
+under central.** MTD $91.80 against Amendment 6's $130 report / $200 hard stop.
+
+### 5.9 Scoring the charter's own calibration
+
+- **Branch odds: badly wrong, and flagged as contaminated in advance.** C was priced 55% and
+  did not fire; E was priced 15% and did. §2.1 — written pre-spend — said E was mechanically
+  likelier than its frozen price and declined to re-price it. So the miss is recorded twice:
+  once as the odds being wrong, once as the design analysis that should have caught it before
+  the odds were written.
+- **Point predictions: 3 of 4 hit** (one void-excluded), with the miss falling on the single
+  intercept derived by extrapolation — the failure mode §0.4 had already named.
+- **The instrument-validation gate passed**, so the phase's numbers sit on an instrument that
+  demonstrably reproduces a known cell.
+
+### 5.10 What this settles
+
+**Settles:** the per-cell criterion works (§5.1); StarCoder2 is outside the harness's domain,
+with citations (§5.5); the compression law's slope survives while its intercept is unreliable
+under extrapolation (§5.4).
+
+**Does not settle:** whether DeepSeek is exceptional. The frozen rule says clean; the margin is
+0.0008, the pre-registered alternate scoring says *sink*, and the interval cannot exclude −0.04.
+**The family question is now genuinely open in a way it was not before** — the "Qwen-base"
+shape that survived Phase 20 rested on DeepSeek being clean, and DeepSeek is now clean only in
+the most technical sense available.
+
+**Successor.** Two candidates, and the second is cheaper and better. (i) Power DeepSeek
+properly: at MDE ≈0.020 it needs n ≈ 200, i.e. a larger donor pool — expensive, and it answers
+one question. (ii) **Test the §5.6 hypothesis directly:** measure per-candidate edit distance
+to the artifact across all four models at match, on committed data, at **$0**. If DeepSeek's
+apparent cleanliness is more faithful copying rather than more resistance, that reframes the
+family question instead of merely re-powering it — and the data to check it is already on disk.
