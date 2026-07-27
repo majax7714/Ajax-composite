@@ -1,0 +1,255 @@
+{
+  "_label": "Phase 22 \u2014 Phase 21's question on a fresh draw [PHASE_22.md]",
+  "prereg_commit": "ace9984",
+  "seed": 401,
+  "k": 24,
+  "n": 56,
+  "rungs": [
+    "coder1p5b",
+    "general1p5b",
+    "deepseek1p3b",
+    "starcoder2_3b"
+  ],
+  "bootstrap_seed": 409,
+  "criteria": {
+    "parse_floor": 0.95,
+    "parse_gap_void": 0.02,
+    "validation_band": 0.04,
+    "reference": -0.048,
+    "min_n": 30
+  },
+  "cells": {
+    "coder1p5b": {
+      "model": "Qwen/Qwen2.5-Coder-1.5B",
+      "n": 56,
+      "achieved_delta_art": -0.006,
+      "mean_iid": 0.3314,
+      "mean_cond": 0.2864,
+      "mean_artifact": 0.3241,
+      "cond_minus_iid": -0.045,
+      "ci_iid": [
+        -0.0716,
+        -0.0185
+      ],
+      "cond_minus_artifact": -0.0377,
+      "ci_art": [
+        -0.056,
+        -0.0183
+      ],
+      "below_both_nulls": true,
+      "parse_iid": 0.9896,
+      "parse_cond": 0.994,
+      "parse_gap": 0.0045,
+      "empty_iid": 0.0,
+      "empty_cond": 0.0,
+      "parse_only_cond_minus_iid": -0.0465,
+      "parse_only_ci": [
+        -0.0736,
+        -0.02
+      ],
+      "parse_only_dropped": 0,
+      "predicted": -0.048,
+      "prediction_hit": true,
+      "void": false,
+      "void_reason": null
+    },
+    "general1p5b": {
+      "model": "Qwen/Qwen2.5-1.5B",
+      "n": 56,
+      "achieved_delta_art": -0.0045,
+      "mean_iid": 0.2838,
+      "mean_cond": 0.2449,
+      "mean_artifact": 0.2689,
+      "cond_minus_iid": -0.0388,
+      "ci_iid": [
+        -0.0606,
+        -0.0184
+      ],
+      "cond_minus_artifact": -0.024,
+      "ci_art": [
+        -0.0431,
+        -0.0069
+      ],
+      "below_both_nulls": true,
+      "parse_iid": 0.9844,
+      "parse_cond": 0.9836,
+      "parse_gap": -0.0007,
+      "empty_iid": 0.0,
+      "empty_cond": 0.0,
+      "parse_only_cond_minus_iid": -0.0401,
+      "parse_only_ci": [
+        -0.062,
+        -0.02
+      ],
+      "parse_only_dropped": 0,
+      "predicted": -0.037,
+      "prediction_hit": true,
+      "void": false,
+      "void_reason": null
+    },
+    "deepseek1p3b": {
+      "model": "deepseek-ai/deepseek-coder-1.3b-base",
+      "n": 56,
+      "achieved_delta_art": -0.0033,
+      "mean_iid": 0.26,
+      "mean_cond": 0.2398,
+      "mean_artifact": 0.2522,
+      "cond_minus_iid": -0.0201,
+      "ci_iid": [
+        -0.0437,
+        0.0008
+      ],
+      "cond_minus_artifact": -0.0124,
+      "ci_art": [
+        -0.0215,
+        -0.0041
+      ],
+      "below_both_nulls": false,
+      "parse_iid": 0.9851,
+      "parse_cond": 0.9955,
+      "parse_gap": 0.0104,
+      "empty_iid": 0.0007,
+      "empty_cond": 0.0,
+      "parse_only_cond_minus_iid": -0.0223,
+      "parse_only_ci": [
+        -0.0454,
+        -0.0006
+      ],
+      "parse_only_dropped": 0,
+      "predicted": 0.011,
+      "prediction_hit": false,
+      "void": false,
+      "void_reason": null
+    },
+    "starcoder2_3b": {
+      "model": "bigcode/starcoder2-3b",
+      "n": 56,
+      "achieved_delta_art": -0.0023,
+      "mean_iid": 0.2549,
+      "mean_cond": 0.2122,
+      "mean_artifact": 0.2443,
+      "cond_minus_iid": -0.0427,
+      "ci_iid": [
+        -0.076,
+        -0.0051
+      ],
+      "cond_minus_artifact": -0.0322,
+      "ci_art": [
+        -0.0607,
+        0.0056
+      ],
+      "below_both_nulls": false,
+      "parse_iid": 0.9167,
+      "parse_cond": 0.9717,
+      "parse_gap": 0.0551,
+      "empty_iid": 0.0112,
+      "empty_cond": 0.0074,
+      "parse_only_cond_minus_iid": -0.0529,
+      "parse_only_ci": [
+        -0.0866,
+        -0.0134
+      ],
+      "parse_only_dropped": 0,
+      "predicted": -0.036,
+      "prediction_hit": true,
+      "void": true,
+      "void_reason": "parse"
+    }
+  },
+  "generation_meta": {
+    "coder1p5b_iid": {
+      "n_meta": 1344,
+      "raw_empty": 0,
+      "stop_reasons": {
+        "```": 1321,
+        "None": 23
+      },
+      "mean_tokens": 119.0
+    },
+    "coder1p5b_cond": {
+      "n_meta": 1344,
+      "raw_empty": 0,
+      "stop_reasons": {
+        "```": 1338,
+        "None": 6
+      },
+      "mean_tokens": 125.4
+    },
+    "general1p5b_iid": {
+      "n_meta": 1344,
+      "raw_empty": 0,
+      "stop_reasons": {
+        "```": 1336,
+        "None": 8
+      },
+      "mean_tokens": 111.8
+    },
+    "general1p5b_cond": {
+      "n_meta": 1344,
+      "raw_empty": 0,
+      "stop_reasons": {
+        "```": 1339,
+        "None": 5
+      },
+      "mean_tokens": 141.3
+    },
+    "deepseek1p3b_iid": {
+      "n_meta": 1344,
+      "raw_empty": 0,
+      "stop_reasons": {
+        "```": 1320,
+        "None": 24
+      },
+      "mean_tokens": 159.4
+    },
+    "deepseek1p3b_cond": {
+      "n_meta": 1344,
+      "raw_empty": 0,
+      "stop_reasons": {
+        "```": 1342,
+        "None": 2
+      },
+      "mean_tokens": 138.0
+    },
+    "starcoder2_3b_iid": {
+      "n_meta": 1344,
+      "raw_empty": 13,
+      "stop_reasons": {
+        "```": 1296,
+        "\nProblem:": 36,
+        "None": 12
+      },
+      "mean_tokens": 138.9
+    },
+    "starcoder2_3b_cond": {
+      "n_meta": 1344,
+      "raw_empty": 0,
+      "stop_reasons": {
+        "```": 1330,
+        "\nProblem:": 11,
+        "None": 3
+      },
+      "mean_tokens": 127.5
+    }
+  },
+  "gates": {
+    "powered": true,
+    "reference_reproduces": true,
+    "live_non_reference_cells": [
+      "general1p5b",
+      "deepseek1p3b"
+    ]
+  },
+  "branch": "E \u2014 PARTIAL: StarCoder2's cell VOID (outside this instrument's domain); DeepSeek adjudicates CLEAN. The family question stays half-open",
+  "stack": {
+    "gpu_name": "NVIDIA L4",
+    "gpu_capability": "8.9",
+    "dtype": "bfloat16",
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8",
+    "vllm": "0.11.0",
+    "gen_template_hash": "808966428bb668ad",
+    "d2c_context_hash": "b9323ddf1a9b253d",
+    "judge_hash": "dbd4f9fa650a6a2f"
+  }
+}
